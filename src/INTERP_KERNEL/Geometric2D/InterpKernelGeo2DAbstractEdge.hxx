@@ -63,6 +63,35 @@ namespace INTERP_KERNEL
     std::list<ElementaryEdge *>::iterator _deep_it;
     std::list<ElementaryEdge *>* _list_handle;
   };
+
+  /**
+   * Reverse iterator on a composed edge. The looping goes from first to last.
+   * nextLoop() moves in the direction first->last, and prevLoop iterates in the direction
+   * last->first.
+   */
+  class ReverseIteratorOnComposedEdge
+  {
+    friend class ComposedEdge;
+    friend class ElementaryEdge;
+    friend class QuadraticPolygon;
+  public:
+    INTERPKERNEL_EXPORT ReverseIteratorOnComposedEdge();
+    INTERPKERNEL_EXPORT ReverseIteratorOnComposedEdge(ComposedEdge *compEdges);
+    INTERPKERNEL_EXPORT bool isValid() const { return _list_handle!=0; }
+    INTERPKERNEL_EXPORT void operator=(const ReverseIteratorOnComposedEdge& other);
+    INTERPKERNEL_EXPORT void first() { _deep_it=_list_handle->rbegin(); }
+    INTERPKERNEL_EXPORT void next() { _deep_it++; }
+    INTERPKERNEL_EXPORT void last();
+    INTERPKERNEL_EXPORT void nextLoop();
+    INTERPKERNEL_EXPORT void previousLoop();
+    INTERPKERNEL_EXPORT bool finished() const { return _deep_it==_list_handle->rend(); }
+    INTERPKERNEL_EXPORT ElementaryEdge *current() { return *_deep_it; }
+  private:
+    std::list<ElementaryEdge *>::reverse_iterator _deep_it;
+    std::list<ElementaryEdge *>* _list_handle;
+  };
+
 }
+
 
 #endif

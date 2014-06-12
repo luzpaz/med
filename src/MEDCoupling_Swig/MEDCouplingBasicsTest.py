@@ -14742,9 +14742,9 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         m2.setConnectivity(conn2, connI2)
 
         # End of construction of input meshes m1bis and m2 -> start of specific part of the test
-        m3, map1, map2, mapI2 = MEDCouplingUMesh.Intersect2DMeshWith1DLine(m1, m2, 1e-10)
+        m3, map1, map2, mapI2 = MEDCouplingUMesh.Intersect2DMeshWith1DLine(m1, m2, 1e-10)        
         m3.mergeNodes(1.0e-8)
-                
+
         self.assertEqual(3,m3.getNumberOfCells())
         self.assertEqual(20,m3.getNumberOfNodes())
         self.assertEqual(2,m3.getSpaceDimension())

@@ -45,6 +45,7 @@ namespace INTERP_KERNEL
   class ComposedEdge
   {
     friend class IteratorOnComposedEdge;
+    friend class ReverseIteratorOnComposedEdge;
   public:
     INTERPKERNEL_EXPORT ComposedEdge() { }
     INTERPKERNEL_EXPORT ComposedEdge(const ComposedEdge& other);

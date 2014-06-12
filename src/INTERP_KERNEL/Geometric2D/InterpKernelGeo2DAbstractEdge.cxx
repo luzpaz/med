@@ -116,3 +116,41 @@ void IteratorOnComposedEdge::insertElemEdges(ComposedEdge *elems, bool changeMyS
     }
 }
 
+
+ReverseIteratorOnComposedEdge::ReverseIteratorOnComposedEdge():_list_handle(0)
+{
+}
+
+ReverseIteratorOnComposedEdge::ReverseIteratorOnComposedEdge(ComposedEdge *compEdges):_list_handle(compEdges->getListBehind())
+{
+  first();
+}
+
+void ReverseIteratorOnComposedEdge::operator=(const ReverseIteratorOnComposedEdge& other)
+{
+  _deep_it = other._deep_it;
+  _list_handle = other._list_handle;
+}
+
+void ReverseIteratorOnComposedEdge::last()
+{
+  _deep_it = _list_handle->rend();
+  _deep_it--;
+}
+
+void ReverseIteratorOnComposedEdge::nextLoop()
+{
+  _deep_it++;
+  if(_deep_it == _list_handle->rend())
+    first();
+}
+
+void ReverseIteratorOnComposedEdge::previousLoop()
+{
+  if(_deep_it != _list_handle->rbegin())
+    _deep_it--;
+  else
+    last();
+}
+
+

@@ -8972,10 +8972,10 @@ void MEDCouplingUMesh::Build2DCellsFrom1DCut(double eps, const MEDCouplingUMesh 
       // Zip consecutive IN segments from the list of candidates, and discard the pieces which are ending nowhere (e.g. an IN polyline
       // with an end-point in the middle of the cell).
       std::vector<std::vector<int> > mapZipTo2;
-      std::list<INTERP_KERNEL::QuadraticPolygon *> zip_list = INTERP_KERNEL::QuadraticPolygon::ZipConsecutiveSegments2(candidates2, pol2s, mapZipTo2);
+      std::list<INTERP_KERNEL::QuadraticPolygon *> zipList = INTERP_KERNEL::QuadraticPolygon::ZipConsecutiveSegments2(candidates2, pol2s, mapZipTo2);
 
       // Now the core of the algo - main output is in cr, crI, cNb1, cNb2 and cNbI2.
-      INTERP_KERNEL::QuadraticPolygon::BuildPartitionFromZipList(pol1, zip_list, edges1, edgesBoundary2, mapp, i, mapZipTo2,
+      INTERP_KERNEL::QuadraticPolygon::BuildPartitionFromZipList(pol1, zipList, edges1, edgesBoundary2, mapp, i, mapZipTo2,
                                                                  offset3,addCoordsQuadratic,cr,crI, cNb1,cNb2, cNbI2);
       // Deals with remaining (non-consumed) edges from m1: these are the edges that were never touched
       // by m2 but that we still want to keep in the final result.
@@ -8994,7 +8994,7 @@ void MEDCouplingUMesh::Build2DCellsFrom1DCut(double eps, const MEDCouplingUMesh 
       // Memory clean-up
       for(std::map<int,INTERP_KERNEL::Node *>::const_iterator it=mappRev.begin();it!=mappRev.end();it++)
         (*it).second->decrRef();
-      for (std::list<INTERP_KERNEL::QuadraticPolygon *>::const_iterator itt = zip_list.begin(); itt != zip_list.end(); itt++)
+      for (std::list<INTERP_KERNEL::QuadraticPolygon *>::const_iterator itt = zipList.begin(); itt != zipList.end(); itt++)
         delete(*itt);
     }
 }

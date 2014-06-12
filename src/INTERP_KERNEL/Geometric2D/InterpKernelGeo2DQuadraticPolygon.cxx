@@ -708,7 +708,7 @@ void QuadraticPolygon::buildPartitionsAbs(QuadraticPolygon& other, std::set<INTE
     }
 }
 
-void QuadraticPolygon::BuildPartitionFromZipList(const QuadraticPolygon & pol1, const std::list<INTERP_KERNEL::QuadraticPolygon *> & zip_list,
+void QuadraticPolygon::BuildPartitionFromZipList(const QuadraticPolygon & pol1, const std::list<INTERP_KERNEL::QuadraticPolygon *> & zipList,
                                                  std::set<INTERP_KERNEL::Edge *> & edgesThis, std::set<INTERP_KERNEL::Edge *> & edgesBoundaryOther,
                                                  const std::map<INTERP_KERNEL::Node *,int>& mapp,
                                                  const int idThis, const std::vector<std::vector<int> > & mapZipTo2,
@@ -717,8 +717,8 @@ void QuadraticPolygon::BuildPartitionFromZipList(const QuadraticPolygon & pol1, 
                                                  std::vector<int>& nbThis, std::vector<int>& nbOther, std::vector<int>& nbOtherI)
 {
   std::vector<QuadraticPolygon *> res;
-  if(!zip_list.empty())
-    ClosePolygonsSimple(pol1, zip_list, res, mapZipTo2, nbOther,nbOtherI);
+  if(!zipList.empty())
+    ClosePolygonsSimple(pol1, zipList, res, mapZipTo2, nbOther,nbOtherI);
 
   for(std::vector<QuadraticPolygon *>::iterator it=res.begin();it!=res.end();it++)
     {
@@ -1206,23 +1206,23 @@ void QuadraticPolygon::ClosePolygons(std::list<QuadraticPolygon *>& pol2Zip, con
     }
 }
 
-void QuadraticPolygon::ClosePolygonsSimple(const QuadraticPolygon& pol1, const std::list<QuadraticPolygon *> & zip_list,
+void QuadraticPolygon::ClosePolygonsSimple(const QuadraticPolygon& pol1, const std::list<QuadraticPolygon *> & zipList,
                                      std::vector<QuadraticPolygon *>& results,const std::vector<std::vector<int> > & mapZipTo2,
                                      std::vector<int>& nbOther, std::vector<int>& nbOtherI)
 {
   // Register all edges of pol1 as 'alive' to start with. They will be consumed as they are
-  // added to the newly formed cells. Edges of pol2s (in zip_list) might be used more than once.
-  std::set<ElementaryEdge *> edges1_alive;
+  // added to the newly formed cells. Edges of pol2s (in zipList) might be used more than once.
+  std::set<ElementaryEdge *> edges1Alive;
   IteratorOnComposedEdge it(const_cast<QuadraticPolygon *>(&pol1));
   for(; !it.finished(); it.next())
-    edges1_alive.insert(it.current());
+    edges1Alive.insert(it.current());
 
-  int inf_loop_detect, i;
+  int infLoopDetect, i;
   std::list<QuadraticPolygon *>::const_iterator itt;
-  for (inf_loop_detect = pol1.recursiveSize() + 1, itt = zip_list.begin(); itt != zip_list.end(); itt++)
-    inf_loop_detect += 2*(*itt)->recursiveSize();
+  for (infLoopDetect = pol1.recursiveSize() + 1, itt = zipList.begin(); itt != zipList.end(); itt++)
+    infLoopDetect += 2*(*itt)->recursiveSize();
 
-  for (i = 0, it.first(); !edges1_alive.empty() && i <= inf_loop_detect;)
+  for (i = 0, it.first(); !edges1Alive.empty() && i <= infLoopDetect;)
     {
       QuadraticPolygon * qp = new QuadraticPolygon();
       results.push_back(qp);
@@ -1230,23 +1230,23 @@ void QuadraticPolygon::ClosePolygonsSimple(const QuadraticPolygon& pol1, const s
       int nbElemFrom2 = 0;
       // Start anywhere valid (=alive) on pol1
       ElementaryEdge * startE;
-      for (startE = it.current(); edges1_alive.find(it.current()) == edges1_alive.end(); it.nextLoop(), startE = it.current());
+      for (startE = it.current(); edges1Alive.find(it.current()) == edges1Alive.end(); it.nextLoop(), startE = it.current());
 
       // Close the new cell:
       do
         {
-          ElementaryEdge *tmp_e = it.current();
-          qp->pushBack(tmp_e->clone());
-          edges1_alive.erase(tmp_e);
-          Node * nodeToTest = tmp_e->getEndNode();
+          ElementaryEdge *tmpEd = it.current();
+          qp->pushBack(tmpEd->clone());
+          edges1Alive.erase(tmpEd);
+          Node * nodeToTest = tmpEd->getEndNode();
           it.nextLoop(); i++;
           // Try to match the end node of the latest added edge from pol1 with one of the node from
-          // one of the ComposedEdge in zip_list
+          // one of the ComposedEdge in zipList
           std::list<QuadraticPolygon *>::const_iterator ret;
           bool direction;
           int idx; // for mapping
-          ret = CheckInList2(nodeToTest, zip_list, direction, idx);
-          if (ret == zip_list.end())
+          ret = CheckInList2(nodeToTest, zipList, direction, idx);
+          if (ret == zipList.end())
             continue;
           size_t oldSz = nbOther.size();
           size_t addSz = std::distance(mapZipTo2[idx].begin(), mapZipTo2[idx].end());
@@ -1255,33 +1255,33 @@ void QuadraticPolygon::ClosePolygonsSimple(const QuadraticPolygon& pol1, const s
           nbElemFrom2 += addSz;
           if (!direction)
             (*ret)->reverse();  // TODO: discuss with Anthony - API of IteratorOnComposedEdge should allow an easy reverse looping?
-          // Switch to zip_list
-          IteratorOnComposedEdge it_pol2(*ret);
-          ElementaryEdge *tmp_e2;
-          for(/* it_pol2.first() */; !it_pol2.finished(); it_pol2.next(), i++)
+          // Switch to zipList
+          IteratorOnComposedEdge itPol2(*ret);
+          ElementaryEdge *tmpEd2;
+          for(/* itPol2.first() */; !itPol2.finished(); itPol2.next(), i++)
             {
-              tmp_e2 = it_pol2.current();
-              qp->pushBack(tmp_e2->clone());
+              tmpEd2 = itPol2.current();
+              qp->pushBack(tmpEd2->clone());
             }
           // search where we landed on pol1 to resume looping on it.
-          if (!edges1_alive.empty())
+          if (!edges1Alive.empty())
             {
               int j;
-              for(j = 0; it.current()->getStartNode() != tmp_e2->getEndNode() && j < inf_loop_detect; j++) // better way of doing this?
+              for(j = 0; it.current()->getStartNode() != tmpEd2->getEndNode() && j < infLoopDetect; j++) // better way of doing this?
                 it.nextLoop();
-              if (j >= inf_loop_detect) // could be a bit more precise and stop before ...
+              if (j >= infLoopDetect) // could be a bit more precise and stop before ...
                 throw Exception("QuadraticPolygon::ClosePolygonsSimple() - Internal error - 1D intersection was looping infinitely!");
               // sanity check - if we are not done with the cell completion, we should land
               // on a live edge.
-              if(edges1_alive.find(it.current()) == edges1_alive.end() && it.current() != startE)
+              if(edges1Alive.find(it.current()) == edges1Alive.end() && it.current() != startE)
                 throw Exception("QuadraticPolygon::ClosePolygonsSimple() - Internal error ! Should never happen.");
             }
         }
-      while(it.current() != startE && !edges1_alive.empty() && i < inf_loop_detect);
+      while(it.current() != startE && !edges1Alive.empty() && i < infLoopDetect);
       // Complete mapping
       nbOtherI.push_back(nbElemFrom2+nbOtherI.back());
     }
-  if (i >= inf_loop_detect)
+  if (i >= infLoopDetect)
     throw Exception("QuadraticPolygon::ClosePolygonsSimple() - Internal error - 1D intersection was looping infinitely!");
 }
 
@@ -1384,12 +1384,12 @@ std::list<QuadraticPolygon *>::iterator QuadraticPolygon::CheckInList(Node *n, s
   return iEnd;
 }
 
-std::list<QuadraticPolygon *>::const_iterator QuadraticPolygon::CheckInList2(Node *n, const std::list<QuadraticPolygon *> & zip_list,
+std::list<QuadraticPolygon *>::const_iterator QuadraticPolygon::CheckInList2(Node *n, const std::list<QuadraticPolygon *> & zipList,
                                                                              bool & direction, int & index)
 {
   direction = true;
   index = 0;
-  for(std::list<QuadraticPolygon *>::const_iterator iter = zip_list.begin(); iter!=zip_list.end(); iter++, index++)
+  for(std::list<QuadraticPolygon *>::const_iterator iter = zipList.begin(); iter!=zipList.end(); iter++, index++)
     {
       if ((*iter)->front()->getStartNode() == n)
         return iter;
@@ -1402,7 +1402,7 @@ std::list<QuadraticPolygon *>::const_iterator QuadraticPolygon::CheckInList2(Nod
             }
         }
     }
-  return zip_list.end();
+  return zipList.end();
 }
 
 
