@@ -41,7 +41,7 @@ std::size_t MEDCalculatorDBSliceField::getHeapMemorySizeWithoutChildren() const
   return 0;
 }
 
-std::vector<const BigMemoryObject *> MEDCalculatorDBSliceField::getDirectChildren() const
+std::vector<const BigMemoryObject *> MEDCalculatorDBSliceField::getDirectChildrenWithNull() const
 {
   return std::vector<const BigMemoryObject *>();
 }

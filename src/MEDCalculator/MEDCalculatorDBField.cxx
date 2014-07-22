@@ -51,7 +51,7 @@ std::size_t MEDCalculatorDBField::getHeapMemorySizeWithoutChildren() const
   return 0;
 }
 
-std::vector<const BigMemoryObject *> MEDCalculatorDBField::getDirectChildren() const
+std::vector<const BigMemoryObject *> MEDCalculatorDBField::getDirectChildrenWithNull() const
 {
   return std::vector<const BigMemoryObject *>();
 }

@@ -41,7 +41,7 @@ namespace ParaMEDMEM
     MEDCalculatorDBSliceField(int iter, int order);
     MEDCalculatorDBSliceField(MEDCouplingFieldDouble *f);
     std::size_t getHeapMemorySizeWithoutChildren() const;
-    std::vector<const BigMemoryObject *> getDirectChildren() const;
+    std::vector<const BigMemoryObject *> getDirectChildrenWithNull() const;
     bool isFetched() const { return _field!=0; }
     void getDtIt(int& it, int& order) const { it=_iteration;  order=_order; }
     void setField(MEDCouplingFieldDouble *f) const;

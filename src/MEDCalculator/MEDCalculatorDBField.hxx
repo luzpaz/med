@@ -46,7 +46,7 @@ namespace ParaMEDMEM
     static MEDCalculatorDBFieldReal *New(const MEDCalculatorBrowserField& ls);
     static MEDCalculatorDBFieldCst *New(double val);
     std::size_t getHeapMemorySizeWithoutChildren() const;
-    std::vector<const BigMemoryObject *> getDirectChildren() const;
+    std::vector<const BigMemoryObject *> getDirectChildrenWithNull() const;
     virtual MEDCalculatorDBField *operator+(const MEDCalculatorDBField& other) const throw(INTERP_KERNEL::Exception) = 0;
     MEDCalculatorDBField *operator+(double val) const throw(INTERP_KERNEL::Exception);
     virtual MEDCalculatorDBField *operator-(const MEDCalculatorDBField& other) const throw(INTERP_KERNEL::Exception) = 0;
