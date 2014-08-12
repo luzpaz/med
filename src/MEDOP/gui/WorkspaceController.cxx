@@ -42,6 +42,7 @@ WorkspaceController::WorkspaceController(StandardApp_Module * salomeModule)
   : TreeGuiManager(salomeModule->getApp(), "Workspace")
 {
   _salomeModule = salomeModule;
+  getDockWidgets()->getDockWidget()->setObjectName("medWorkspaceDock");
 
   this->tabifyDockWidgets(false);
 
