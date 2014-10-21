@@ -44,10 +44,14 @@ DatasourceController::DatasourceController(StandardApp_Module * salomeModule) {
   STDLOG("Creating a DatasourceController");
   _salomeModule = salomeModule;
   _studyEditor = new SALOME_AppStudyEditor(_salomeModule->getApp());
-  _dlgChangeUnderlyingMesh = new DlgChangeUnderlyingMesh(_studyEditor);
 
+  _dlgChangeUnderlyingMesh = new DlgChangeUnderlyingMesh(_studyEditor);
   connect(_dlgChangeUnderlyingMesh,SIGNAL(inputValidated()),
           this, SLOT(OnChangeUnderlyingMeshInputValidated()));
+
+  _dlgInterpolateField = new DlgInterpolateField(_studyEditor);
+  connect(_dlgInterpolateField,SIGNAL(inputValidated()),
+          this, SLOT(OnInterpolateFieldInputValidated()));
 
 }
 
@@ -104,6 +108,11 @@ void DatasourceController::createActions() {
   label = tr("LAB_CHANGE_MESH");
   icon  = tr("ICO_DATASOURCE_CHANGE_MESH");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnChangeUnderlyingMesh()),icon);
+  _salomeModule->addActionInPopupMenu(actionId);
+
+  label = tr("LAB_INTERPOLATE_FIELD");
+  icon  = tr("ICO_DATASOURCE_INTERPOLATE_FIELD");
+  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnInterpolateField()),icon);
   _salomeModule->addActionInPopupMenu(actionId);
 
 }
@@ -348,6 +357,13 @@ void DatasourceController::OnUseInWorkspace() {
     MEDOP::FieldHandler * fieldHandler =
       MEDOPFactoryClient::getDataManager()->getFieldHandler(fieldId);
 
+    if (! fieldHandler) {
+      QMessageBox::warning(_salomeModule->getApp()->desktop(),
+         tr("Operation not allowed"),
+         tr("No field is defined"));
+      return;
+    }
+
     QString alias(fieldHandler->fieldname);
     DlgAlias dialog;
     dialog.setAlias(alias);
@@ -406,7 +422,6 @@ void DatasourceController::OnUseInWorkspace() {
   }
 }
 
-
 void DatasourceController::OnChangeUnderlyingMesh() {
   // We need a studyEditor updated on the active study
   _studyEditor->updateActiveStudy();
@@ -456,6 +471,79 @@ void DatasourceController::OnChangeUnderlyingMeshInputValidated() {
 
   // Tag the item to prevent double import
   //_studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
+}
 
+void DatasourceController::OnInterpolateField() {
+  // We need a studyEditor updated on the active study
+  _studyEditor->updateActiveStudy();
 
+  // Get the selected objects in the study (SObject). In case of a
+  // multiple selection, we consider only the first item. At least one
+  // item must be selected.
+  SALOME_StudyEditor::SObjectList * listOfSObject = _studyEditor->getSelectedObjects();
+  if ( listOfSObject->size() > 0 ) {
+    SALOMEDS::SObject_var soField = listOfSObject->at(0);
+    int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
+    // _GBO_ : the dialog should not be modal, so that we can choose a
+    // mesh in the browser. Then we have to emit a signal from the
+    // dialog.accept, connected to a slot of the DatasourceControler
+    _dlgInterpolateField->setFieldId(fieldId);
+    Qt::WindowFlags flags = _dlgInterpolateField->windowFlags();
+    _dlgInterpolateField->setWindowFlags(flags | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
+    _dlgInterpolateField->open();
+  }
+}
+
+void DatasourceController::OnInterpolateFieldInputValidated() {
+  MEDOP::InterpolationParameters params;
+  params.precision = _dlgInterpolateField->getPrecision();
+  STDLOG("precision = " << params.precision);
+  params.defaultValue = _dlgInterpolateField->getDefaultValue();
+  STDLOG("defaultValue = " << params.defaultValue);
+  params.reverse = _dlgInterpolateField->getReverse();
+  STDLOG("reverse = " << params.reverse);
+  params.intersectionType = _dlgInterpolateField->getIntersectionType().c_str();
+  STDLOG("intersectionType = " << params.intersectionType);
+  params.method = _dlgInterpolateField->getMethod().c_str();
+  STDLOG("method = " << params.method);
+  params.nature = _dlgInterpolateField->getFieldNature().c_str();
+  STDLOG("nature = " << params.nature);
+
+  int meshId = _dlgInterpolateField->getMeshId();
+  STDLOG("meshId = " << ToString(meshId));
+  int fieldId = _dlgInterpolateField->getFieldId();
+  MEDOP::FieldHandler* fieldHandler = MEDOPFactoryClient::getDataManager()->getFieldHandler(fieldId);
+
+  // We don't modify the original field but create first a duplicate
+  // MEDOP::FieldHandler* duplicate = MEDOPFactoryClient::getCalculator()->dup(*fieldHandler);
+  //MEDOPFactoryClient::getDataManager()->changeUnderlyingMesh(duplicate->id, meshId);
+  MEDOP::FieldHandler* result = NULL;
+  try {
+    result = MEDOPFactoryClient::getDataManager()->interpolateField(fieldId, meshId, params);
+  }
+  catch(...) {
+    STDLOG("Unable to process field interpolation; please check interpolation parameters");
+    QMessageBox::critical(_salomeModule->getApp()->desktop(),
+                          tr("Operation failed"),
+                          tr("Unable to process field interpolation; please check interpolation parameters"));
+    return;
+  }
+
+  // Request once more the duplicate to update the meta-data on this
+  // client side
+  // duplicate = MEDOPFactoryClient::getDataManager()->getFieldHandler(duplicate->id);
+
+  // >>>
+  // WARN: the following is a temporary code for test purpose
+  // Automatically add in ws
+  DatasourceEvent * event = new DatasourceEvent();
+  event->eventtype = DatasourceEvent::EVENT_IMPORT_OBJECT;
+  XmedDataObject * dataObject = new XmedDataObject();
+  dataObject->setFieldHandler(*result);
+  event->objectdata = dataObject;
+  emit datasourceSignal(event);
+  // Note that this signal is processed by the WorkspaceController
+
+  // // Tag the item to prevent double import
+  // //_studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
 }

@@ -50,7 +50,7 @@ module MEDOP
    * point that aggregate a list of fields that relie on the same mesh
    * with the same type (the fields in a timeseries differ by their
    * time step).
-   * 
+   *
    * Then you could have a field with no fieldseries associated but
    * directly associated to a mesh. That is typically the case of
    * fields created by MED operations: if you operate tow fields
@@ -101,9 +101,18 @@ module MEDOP
   typedef sequence<FieldHandler> FieldHandlerList;
   typedef sequence<long> FieldIdList;
 
+  struct InterpolationParameters {
+    double precision;
+    double defaultValue;
+    boolean reverse;
+    string method;
+    string nature;
+    string intersectionType;
+  };
+
   interface MEDDataManager: SALOME::GenericObj
   {
-    
+
     //==========================================================
     // Datasource management
     //==========================================================
@@ -112,7 +121,7 @@ module MEDOP
     //==========================================================
     // Mesh data management
     //==========================================================
-    
+
     MeshHandler     getMesh(in long meshId) raises (SALOME::SALOME_Exception);
     MeshHandlerList getMeshList(in long datasourceId);
 
@@ -136,16 +145,19 @@ module MEDOP
 
 
     void updateFieldMetadata(in long   fieldHandlerId,
-			     in string fieldname,
-			     in long   iteration,
-			     in long   order,
-			     in string source);
+                             in string fieldname,
+                             in long   iteration,
+                             in long   order,
+                             in string source);
 
     //void saveFields(in FieldHandlerList fieldHandlerList, in string filepath);
 
     void changeUnderlyingMesh(in long fieldHandlerId, in long meshHandlerId)
       raises (SALOME::SALOME_Exception);
-    
+
+    FieldHandler interpolateField(in long fieldHandlerId, in long meshHandlerId, in InterpolationParameters params)
+      raises (SALOME::SALOME_Exception);
+
     //==========================================================
     // General purpose data management
     //==========================================================

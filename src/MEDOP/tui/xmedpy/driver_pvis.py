@@ -17,7 +17,7 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-# Author : Guillaume Boulant (EDF) 
+# Author : Guillaume Boulant (EDF)
 
 import MEDCoupling
 __mapTypeOfField2ParavisLabel={
@@ -39,7 +39,7 @@ def pvis_typeOfFieldLabel(typeOfField):
     try:
         return __mapTypeOfField2ParavisLabel[typeOfField]
     except IndexError, e:
-        return "UNCKNOWN"
+        return "UNKNOWN"
 
 def pvis_scalarmap(filename,meshname,fieldname,typeOfField,iteration=-1):
     """
@@ -47,22 +47,44 @@ def pvis_scalarmap(filename,meshname,fieldname,typeOfField,iteration=-1):
     load from a med file using the PARAVIS module.
     """
     import pvsimple
-    
+
     reader = pvsimple.MEDReader( FileName=filename )
-    # For fiels defined on cells, it seems to be required to specify
-    # the type of fields
+
+    representation = pvsimple.Show()
     if typeOfField == MEDCoupling.ON_CELLS:
-        reader.Groups = ["GROUP/%s/%s/No_Group"%(meshname,pvis_typeOfFieldLabel(typeOfField))]
+        representation.ColorArrayName = ("CELLS", fieldname)
+        data = reader.CellData
+    else:
+        representation.ColorArrayName = ("POINTS", fieldname)
+        data = reader.PointData
 
-    representation = pvsimple.GetDisplayProperties(reader)
-    representation.ColorArrayName = fieldname
+    # :TODO: Determine nb components
+    nb_cmp = 1
+    mode = "Magnitude" # "Component" if nb_cmp > 1
 
-    lookupTable = pvsimple.GetLookupTableForArray(
-        fieldname, 1, NanColor=[0.25, 0.0, 0.0],
-        RGBPoints=[25.0, 0.23, 0.30, 0.754, 245.0, 0.71, 0.016, 0.15],
-        VectorMode='Magnitude', ColorSpace='Diverging', ScalarRangeInitialized=1.0 )
-    representation.LookupTable = lookupTable
+    # Get data range (mini/maxi)
+    for n in range(data.GetNumberOfArrays()):
+        if data.GetArray(n).GetName() == fieldname:
+            mini,maxi = data.GetArray(n).GetRange()
 
+    stepvalue = (maxi-mini)/100. # 100 steps
+
+    # Build Lookup table
+    RGBPoints = [mini, 0.0, 0.0, 1.0, maxi, 1.0, 0.0, 0.0]
+    nb = int((maxi-mini)/stepvalue)-1
+    Table = pvsimple.GetLookupTableForArray("", nb_cmp, VectorMode=mode, ColorSpace='HSV')
+    Table.Discretize = 1
+    Table.NumberOfTableValues = nb
+    Table.RGBPoints = RGBPoints
+
+    representation.Representation = 'Surface'
+    representation.LookupTable = Table
+
+    # Build scalar bar
+    scalarbar = pvsimple.CreateScalarBar(LabelFormat = '%.1f',Title= "",LabelFontSize=12,Enabled=1,LookupTable=Table,TitleFontSize=12,LabelColor=[0.0, 0.0, 0.0],TitleColor=[0.0, 0.0, 0.0],)
+    pvsimple.SetActiveSource(reader)
+    pvsimple.GetRenderView().Representations.append(scalarbar)
+    pvsimple.SetActiveSource(reader)
     pvsimple.Render()
 
     return True
@@ -78,7 +100,7 @@ def TEST_scalarmap():
                    properties.testFieldName,
                    properties.testTypeOfField,
                    properties.testFieldIt)
-    
+
 if __name__ == "__main__":
     TEST_scalarmap()
 

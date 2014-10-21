@@ -17,7 +17,7 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-# Author : Guillaume Boulant (EDF) 
+# Author : Guillaume Boulant (EDF)
 
 #
 # ===================================================================
@@ -29,7 +29,7 @@
 
 import xmed
 from xmed.fieldproxy import FieldProxy, newFieldProxy
-    
+
 # ===================================================================
 # Operations on fields
 
@@ -87,7 +87,7 @@ def status(local=True,remote=False):
 
         if len(fieldHandlerList) > 0:
             status+="(use 'f=get(id)' to get a field in the current context)"
-    
+
     return status
 
 # For simpler typing, one can create a python command for status
@@ -104,7 +104,7 @@ class ListFields(object):
         # remote metadata on the engine (MEDCouplingFieldDouble) are
         # displayed by the stat command. Otherwise, only the local
         # metadata are displayed.
-        
+
     def __repr__(self):
         return status(self.__local, self.__remote)
 
@@ -121,13 +121,13 @@ def load(medFileName=filepath):
     """
     This function indicates that we want to use the fields from the
     specified med file. The fields meta-data are loaded in the engine
-    part of the module. To get a fieldproxy on a field, call the get 
+    part of the module. To get a fieldproxy on a field, call the get
     function with the id of the required field. To display the whole
     list of fields loaded in the engine, type 'ls' (la verbose).
     """
     xmed.dataManager.addDatasource(filepath)
     print status(local=False,remote=True)
-    
+
 def get(fieldHandlerId):
     """
     This return a field proxy on the field identified by the specified
@@ -163,22 +163,31 @@ VIEWER_VISU    = "VISU"
 VIEWER_PARAVIS = "PARAVIS"
 VIEWER_DEFAULT = VIEWER_PARAVIS
 
-VIEWER_TMP_FILE = "/tmp/medop_viewer.med"
+import tempfile
 
 def view_using_paravis(aFieldProxy):
+    temp = tempfile.NamedTemporaryFile(prefix="medop_viewer", suffix='.med', delete=False)
+
     # __GBO__ TO BE IMPROVED: we used a tmp file in this first step of
     # development, but we should used at last a MEDCoupling corba
     # object (see how to use the stuff in PARAVIS/src/Plugins)
-    xmed.dataManager.saveFields(VIEWER_TMP_FILE, [aFieldProxy.id])
-    
+    xmed.dataManager.saveFields(temp.name, [aFieldProxy.id])
+
     from xmed.driver_pvis import pvis_scalarmap
-    pvis_scalarmap(VIEWER_TMP_FILE,
+    pvis_scalarmap(temp.name,
                    aFieldProxy.meshname,
                    aFieldProxy.fieldname,
                    aFieldProxy.type,
                    aFieldProxy.iteration)
+    temp.close()
+#
 
 def view_using_visu(aFieldProxy):
+    # No more used
+    raise Exception("view_using_visu: No more used")
+
+    VIEWER_TMP_FILE = "/tmp/medop_viewer.med"
+
     # __GBO__ TO BE IMPROVED: we used a tmp file in this first step of
     # development, but we should used at last a MEDCoupling corba
     # object (see how to use the stuff in PARAVIS/src/Plugins)
@@ -200,7 +209,7 @@ def view_using_visu(aFieldProxy):
                             iteration)
     if result is False:
         xmed.err("the field can't be displayed")
-    
+
 def view(aFieldProxy, using=VIEWER_DEFAULT):
     """
     This displays a 3D view of the field using VISU or PARAVIS,
@@ -213,4 +222,4 @@ def view(aFieldProxy, using=VIEWER_DEFAULT):
         view_using_paravis(aFieldProxy)
     else:
         view_using_visu(aFieldProxy)
-    
+

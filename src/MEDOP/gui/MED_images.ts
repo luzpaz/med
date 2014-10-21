@@ -20,6 +20,10 @@
       <translation>datasource_changeUnderlyingMesh.png</translation>
     </message>
     <message>
+      <source>ICO_DATASOURCE_INTERPOLATE_FIELD</source>
+      <translation>datasource_interpolateField.png</translation>
+    </message>
+    <message>
       <source>ICO_DATASOURCE_EXPAND_FIELD</source>
       <translation>datasource_expandfield.png</translation>
     </message>

@@ -79,7 +79,7 @@ std::string MEDDataManager_i::source_to_file(const char * source)
  */
 MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath) {
 
-  // We first check that this datasource is not already registered  
+  // We first check that this datasource is not already registered
   long sourceid = getDatasourceId(filepath);
   if ( sourceid != LONG_UNDEFINED ) {
     // The file is already registered under the identifier sourceid
@@ -121,7 +121,7 @@ MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath)
     for (int iField = 0; iField < nbOfFields; iField++) {
       const char * fieldName = fieldNames[iField].c_str();
       LOG("-- name of field " << iField << " = " << fieldName);
-      
+
       // A field name could identify several MEDCoupling fields, that
       // differ by their spatial discretization on the mesh (values on
       // cells, values on nodes, ...). This spatial discretization is
@@ -186,13 +186,13 @@ MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath)
       }
     }
   }
-  
+
   return new MEDOP::DatasourceHandler(*datasourceHandler);
 }
 
 long MEDDataManager_i::getDatasourceId(const char *filepath) {
   std::string uri(file_to_source(filepath));
-  DatasourceHandlerMapIterator it = _datasourceHandlerMap.begin();  
+  DatasourceHandlerMapIterator it = _datasourceHandlerMap.begin();
   while ( it != _datasourceHandlerMap.end() ) {
     if ( strcmp(it->second->uri,uri.c_str()) == 0 ) {
       return it->first;
@@ -268,7 +268,7 @@ MEDOP::FieldseriesHandlerList * MEDDataManager_i::getFieldseriesListOnMesh(CORBA
 
 /*!
  * A fieldseries is a timeseries of fields. Then the list of fields is
- * the different time iterations defined for the specified field id.  
+ * the different time iterations defined for the specified field id.
  */
 MEDOP::FieldHandlerList * MEDDataManager_i::getFieldListInFieldseries(CORBA::Long fieldseriesId) {
 
@@ -359,32 +359,32 @@ void MEDDataManager_i::saveFields(const char * filepath,
   if ( fieldIdList.length() == 0 ) {
     throw KERNEL::createSalomeException("No fields to save");
   }
-  
+
   // Consider the first field to initiate the med file
   CORBA::Long fieldHandlerId = fieldIdList[0];
   MEDOP::FieldHandler * fieldHandler = getFieldHandler(fieldHandlerId);
-  MEDCouplingFieldDouble* fieldDouble = getFieldDouble(fieldHandler);  
+  MEDCouplingFieldDouble* fieldDouble = getFieldDouble(fieldHandler);
 
   try {
     bool writeFromScratch = true;
     MEDLoader::WriteField(filepath, fieldDouble, writeFromScratch);
-    
+
     writeFromScratch = false;
     for(CORBA::ULong i=1; i<fieldIdList.length(); i++) {
       fieldHandlerId = fieldIdList[i];
       fieldHandler = getFieldHandler(fieldHandlerId);
-      fieldDouble = getFieldDouble(fieldHandler);  
+      fieldDouble = getFieldDouble(fieldHandler);
       MEDLoader::WriteField(filepath, fieldDouble, writeFromScratch);
     }
   }
   catch (INTERP_KERNEL::Exception &ex) {
-    std::string message = 
+    std::string message =
       std::string("Error when saving file ") +
       std::string(filepath) + std::string(" : ") + ex.what();
     throw KERNEL::createSalomeException(message.c_str());
   }
   catch (const std::exception& ex) {
-    std::string message = 
+    std::string message =
       std::string("Error when saving file ") +
       std::string(filepath) + std::string(" : ") + ex.what();
     throw KERNEL::createSalomeException(message.c_str());
@@ -414,21 +414,21 @@ void MEDDataManager_i::savePersistentFields(const char * filepath) {
       listId.push_back(mapIt->first);
     }
   }
-  
+
   MEDOP::FieldIdList fieldIdList;
   fieldIdList.length(listId.size());
   for (int i=0; i<listId.size(); i++) {
     fieldIdList[i] = CORBA::Long(listId[i]);
   }
-  
+
   try {
     this->saveFields(filepath, fieldIdList);
-  } 
+  }
   catch (const SALOME::SALOME_Exception & ex) {
     throw ex;
   }
   catch (const std::exception& ex) {
-    std::string message = 
+    std::string message =
       std::string("Error when saving file ") +
       std::string(filepath) + std::string(" : ") + ex.what();
     throw KERNEL::createSalomeException(message.c_str());
@@ -501,16 +501,16 @@ MEDCouplingUMesh * MEDDataManager_i::getUMesh(long meshHandlerId) {
     myMesh = _meshMap[meshHandlerId];
   } else {
     // The mesh is not loaded yet ==> load it and register it in the map
-    LOG("getUMesh: the mesh must be loaded. meshid="<<meshHandlerId);    
+    LOG("getUMesh: the mesh must be loaded. meshid="<<meshHandlerId);
     if ( _meshHandlerMap[meshHandlerId] == NULL ) {
-      std::string message = 
+      std::string message =
   std::string("No mesh for id=") + ToString(meshHandlerId);
       LOG("getUMesh: "<<message);
       throw KERNEL::createSalomeException(message.c_str());
     }
 
     long sourceid = _meshHandlerMap[meshHandlerId]->sourceid;
-    std::string filepath(source_to_file((_datasourceHandlerMap[sourceid])->uri));  
+    std::string filepath(source_to_file((_datasourceHandlerMap[sourceid])->uri));
     const char * meshName = _meshHandlerMap[meshHandlerId]->name;
     int meshDimRelToMax = 0;
     myMesh = MEDLoader::ReadUMeshFromFile(filepath,meshName,meshDimRelToMax);
@@ -525,7 +525,7 @@ MEDCouplingUMesh * MEDDataManager_i::getUMesh(long meshHandlerId) {
  */
 long MEDDataManager_i::getUMeshId(const MEDCouplingMesh * mesh) {
   bool found = false;
-  MeshMapIterator it = _meshMap.begin();  
+  MeshMapIterator it = _meshMap.begin();
   while ( it != _meshMap.end() ) {
     found = (it->second == mesh);
     if (found) {
@@ -625,7 +625,7 @@ MEDOP::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fieldD
   // variables are updated by this function call. This is the mean to
   // retrieve the iteration and order of the field.
   double timestamp = fieldDouble->getTime(iteration, order);
-  
+
   // For the fields that are created in memory (by operations for
   // example), the convention for the source attribute is to specify
   // the fielddouble name, because this name describes the operation
@@ -659,13 +659,13 @@ MEDOP::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fieldD
   else {
     fieldHandler->meshid = meshHandlerId;
   }
-  
+
   _fieldHandlerMap[fieldHandler->id] = fieldHandler;
   _fieldDoubleMap[fieldHandler->id] = fieldDouble;
   // >>> WARNING: CORBA structure assignement specification ==> return
   // >>> a deep copy to avoid the destruction of the fieldHandler
   // >>> registered in the map (assignement acts as a destructor for
-  // >>> CORBA struct).   
+  // >>> CORBA struct).
   return new MEDOP::FieldHandler(*fieldHandler);
 }
 
@@ -700,7 +700,7 @@ void MEDDataManager_i::updateFieldMetadata(CORBA::Long  fieldHandlerId,
  * new mesh is not identical to the old one.
  */
 void MEDDataManager_i::changeUnderlyingMesh(CORBA::Long fieldHandlerId, CORBA::Long meshHandlerId) {
-  
+
   MEDOP::FieldHandler * fieldHandler = getFieldHandler(fieldHandlerId);
   MEDCouplingFieldDouble* fieldDouble = getFieldDouble(fieldHandler);
   MEDCouplingMesh * newMesh = getUMesh(meshHandlerId);
@@ -724,6 +724,92 @@ void MEDDataManager_i::changeUnderlyingMesh(CORBA::Long fieldHandlerId, CORBA::L
   // synchronized
 }
 
+INTERP_KERNEL::IntersectionType MEDDataManager_i::_getIntersectionType(const char* intersType) {
+  std::string type(intersType);
+  if (type == "Triangulation") {
+    return INTERP_KERNEL::Triangulation;
+  }
+  else if (type == "Convex") {
+    return INTERP_KERNEL::Convex;
+  }
+  else if (type == "Geometric2D") {
+    return INTERP_KERNEL::Geometric2D;
+  }
+  else if (type == "PointLocator") {
+    return INTERP_KERNEL::PointLocator;
+  }
+  else if (type == "Barycentric") {
+    return INTERP_KERNEL::Barycentric;
+  }
+  else if (type == "BarycentricGeo2D") {
+    return INTERP_KERNEL::BarycentricGeo2D;
+  }
+
+  std::string message("Error when trying to interpolate field: ");
+  message.append("Unrecognized intersection type: ");
+  message.append(type);
+  throw KERNEL::createSalomeException(message.c_str());
+}
+
+ParaMEDMEM::NatureOfField MEDDataManager_i::_getNatureOfField(const char* fieldNature) {
+  std::string nature(fieldNature);
+  if (nature == "NoNature") {
+    return NoNature;
+  }
+  else if (nature == "ConservativeVolumic") {
+    return ConservativeVolumic;
+  }
+  else if (nature == "Integral") {
+    return Integral;
+  }
+  else if (nature == "IntegralGlobConstraint") {
+    return IntegralGlobConstraint;
+  }
+  else if (nature == "RevIntegral") {
+    return RevIntegral;
+  }
+
+  std::string message("Error when trying to interpolate field: ");
+  message.append("Unrecognized field nature: ");
+  message.append(nature);
+  throw KERNEL::createSalomeException(message.c_str());
+}
+
+MEDOP::FieldHandler* MEDDataManager_i::interpolateField(CORBA::Long fieldHandlerId, CORBA::Long meshHandlerId, const MEDOP::InterpolationParameters& params) {
+  MEDOP::FieldHandler* fieldHandler = getFieldHandler(fieldHandlerId);
+  MEDCouplingFieldDouble* sourceField = getFieldDouble(fieldHandler);
+  MEDCouplingMesh* sourceMesh = getUMesh(fieldHandler->meshid);
+  MEDCouplingMesh* targetMesh = getUMesh(meshHandlerId);
+
+  double precision = params.precision;
+  INTERP_KERNEL::IntersectionType interpType = this->_getIntersectionType(params.intersectionType);
+  std::string method(params.method);
+  double defaultValue = params.defaultValue;
+  bool reverse = params.reverse;
+  ParaMEDMEM::NatureOfField nature = this->_getNatureOfField(params.nature);
+
+  // 1. Build remapper between sourceMesh and targetMesh (compute interpolation matrix)
+  MEDCouplingRemapper remapper;
+  remapper.setPrecision(precision);
+  remapper.setIntersectionType(interpType);
+  remapper.prepare(sourceMesh, targetMesh, method.c_str());
+
+  // 2. Apply interpolation to the field
+  sourceField->setNature(nature);
+  MEDCouplingFieldDouble* targetField = NULL;
+  if (reverse) {
+    targetField = remapper.reverseTransferField(sourceField, defaultValue);
+  } else {
+    targetField = remapper.transferField(sourceField, defaultValue);
+  }
+  targetField->setMesh(targetMesh);
+  targetField->setName(targetMesh->getName() + "_field");
+
+  // 3. Create and register field handler
+  MEDOP::FieldHandler* fieldResultHandler = this->addField(targetField, this->getUMeshId(targetField->getMesh()));
+  return fieldResultHandler;
+}
+
 
 
 /*!
@@ -731,7 +817,7 @@ void MEDDataManager_i::changeUnderlyingMesh(CORBA::Long fieldHandlerId, CORBA::L
  * the server side (data in the SALOME container).
  */
 void MEDDataManager_i::serverlog() {
-  
+
   LOG("==== Field Handler Map ====================================================");
   LOG("Size = "<<_fieldHandlerMap.size());
   FieldHandlerMapIterator fhmIt;

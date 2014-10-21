@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// Author : Guillaume Boulant (EDF) 
+// Author : Guillaume Boulant (EDF)
 
 #ifndef DATASOURCE_CONTROLLER_H
 #define DATASOURCE_CONTROLLER_H
@@ -31,6 +31,7 @@
 
 #include "XmedDataModel.hxx"
 #include "DlgChangeUnderlyingMesh.hxx"
+#include "DlgInterpolateField.hxx"
 #include "MEDOPGUI.hxx"
 //
 // The DatasourceController defines data structures and classes to
@@ -48,7 +49,7 @@
 // transmit an object AND an alias.
 typedef struct {
   enum EventType {
-    // 
+    //
     EVENT_IMPORT_OBJECT, // Simply import the object in the workspace
     EVENT_USE_OBJECT,    // Import in the workspace AND define a proxy
                          // variable in the tui console to use it
@@ -77,6 +78,7 @@ public:
 public slots:
   // Callback connected to dialog box validation signals
   void OnChangeUnderlyingMeshInputValidated();
+  void OnInterpolateFieldInputValidated();
 
 signals:
   void datasourceSignal(const DatasourceEvent * event);
@@ -88,6 +90,7 @@ protected slots:
   void OnVisualize();
   void OnUseInWorkspace();
   void OnChangeUnderlyingMesh();
+  void OnInterpolateField();
 
 
 private:
@@ -95,6 +98,7 @@ private:
   SALOME_AppStudyEditor * _studyEditor;
 
   DlgChangeUnderlyingMesh * _dlgChangeUnderlyingMesh;
+  DlgInterpolateField * _dlgInterpolateField;
 
 };
 

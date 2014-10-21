@@ -44,6 +44,11 @@
       <translation>Change underlying mesh</translation>
     </message>
     <message>
+      <location filename="MEDOP/gui/DatasourceController.cxx" line="113"/>
+      <source>LAB_INTERPOLATE_FIELD</source>
+      <translation>Interpolate field</translation>
+    </message>
+    <message>
       <location filename="MEDOP/gui/DatasourceController.cxx" line="157"/>
       <source>IMPORT_MED_FIELDS</source>
       <translation>Import MED fields</translation>
@@ -119,6 +124,54 @@
       <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="391"/>
       <source>SELECT_MESH</source>
       <translation>You must select a mesh in the explorer and clic the button Mesh</translation>
+    </message>
+  </context>
+  <context>
+    <name>DlgInterpolateField</name>
+    <message>
+      <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="391"/>
+      <source>SELECT_MESH</source>
+      <translation>You must select a mesh in the explorer and clic the button Mesh</translation>
+    </message>
+    <message>
+      <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="406"/>
+      <source>TARGET_MESH_GT</source>
+      <translation>Target mesh -&gt;</translation>
+    </message>
+    <message>
+      <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="423"/>
+      <source>MSG_EXPLORER</source>
+      <translation>(Explorer provides a view on MED data sources (mesh and fields) referenced in data space)</translation>
+    </message>
+    <message>
+      <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="450"/>
+      <source>LABEL_PRECISION</source>
+      <translation>Interpolator precision</translation>
+    </message>
+    <message>
+      <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="493"/>
+      <source>LABEL_INTERSECTION_TYPE</source>
+      <translation>Intersection type</translation>
+    </message>
+    <message>
+      <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="520"/>
+      <source>LABEL_METHOD</source>
+      <translation>Interpolation method</translation>
+    </message>
+    <message>
+      <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="547"/>
+      <source>LABEL_DEFAULT_VALUE</source>
+      <translation>Default value of resulting field</translation>
+    </message>
+    <message>
+      <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="581"/>
+      <source>LABEL_REVERSE</source>
+      <translation>Reverse interpolation ?</translation>
+    </message>
+    <message>
+      <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="612"/>
+      <source>LABEL_NATURE</source>
+      <translation>Field nature</translation>
     </message>
   </context>
   <context>

@@ -26,6 +26,7 @@
 #include CORBA_SERVER_HEADER(MEDDataManager)
 #include "SALOME_GenericObj_i.hh"
 
+#include "MEDCouplingRemapper.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 using namespace ParaMEDMEM;
@@ -61,7 +62,7 @@ class MEDOP_EXPORT MEDDataManager_i: public POA_MEDOP::MEDDataManager,
 {
 public:
 
-  // 
+  //
   // ===========================================================
   // Functions specified in the IDL interface
   // ===========================================================
@@ -73,7 +74,7 @@ public:
   // -----------------------------------------------------------
   // Mesh management
   MEDOP::MeshHandlerList * getMeshList(CORBA::Long datasourceId);
-  MEDOP::MeshHandler * getMesh(CORBA::Long meshId); 
+  MEDOP::MeshHandler * getMesh(CORBA::Long meshId);
 
   // -----------------------------------------------------------
   // Field management
@@ -97,13 +98,14 @@ public:
          const char * source);
 
   void changeUnderlyingMesh(CORBA::Long fieldHandlerId, CORBA::Long meshHandlerId);
+  MEDOP::FieldHandler* interpolateField(CORBA::Long fieldHandlerId, CORBA::Long meshHandlerId, const MEDOP::InterpolationParameters& params);
 
   void   setEventListenerIOR(const char * ior);
   char * getEventListenerIOR();
 
   void serverlog();
 
-  // 
+  //
   // ===========================================================
   // Other public functions (non available via CORBA)
   // ===========================================================
@@ -155,6 +157,10 @@ private:
 
   MEDCouplingUMesh * getUMesh(long meshHandlerId);
   long getUMeshId(const MEDCouplingMesh * mesh);
+
+  INTERP_KERNEL::IntersectionType _getIntersectionType(const char* intersType);
+  ParaMEDMEM::NatureOfField _getNatureOfField(const char* fieldNature);
+
 };
 
 #endif // _MED_DATAMANAGER_I_HXX_

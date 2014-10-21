@@ -16,7 +16,7 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author : Guillaume Boulant (EDF) 
+// Author : Guillaume Boulant (EDF)
 
 #include "XmedConsoleDriver.hxx"
 #include "Utils_SALOME_Exception.hxx"
@@ -39,7 +39,7 @@ XmedConsoleDriver::XmedConsoleDriver(SalomeApp_Application * application) {
  * instructions are sent once.
  */
 void XmedConsoleDriver::setup() {
-  
+
   if ( !_importXmedDone ) {
     QStringList commands;
     // First import xmed to initialize the main objects, in particular
@@ -51,6 +51,11 @@ void XmedConsoleDriver::setup() {
     commands+="from xmed import load, get, put, dup, ls, la, save, view, doc, wipe";
     // A last one to clear the console screen
     //commands+="wipe";
+
+    // start PVServer and show render view
+    commands+="import pvsimple as pvs";
+    commands+="";
+    //commands+="pvs.ShowParaviewView()";
 
     this->exec(commands);
     _importXmedDone = true;
