@@ -17,7 +17,7 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-# Author : Guillaume Boulant (EDF) 
+# Author : Guillaume Boulant (EDF)
 
 import xmed
 import MEDOP
@@ -85,7 +85,7 @@ class FieldProxy:
                 xmed.err("The modification of the attribute %s is not possible"%name)
         else:
             self.__dict__[name] = value
-        
+
     def __repr__(self):
         """
         Return a string containing a printable representation of this
@@ -146,7 +146,7 @@ class FieldProxy:
             return None
 
         return FieldProxy(rfieldHandler)
-    
+
     def __radd__(self, operande):
         """
         The user typed 'operande+self', we replace by 'self+operande'
@@ -183,7 +183,7 @@ class FieldProxy:
             return None
 
         return FieldProxy(rfieldHandler)
-        
+
     def __rsub__(self, operande):
         """
         The user typed 'operande-self' where operande is not a field
@@ -207,9 +207,9 @@ class FieldProxy:
         except SALOME.SALOME_Exception, ex:
             xmed.err(ex.details.text)
             return None
-        
+
         return FieldProxy(rfieldHandler)
-        
+
     def __mul__(self, operande):
         """
         This makes the multiplication of two fields or the
@@ -290,7 +290,7 @@ class FieldProxy:
 
     def __abs__(self):
         """
-        This compute the absolute value of the field. We use here 
+        This compute the absolute value of the field. We use here
         """
         return self.ope(function="abs(u)",duplicate=True)
 
@@ -332,7 +332,7 @@ class FieldProxy:
             return None
 
         return FieldProxy(rfieldHandler)
-        
+
 
     def __call__(self, restriction=None):
         """
@@ -359,7 +359,7 @@ class FieldProxy:
             order = self.order
         if source is None:
             source = self.source
-            
+
         xmed.dataManager.updateFieldMetadata(self.id,name,iteration,order,source)
         self.__fieldHandler.fieldname = name
         self.__fieldHandler.iteration = iteration
@@ -375,7 +375,7 @@ class FieldProxy:
 
         # Print for visual control
         print self.__repr__()
-            
+
 #
 # ===================================================================
 # Functions for events notification
@@ -385,14 +385,14 @@ class FieldProxy:
 # that they could be used in another context than the FieldProxy instances
 import MEDOP
 
-def __notifyGui(type, fieldId):
+def __notifyGui(type, fieldId=-1):
     medEvent = MEDOP.MedEvent(type, fieldId)
-    
+
     if not xmed.eventListenerIsRunning(): return
-    
+
     # Notify the GUI of the update event
     xmed.eventListener.processMedEvent(medEvent)
-    
+
 
 def notifyGui_update(fieldId):
     """
@@ -404,19 +404,20 @@ def notifyGui_update(fieldId):
 
 def notifyGui_add(fieldId):
     __notifyGui(MEDOP.EVENT_ADDNEW_FIELD,fieldId)
-  
+
+def notifyGui_remove(fieldId):
+    __notifyGui(MEDOP.EVENT_DELETE_FIELD,fieldId)
+
+def notifyGui_clean():
+    __notifyGui(MEDOP.EVENT_CLEAN_WORKSPACE)
+
 #
 # ===================================================================
 # use case functions
 # ===================================================================
 #
-    
+
 # ===================================================================
 if __name__ == "__main__":
     # See test_medoperation.py
     pass
-
-
-
-
-

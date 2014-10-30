@@ -142,6 +142,7 @@ void WorkspaceController::processItemList(QStringList itemNameIdList, int action
   }
   else if ( actionId == _actionIds.remove ) {
     STDLOG("WorkspaceController::processItemList: remove");
+    this->_removeItemList(itemNameIdList);
   }
   else {
     STDLOG("WorkspaceController::processItemList: ERR : action unknown ");
@@ -269,6 +270,29 @@ void WorkspaceController::processMedEvent(const MEDOP::MedEvent * event) {
     dataObject->setFieldHandler(*fieldHandler);
     this->getDataTreeModel()->addData(dataObject);
   }
+  else if ( event->type == MEDOP::EVENT_DELETE_FIELD ) {
+    STDLOG("remove field");
+    std::map<string, DataObject *>::iterator itr = dataModel->begin();
+    for ( ; itr != dataModel->end(); ++itr) {
+      XmedDataObject* obj = dynamic_cast<XmedDataObject*>(itr->second);
+      if (obj->getFieldHandler()->id == event->fieldid) {
+        std::string itemNameId = obj->getNameId();
+        this->getDataTreeModel()->removeData(obj);
+        dataModel->removeDataObject(itemNameId);
+        return;
+      }
+    }
+  }
+  else if ( event->type == MEDOP::EVENT_CLEAN_WORKSPACE ) {
+    STDLOG("clean workspace");
+    std::map<string, DataObject *>::iterator itr = dataModel->begin();
+    for ( ; itr != dataModel->end(); ++itr) {
+      XmedDataObject* obj = dynamic_cast<XmedDataObject*>(itr->second);
+      std::string itemNameId = obj->getNameId();
+      this->getDataTreeModel()->removeData(obj);
+      dataModel->removeDataObject(itemNameId);
+    }
+  }
 
 }
 
@@ -293,6 +317,44 @@ void WorkspaceController::_saveItemList(QStringList itemNameIdList) {
   if ( filename.isEmpty() ) return;
 
   MEDOPFactoryClient::getDataManager()->saveFields(QCHARSTAR(filename), fieldIdList);
+}
+
+/*!
+ * This function remove the selected item from workspace.
+ */
+void WorkspaceController::_removeItemList(QStringList itemNameIdList) {
+  XmedDataModel * dataModel = (XmedDataModel *)this->getDataModel();
+  if ( dataModel == NULL ) {
+    LOG("No data model associated to this tree view");
+    return;
+  }
+
+  // __GBO__: In this version, we consider only the first field in the selection
+  QString itemNameId = itemNameIdList[0];
+
+  // We can request the dataModel to obtain the dataObject associated
+  // to this item (iteNameId is a TreeView id, Qt stuff only).
+  XmedDataObject * dataObject =
+    (XmedDataObject *)dataModel->getDataObject(QS2S(itemNameId));
+
+  if ( dataObject == NULL ) {
+    LOG("WorkspaceController: WARN! No data object associated to the item "<<itemNameId);
+    return;
+  }
+
+  // Then, we can request this data object to obtain the associated
+  // FieldHandler.
+  MEDOP::FieldHandler * fieldHandler = dataObject->getFieldHandler();
+  STDLOG("Field: mesh="<<fieldHandler->meshname<<" name="<<fieldHandler->fieldname);
+
+  // Remove the field variable from console
+  QStringList commands;
+  commands+=QString("remove(get(%1))").arg(fieldHandler->id);
+  _consoleDriver->exec(commands);
+
+  // Finally, we can remove the field from tree data model and tree view
+  this->getDataTreeModel()->removeData(dataObject);
+  dataModel->removeDataObject(QS2S(itemNameId));
 }
 
 /**
@@ -339,7 +401,6 @@ void WorkspaceController::_exportItemList(QStringList itemNameIdList) {
   _consoleDriver->exec(commands);
 
 }
-
 
 /*!
  * This function sends a request to the SALOME data visualisation
@@ -454,7 +515,8 @@ void WorkspaceController::OnSaveWorkspace() {
 
 #include <QMessageBox>
 void WorkspaceController::OnCleanWorkspace() {
-  QMessageBox::warning(_salomeModule->getApp()->desktop(),
-           tr("NOT_IMPLEMENTED_YET"),
-           tr("FUNCTION_NOT_IMPLEMENTED"));
+  // Remove field from console
+  QStringList commands;
+  commands += QString("clean()");
+  _consoleDriver->exec(commands);
 }

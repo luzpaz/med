@@ -17,7 +17,7 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-# Author : Guillaume Boulant (EDF) 
+# Author : Guillaume Boulant (EDF)
 
 #
 # ===============================================================
@@ -112,7 +112,7 @@ def eventListenerIsRunning():
     global eventListener
     if eventListener is not None:
         return True
-    
+
     # Try to define the event listener
     connectEventListener()
     if eventListener is None:
@@ -133,7 +133,7 @@ connectEventListener()
 # Automatic import of some elements of the package
 # ===============================================================
 #
-from fieldtools import load, get, put, dup, ls, la, save, view
+from fieldtools import load, get, put, dup, ls, la, save, view, remove, clean
 from fieldguide import doc
 from cmdtools import cls, wipe
 

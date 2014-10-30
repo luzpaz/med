@@ -9,14 +9,14 @@ using std::endl;
 DlgAlias::DlgAlias(QDialog *parent) : QDialog(parent)
 {
   ui.setupUi(this); // A faire en premier
-  
+
   /*
     Personnalisez vos widgets ici si nécessaire
     Réalisez des connexions supplémentaires entre signaux et slots
   */
-  
+
   // The slots accept() and reject() are already connected to the
-  // buttonbox (inherited features) 
+  // buttonbox (inherited features)
 }
 
 void DlgAlias::accept() {
@@ -33,9 +33,9 @@ void DlgAlias::accept() {
 //}
 
 void DlgAlias::setAlias(QString alias) {
-  ui.txtAlias->setText(alias);
+  ui.txtAlias->setText(alias.trimmed().replace(' ', '_'));
 }
 
 QString DlgAlias::getAlias() {
-  return ui.txtAlias->text().trimmed();
+  return ui.txtAlias->text().trimmed().replace(' ', '_');
 }

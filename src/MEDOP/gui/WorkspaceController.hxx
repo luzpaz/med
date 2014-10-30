@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// Author : Guillaume Boulant (EDF) 
+// Author : Guillaume Boulant (EDF)
 
 #ifndef _WORKSPACE_CONTROLLER_HXX
 #define _WORKSPACE_CONTROLLER_HXX
@@ -70,6 +70,7 @@ private:
 
   void _exportItemList(QStringList itemNameIdList);
   void _saveItemList(QStringList itemNameIdList);
+  void _removeItemList(QStringList itemNameIdList);
   void _viewItemList(QStringList itemNameIdList);
 
   MEDEventListener_i * _medEventListener;

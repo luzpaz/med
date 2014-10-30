@@ -48,7 +48,7 @@ void XmedConsoleDriver::setup() {
     // Set the globals dictionnary so that the fields tools work properly.
     commands+="xmed.setConsoleGlobals(globals())";
     // Import the tools required for field operations
-    commands+="from xmed import load, get, put, dup, ls, la, save, view, doc, wipe";
+    commands+="from xmed import load, get, put, dup, ls, la, save, view, doc, wipe, remove, clean";
     // A last one to clear the console screen
     //commands+="wipe";
 

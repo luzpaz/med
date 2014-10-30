@@ -113,6 +113,34 @@ ls=ListFields(all=False)
 la=ListFields(all=True)
 
 # ===================================================================
+# Remove variable from console
+from xmed.fieldproxy import notifyGui_remove
+def remove(aFieldProxy):
+    dvars = pyConsoleGlobals
+    if dvars is None:
+        return
+    for varkey, var in dvars.items():
+        if isinstance(var, FieldProxy) and var.id == aFieldProxy.id:
+            exec("del %s"%varkey) in pyConsoleGlobals
+    notifyGui_remove(aFieldProxy.id)
+#
+
+# Clean workspace
+from xmed.fieldproxy import notifyGui_clean
+def clean():
+    dvars = pyConsoleGlobals
+    if dvars is None:
+        return
+    all_keys = []
+    for varkey, var in dvars.items():
+        if isinstance(var, FieldProxy):
+            all_keys.append("%s"%varkey)
+    if len(all_keys) > 0:
+        exec "del "+",".join(all_keys) in pyConsoleGlobals
+    notifyGui_clean()
+#
+
+# ===================================================================
 # Field Data Management
 from xmed import properties
 filepath  = properties.testFilePath

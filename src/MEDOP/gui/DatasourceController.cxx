@@ -114,7 +114,6 @@ void DatasourceController::createActions() {
   icon  = tr("ICO_DATASOURCE_INTERPOLATE_FIELD");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnInterpolateField()),icon);
   _salomeModule->addActionInPopupMenu(actionId);
-
 }
 
 /**
@@ -151,7 +150,6 @@ MEDOP::DatasourceHandler * DatasourceController::addDatasource(const char * file
     _studyEditor->setIcon(soMesh,tr("ICO_DATASOURCE_MESH").toStdString().c_str());
     _studyEditor->setParameterInt(soMesh,OBJECT_ID,meshHandler.id);
     _studyEditor->setParameterBool(soMesh,OBJECT_IS_IN_WORKSPACE,false);
-
 
     // We add the field timeseries defined on this mesh, as children
     // of the mesh SObject
@@ -382,7 +380,7 @@ void DatasourceController::OnUseInWorkspace() {
     event->objectalias = alias;
     emit datasourceSignal(event);
     // Tag the item to prevent double import
-    _studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
+    //    _studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
     // Tag the field as persistent on the server. It means that a
     // saving of the workspace will save at least this field (maybe it
     // should be an option?)
@@ -396,27 +394,27 @@ void DatasourceController::OnUseInWorkspace() {
 
       bool isInWorkspace = _studyEditor->getParameterBool(soField,OBJECT_IS_IN_WORKSPACE);
       if ( !isInWorkspace ) {
-  int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
-  MEDOP::FieldHandler * fieldHandler =
-    MEDOPFactoryClient::getDataManager()->getFieldHandler(fieldId);
-  DatasourceEvent * event = new DatasourceEvent();
-  event->eventtype = DatasourceEvent::EVENT_IMPORT_OBJECT;
-  XmedDataObject * dataObject = new XmedDataObject();
-  dataObject->setFieldHandler(*fieldHandler);
-  event->objectdata  = dataObject;
-  emit datasourceSignal(event);
-  // Note that this signal is processed by the WorkspaceController
+        int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
+        MEDOP::FieldHandler * fieldHandler =
+          MEDOPFactoryClient::getDataManager()->getFieldHandler(fieldId);
+        DatasourceEvent * event = new DatasourceEvent();
+        event->eventtype = DatasourceEvent::EVENT_IMPORT_OBJECT;
+        XmedDataObject * dataObject = new XmedDataObject();
+        dataObject->setFieldHandler(*fieldHandler);
+        event->objectdata  = dataObject;
+        emit datasourceSignal(event);
+        // Note that this signal is processed by the WorkspaceController
 
-  // Tag the item to prevent double import
-  _studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
-  // Tag the field as persistent on the server. It means that a
-  // saving of the workspace will save at least this field (maybe it
-  // should be an option?)
-  MEDOPFactoryClient::getDataManager()->markAsPersistent(fieldId, true);
+        // Tag the item to prevent double import
+        //        _studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
+        // Tag the field as persistent on the server. It means that a
+        // saving of the workspace will save at least this field (maybe it
+        // should be an option?)
+        MEDOPFactoryClient::getDataManager()->markAsPersistent(fieldId, true);
       }
       else {
-  STDLOG("The field "<<_studyEditor->getName(soField)<<
-         " is already defined in the workspace");
+        STDLOG("The field "<<_studyEditor->getName(soField)<<
+               " is already defined in the workspace");
       }
     }
   }
