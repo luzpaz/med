@@ -1,29 +1,31 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="fr_FR">
 <context>
     <name>@default</name>
     <message>
         <source>MEN_BUILDER3</source>
-        <translation type="unfinished">Load a python script</translation>
+        <translation>Charger un script python</translation>
     </message>
     <message>
         <source>STS_BUILDER3</source>
-        <translation type="unfinished">Load a python script</translation>
+        <translation>Charger un script python</translation>
     </message>
     <message>
         <source>TLT_BUILDER3</source>
-        <translation type="unfinished">Load a python script</translation>
+        <translation>Charger un script python</translation>
     </message>
     <message>
         <source>STS_LOAD_DXF</source>
-        <translation type="unfinished">Load DXF file</translation>
+        <translation>Charger un fichier DXF</translation>
     </message>
     <message>
         <source>MEN_LOAD_DXF</source>
-        <translation type="unfinished">Load DXF file</translation>
+        <translation>Charger un fichier DXF</translation>
     </message>
     <message>
         <source>TLT_LOAD_DXF</source>
-        <translation type="unfinished">Load DXF file</translation>
+        <translation>Charger un fichier DXF</translation>
     </message>
     <message>
         <source>TLT_MY_NEW_ITEM</source>
