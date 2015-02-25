@@ -303,6 +303,12 @@ void DatasourceController::OnVisualize() {
       continue;
 
     MEDOP::FieldHandler * fieldHandler = MEDOPFactoryClient::getDataManager()->getFieldHandler(fieldId);
+    if (! fieldHandler) {
+      QMessageBox::warning(_salomeModule->getApp()->desktop(),
+         tr("Operation not allowed"),
+         tr("No field is defined"));
+      return;
+    }
 
     DatasourceEvent * event = new DatasourceEvent();
     event->eventtype = DatasourceEvent::EVENT_VIEW_OBJECT;
