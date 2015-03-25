@@ -428,4 +428,15 @@ def ParaMEDMEMMEDCouplingExtrudedMeshnew(cls,*args):
     return _MEDCalculator.MEDCouplingExtrudedMesh____new___(cls,args)
 %}
 
+%pythoncode %{
+def ParaMEDMEMMEDFileUMeshnew(cls,*args):
+    import _MEDCalculator
+    return _MEDCalculator.MEDFileUMesh____new___(cls,args)
+%}
+
 %include "MEDCouplingFinalize.i"
+
+%pythoncode %{
+MEDFileUMesh.__new__=classmethod(ParaMEDMEMMEDFileUMeshnew)
+del ParaMEDMEMMEDFileUMeshnew
+%}
