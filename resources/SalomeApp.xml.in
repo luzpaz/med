@@ -34,6 +34,7 @@
     <parameter name="sub_menu"          value="%1 module"/>
     <parameter name="User's Guide"      value="%MED_ROOT_DIR%/share/doc/salome/gui/MED/index.html"/>
     <parameter name="Developer's Guide" value="%MED_ROOT_DIR%/share/doc/salome/tui/MED/index.html"/>
+    <parameter name="Medfichier" value="%MED3HOME%/share/doc/html/index.html"/>
   </section>
   <section name="resources">
     <!-- Module resources -->
