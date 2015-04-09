@@ -55,6 +55,10 @@ protected:
   virtual bool activateModule( SUIT_Study* theStudy );
   virtual bool deactivateModule( SUIT_Study* theStudy );
 
+ private:
+  //! Shows or hides ParaView view window
+  void showView(bool);
+
 private:
   DatasourceController * _datasourceController;
   WorkspaceController *  _workspaceController;

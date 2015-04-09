@@ -27,6 +27,12 @@
 
 #include "MEDOPFactoryClient.hxx"
 
+#include <LightApp_Application.h>
+#include "PVViewer_ViewManager.h"
+#include "PVViewer_ViewWindow.h"
+#include "PVViewer_ViewModel.h"
+#include "SUIT_ViewManager.h"
+
 MEDOPModule::MEDOPModule() :
   StandardApp_Module()
 {
@@ -82,9 +88,35 @@ void MEDOPModule::createModuleWidgets() {
     _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent *)));
 }
 
+/*!
+  \brief Shows (toShow = true) or hides ParaView view window
+*/
+void MEDOPModule::showView( bool toShow )
+{
+  LightApp_Application* anApp = getApp();
+  PVViewer_ViewManager* viewMgr =
+    dynamic_cast<PVViewer_ViewManager*>( anApp->getViewManager( PVViewer_Viewer::Type(), false ) );
+  if ( !viewMgr ) {
+    viewMgr = new PVViewer_ViewManager( anApp->activeStudy(), anApp->desktop(), anApp->logWindow() );
+    anApp->addViewManager( viewMgr );
+    connect( viewMgr, SIGNAL( lastViewClosed( SUIT_ViewManager* ) ),
+             anApp, SLOT( onCloseView( SUIT_ViewManager* ) ) );
+  }
+
+  PVViewer_ViewWindow* pvWnd = dynamic_cast<PVViewer_ViewWindow*>( viewMgr->getActiveView() );
+  if ( !pvWnd ) {
+    pvWnd = dynamic_cast<PVViewer_ViewWindow*>( viewMgr->createViewWindow() );
+    // this also connects to the pvserver and instantiates relevant PV behaviors
+  }
+
+  pvWnd->setShown( toShow );
+  if ( toShow ) pvWnd->setFocus();
+}
+
 bool MEDOPModule::activateModule( SUIT_Study* theStudy )
 {
   bool bOk = StandardApp_Module::activateModule( theStudy );
+  showView(true);
   _workspaceController->showDockWidgets(true);
   this->setDockLayout(StandardApp_Module::DOCKLAYOUT_LEFT_VLARGE);
   return bOk;
@@ -93,6 +125,7 @@ bool MEDOPModule::deactivateModule( SUIT_Study* theStudy )
 {
   _workspaceController->showDockWidgets(false);
   this->unsetDockLayout();
+  showView(false);
   return StandardApp_Module::deactivateModule( theStudy );
 }
 
