@@ -46,6 +46,7 @@ class MEDOPGUI_EXPORT MEDOPModule: public StandardApp_Module
 
 public:
   MEDOPModule();
+  void viewManagers( QStringList& ) const;
 
 protected:
   virtual Engines::EngineComponent_ptr getEngine() const;
@@ -54,10 +55,6 @@ protected:
   virtual void createModuleActions();
   virtual bool activateModule( SUIT_Study* theStudy );
   virtual bool deactivateModule( SUIT_Study* theStudy );
-
- private:
-  //! Shows or hides ParaView view window
-  void showView(bool);
 
 private:
   DatasourceController * _datasourceController;
