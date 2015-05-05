@@ -29,11 +29,11 @@
     </message>
     <message>
         <source>TLT_MY_NEW_ITEM</source>
-        <translation>My menu item</translation>
+        <translation>Mon nouvel item</translation>
     </message>
     <message>
         <source>TLT_GET_BANNER</source>
-        <translation>Get XMED banner</translation>
+        <translation>Récupère la bannière XMED</translation>
     </message>
     <message>
         <source>TOOL_XMED</source>
@@ -41,47 +41,47 @@
     </message>
     <message>
         <source>STS_MY_NEW_ITEM</source>
-        <translation>Call my menu item</translation>
+        <translation>Appelle mon nouvel item</translation>
     </message>
     <message>
         <source>MEN_FILE_XMED</source>
-        <translation>Hello</translation>
+        <translation>Salut</translation>
     </message>
     <message>
         <source>MEN_GET_BANNER</source>
-        <translation>Get banner</translation>
+        <translation>Récupère la bannière</translation>
     </message>
     <message>
         <source>MEN_FILE</source>
-        <translation>&amp;File</translation>
+        <translation>&amp;Fichier</translation>
     </message>
     <message>
         <source>STS_GET_BANNER</source>
-        <translation>Get XMED banner</translation>
+        <translation>Récupère la bannière XMED</translation>
     </message>
     <message>
         <source>TLT_BUILDER1</source>
-        <translation>Create base vectors Vx, Vy, Vz</translation>
+        <translation>Crée les vecteurs de base Vx, Vy, Vz</translation>
     </message>
     <message>
         <source>TLT_BUILDER2</source>
-        <translation>Create connected edges (arcs and lines)</translation>
+        <translation>Crée les arêtes connectées (arcs et lignes)</translation>
     </message>
     <message>
         <source>STS_BUILDER1</source>
-        <translation>Create base vectors Vx, Vy, Vz</translation>
+        <translation>Crée les vecteurs de base Vx, Vy, Vz</translation>
     </message>
     <message>
         <source>STS_BUILDER2</source>
-        <translation>Create connected edges (arcs and lines)</translation>
+        <translation>Crée les arêtes connectées (arcs et lignes)</translation>
     </message>
     <message>
         <source>MEN_BUILDER1</source>
-        <translation>Create base vectors Vx, Vy, Vz</translation>
+        <translation>Crée les vecteurs de base Vx, Vy, Vz</translation>
     </message>
     <message>
         <source>MEN_BUILDER2</source>
-        <translation>Create connected edges (arcs and lines)</translation>
+        <translation>Crée les arêtes connectées (arcs et lignes)</translation>
     </message>
     <message>
         <source>MEN_XMED</source>
@@ -89,11 +89,11 @@
     </message>
     <message>
         <source>MEN_MY_NEW_ITEM</source>
-        <translation>My menu item</translation>
+        <translation>Mon nouvel item</translation>
     </message>
 </context>
 <context>
-    <name>XMEDGUI</name>
+    <name>XMEDGUI_maquette</name>
     <message>
         <source>BUT_OK</source>
         <translation>OK</translation>

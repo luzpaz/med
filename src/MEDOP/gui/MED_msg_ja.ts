@@ -46,7 +46,7 @@
     <message>
       <location filename="MEDOP/gui/DatasourceController.cxx" line="113"/>
       <source>LAB_INTERPOLATE_FIELD</source>
-      <translation type="unfinished">Interpolate field</translation>
+      <translation>挿入フィールド</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/DatasourceController.cxx" line="157"/>
@@ -131,47 +131,47 @@
     <message>
       <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="391"/>
       <source>SELECT_MESH</source>
-      <translation type="unfinished">You must select a mesh in the explorer and clic the button Mesh</translation>
+      <translation>エクスプローラ内のメッシュを選択し、メッシュボタンをクリックする必要があります。</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="406"/>
       <source>TARGET_MESH_GT</source>
-      <translation type="unfinished">Target mesh -></translation>
+      <translation>Target mesh -&gt;</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="423"/>
       <source>MSG_EXPLORER</source>
-      <translation type="unfinished">(Explorer provides a view on MED data sources (mesh and fields) referenced in data space)</translation>
+      <translation>エクスプローラによってデータスペース内で参照されたMEDデータソース（メッシュおよびフィールド）上に表示します。</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="450"/>
       <source>LABEL_PRECISION</source>
-      <translation type="unfinished">Interpolator precision</translation>
+      <translation>挿入精度</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="493"/>
       <source>LABEL_INTERSECTION_TYPE</source>
-      <translation type="unfinished">Intersection type</translation>
+      <translation>交点タイプ</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="520"/>
       <source>LABEL_METHOD</source>
-      <translation type="unfinished">Interpolation method</translation>
+      <translation>挿入方法</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="547"/>
       <source>LABEL_DEFAULT_VALUE</source>
-      <translation type="unfinished">Default value of resulting field</translation>
+      <translation>結果フィールドのデフォルト値</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="581"/>
       <source>LABEL_REVERSE</source>
-      <translation type="unfinished">Reverse interpolation ?</translation>
+      <translation>挿入を反転しますか？</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgInterpolateField.ui" line="612"/>
       <source>LABEL_NATURE</source>
-      <translation type="unfinished">Field nature</translation>
+      <translation>フィールド性質</translation>
     </message>
   </context>
   <context>
