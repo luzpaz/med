@@ -17,19 +17,5 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(COMPONENT_NAME MEDCOUPLING)
-
-SUBDIRS(INTERP_KERNELTest)
-SUBDIRS(MEDCalculator)
-SUBDIRS(MEDCoupling)
-#SUBDIRS(MEDCouplingCorba)
-#SUBDIRS(MEDCouplingCorba_Swig)
-SUBDIRS(MEDCoupling_Swig)
-SUBDIRS(MEDLoader)
-SUBDIRS(MEDLoader/Swig)
-#SUBDIRS(MEDOP)
-SUBDIRS(MEDPartitioner)
-#SUBDIRS(ParaMEDMEM_Swig)
-#SUBDIRS(ParaMEDMEMTest)
-SUBDIRS(MEDPartitioner_Swig)
-SUBDIRS(RENUMBER_Swig)
+ADD_TEST(MEDPartitionerTest python MEDPartitionerTest.py)
+SET_TESTS_PROPERTIES(MEDPartitionerTest PROPERTIES LABELS "${COMPONENT_NAME}")
