@@ -17,4 +17,4 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SUBDIRS(MEDCoupling)
+ADD_SUBDIRECTORY(MEDCoupling)
