@@ -26,7 +26,9 @@
 #include CORBA_CLIENT_HEADER(SALOMEDS)
 
 #include "MEDOPFactoryClient.hxx"
+#ifndef DISABLE_PVVIEWER
 #include "PVViewer_ViewModel.h"
+#endif
 
 MEDOPModule::MEDOPModule() :
   StandardApp_Module()
@@ -106,5 +108,7 @@ void MEDOPModule::createModuleActions() {
 
 void MEDOPModule::viewManagers( QStringList& list ) const
 {
+#ifndef DISABLE_PVVIEWER
   list.append( PVViewer_Viewer::Type() );
+#endif
 }

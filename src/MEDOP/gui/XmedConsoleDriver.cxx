@@ -52,10 +52,12 @@ void XmedConsoleDriver::setup() {
     // A last one to clear the console screen
     //commands+="wipe";
 
+#ifndef DISABLE_PVVIEWER
     // start PVServer and show render view
     commands+="import pvsimple as pvs";
     commands+="";
     //commands+="pvs.ShowParaviewView()";
+#endif
 
     this->exec(commands);
     _importXmedDone = true;
