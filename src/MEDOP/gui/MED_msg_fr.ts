@@ -29,6 +29,10 @@
       <translation>Étendre les series temporelles du champ</translation>
     </message>
     <message>
+      <source>LAB_VISUALIZE_SCALARMAP</source>
+      <translation>Carte scalaire</translation>
+    </message>
+    <message>
       <location filename="MEDOP/gui/DatasourceController.cxx" line="69"/>
       <source>LAB_VISUALIZE</source>
       <translation>Visualiser</translation>

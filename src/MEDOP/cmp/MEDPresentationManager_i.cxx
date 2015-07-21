@@ -1,4 +1,4 @@
-// Copyright (C) 2005-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2011-2015  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,33 +17,32 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __MEDOPFactory_IDL_
-#define __MEDOPFactory_IDL_
+#include "MEDPresentationManager_i.hxx"
+#include "SALOME_KernelServices.hxx"
+#include "Basics_Utils.hxx"
 
-#include "SALOME_Component.idl"
-#include "SALOME_Exception.idl"
-#include "MEDDataManager.idl"
-#include "MEDCalculator.idl"
-#include "MEDPresentationManager.idl"
+MEDPresentationManager_i* MEDPresentationManager_i::_instance = NULL;
 
-/*!
- * This module contains the interface required for starting with MED
- * operations. It defines the factory methods to get the main SALOME
- * MED components for MED field operations.
- *
- * WRN: This interface is an EngineComponent so that it could be retrieve
- * in the CORBA context using the LifeCycleCorba registry.
-*/
-module MEDOP
+MEDPresentationManager_i*
+MEDPresentationManager_i::getInstance() {
+  if ( _instance == NULL )
+    _instance = new MEDPresentationManager_i();
+  return _instance;
+}
+
+MEDPresentationManager_i::MEDPresentationManager_i()
 {
-  interface MEDOPFactory : Engines::EngineComponent
-  {
+}
 
-    MEDOP::MEDDataManager getDataManager();
-    MEDOP::MEDCalculator getCalculator();
-    MEDOP::MEDPresentationManager getPresentationManager();
+MEDPresentationManager_i::~MEDPresentationManager_i()
+{
+}
 
-  };
-};
+#include <iostream>
 
-#endif
+void
+MEDPresentationManager_i::MakeScalarMap(CORBA::Long fieldHandlerId, const char* viewMode)
+{
+  //throw KERNEL::createSalomeException("Not implemented yet");
+  std::cout << "MEDPresentationManager_i::MakeScalarMap: Not implemented yet\n";
+}

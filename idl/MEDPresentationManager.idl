@@ -17,33 +17,22 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __MEDOPFactory_IDL_
-#define __MEDOPFactory_IDL_
+#ifndef __MED_PRESENTATION_MANAGER_IDL_
+#define __MED_PRESENTATION_MANAGER_IDL_
 
-#include "SALOME_Component.idl"
-#include "SALOME_Exception.idl"
+#include "SALOME_GenericObj.idl"
 #include "MEDDataManager.idl"
-#include "MEDCalculator.idl"
-#include "MEDPresentationManager.idl"
 
-/*!
- * This module contains the interface required for starting with MED
- * operations. It defines the factory methods to get the main SALOME
- * MED components for MED field operations.
- *
- * WRN: This interface is an EngineComponent so that it could be retrieve
- * in the CORBA context using the LifeCycleCorba registry.
-*/
 module MEDOP
 {
-  interface MEDOPFactory : Engines::EngineComponent
+
+  interface MEDPresentationManager : SALOME::GenericObj
   {
 
-    MEDOP::MEDDataManager getDataManager();
-    MEDOP::MEDCalculator getCalculator();
-    MEDOP::MEDPresentationManager getPresentationManager();
+    void MakeScalarMap(in long fieldHandlerId, in string viewMode);
 
   };
+
 };
 
 #endif

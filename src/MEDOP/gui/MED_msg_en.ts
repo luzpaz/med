@@ -29,6 +29,10 @@
       <translation>Expand field timeseries</translation>
     </message>
     <message>
+      <source>LAB_VISUALIZE_SCALARMAP</source>
+      <translation>Scalar map</translation>
+    </message>
+    <message>
       <location filename="MEDOP/gui/DatasourceController.cxx" line="69"/>
       <source>LAB_VISUALIZE</source>
       <translation>Visualize</translation>

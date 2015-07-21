@@ -26,13 +26,14 @@
 #include CORBA_SERVER_HEADER(MEDOPFactory)
 #include CORBA_SERVER_HEADER(MEDDataManager)
 #include CORBA_SERVER_HEADER(MEDCalculator)
+#include CORBA_SERVER_HEADER(MEDPresentationManager)
 #include "SALOME_Component_i.hxx"
 
 #include "MEDOP.hxx"
 class MEDOP_EXPORT MEDOPFactory_i: public POA_MEDOP::MEDOPFactory,
            public Engines_Component_i
 {
-  
+
 public:
   MEDOPFactory_i(CORBA::ORB_ptr orb,
      PortableServer::POA_ptr poa,
@@ -45,7 +46,9 @@ public:
   MEDOP::MEDDataManager_ptr getDataManager();
   /*! Returns the singleton instance of the calculator */
   MEDOP::MEDCalculator_ptr getCalculator();
-  
+  /*! Returns the singleton instance of the prsentation manager */
+  MEDOP::MEDPresentationManager_ptr getPresentationManager();
+
 };
 
 extern "C"

@@ -53,7 +53,7 @@ typedef struct {
     EVENT_IMPORT_OBJECT, // Simply import the object in the workspace
     EVENT_USE_OBJECT,    // Import in the workspace AND define a proxy
                          // variable in the tui console to use it
-    EVENT_VIEW_OBJECT    // View with a salome viewer (SMESH/VISU/PARAVIS)
+    EVENT_VIEW_OBJECT_SCALAR_MAP
   };
   int eventtype;
   XmedDataObject * objectdata;
@@ -87,11 +87,13 @@ protected slots:
   void OnAddDatasource();
   void OnAddImagesource();
   void OnExpandField();
-  void OnVisualize();
+  void OnVisualizeScalarMap();
   void OnUseInWorkspace();
   void OnChangeUnderlyingMesh();
   void OnInterpolateField();
 
+private:
+  void visualize(DatasourceEvent::EventType);
 
 private:
   StandardApp_Module * _salomeModule;

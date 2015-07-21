@@ -90,11 +90,11 @@ void DatasourceController::createActions() {
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnExpandField()),icon);
   _salomeModule->addActionInPopupMenu(actionId);
 
-  // Create a control view
-  label = tr("LAB_VISUALIZE");
+  // Create a view submenu with usual visualization functions
+  label = tr("LAB_VISUALIZE_SCALARMAP");
   icon  = tr("ICO_DATASOURCE_VIEW");
-  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualize()),icon);
-  _salomeModule->addActionInPopupMenu(actionId);
+  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeScalarMap()),icon);
+  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
 
   // Use in workspace
   label = tr("LAB_USE_IN_WORKSPACE");
@@ -282,9 +282,7 @@ void DatasourceController::OnExpandField()
   _salomeModule->updateObjBrowser(true);
 }
 
-void DatasourceController::OnVisualize() {
-  STDLOG("OnVisualize: To Be Implemented");
-
+void DatasourceController::visualize(DatasourceEvent::EventType eventType) {
   // We need a _studyEditor updated on the active study
   _studyEditor->updateActiveStudy();
 
@@ -311,13 +309,16 @@ void DatasourceController::OnVisualize() {
     }
 
     DatasourceEvent * event = new DatasourceEvent();
-    event->eventtype = DatasourceEvent::EVENT_VIEW_OBJECT;
+    event->eventtype = eventType;
     XmedDataObject * dataObject = new XmedDataObject();
     dataObject->setFieldHandler(*fieldHandler);
     event->objectdata  = dataObject;
     emit datasourceSignal(event);
   }
+}
 
+void DatasourceController::OnVisualizeScalarMap() {
+  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_SCALAR_MAP);
 }
 
 void DatasourceController::OnUseInWorkspace() {

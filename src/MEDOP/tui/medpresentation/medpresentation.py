@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2015  CEA/DEN, EDF R&D
+# Copyright (C) 2011-2015  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,5 +17,24 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-ADD_SUBDIRECTORY(xmedpy)
-ADD_SUBDIRECTORY(medpresentation)
+import xmed
+import MEDOP
+import SALOME
+
+__manager = xmed.factory.getPresentationManager()
+
+def LoadDataSource(filename):
+  dataHandler = xmed.dataManager.addDatasource(filename)
+  print data
+  #return data
+#
+
+def MakeScalarMap(proxy, viewMode):
+  # Create the presentation instance in CORBA engine
+  # The engine in turn creates the ParaView pipeline elements
+
+  print "In MakeScalarMap (Python)"
+  __manager.MakeScalarMap(proxy.id, viewMode)
+
+
+#

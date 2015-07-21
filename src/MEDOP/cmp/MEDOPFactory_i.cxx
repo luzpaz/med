@@ -26,6 +26,7 @@
 
 #include "MEDDataManager_i.hxx"
 #include "MEDCalculator_i.hxx"
+#include "MEDPresentationManager_i.hxx"
 
 using namespace std;
 
@@ -61,6 +62,12 @@ MEDOP::MEDCalculator_ptr MEDOPFactory_i::getCalculator() {
   MEDCalculator_i * medCalculator = MEDCalculator_i::getInstance();
   MEDOP::MEDCalculator_ptr medCalculatorPtr = medCalculator->_this();
   return medCalculatorPtr;
+}
+
+MEDOP::MEDPresentationManager_ptr MEDOPFactory_i::getPresentationManager() {
+  MEDPresentationManager_i * manager = MEDPresentationManager_i::getInstance();
+  MEDOP::MEDPresentationManager_ptr managerPtr = manager->_this();
+  return managerPtr;
 }
 
 extern "C"
