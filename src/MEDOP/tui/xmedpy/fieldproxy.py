@@ -385,8 +385,8 @@ class FieldProxy:
 # that they could be used in another context than the FieldProxy instances
 import MEDOP
 
-def __notifyGui(type, fieldId=-1):
-    medEvent = MEDOP.MedEvent(type, fieldId)
+def __notifyGui(type, fieldId=-1, filename=""):
+    medEvent = MEDOP.MedEvent(type, fieldId, filename)
 
     if not xmed.eventListenerIsRunning(): return
 
@@ -410,6 +410,9 @@ def notifyGui_remove(fieldId):
 
 def notifyGui_clean():
     __notifyGui(MEDOP.EVENT_CLEAN_WORKSPACE)
+
+def notifyGui_addsource(filename):
+    __notifyGui(MEDOP.EVENT_ADD_DATASOURCE,-1,filename)
 
 #
 # ===================================================================

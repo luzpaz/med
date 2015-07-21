@@ -552,3 +552,12 @@ void DatasourceController::OnInterpolateFieldInputValidated() {
   // // Tag the item to prevent double import
   // //_studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
 }
+
+void
+DatasourceController::processWorkspaceEvent(const MEDOP::MedEvent * event)
+{
+  if ( event->type == MEDOP::EVENT_ADD_DATASOURCE ) {
+    this->addDatasource(event->filename);
+    _salomeModule->updateObjBrowser(true);
+  }
+}

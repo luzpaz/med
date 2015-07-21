@@ -22,6 +22,7 @@
 #ifndef DATASOURCE_CONTROLLER_H
 #define DATASOURCE_CONTROLLER_H
 
+#include "MEDEventListener_i.hxx"
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MEDDataManager)
 #include <StandardApp_Module.hxx>
@@ -79,6 +80,7 @@ public slots:
   // Callback connected to dialog box validation signals
   void OnChangeUnderlyingMeshInputValidated();
   void OnInterpolateFieldInputValidated();
+  void processWorkspaceEvent(const MEDOP::MedEvent * event);
 
 signals:
   void datasourceSignal(const DatasourceEvent * event);

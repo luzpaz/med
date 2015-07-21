@@ -59,6 +59,9 @@ public slots:
   void OnSaveWorkspace();
   void OnCleanWorkspace();
 
+signals:
+  void workspaceSignal(const MEDOP::MedEvent * event);
+
 private:
   XmedConsoleDriver * _consoleDriver;
   StandardApp_Module * _salomeModule;

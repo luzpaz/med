@@ -293,6 +293,9 @@ void WorkspaceController::processMedEvent(const MEDOP::MedEvent * event) {
       dataModel->removeDataObject(itemNameId);
     }
   }
+  else if ( event->type == MEDOP::EVENT_ADD_DATASOURCE ) {
+    emit workspaceSignal(event); // forward to DatasourceController
+  }
 
 }
 

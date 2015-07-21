@@ -83,6 +83,9 @@ void MEDOPModule::createModuleWidgets() {
 
   connect(_datasourceController, SIGNAL(datasourceSignal(const DatasourceEvent *)),
     _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent *)));
+
+  connect(_workspaceController, SIGNAL(workspaceSignal(const MEDOP::MedEvent *)),
+    _datasourceController, SLOT(processWorkspaceEvent(const MEDOP::MedEvent *)));
 }
 
 bool MEDOPModule::activateModule( SUIT_Study* theStudy )

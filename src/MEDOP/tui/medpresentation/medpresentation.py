@@ -24,9 +24,8 @@ import SALOME
 __manager = xmed.factory.getPresentationManager()
 
 def LoadDataSource(filename):
-  dataHandler = xmed.dataManager.addDatasource(filename)
-  print data
-  #return data
+  from xmed.fieldproxy import notifyGui_addsource
+  notifyGui_addsource(filename)
 #
 
 def MakeScalarMap(proxy, viewMode):

@@ -55,6 +55,4 @@ void MEDEventListener_i::processMedEvent(const MEDOP::MedEvent & event) {
   // WorkspaceController (connect to a slot of WorkspaceController).
 
   emit medEventSignal(new MEDOP::MedEvent(event));
-  
-
 }
