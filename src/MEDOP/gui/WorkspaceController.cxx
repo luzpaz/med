@@ -498,6 +498,12 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
     commands += QString("MakeScalarMap(get(%1), %2)").arg(fieldHandler->id).arg(viewMode);
     _consoleDriver->exec(commands);
   }
+  else if ( event->eventtype == DatasourceEvent::EVENT_ADD_DATASOURCE ) {
+    QStringList commands;
+    commands += QString("from medpresentation import LoadDataSource");
+    commands += QString("LoadDataSource('%1')").arg(event->objectalias);
+    _consoleDriver->exec(commands);
+  }
   else {
     STDLOG("The event "<<event->eventtype<<" is not implemented yet");
   }

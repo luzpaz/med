@@ -54,7 +54,8 @@ typedef struct {
     EVENT_IMPORT_OBJECT, // Simply import the object in the workspace
     EVENT_USE_OBJECT,    // Import in the workspace AND define a proxy
                          // variable in the tui console to use it
-    EVENT_VIEW_OBJECT_SCALAR_MAP
+    EVENT_VIEW_OBJECT_SCALAR_MAP,
+    EVENT_ADD_DATASOURCE // to forward action to workspace (and then to python console)
   };
   int eventtype;
   XmedDataObject * objectdata;
@@ -74,7 +75,6 @@ public:
   ~DatasourceController();
 
   void createActions();
-  MEDOP::DatasourceHandler * addDatasource(const char * filename);
 
 public slots:
   // Callback connected to dialog box validation signals
@@ -96,6 +96,8 @@ protected slots:
 
 private:
   void visualize(DatasourceEvent::EventType);
+  void addDatasource(const char* filename);
+  void updateTreeViewWithNewDatasource(const MEDOP::DatasourceHandler*);
 
 private:
   StandardApp_Module * _salomeModule;

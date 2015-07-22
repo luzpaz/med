@@ -69,7 +69,8 @@ public:
   //
   // -----------------------------------------------------------
   // Datasource management
-  MEDOP::DatasourceHandler * addDatasource(const char *filepath);
+  MEDOP::DatasourceHandler * loadDatasource(const char *filepath);
+  MEDOP::DatasourceHandler * getDatasourceHandler(const char *filepath);
 
   // -----------------------------------------------------------
   // Mesh management

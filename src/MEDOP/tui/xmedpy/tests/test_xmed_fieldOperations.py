@@ -38,7 +38,7 @@ xmed.setConsoleGlobals(globals())
 
 # Load some test data in the MedDataManager
 filepath  = properties.testFilePath
-xmed.dataManager.addDatasource(filepath)
+xmed.dataManager.loadDatasource(filepath)
 fieldHandlerList = xmed.dataManager.getFieldHandlerList()
 
 def setup():
@@ -63,11 +63,11 @@ def TEST_addition():
     # The addition can be done using field handler directly
     addFieldHandler = xmed.calculator.add(fieldHandler0, fieldHandler1)
     print addFieldHandler
-    
+
     # Or with a field proxy that ease the writing of operations
     fieldProxy0 = FieldProxy(fieldHandler0)
     fieldProxy1 = FieldProxy(fieldHandler1)
-    
+
     res = fieldProxy0 + fieldProxy1
     if res is None: return False
 
@@ -128,7 +128,7 @@ def TEST_composition():
     if res is None: return False
 
     return True
-    
+
 def TEST_litteral_equation():
     fieldProxy0 = FieldProxy(fieldHandlerList[0])
     res = fieldProxy0.ope("abs(u)^2")
@@ -225,7 +225,7 @@ def myusecases():
     #TEST_unary_operations()
     #TEST_update_metadata()
     #TEST_composition()
-    
+
 if __name__ == "__main__":
     #myusecases()
     myunittests()

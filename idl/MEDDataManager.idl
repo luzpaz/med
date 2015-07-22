@@ -116,7 +116,8 @@ module MEDOP
     //==========================================================
     // Datasource management
     //==========================================================
-    DatasourceHandler addDatasource(in string filepath);
+    DatasourceHandler loadDatasource(in string filepath);
+    DatasourceHandler getDatasourceHandler(in string filepath);
 
     //==========================================================
     // Mesh data management

@@ -123,10 +123,21 @@ void DatasourceController::createActions() {
  * informations to the GUI, and the GUI creates a tree view of these
  * data in the study object browser.
  */
-MEDOP::DatasourceHandler * DatasourceController::addDatasource(const char * filename) {
-
-  MEDOP::DatasourceHandler * datasourceHandler =
-    MEDOPFactoryClient::getDataManager()->addDatasource(filename);
+void
+DatasourceController::addDatasource(const char* filename)
+{
+  DatasourceEvent* event = new DatasourceEvent();
+  event->eventtype = DatasourceEvent::EVENT_ADD_DATASOURCE;
+  event->objectalias = filename;
+  emit datasourceSignal(event);
+}
+// call to this function is trigerred by workspace (itself from python console)
+void
+DatasourceController::updateTreeViewWithNewDatasource(const MEDOP::DatasourceHandler* datasourceHandler)
+{
+  if (!datasourceHandler) {
+    return;
+  }
 
   // We need a studyEditor updated on the active study
   _studyEditor->updateActiveStudy();
@@ -169,8 +180,6 @@ MEDOP::DatasourceHandler * DatasourceController::addDatasource(const char * file
       _studyEditor->setParameterBool(soFieldseries,OBJECT_IS_IN_WORKSPACE,false);
     }
   }
-
-  return datasourceHandler;
 }
 
 
@@ -554,10 +563,11 @@ void DatasourceController::OnInterpolateFieldInputValidated() {
 }
 
 void
-DatasourceController::processWorkspaceEvent(const MEDOP::MedEvent * event)
+DatasourceController::processWorkspaceEvent(const MEDOP::MedEvent* event)
 {
   if ( event->type == MEDOP::EVENT_ADD_DATASOURCE ) {
-    this->addDatasource(event->filename);
+    MEDOP::DatasourceHandler* datasourceHandler = MEDOPFactoryClient::getDataManager()->getDatasourceHandler(event->filename);
+    this->updateTreeViewWithNewDatasource(datasourceHandler);
     _salomeModule->updateObjBrowser(true);
   }
 }

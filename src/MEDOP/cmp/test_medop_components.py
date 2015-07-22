@@ -106,13 +106,13 @@ testFilePath = getFilePath(testFileName)
 #
 def TEST_getDataManager():
     dataManager = factory.getDataManager()
-    if "addDatasource" not in dir(dataManager):
+    if "loadDatasource" not in dir(dataManager):
         return False
     return True
 
-def TEST_addDatasource():
+def TEST_loadDatasource():
     dataManager = factory.getDataManager()
-    datasource = dataManager.addDatasource(testFilePath)
+    datasource = dataManager.loadDatasource(testFilePath)
     if datasource.name != testFileName:
         print "ERR: datasource.name=%s (should be %s)"%(datasource.name,testFilePath)
         return False
@@ -120,16 +120,16 @@ def TEST_addDatasource():
     # We try to load the file twice. It should not load twice and
     # return the same datasource as previously registered (same id).
     sourceid_ref = datasource.id
-    datasource = dataManager.addDatasource(testFilePath)
+    datasource = dataManager.loadDatasource(testFilePath)
     if datasource.id != sourceid_ref:
         print "ERR: datasource.id=%s (should be %s)"%(datasource.id,sourceid_ref)
         return False
-        
+
     return True
 
 def TEST_getFieldHandlerList():
     dataManager = factory.getDataManager()
-    datasource = dataManager.addDatasource(testFilePath)
+    datasource = dataManager.loadDatasource(testFilePath)
     fieldHandlerList = dataManager.getFieldHandlerList()
     if fieldHandlerList is None or len(fieldHandlerList) == 0:
         return False
@@ -137,7 +137,7 @@ def TEST_getFieldHandlerList():
 
 def TEST_getFieldRepresentation():
     dataManager = factory.getDataManager()
-    datasource = dataManager.addDatasource(testFilePath)
+    datasource = dataManager.loadDatasource(testFilePath)
     fieldHandlerList = dataManager.getFieldHandlerList()
     fieldHandler0 = fieldHandlerList[0]
 
@@ -146,13 +146,13 @@ def TEST_getFieldRepresentation():
 
 def TEST_updateFieldMetadata():
     dataManager = factory.getDataManager()
-    datasource = dataManager.addDatasource(testFilePath)
+    datasource = dataManager.loadDatasource(testFilePath)
     fieldHandlerList = dataManager.getFieldHandlerList()
     fieldHandler0 = fieldHandlerList[0]
 
     fieldid = fieldHandler0.id
     newname = fieldHandler0.fieldname + " modified"
-    
+
     dataManager.updateFieldMetadata(fieldid, newname,
                                     fieldHandler0.iteration,
                                     fieldHandler0.order,
@@ -168,7 +168,7 @@ def TEST_updateFieldMetadata():
 
 def TEST_saveFields():
     dataManager = factory.getDataManager()
-    datasource = dataManager.addDatasource(testFilePath)
+    datasource = dataManager.loadDatasource(testFilePath)
     fieldHandlerList = dataManager.getFieldHandlerList()
     fieldHandler0 = fieldHandlerList[0]
     fieldIdList = [fieldHandler0.id]
@@ -176,7 +176,7 @@ def TEST_saveFields():
 
     print "fieldIdList = %s"%fieldIdList
     print "filepath = %s"%filepath
-    
+
     dataManager.saveFields(filepath,fieldIdList)
     # We just control that the file exists. But we should reload the
     # contents to check the fields
@@ -193,17 +193,17 @@ def TEST_saveFields():
 #
 def TEST_MEDDataManager_getMeshList():
     dataManager = factory.getDataManager()
-    datasourceHandler = dataManager.addDatasource(testFilePath)
+    datasourceHandler = dataManager.loadDatasource(testFilePath)
     meshHandlerList = dataManager.getMeshList(datasourceHandler.id)
     print meshHandlerList
 
     if len(meshHandlerList) == 0:
         return False
     return True
-    
+
 def TEST_MEDDataManager_getMesh():
     dataManager = factory.getDataManager()
-    datasourceHandler = dataManager.addDatasource(testFilePath)
+    datasourceHandler = dataManager.loadDatasource(testFilePath)
     meshHandlerList = dataManager.getMeshList(datasourceHandler.id)
     for mRef in meshHandlerList:
         meshId = mRef.id
@@ -212,10 +212,10 @@ def TEST_MEDDataManager_getMesh():
         if ( mRes.name != mRef.name ) or ( mRes.sourceid != mRef.sourceid):
             return False
     return True
-    
+
 def TEST_MEDDataManager_getFieldseriesListOnMesh():
     dataManager = factory.getDataManager()
-    datasourceHandler = dataManager.addDatasource(testFilePath)
+    datasourceHandler = dataManager.loadDatasource(testFilePath)
 
     meshHandlerList = dataManager.getMeshList(datasourceHandler.id)
     # We look for the fieldseries defined on the first mesh of the list
@@ -232,7 +232,7 @@ def TEST_MEDDataManager_getFieldListInFieldseries():
     testFilePath = os.path.join(RESDIR,testFileName)
 
     testFilePath  = getFilePath("timeseries.med")
-    datasourceHandler = dataManager.addDatasource(testFilePath)
+    datasourceHandler = dataManager.loadDatasource(testFilePath)
 
     meshHandlerList = dataManager.getMeshList(datasourceHandler.id)
     # We look for the fieldseries defined on the first mesh of the list
@@ -255,7 +255,7 @@ def TEST_MEDDataManager_getFieldListInFieldseries():
 #
 def TEST_Calculator_basics():
     dataManager = factory.getDataManager()
-    datasource = dataManager.addDatasource(testFilePath)
+    datasource = dataManager.loadDatasource(testFilePath)
     fieldHandlerList = dataManager.getFieldHandlerList()
 
     # Try to operate on the two first fields
@@ -274,7 +274,7 @@ def TEST_Calculator_basics():
     div = calculator.div(fieldHandler0, fieldHandler1)
     print div
     #power = calculator.pow(fieldHandler0, 2)
-    #print power 
+    #print power
     linear = calculator.lin(fieldHandler0, 3,2)
     print linear
 
@@ -282,7 +282,7 @@ def TEST_Calculator_basics():
 
 def TEST_Calculator_applyFunc():
     dataManager = factory.getDataManager()
-    datasource = dataManager.addDatasource(testFilePath)
+    datasource = dataManager.loadDatasource(testFilePath)
     fieldHandlerList = dataManager.getFieldHandlerList()
     fieldHandler = fieldHandlerList[0]
 
@@ -307,7 +307,7 @@ def TEST_Calculator_applyFunc():
 #
 def TEST_markAsPersistent():
     dataManager = factory.getDataManager()
-    datasource = dataManager.addDatasource(testFilePath)
+    datasource = dataManager.loadDatasource(testFilePath)
     fieldHandlerList = dataManager.getFieldHandlerList()
     fieldHandler0 = fieldHandlerList[0]
     fieldHandler1 = fieldHandlerList[1]
@@ -337,8 +337,8 @@ class MyTestSuite(unittest.TestCase):
     def test_getDataManager(self):
         self.assertTrue(TEST_getDataManager())
 
-    def test_addDatasource(self):
-        self.assertTrue(TEST_addDatasource())
+    def test_loadDatasource(self):
+        self.assertTrue(TEST_loadDatasource())
 
     def test_getFieldHandlerList(self):
         self.assertTrue(TEST_getFieldHandlerList())

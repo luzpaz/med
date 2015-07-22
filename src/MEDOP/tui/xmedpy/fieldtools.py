@@ -155,6 +155,8 @@ def load(medFileName=filepath):
     """
     xmed.dataManager.addDatasource(filepath)
     print status(local=False,remote=True)
+    from xmed.fieldproxy import notifyGui_addsource
+    notifyGui_addsource(filename)
 
 def get(fieldHandlerId):
     """

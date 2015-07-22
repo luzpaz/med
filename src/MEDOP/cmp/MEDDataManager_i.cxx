@@ -77,7 +77,7 @@ std::string MEDDataManager_i::source_to_file(const char * source)
  * is a key to retrieve all informations concerning the data (meshes,
  * fields).
  */
-MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath) {
+MEDOP::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepath) {
 
   // We first check that this datasource is not already registered
   long sourceid = getDatasourceId(filepath);
@@ -202,6 +202,20 @@ long MEDDataManager_i::getDatasourceId(const char *filepath) {
   return LONG_UNDEFINED;
 }
 
+MEDOP::DatasourceHandler*
+MEDDataManager_i::getDatasourceHandler(const char *filepath)
+{
+  std::string uri(file_to_source(filepath));
+  DatasourceHandlerMapIterator it = _datasourceHandlerMap.begin();
+  while ( it != _datasourceHandlerMap.end() ) {
+    if ( strcmp(it->second->uri,uri.c_str()) == 0 ) {
+      return it->second;
+    }
+    ++it;
+  }
+  return NULL;
+}
+
 
 MEDOP::MeshHandler * MEDDataManager_i::getMesh(CORBA::Long meshId) {
   if ( _meshHandlerMap.count(meshId) == 0 ) {
@@ -293,7 +307,7 @@ MEDOP::FieldHandlerList * MEDDataManager_i::getFieldListInFieldseries(CORBA::Lon
 
 /*!
  * This returns the whole set of fields handlers for all datasource
- * that have been loaded using addDatasource.
+ * that have been loaded using loadDatasource.
  */
 MEDOP::FieldHandlerList * MEDDataManager_i::getFieldHandlerList() {
   MEDOP::FieldHandlerList_var fieldHandlerSeq = new MEDOP::FieldHandlerList();
@@ -562,15 +576,15 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDOP::FieldHand
   // At this step, the mesh handler needs a meshid correctly
   // set. Normally, we should arrive at this step only in the case
   // where the field is loaded from a file ==> the meshid is defined
-  // (see the addDatasource function).
+  // (see the loadDatasource function).
   //
   // >>>> __GBO__ TO BE CHECKED AND SERIOUSLY TESTED. There at least
   // one case where we can arrive here with no previous call to
-  // addDataSource: for example the field handler list can be obtained
-  // from a call to addFieldsFromFile instead of addDataSource (see
+  // loadDataSource: for example the field handler list can be obtained
+  // from a call to addFieldsFromFile instead of loadDataSource (see
   // for exemple the getFieldRepresentation service of the
   // dataManager, that comes here and then calls getUMesh where we
-  // need a map initialized only in addDataSource) <<<<
+  // need a map initialized only in loadDataSource) <<<<
   long meshid = fieldHandler->meshid;
 
   // We first have to check if the associated mesh is already loaded

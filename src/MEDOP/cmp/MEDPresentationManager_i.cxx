@@ -41,6 +41,5 @@ MEDPresentationManager_i::~MEDPresentationManager_i()
 void
 MEDPresentationManager_i::MakeScalarMap(const MEDOP::ScalarMapParameters& params)
 {
-  std::cout << "View mode: " << params.viewMode << std::endl;
   std::cout << "MEDPresentationManager_i::MakeScalarMap: Not implemented yet\n";
 }

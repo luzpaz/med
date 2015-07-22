@@ -24,6 +24,7 @@ import SALOME
 __manager = xmed.factory.getPresentationManager()
 
 def LoadDataSource(filename):
+  xmed.dataManager.loadDatasource(filename)
   from xmed.fieldproxy import notifyGui_addsource
   notifyGui_addsource(filename)
 #
@@ -36,7 +37,7 @@ def MakeScalarMap(proxy, viewMode=MEDOP.VIEW_MODE_REPLACE):
 
   print "viewMode:", viewMode, " [", type(viewMode), "]"
 
-  params = MEDOP.ScalarMapParameters(proxy.id, viewMode);
+  params = MEDOP.ScalarMapParameters(proxy.id, viewMode)
   __manager.MakeScalarMap(params)
 
 #
