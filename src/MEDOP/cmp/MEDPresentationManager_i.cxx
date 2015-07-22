@@ -18,8 +18,6 @@
 //
 
 #include "MEDPresentationManager_i.hxx"
-#include "SALOME_KernelServices.hxx"
-#include "Basics_Utils.hxx"
 
 MEDPresentationManager_i* MEDPresentationManager_i::_instance = NULL;
 
@@ -41,8 +39,8 @@ MEDPresentationManager_i::~MEDPresentationManager_i()
 #include <iostream>
 
 void
-MEDPresentationManager_i::MakeScalarMap(CORBA::Long fieldHandlerId, const char* viewMode)
+MEDPresentationManager_i::MakeScalarMap(const MEDOP::ScalarMapParameters& params)
 {
-  //throw KERNEL::createSalomeException("Not implemented yet");
+  std::cout << "View mode: " << params.viewMode << std::endl;
   std::cout << "MEDPresentationManager_i::MakeScalarMap: Not implemented yet\n";
 }

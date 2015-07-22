@@ -35,7 +35,7 @@ class MEDOP_EXPORT MEDPresentationManager_i: public POA_MEDOP::MEDPresentationMa
 
   static MEDPresentationManager_i* getInstance();
 
-  void MakeScalarMap(CORBA::Long fieldHandlerId, const char*);
+  void MakeScalarMap(const MEDOP::ScalarMapParameters&);
 
  private:
 

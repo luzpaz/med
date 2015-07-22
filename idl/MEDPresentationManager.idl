@@ -26,10 +26,22 @@
 module MEDOP
 {
 
+  enum MEDPresentationViewMode {
+    VIEW_MODE_OVERLAP,
+    VIEW_MODE_REPLACE,
+    VIEW_MODE_NEW_LAYOUT,
+    VIEW_MODE_SPLIT_VIEW
+  };
+
+  struct ScalarMapParameters {
+    long fieldHandlerId;
+    MEDPresentationViewMode viewMode;
+  };
+
   interface MEDPresentationManager : SALOME::GenericObj
   {
 
-    void MakeScalarMap(in long fieldHandlerId, in string viewMode);
+    void MakeScalarMap(in ScalarMapParameters params);
 
   };
 

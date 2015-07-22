@@ -488,9 +488,14 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
   else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_SCALAR_MAP ) {
     QStringList commands;
     commands += QString("from medpresentation import MakeScalarMap");
-    QString viewMode = "view mode"; // :TODO: change this (get value from dedicated dialog)
+    commands += QString("import MEDOP");
+
+#define stringify( name ) # name
+    QString viewMode = stringify(MEDOP::VIEW_MODE_NEW_LAYOUT); // :TODO: change this (get value from dedicated dialog)
+    viewMode.replace("::", ".");
+
     MEDOP::FieldHandler* fieldHandler = dataObject->getFieldHandler();
-    commands += QString("MakeScalarMap(get(%1), '%2')").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("MakeScalarMap(get(%1), %2)").arg(fieldHandler->id).arg(viewMode);
     _consoleDriver->exec(commands);
   }
   else {

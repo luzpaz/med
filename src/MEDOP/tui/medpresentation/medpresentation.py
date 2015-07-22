@@ -28,12 +28,15 @@ def LoadDataSource(filename):
   notifyGui_addsource(filename)
 #
 
-def MakeScalarMap(proxy, viewMode):
+def MakeScalarMap(proxy, viewMode=MEDOP.VIEW_MODE_REPLACE):
   # Create the presentation instance in CORBA engine
   # The engine in turn creates the ParaView pipeline elements
 
   print "In MakeScalarMap (Python)"
-  __manager.MakeScalarMap(proxy.id, viewMode)
 
+  print "viewMode:", viewMode, " [", type(viewMode), "]"
+
+  params = MEDOP.ScalarMapParameters(proxy.id, viewMode);
+  __manager.MakeScalarMap(params)
 
 #
