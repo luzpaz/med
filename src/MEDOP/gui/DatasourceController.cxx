@@ -123,6 +123,7 @@ void DatasourceController::createActions() {
  * informations to the GUI, and the GUI creates a tree view of these
  * data in the study object browser.
  */
+// This function emits a signal that will be caught by workspace to delegate command (datasource creation) to python console.
 void
 DatasourceController::addDatasource(const char* filename)
 {
@@ -131,7 +132,7 @@ DatasourceController::addDatasource(const char* filename)
   event->objectalias = filename;
   emit datasourceSignal(event);
 }
-// call to this function is trigerred by workspace (itself from python console)
+// After above data source creation, python console emits a signal, forwarded by workspace, to update the GUI
 void
 DatasourceController::updateTreeViewWithNewDatasource(const MEDOP::DatasourceHandler* datasourceHandler)
 {
@@ -182,7 +183,6 @@ DatasourceController::updateTreeViewWithNewDatasource(const MEDOP::DatasourceHan
   }
 }
 
-
 void DatasourceController::OnAddDatasource()
 {
   // Dialog to get the filename where the input data are read from
@@ -192,14 +192,6 @@ void DatasourceController::OnAddDatasource()
   QString anInitialPath = "";
   if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
     anInitialPath = QDir::currentPath();
-
-  /*
-  QString filename = SUIT_FileDlg::getFileName(_salomeModule->getApp()->desktop(),
-                                               "",
-                                               filter,
-                                               tr("IMPORT_MED_FIELDS"),
-                                               true);
-  */
 
   QStringList filenames = SUIT_FileDlg::getOpenFileNames( _salomeModule->getApp()->desktop(),
                                                           anInitialPath,
@@ -216,8 +208,8 @@ void DatasourceController::OnAddDatasource()
 }
 
 #include "DlgImageToMed.hxx"
-#include <stdio.h>
-#include <stdlib.h>
+//#include <stdio.h>
+//#include <stdlib.h>
 void DatasourceController::OnAddImagesource()
 {
 
@@ -230,6 +222,7 @@ void DatasourceController::OnAddImagesource()
   }
 
   QString imageFilename = dialog.getImageFilepath();
+  /*
   QString medFilename   = dialog.getMedFilepath();
   bool autoLoad         = dialog.isAutoLoaded();
 
@@ -249,7 +242,12 @@ void DatasourceController::OnAddImagesource()
     this->addDatasource(QCHARSTAR(medFilename));
     _salomeModule->updateObjBrowser(true);
   }
+  */
 
+  DatasourceEvent* event = new DatasourceEvent();
+  event->eventtype = DatasourceEvent::EVENT_ADD_IMAGE_AS_DATASOURCE;
+  event->objectalias = imageFilename;
+  emit datasourceSignal(event);
 }
 
 void DatasourceController::OnExpandField()

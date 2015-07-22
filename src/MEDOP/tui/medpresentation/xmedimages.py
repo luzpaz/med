@@ -18,7 +18,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# Author : Guillaume Boulant (EDF) 
+# Author : Guillaume Boulant (EDF)
 
 import MEDCoupling as MC
 import MEDLoader as ML
@@ -36,14 +36,14 @@ class FieldBuilder:
         imgbw=ImageOps.grayscale(img)
         # WARN: We keep only the grayscale. Maybe, it could be usefull
         # to get the RGB scales each on one component of the field.
-        
+
         # Creating a cartesian mesh with a grid of the size of the image
         # The sizes defined the number of pixel in a direction, then the
-        # number of cells to create in the mesh in that direction.        
+        # number of cells to create in the mesh in that direction.
         width,height=imgbw.size
         mesh=self.createMesh("grid_%sx%s"%(width,height),width,height)
         field=self.createField("imagefield",mesh,imgbw)
-        
+
         # The MEDLoader can be used to save all the stuff in a med file. You
         # just have to specify the field and the MEDLoader will save the
         # underlying mesh.
@@ -61,18 +61,18 @@ class FieldBuilder:
         # are considered as values defined on cells. With size values in a
         # direction, we have to create size+1 mesh nodes in that direction.
         # <<<
-        
+
         # The mesh is created using MEDCoupling
         cmesh=MC.MEDCouplingCMesh.New();
         cmesh.setName(meshname)
-        
+
         # We use an arbitrary step between cells (the value does not matter)
         stepX = 0.1
         nbNodesX = sizeX+1
         arrX = [float(i * stepX) for i in range(nbNodesX)]
         coordsX=MC.DataArrayDouble.New()
         coordsX.setValues(arrX,nbNodesX,1)
-        
+
         # For the Y dimension, we have to reverse the coordinates (the
         # first pixel is at y=height and not at y=0).
         stepY = 0.1
@@ -81,23 +81,23 @@ class FieldBuilder:
         arrY=[float(lengthY - i * stepY) for i in range(nbNodesY)]
         coordsY=MC.DataArrayDouble.New()
         coordsY.setValues(arrY,nbNodesY,1)
-        
+
         cmesh.setCoords(coordsX,coordsY)
         print "Imagem mesh dimension: %d"%cmesh.getSpaceDimension()
-        
+
         # WARN: In the current state of development of MEDLoader, only
         # unstructured meshes are supported for writting function in med
         # files. We just have to convert the cartesian mesh in an unstructured
         # mesh before creating the field.
         umesh=cmesh.buildUnstructured();
         umesh.setName(cmesh.getName())
-        
+
         return umesh
-    
+
     def createField(self, fieldname, mesh, image):
         """
         Creating a scalar field on the mesh using image data
-        """    
+        """
         # Create the field using MEDCoupling
         field = MC.MEDCouplingFieldDouble.New(MC.ON_CELLS,MC.ONE_TIME);
         field.setName(fieldname);
@@ -105,16 +105,16 @@ class FieldBuilder:
         # OPTIONAL: We set an arbitrary time step for test purpose
         field.setIteration(0);
         field.setOrder(0)
-        
+
         imagedata=list(image.getdata())
         width,height=image.size
         nbCells = width*height
         dataArray=MC.DataArrayDouble.New();
         nbComponents=1 # For a scalar field
-        
+
         dataArray.setValues(imagedata,nbCells,nbComponents)
         field.setArray(dataArray);
-        
+
         return field
 
 #
@@ -135,11 +135,11 @@ def TEST_pil():
     imgFilePath = getTestImagePath()
     img=Image.open(imageFilepath)
     imgbw=ImageOps.grayscale(img)
-    
+
 
 def TEST_image2med():
     imgFilePath = getTestImagePath()
-    builder = FieldBuilder()    
+    builder = FieldBuilder()
     builder.image2med(imgFilePath,"image.med")
 
 # ===================================================================

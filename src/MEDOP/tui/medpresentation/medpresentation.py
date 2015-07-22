@@ -29,6 +29,19 @@ def LoadDataSource(filename):
   notifyGui_addsource(filename)
 #
 
+def LoadImageAsDataSource(filename):
+  # get temp file name to generate med file from image
+  import tempfile
+  temp = tempfile.NamedTemporaryFile(suffix='.cfg')
+  medfilename = temp.name
+  temp.close()
+
+  from xmedimages import FieldBuilder
+  builder = FieldBuilder()
+  builder.image2med(filename, medfilename)
+  LoadDataSource(medfilename)
+#
+
 def MakeScalarMap(proxy, viewMode=MEDOP.VIEW_MODE_REPLACE):
   # Create the presentation instance in CORBA engine
   # The engine in turn creates the ParaView pipeline elements

@@ -504,6 +504,12 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
     commands += QString("LoadDataSource('%1')").arg(event->objectalias);
     _consoleDriver->exec(commands);
   }
+  else if ( event->eventtype == DatasourceEvent::EVENT_ADD_IMAGE_AS_DATASOURCE ) {
+    QStringList commands;
+    commands += QString("from medpresentation import LoadImageAsDataSource");
+    commands += QString("LoadImageAsDataSource('%1')").arg(event->objectalias);
+    _consoleDriver->exec(commands);
+  }
   else {
     STDLOG("The event "<<event->eventtype<<" is not implemented yet");
   }

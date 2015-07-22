@@ -55,7 +55,9 @@ typedef struct {
     EVENT_USE_OBJECT,    // Import in the workspace AND define a proxy
                          // variable in the tui console to use it
     EVENT_VIEW_OBJECT_SCALAR_MAP,
-    EVENT_ADD_DATASOURCE // to forward action to workspace (and then to python console)
+    // these ones forward actions to workspace (and then to python console)
+    EVENT_ADD_DATASOURCE,
+    EVENT_ADD_IMAGE_AS_DATASOURCE
   };
   int eventtype;
   XmedDataObject * objectdata;

@@ -18,4 +18,6 @@
 #
 
 from medpresentation import LoadDataSource
+from medpresentation import LoadImageAsDataSource
+
 from medpresentation import MakeScalarMap
