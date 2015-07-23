@@ -487,7 +487,7 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
   }
   else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_SCALAR_MAP ) {
     QStringList commands;
-    commands += QString("from medpresentation import MakeScalarMap");
+    commands += QString("from medcalc import MakeScalarMap");
     commands += QString("import MEDOP");
 
 #define stringify( name ) # name
@@ -500,13 +500,13 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
   }
   else if ( event->eventtype == DatasourceEvent::EVENT_ADD_DATASOURCE ) {
     QStringList commands;
-    commands += QString("from medpresentation import LoadDataSource");
+    commands += QString("from medcalc import LoadDataSource");
     commands += QString("LoadDataSource('%1')").arg(event->objectalias);
     _consoleDriver->exec(commands);
   }
   else if ( event->eventtype == DatasourceEvent::EVENT_ADD_IMAGE_AS_DATASOURCE ) {
     QStringList commands;
-    commands += QString("from medpresentation import LoadImageAsDataSource");
+    commands += QString("from medcalc import LoadImageAsDataSource");
     commands += QString("LoadImageAsDataSource('%1')").arg(event->objectalias);
     _consoleDriver->exec(commands);
   }

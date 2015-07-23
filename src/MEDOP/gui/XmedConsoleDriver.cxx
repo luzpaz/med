@@ -67,9 +67,10 @@ void XmedConsoleDriver::setup() {
 /*!
  * This function sends the specified list of commands to the console.
  */
-void XmedConsoleDriver::exec(QStringList commands) {
+void XmedConsoleDriver::exec(const QStringList& commands) {
   QStringListIterator it(commands);
   while (it.hasNext()) {
     _pyConsole->exec(it.next());
   }
+  this->_history.append(commands);
 }

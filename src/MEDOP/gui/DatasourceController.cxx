@@ -477,7 +477,7 @@ void DatasourceController::OnChangeUnderlyingMeshInputValidated() {
   event->eventtype = DatasourceEvent::EVENT_IMPORT_OBJECT;
   XmedDataObject * dataObject = new XmedDataObject();
   dataObject->setFieldHandler(*duplicate);
-  event->objectdata  = dataObject;
+  event->objectdata = dataObject;
   emit datasourceSignal(event);
   // Note that this signal is processed by the WorkspaceController
 

@@ -16,7 +16,7 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author : Guillaume Boulant (EDF) 
+// Author : Guillaume Boulant (EDF)
 
 #ifndef XMEDCONSOLEDRIVER_HXX
 #define XMEDCONSOLEDRIVER_HXX
@@ -28,17 +28,22 @@
 
 #include "MEDOPGUI.hxx"
 
+typedef QList<QStringList> CommandsHistory;
+
 class MEDOPGUI_EXPORT XmedConsoleDriver {
 
 public:
   XmedConsoleDriver(SalomeApp_Application * application);
 
   void setup();
-  void exec(QStringList commands);
+  void exec(const QStringList& commands);
+
+  inline const CommandsHistory& getHistory() { return _history; }
 
 private:
   PyConsole_Console * _pyConsole;
   bool _importXmedDone;
+  CommandsHistory _history;
 };
 
 #endif //XMEDCONSOLEDRIVER_HXX
