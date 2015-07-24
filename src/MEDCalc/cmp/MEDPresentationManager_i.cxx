@@ -18,6 +18,7 @@
 //
 
 #include "MEDPresentationManager_i.hxx"
+#include "MEDFactoryClient.hxx"
 
 MEDPresentationManager_i* MEDPresentationManager_i::_instance = NULL;
 
@@ -50,4 +51,13 @@ void
 MEDPresentationManager_i::MakeScalarMap(const MEDCALC::ScalarMapParameters& params)
 {
   std::cout << "MEDPresentationManager_i::MakeScalarMap: Not implemented yet\n";
+
+  std::size_t fieldHandlerId = params.fieldHandlerId;
+  MEDCALC::MEDPresentationViewMode viewMode = params.viewMode;
+
+  std::cout << "\tfieldHandlerId: " << fieldHandlerId << std::endl;
+  std::cout << "\tviewMode: " << viewMode << std::endl;
+
+  MEDCALC::FieldHandler* fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldHandlerId);
+
 }

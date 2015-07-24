@@ -28,7 +28,7 @@
 #include CORBA_CLIENT_HEADER(MEDDataManager)
 #include CORBA_CLIENT_HEADER(MEDCalculator)
 
-#include "MEDCALCGUI.hxx"
+#include "MEDCALC.hxx"
 
 // This helper manages static variables binded on main objects of the
 // XMED context, so that they could be initialized once and shared in
@@ -36,9 +36,9 @@
 // class while this instance are singleton instances.
 
 namespace MEDFactoryClient {
-  MEDCALCGUI_EXPORT MEDCALC::MEDFactory_ptr getFactory();
-  MEDCALCGUI_EXPORT MEDCALC::MEDDataManager_ptr getDataManager();
-  MEDCALCGUI_EXPORT MEDCALC::MEDCalculator_ptr getCalculator();
+  MEDCALC_EXPORT MEDCALC::MEDFactory_ptr getFactory();
+  MEDCALC_EXPORT MEDCALC::MEDDataManager_ptr getDataManager();
+  MEDCALC_EXPORT MEDCALC::MEDCalculator_ptr getCalculator();
 }
 
 #endif // _MEDFACTORY_CLIENT_HXX_
