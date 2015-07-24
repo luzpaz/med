@@ -22,7 +22,7 @@
   See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 
 -->
- 
+
 <!-- XML component catalog -->
 <begin-catalog>
 
@@ -72,14 +72,14 @@
 <!-- Component list -->
 <component-list>
 
-	<component>
-                <component-name>MEDOPFactory</component-name>
-		<component-username>MEDOP Factory</component-username>
-		<component-type>MED</component-type>
-		<component-author>Guillaume Boulant</component-author>
-		<component-version>@SALOMEMED_VERSION@</component-version>
-		<component-comment>Factory of SALOME components for MED Field operations</component-comment>
-		<component-multistudy>0</component-multistudy>
+        <component>
+                <component-name>MEDFactory</component-name>
+                <component-username>MEDCalc Factory</component-username>
+                <component-type>MED</component-type>
+                <component-author>Guillaume Boulant</component-author>
+                <component-version>@SALOMEMED_VERSION@</component-version>
+                <component-comment>Factory of SALOME components for MED Field operations</component-comment>
+                <component-multistudy>0</component-multistudy>
         </component>
 
 </component-list>

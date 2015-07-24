@@ -28,7 +28,7 @@
 #include "SALOME_GenericObj.idl"
 #include "SALOME_Exception.idl"
 
-module MEDOP
+module MEDCALC
 {
   struct DatasourceHandler {
     long id;

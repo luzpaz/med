@@ -1,0 +1,50 @@
+# Copyright (C) 2015  CEA/DEN, EDF R&D
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+
+# This functions are to be used to notify the USER of some events
+# arising on the field operation. It is NOT to be used for logging
+# purpose
+def inf(msg): print "INF: "+str(msg)
+def wrn(msg): print "WRN: "+str(msg)
+def err(msg): print "ERR: "+str(msg)
+def dbg(msg): print "DBG: "+str(msg)
+
+# Initialize CORBA stuff
+import medcorba
+
+# Connect event listener
+import medevents
+
+# Fields utilities
+from fieldproxy import newFieldProxy, FieldProxy
+
+# Input/Output
+from medio import LoadDataSource
+from medio import LoadImageAsDataSource
+
+# Presentations
+from medpresentation import MakeScalarMap
+from medpresentation import MakeIsoSurface
+from medpresentation import MakeVectorField
+from medpresentation import MakeSlices
+from medpresentation import MakeDeflectionShape
+from medpresentation import MakePointSprite
+
+# Console commands
+import medconsole

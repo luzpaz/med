@@ -23,7 +23,7 @@
 #include "SALOME_GenericObj.idl"
 #include "MEDDataManager.idl"
 
-module MEDOP
+module MEDCALC
 {
 
   enum MEDPresentationViewMode {
