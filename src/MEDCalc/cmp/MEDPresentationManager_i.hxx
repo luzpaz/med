@@ -30,6 +30,10 @@
 
 #include <vector>
 
+typedef ::CORBA::Long TypeID;
+
+class MEDPresentation;
+
 class MEDCALC_EXPORT MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
                                                public SALOME::GenericObj_i
 {
@@ -37,10 +41,10 @@ class MEDCALC_EXPORT MEDPresentationManager_i: public POA_MEDCALC::MEDPresentati
 
   static MEDPresentationManager_i* getInstance();
 
-  void MakeScalarMap(const MEDCALC::ScalarMapParameters&);
+  TypeID makeScalarMap(const MEDCALC::ScalarMapParameters&);
+  void setPresentationProperty(TypeID presentationID, const char * propName, const char *  propValue);
 
  private:
-
   MEDPresentationManager_i();
   virtual ~MEDPresentationManager_i();
 
@@ -49,9 +53,10 @@ class MEDCALC_EXPORT MEDPresentationManager_i: public POA_MEDCALC::MEDPresentati
   // The MEDPresentationManager is a singleton, whose instance can be obtained
   // using the getInstance static method.
   static MEDPresentationManager_i * _instance;
+  static TypeID GenerateID();
 
   // Owns a list of MEDPresentation objects
-  //std::vector<MEDPresentation*> _presentations;
+  std::map< TypeID, MEDPresentation * > _presentations;
 
 };
 

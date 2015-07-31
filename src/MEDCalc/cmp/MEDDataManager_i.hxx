@@ -71,6 +71,7 @@ public:
   // Datasource management
   MEDCALC::DatasourceHandler * loadDatasource(const char *filepath);
   MEDCALC::DatasourceHandler * getDatasourceHandler(const char *filepath);
+  MEDCALC::DatasourceHandler * getDatasourceHandlerFromID(CORBA::Long sourceId);
 
   // -----------------------------------------------------------
   // Mesh management

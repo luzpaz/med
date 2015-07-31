@@ -118,6 +118,7 @@ module MEDCALC
     //==========================================================
     DatasourceHandler loadDatasource(in string filepath);
     DatasourceHandler getDatasourceHandler(in string filepath);
+    DatasourceHandler getDatasourceHandlerFromID(in long sourceid);
 
     //==========================================================
     // Mesh data management

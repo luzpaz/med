@@ -31,7 +31,7 @@ def MakeScalarMap(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
   print "viewMode:", viewMode, " [", type(viewMode), "]"
 
   params = MEDCALC.ScalarMapParameters(proxy.id, viewMode)
-  __manager.MakeScalarMap(params)
+  __manager.makeScalarMap(params)
 
 #
 

@@ -25,7 +25,6 @@
 
 module MEDCALC
 {
-
   enum MEDPresentationViewMode {
     VIEW_MODE_OVERLAP,
     VIEW_MODE_REPLACE,
@@ -41,8 +40,9 @@ module MEDCALC
   interface MEDPresentationManager : SALOME::GenericObj
   {
 
-    void MakeScalarMap(in ScalarMapParameters params);
-
+    long makeScalarMap(in ScalarMapParameters params);
+    void setPresentationProperty(in long presId, in string propName, in string propValue);
+    
   };
 
 };

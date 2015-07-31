@@ -19,6 +19,7 @@
 
 #include "MEDPresentationManager_i.hxx"
 #include "MEDFactoryClient.hxx"
+#include "MEDPresentation.hxx"
 
 MEDPresentationManager_i* MEDPresentationManager_i::_instance = NULL;
 
@@ -45,19 +46,52 @@ MEDPresentationManager_i::~MEDPresentationManager_i()
   */
 }
 
+TypeID MEDPresentationManager_i::GenerateID()
+{
+  static TypeID START_ID = -1;
+  START_ID++;
+  return START_ID;
+}
+
 #include <iostream>
 
 void
-MEDPresentationManager_i::MakeScalarMap(const MEDCALC::ScalarMapParameters& params)
+MEDPresentationManager_i::setPresentationProperty(TypeID presentationID, const char * propName, const char *  propValue)
 {
-  std::cout << "MEDPresentationManager_i::MakeScalarMap: Not implemented yet\n";
+  if (_presentations.find(presentationID) != _presentations.end())
+    {
+      MEDPresentation * pres(_presentations[presentationID]);
+      pres->setProperty(propName, propValue);
+    }
+  else
+    {
+      std::cerr << "setPresentationProperty(): presentation not found!!" << std::endl;
+    }
+}
 
-  std::size_t fieldHandlerId = params.fieldHandlerId;
+TypeID
+MEDPresentationManager_i::makeScalarMap(const MEDCALC::ScalarMapParameters& params)
+{
+  MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
+
+  TypeID fieldHandlerId = params.fieldHandlerId;
   MEDCALC::MEDPresentationViewMode viewMode = params.viewMode;
+
+  MEDCALC::FieldHandler* fieldHandler = dataManager->getFieldHandler(fieldHandlerId);
+  MEDCALC::MeshHandler* meshHandler = dataManager->getMesh(fieldHandler->meshid);
+  MEDCALC::DatasourceHandler* dataSHandler = dataManager->getDatasourceHandlerFromID(meshHandler->sourceid);
 
   std::cout << "\tfieldHandlerId: " << fieldHandlerId << std::endl;
   std::cout << "\tviewMode: " << viewMode << std::endl;
+  std::cout << "\tfileName: " <<  dataSHandler->uri << std::endl;
+  std::cout << "\tfiedName: " << fieldHandler->fieldname << std::endl;
 
-  MEDCALC::FieldHandler* fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldHandlerId);
+  // Create a new presentation instance
+  TypeID newID = MEDPresentationManager_i::GenerateID();
+  MEDPresentationScalarMap * scalarMap = new MEDPresentationScalarMap(fieldHandler, true);  // on stack or on heap?? stack for now
+  _presentations.insert( std::pair<TypeID, MEDPresentation *>(newID, scalarMap) );
 
+  scalarMap->generatePipeline();
+
+  return newID;
 }

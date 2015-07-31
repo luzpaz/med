@@ -216,6 +216,16 @@ MEDDataManager_i::getDatasourceHandler(const char *filepath)
   return NULL;
 }
 
+MEDCALC::DatasourceHandler*
+MEDDataManager_i::getDatasourceHandlerFromID(CORBA::Long sourceid)
+{
+  DatasourceHandlerMapIterator it = _datasourceHandlerMap.find(sourceid);
+  if (it != _datasourceHandlerMap.end())
+    {
+      return it->second;
+    }
+  return NULL;
+}
 
 MEDCALC::MeshHandler * MEDDataManager_i::getMesh(CORBA::Long meshId) {
   if ( _meshHandlerMap.count(meshId) == 0 ) {
