@@ -83,8 +83,8 @@ connectEventListener()
 # that they could be used in another context than the FieldProxy instances
 import MEDCALC
 
-def __notifyGui(type, fieldId=-1, filename=""):
-  medEvent = MEDCALC.MedEvent(type, fieldId, filename)
+def __notifyGui(eventType, dataId=-1, filename=""):
+  medEvent = MEDCALC.MedEvent(eventType, dataId, filename)
   if not eventListenerIsRunning(): return
 
   # Notify the GUI of the update event
@@ -111,4 +111,7 @@ def notifyGui_cleanWorkspace():
 #
 def notifyGui_addDatasource(filename):
   __notifyGui(MEDCALC.EVENT_ADD_DATASOURCE, -1, filename)
+#
+def notifyGui_addPresentation(presentation_id):
+  __notifyGui(MEDCALC.EVENT_ADD_PRESENTATION, presentation_id)
 #

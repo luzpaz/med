@@ -29,6 +29,7 @@
 #include "MEDCALC.hxx"
 
 #include <vector>
+#include <string>
 
 typedef ::CORBA::Long TypeID;
 
@@ -42,7 +43,8 @@ class MEDCALC_EXPORT MEDPresentationManager_i: public POA_MEDCALC::MEDPresentati
   static MEDPresentationManager_i* getInstance();
 
   TypeID makeScalarMap(const MEDCALC::ScalarMapParameters&);
-  void setPresentationProperty(TypeID presentationID, const char * propName, const char *  propValue);
+  void setPresentationProperty(TypeID presentationID, const char * propName, const char * propValue);
+  char* getPresentationProperty(TypeID presentationID, const char* propName);
 
  private:
   MEDPresentationManager_i();

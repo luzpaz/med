@@ -42,7 +42,8 @@ module MEDCALC
 
     long makeScalarMap(in ScalarMapParameters params);
     void setPresentationProperty(in long presId, in string propName, in string propValue);
-    
+    string getPresentationProperty(in long presId, in string propName);
+
   };
 
 };

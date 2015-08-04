@@ -56,7 +56,7 @@ TypeID MEDPresentationManager_i::GenerateID()
 #include <iostream>
 
 void
-MEDPresentationManager_i::setPresentationProperty(TypeID presentationID, const char * propName, const char *  propValue)
+MEDPresentationManager_i::setPresentationProperty(TypeID presentationID, const char * propName, const char * propValue)
 {
   if (_presentations.find(presentationID) != _presentations.end())
     {
@@ -67,6 +67,19 @@ MEDPresentationManager_i::setPresentationProperty(TypeID presentationID, const c
     {
       std::cerr << "setPresentationProperty(): presentation not found!!" << std::endl;
     }
+}
+
+char*
+MEDPresentationManager_i::getPresentationProperty(TypeID presentationID, const char* propName)
+{
+  if (_presentations.find(presentationID) != _presentations.end()) {
+    MEDPresentation* pres = _presentations[presentationID];
+    return (char*) pres->getProperty(propName).c_str();
+  }
+  else {
+    std::cerr << "getPresentationProperty(): presentation not found!!" << std::endl;
+    return (char*) "";
+  }
 }
 
 TypeID

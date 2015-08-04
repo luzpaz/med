@@ -47,7 +47,7 @@ MEDEventListener_i::~MEDEventListener_i()
 }
 
 void MEDEventListener_i::processMedEvent(const MEDCALC::MedEvent & event) {
-  LOG("Start processing event for field id="<<event.fieldid);
+  LOG("Start processing event for field id="<<event.dataId);
 
   // This function must be executed as fast as possible because the
   // CORBA request is a synchronous call. Then we just emit a Qt

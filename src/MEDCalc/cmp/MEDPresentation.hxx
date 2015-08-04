@@ -29,22 +29,26 @@
 #include CORBA_SERVER_HEADER(MEDPresentationManager)
 
 #include <vector>
+#include <map>
 #include <string>
 
 class MEDCALC_EXPORT MEDPresentation
 {
-public:
   friend class MEDPresentationManager_i;
 
-  MEDPresentation(MEDCALC::FieldHandler* fieldHdl):
-    _fieldHandler(fieldHdl), _pipeline(0), _display(0)
-  {}
+public:
+
   virtual ~MEDPresentation() {}
 
-  void setProperty(const char * propName, const char * propValue);
+  void setProperty(const std::string& propName, const std::string& propValue);
+  const std::string getProperty(const std::string& propName);
   std::string getFieldTypeString();
 
 protected:
+
+  MEDPresentation(MEDCALC::FieldHandler* fieldHdl):
+    _fieldHandler(fieldHdl), _pipeline(0), _display(0), _properties()
+  {}
 
   void generatePipeline();
   virtual void internalGeneratePipeline() = 0;
@@ -61,6 +65,9 @@ protected:
 
   ///! Corresponding display object, if any:
   std::vector< PyObject * > _display;
+
+  ///! Presentation properties <key,value>
+  std::map<std::string, std::string> _properties;
 };
 
 class MEDCALC_EXPORT MEDPresentationScalarMap :  public MEDPresentation

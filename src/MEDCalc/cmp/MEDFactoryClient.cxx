@@ -58,4 +58,16 @@ namespace MEDFactoryClient {
     }
     return calculator;
   }
+
+  /*!
+   * This returns a singleton (static) instance of the MED presentation manager.
+   */
+  MEDCALC::MEDPresentationManager_ptr getPresentationManager() {
+    static MEDCALC::MEDPresentationManager_ptr presentationManager;
+    if(CORBA::is_nil(presentationManager)){
+      presentationManager = getFactory()->getPresentationManager();
+    }
+    return presentationManager;
+  }
+
 }

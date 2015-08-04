@@ -19,6 +19,7 @@
 
 import medcalc
 import MEDCALC
+from medcalc.medevents import notifyGui_addPresentation
 
 __manager = medcalc.medcorba.factory.getPresentationManager()
 
@@ -31,8 +32,8 @@ def MakeScalarMap(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
   print "viewMode:", viewMode, " [", type(viewMode), "]"
 
   params = MEDCALC.ScalarMapParameters(proxy.id, viewMode)
-  __manager.makeScalarMap(params)
-
+  presentation_id = __manager.makeScalarMap(params)
+  notifyGui_addPresentation(presentation_id)
 #
 
 def MakeIsoSurface():

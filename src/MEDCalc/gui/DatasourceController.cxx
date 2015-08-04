@@ -179,8 +179,23 @@ DatasourceController::updateTreeViewWithNewDatasource(const MEDCALC::DatasourceH
       _studyEditor->setIcon(soFieldseries,tr("ICO_DATASOURCE_FIELD").toStdString().c_str());
       _studyEditor->setParameterInt(soFieldseries,OBJECT_ID,fieldseriesHandler.id);
       _studyEditor->setParameterBool(soFieldseries,OBJECT_IS_IN_WORKSPACE,false);
+      //std::cout << "soFieldseries.GetIOR(): " << soFieldseries._retn()->GetIOR() << std::endl;
+      //std::cout << _studyEditor->findObject(soFieldseries._retn()->GetIOR())->GetIOR() << std::endl;
+      std::cout << "soFieldseries.GetName(): " << soFieldseries._retn()->GetName() << std::endl;
+
     }
   }
+}
+
+void
+DatasourceController::updateTreeViewWithNewPresentation(long presentationId)
+{
+  if (presentationId < 0) {
+    return;
+  }
+
+  std::string name = MEDFactoryClient::getPresentationManager()->getPresentationProperty(presentationId, "name");
+
 }
 
 void DatasourceController::OnAddDatasource()
@@ -566,6 +581,10 @@ DatasourceController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
   if ( event->type == MEDCALC::EVENT_ADD_DATASOURCE ) {
     MEDCALC::DatasourceHandler* datasourceHandler = MEDFactoryClient::getDataManager()->getDatasourceHandler(event->filename);
     this->updateTreeViewWithNewDatasource(datasourceHandler);
+    _salomeModule->updateObjBrowser(true);
+  }
+  else if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
+    this->updateTreeViewWithNewPresentation(event->dataId);
     _salomeModule->updateObjBrowser(true);
   }
 }

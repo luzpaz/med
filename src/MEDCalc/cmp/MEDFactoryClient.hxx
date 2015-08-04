@@ -39,6 +39,7 @@ namespace MEDFactoryClient {
   MEDCALC_EXPORT MEDCALC::MEDFactory_ptr getFactory();
   MEDCALC_EXPORT MEDCALC::MEDDataManager_ptr getDataManager();
   MEDCALC_EXPORT MEDCALC::MEDCalculator_ptr getCalculator();
+  MEDCALC_EXPORT MEDCALC::MEDPresentationManager_ptr getPresentationManager();
 }
 
 #endif // _MEDFACTORY_CLIENT_HXX_

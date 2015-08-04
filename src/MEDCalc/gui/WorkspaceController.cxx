@@ -253,7 +253,7 @@ void WorkspaceController::_importFieldIntoConsole(MEDCALC::FieldHandler * fieldH
  */
 void WorkspaceController::processMedEvent(const MEDCALC::MedEvent * event) {
   STDLOG("WorkspaceController::processMedEvent");
-  STDLOG("fieldid  :"<<event->fieldid);
+  STDLOG("dataId  :"<<event->dataId);
 
   XmedDataModel * dataModel = (XmedDataModel *)this->getDataModel();
   if ( dataModel == NULL ) {
@@ -267,7 +267,7 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent * event) {
   else if ( event->type == MEDCALC::EVENT_PUT_IN_WORKSPACE ) {
     STDLOG("add new field");
     MEDCALC::FieldHandler * fieldHandler =
-      MEDFactoryClient::getDataManager()->getFieldHandler(event->fieldid);
+      MEDFactoryClient::getDataManager()->getFieldHandler(event->dataId);
 
     XmedDataObject * dataObject = (XmedDataObject *)dataModel->newDataObject();
     dataObject->setFieldHandler(*fieldHandler);
@@ -278,7 +278,7 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent * event) {
     std::map<string, DataObject *>::iterator itr = dataModel->begin();
     for ( ; itr != dataModel->end(); ++itr) {
       XmedDataObject* obj = dynamic_cast<XmedDataObject*>(itr->second);
-      if (obj->getFieldHandler()->id == event->fieldid) {
+      if (obj->getFieldHandler()->id == event->dataId) {
         std::string itemNameId = obj->getNameId();
         this->getDataTreeModel()->removeData(obj);
         dataModel->removeDataObject(itemNameId);
@@ -297,6 +297,9 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent * event) {
     }
   }
   else if ( event->type == MEDCALC::EVENT_ADD_DATASOURCE ) {
+    emit workspaceSignal(event); // forward to DatasourceController
+  }
+  else if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
     emit workspaceSignal(event); // forward to DatasourceController
   }
 

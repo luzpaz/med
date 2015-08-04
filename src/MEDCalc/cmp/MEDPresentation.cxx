@@ -37,12 +37,27 @@ void MEDPresentation::pushInternal(PyObject * obj, PyObject * disp)
   _display.push_back(disp);
 }
 
-void MEDPresentation::setProperty(const char * propName, const char * propValue)
+void MEDPresentation::setProperty(const std::string& propName, const std::string& propValue)
 {
   // LIMITED!!! For now switch the first display element to Wireframe
-
+  /*
   PyLockWrapper lock;
   PyObject_CallMethod(_display[0], (char*)"SetRepresentationType", (char*)"(s)", "Wireframe");
+  */
+
+  _properties[propName] = propValue;
+}
+
+const std::string
+MEDPresentation::getProperty(const std::string& propName)
+{
+  if (_properties.find(propName) != _properties.end()) {
+    return _properties[propName];
+  }
+  else {
+    std::cerr << "getProperty(): no property named " << propName << std::endl;
+    return std::string();
+  }
 }
 
 PyObject * MEDPresentation::getPythonObjectFromMain(const char * python_var)

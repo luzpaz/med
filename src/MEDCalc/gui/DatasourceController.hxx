@@ -27,6 +27,7 @@
 #include CORBA_CLIENT_HEADER(MEDDataManager)
 #include <StandardApp_Module.hxx>
 #include <SALOME_AppStudyEditor.hxx>
+#include <MEDPresentation.hxx>
 
 #include <map>
 
@@ -57,7 +58,8 @@ typedef struct {
     EVENT_VIEW_OBJECT_SCALAR_MAP,
     // these ones forward actions to workspace (and then to python console)
     EVENT_ADD_DATASOURCE,
-    EVENT_ADD_IMAGE_AS_DATASOURCE
+    EVENT_ADD_IMAGE_AS_DATASOURCE,
+    EVENT_ADD_PRESENTATION
   };
   int eventtype;
   XmedDataObject * objectdata;
@@ -100,6 +102,7 @@ private:
   void visualize(DatasourceEvent::EventType);
   void addDatasource(const char* filename);
   void updateTreeViewWithNewDatasource(const MEDCALC::DatasourceHandler*);
+  void updateTreeViewWithNewPresentation(long presentationId);
 
 private:
   StandardApp_Module * _salomeModule;
