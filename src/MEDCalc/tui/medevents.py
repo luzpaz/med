@@ -83,8 +83,8 @@ connectEventListener()
 # that they could be used in another context than the FieldProxy instances
 import MEDCALC
 
-def __notifyGui(eventType, dataId=-1, filename=""):
-  medEvent = MEDCALC.MedEvent(eventType, dataId, filename)
+def __notifyGui(eventType, dataId=-1, filename="", presentationId=-1):
+  medEvent = MEDCALC.MedEvent(eventType, dataId, filename, presentationId)
   if not eventListenerIsRunning(): return
 
   # Notify the GUI of the update event
@@ -97,21 +97,21 @@ def notifyGui_updateField(fieldId):
   meta-data have changed so it could update the gui
   presentations of this field.
   """
-  __notifyGui(MEDCALC.EVENT_UPDATE_FIELD,fieldId)
+  __notifyGui(MEDCALC.EVENT_UPDATE_FIELD, dataId=fieldId)
 #
 
 def notifyGui_putInWorkspace(fieldId):
-  __notifyGui(MEDCALC.EVENT_PUT_IN_WORKSPACE,fieldId)
+  __notifyGui(MEDCALC.EVENT_PUT_IN_WORKSPACE, dataId=fieldId)
 #
 def notifyGui_removeFromWorkspace(fieldId):
-  __notifyGui(MEDCALC.EVENT_REMOVE_FROM_WORKSPACE, fieldId)
+  __notifyGui(MEDCALC.EVENT_REMOVE_FROM_WORKSPACE, dataId=fieldId)
 
 def notifyGui_cleanWorkspace():
   __notifyGui(MEDCALC.EVENT_CLEAN_WORKSPACE)
 #
 def notifyGui_addDatasource(filename):
-  __notifyGui(MEDCALC.EVENT_ADD_DATASOURCE, -1, filename)
+  __notifyGui(MEDCALC.EVENT_ADD_DATASOURCE, filename=filename)
 #
-def notifyGui_addPresentation(presentation_id):
-  __notifyGui(MEDCALC.EVENT_ADD_PRESENTATION, presentation_id)
+def notifyGui_addPresentation(fieldId, presId):
+  __notifyGui(MEDCALC.EVENT_ADD_PRESENTATION, dataId=fieldId, presentationId=presId)
 #

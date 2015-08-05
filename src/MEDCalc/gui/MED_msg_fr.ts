@@ -4,6 +4,10 @@
   <context>
     <name>DatasourceController</name>
     <message>
+      <source>MEDPresentationScalarMap</source>
+      <translation>Carte scalaire</translation>
+    </message>
+    <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="45"/>
       <source>LAB_ADD_DATA_SOURCE</source>
       <translation>Importer des données MED</translation>

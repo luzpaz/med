@@ -102,11 +102,12 @@ private:
   void visualize(DatasourceEvent::EventType);
   void addDatasource(const char* filename);
   void updateTreeViewWithNewDatasource(const MEDCALC::DatasourceHandler*);
-  void updateTreeViewWithNewPresentation(long presentationId);
+  void updateTreeViewWithNewPresentation(long fieldId, long presentationId);
 
 private:
   StandardApp_Module * _salomeModule;
   SALOME_AppStudyEditor * _studyEditor;
+  std::map<long, std::string> _fieldSeriesEntries;
 
   DlgChangeUnderlyingMesh * _dlgChangeUnderlyingMesh;
   DlgInterpolateField * _dlgInterpolateField;

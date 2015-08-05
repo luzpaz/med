@@ -33,7 +33,7 @@ def MakeScalarMap(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
 
   params = MEDCALC.ScalarMapParameters(proxy.id, viewMode)
   presentation_id = __manager.makeScalarMap(params)
-  notifyGui_addPresentation(presentation_id)
+  notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
 def MakeIsoSurface():

@@ -4,6 +4,10 @@
   <context>
     <name>@default</name>
     <message>
+      <source>ICO_MED_PRESENTATION</source>
+      <translation>pqAppIcon16.png</translation>
+    </message>
+    <message>
       <source>ICO_IMPORT_MED</source>
       <translation>datasource_add.png</translation>
     </message>

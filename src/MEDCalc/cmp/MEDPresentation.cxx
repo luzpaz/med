@@ -24,6 +24,12 @@
 #include <PyInterp_Utils.h>
 #include <iostream>
 
+MEDPresentation::MEDPresentation(MEDCALC::FieldHandler* fieldHdl, std::string name)
+    : _fieldHandler(fieldHdl), _pipeline(0), _display(0), _properties()
+{
+  setProperty("name", name);
+}
+
 void MEDPresentation::generatePipeline()
 {
   // Might be more complicated in the future:

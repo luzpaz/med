@@ -46,9 +46,7 @@ public:
 
 protected:
 
-  MEDPresentation(MEDCALC::FieldHandler* fieldHdl):
-    _fieldHandler(fieldHdl), _pipeline(0), _display(0), _properties()
-  {}
+  MEDPresentation(MEDCALC::FieldHandler* fieldHdl, std::string name);
 
   void generatePipeline();
   virtual void internalGeneratePipeline() = 0;
@@ -74,7 +72,7 @@ class MEDCALC_EXPORT MEDPresentationScalarMap :  public MEDPresentation
 {
 public:
   MEDPresentationScalarMap(MEDCALC::FieldHandler* fieldHdl, bool wireframe) :
-    MEDPresentation(fieldHdl),
+    MEDPresentation(fieldHdl, "MEDPresentationScalarMap"),
     _isWireframe(wireframe)
   {}
   virtual ~MEDPresentationScalarMap() {}

@@ -41,6 +41,7 @@ module MEDCALC
     MedEventType  type;
     long          dataId;
     string        filename;
+    long          presentationId;
   };
 
   interface MEDEventListener: SALOME::GenericObj {
