@@ -30,9 +30,12 @@
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MEDDataManager)
-#include <StandardApp_Module.hxx>
+//#include <StandardApp_Module.hxx>
+#include <SalomeApp_Module.h>
 
 #include <vector>
+
+class MEDModule;
 
 /*!
  * This class defines a DockWidget plugged in the SALOME application,
@@ -44,7 +47,8 @@ class MEDCALCGUI_EXPORT WorkspaceController: public TreeGuiManager {
   Q_OBJECT
 
 public:
-  WorkspaceController(StandardApp_Module * salomeModule);
+  //WorkspaceController(StandardApp_Module * salomeModule);
+  WorkspaceController(MEDModule * salomeModule);
   ~WorkspaceController();
 
   void createActions();
@@ -64,7 +68,8 @@ signals:
 
 private:
   XmedConsoleDriver * _consoleDriver;
-  StandardApp_Module * _salomeModule;
+  //StandardApp_Module * _salomeModule;
+  MEDModule * _salomeModule;
   void _importItem(QString itemNameId);
   void _importItemList(QStringList itemNameIdList);
   void _importFieldIntoConsole(MEDCALC::FieldHandler * fieldHandler,

@@ -22,6 +22,7 @@
 #include "WorkspaceController.hxx"
 #include "QtHelper.hxx"
 #include "MEDFactoryClient.hxx"
+#include "MEDModule.hxx"
 #include "XmedDataModel.hxx"
 #include "DlgAlias.hxx"
 
@@ -32,13 +33,15 @@
 #include <SALOME_LifeCycleCORBA.hxx>
 #include <SUIT_FileDlg.h>
 #include <SUIT_Desktop.h>
+#include <SUIT_ResourceMgr.h>
 
 /*!
  * This class defines a DockWidget plugged in the SALOME application,
  * and containing a tree view for rendering a hierarchical data
  * model. This datamodel contains the objects used in the workspace.
  */
-WorkspaceController::WorkspaceController(StandardApp_Module * salomeModule)
+//WorkspaceController::WorkspaceController(StandardApp_Module * salomeModule)
+WorkspaceController::WorkspaceController(MEDModule * salomeModule)
   : TreeGuiManager(salomeModule->getApp(), "Workspace")
 {
   _salomeModule = salomeModule;
@@ -97,6 +100,7 @@ WorkspaceController::WorkspaceController(StandardApp_Module * salomeModule)
 }
 
 WorkspaceController::~WorkspaceController() {
+  std::cout << "WorkspaceController::~WorkspaceController()\n";
   MEDEventListener_i::release();
 }
 
@@ -106,18 +110,23 @@ WorkspaceController::~WorkspaceController() {
  * connected slots.
  */
 void WorkspaceController::createActions() {
+  QWidget* dsk = _salomeModule->getApp()->desktop();
+  SUIT_ResourceMgr* resMgr = _salomeModule->getApp()->resourceMgr();
+  int toolbarId = _salomeModule->createTool("Workspace", "WorkspaceToolbar");
 
   QString label   = tr("LAB_SAVE_WORKSPACE");
   QString tooltip = tr("TIP_SAVE_WORKSPACE");
   QString icon    = tr("ICO_WORKSPACE_SAVE");
   int actionId = _salomeModule->createStandardAction(label,this,SLOT(OnSaveWorkspace()),icon,tooltip);
-  _salomeModule->addActionInToolbar(actionId);
+  //_salomeModule->addActionInToolbar(actionId);
+  _salomeModule->createTool(actionId, toolbarId);
 
   label   = tr("LAB_CLEAN_WORKSPACE");
   tooltip = tr("TIP_CLEAN_WORKSPACE");
   icon    = tr("ICO_WORKSPACE_CLEAN");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnCleanWorkspace()),icon,tooltip);
-  _salomeModule->addActionInToolbar(actionId);
+//_salomeModule->addActionInToolbar(actionId);
+  _salomeModule->createTool(actionId, toolbarId);
 }
 
 /*!
@@ -474,6 +483,7 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
   XmedDataObject * dataObject = event->objectdata;
 
   if ( event->eventtype == DatasourceEvent::EVENT_IMPORT_OBJECT ) {
+    std::cout << "IMPORT object in workspace: " << dataObject->toString() << std::endl;
     STDLOG("IMPORT object in workspace:\n"<<dataObject->toString());
     // _GBO_ QUESTION: tag automatically the object as a peristant object ??
     // We first add the data object to the internal data model

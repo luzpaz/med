@@ -82,5 +82,14 @@
                 <component-multistudy>0</component-multistudy>
         </component>
 
+        <component>
+            <component-name>MED</component-name>
+            <component-username>Med</component-username>
+            <component-type>MED</component-type>
+            <component-version>@SALOMEMED_VERSION@</component-version>
+            <component-comment>MED component engine</component-comment>
+            <component-multistudy>0</component-multistudy>
+        </component>
+
 </component-list>
 </begin-catalog>

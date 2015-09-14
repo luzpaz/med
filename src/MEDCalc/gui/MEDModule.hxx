@@ -22,21 +22,23 @@
 #ifndef _MED_MODULE_HXX_
 #define _MED_MODULE_HXX_
 
-#include "StandardApp_Module.hxx"
+#include "MEDCALCGUI.hxx"
+
+#include <SalomeApp_Module.h>
 
 #include "WorkspaceController.hxx"
 #include "XmedDataModel.hxx"
 #include "DatasourceController.hxx"
 
 #include <SALOMEconfig.h>
-#include CORBA_SERVER_HEADER(SALOME_Component)
+#include CORBA_CLIENT_HEADER(MED_Gen)
 
-#include "MEDCALCGUI.hxx"
+class SalomeApp_Application;
 
 /*!
  * This class defines the gui of the MED module.
  */
-class MEDCALCGUI_EXPORT MEDModule: public StandardApp_Module
+class MEDCALCGUI_EXPORT MEDModule: public SalomeApp_Module
 {
   Q_OBJECT
 
@@ -46,20 +48,39 @@ class MEDCALCGUI_EXPORT MEDModule: public StandardApp_Module
 
 public:
   MEDModule();
-  void viewManagers( QStringList& ) const;
+  ~MEDModule();
 
-protected:
-  virtual Engines::EngineComponent_ptr getEngine() const;
-  virtual QString studyIconName();
-  virtual void createModuleWidgets();
-  virtual void createModuleActions();
-  virtual bool activateModule( SUIT_Study* theStudy );
-  virtual bool deactivateModule( SUIT_Study* theStudy );
+  static MED_ORB::MED_Gen_var engine();
+
+  virtual void                    initialize( CAM_Application* app );
+  virtual QString                 engineIOR() const;
+
+  virtual QString                 iconName() const;
+
+  virtual void                    windows( QMap<int, int>& theMap ) const;
+  virtual void                    viewManagers( QStringList& theList ) const;
+
+  int createStandardAction(const QString& label,
+                           QObject * slotobject,
+                           const char* slotmember,
+                           const QString& iconName,
+                           const QString& tooltip=QString());
+  void addActionInPopupMenu(int actionId,const QString& menus="",const QString& rule="client='ObjectBrowser'");
+
+public slots:
+  virtual bool                    activateModule( SUIT_Study* theStudy );
+  virtual bool                    deactivateModule( SUIT_Study* theStudy );
+
+private:
+  void createModuleWidgets();
+  void createModuleActions();
+  static void init();
 
 private:
   DatasourceController * _datasourceController;
   WorkspaceController *  _workspaceController;
   XmedDataModel *        _xmedDataModel;
+  static MED_ORB::MED_Gen_var myEngine;
 };
 
 #endif

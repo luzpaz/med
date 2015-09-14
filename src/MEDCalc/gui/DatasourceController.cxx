@@ -22,10 +22,23 @@
 #include "DatasourceController.hxx"
 #include "DatasourceConstants.hxx"
 
+#include <SalomeApp_Application.h>
+#include <SalomeApp_Study.h>
+#include <SalomeApp_DataObject.h>
+
+#include <SALOME_ListIO.hxx>
+#include <LightApp_SelectionMgr.h>
+
+#include <SALOME_LifeCycleCORBA.hxx>
+#include <SALOMEDS_SObject.hxx>
+#include <SALOMEDS_Study.hxx>
+
 #include "MEDFactoryClient.hxx"
+#include "MEDModule.hxx"
 #include "QtHelper.hxx"
 
 #include CORBA_CLIENT_HEADER(SALOMEDS)
+#include CORBA_CLIENT_HEADER(SALOMEDS_Attributes)
 #include <SUIT_FileDlg.h>
 #include <SUIT_Desktop.h>
 
@@ -40,8 +53,8 @@
 // Datasource controller
 // ==============================================================
 //
-DatasourceController::DatasourceController(StandardApp_Module * salomeModule)
-  : _fieldSeriesEntries()
+//DatasourceController::DatasourceController(StandardApp_Module * salomeModule)
+DatasourceController::DatasourceController(MEDModule * salomeModule)
 {
   STDLOG("Creating a DatasourceController");
   _salomeModule = salomeModule;
@@ -63,6 +76,10 @@ DatasourceController::~DatasourceController() {
 }
 
 void DatasourceController::createActions() {
+  //QWidget* dsk = _salomeModule->getApp()->desktop();
+  //SUIT_ResourceMgr* resMgr = _salomeModule->getApp()->resourceMgr();
+  int toolbarId = _salomeModule->createTool("Datasource", "DatasourceToolbar");
+
   //
   // Main actions (toolbar and menubar)
   //
@@ -71,17 +88,21 @@ void DatasourceController::createActions() {
   QString icon    = tr("ICO_DATASOURCE_ADD");
   int actionId;
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnAddDatasource()),icon,tooltip);
-  _salomeModule->addActionInToolbar(actionId);
+  //_salomeModule->addActionInToolbar(actionId);
+  _salomeModule->createTool(actionId, toolbarId);
 
   // This action has to be placed in the general file menu with the label "Import MED file"
   int menuId = _salomeModule->createMenu( tr( "MEN_FILE" ), -1,  1 );
-  _salomeModule->addActionInMenubar(actionId, menuId);
+  //_salomeModule->addActionInMenubar(actionId, menuId);
+  _salomeModule->action(actionId)->setIconVisibleInMenu(true);
+  _salomeModule->createMenu(actionId, menuId, 10);
 
   label   = tr("LAB_ADD_IMAGE_SOURCE");
   tooltip = tr("TIP_ADD_IMAGE_SOURCE");
   icon    = tr("ICO_IMAGE_ADD");
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnAddImagesource()),icon,tooltip);
-  _salomeModule->addActionInToolbar(actionId);
+  // _salomeModule->addActionInToolbar(actionId);
+  _salomeModule->createTool(actionId, toolbarId);
 
   //
   // Actions for popup menu only
@@ -142,47 +163,13 @@ DatasourceController::updateTreeViewWithNewDatasource(const MEDCALC::DatasourceH
     return;
   }
 
-  // We need a studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
+  _PTR(Study) studyDS = study->studyDS();
 
-  // Create a datasource SObject as a father of the module root
-  SALOMEDS::SComponent_var root = _studyEditor->findRoot(QCHARSTAR(_salomeModule->moduleName()));
-  SALOMEDS::SObject_var soDatasource = _studyEditor->newObject(root);
-  _studyEditor->setName(soDatasource,datasourceHandler->name);
-  _studyEditor->setIcon(soDatasource,tr("ICO_DATASOURCE").toStdString().c_str());
-  _studyEditor->setParameterInt(soDatasource,OBJECT_ID,datasourceHandler->id);
+  _salomeModule->engine()->addDatasourceToStudy(_CAST(Study, studyDS)->GetStudy(), *datasourceHandler);
 
-  // We can add the meshes as children of the datasource
-  MEDCALC::MeshHandlerList * meshHandlerList =
-    MEDFactoryClient::getDataManager()->getMeshList(datasourceHandler->id);
-
-  for(CORBA::ULong iMesh=0; iMesh<meshHandlerList->length(); iMesh++) {
-    MEDCALC::MeshHandler meshHandler = (*meshHandlerList)[iMesh];
-    SALOMEDS::SObject_var soMesh = _studyEditor->newObject(soDatasource);
-    _studyEditor->setName(soMesh,meshHandler.name);
-    _studyEditor->setIcon(soMesh,tr("ICO_DATASOURCE_MESH").toStdString().c_str());
-    _studyEditor->setParameterInt(soMesh,OBJECT_ID,meshHandler.id);
-    _studyEditor->setParameterBool(soMesh,OBJECT_IS_IN_WORKSPACE,false);
-
-    // We add the field timeseries defined on this mesh, as children
-    // of the mesh SObject
-    MEDCALC::FieldseriesHandlerList * fieldseriesHandlerList =
-      MEDFactoryClient::getDataManager()->getFieldseriesListOnMesh(meshHandler.id);
-
-    for(CORBA::ULong iFieldseries=0; iFieldseries<fieldseriesHandlerList->length(); iFieldseries++) {
-      MEDCALC::FieldseriesHandler fieldseriesHandler = (*fieldseriesHandlerList)[iFieldseries];
-      SALOMEDS::SObject_var soFieldseries = _studyEditor->newObject(soMesh);
-      _fieldSeriesEntries[fieldseriesHandler.id] = soFieldseries->GetID();
-
-      std::string label(fieldseriesHandler.name);
-      label +=" ("+std::string(XmedDataObject::mapTypeOfFieldLabel[fieldseriesHandler.type])+")";
-      _studyEditor->setName(soFieldseries,label.c_str());
-
-      _studyEditor->setIcon(soFieldseries,tr("ICO_DATASOURCE_FIELD").toStdString().c_str());
-      _studyEditor->setParameterInt(soFieldseries,OBJECT_ID,fieldseriesHandler.id);
-      _studyEditor->setParameterBool(soFieldseries,OBJECT_IS_IN_WORKSPACE,false);
-    }
-  }
+  // update Object browser
+  _salomeModule->getApp()->updateObjectBrowser(true);
 }
 
 void
@@ -193,21 +180,17 @@ DatasourceController::updateTreeViewWithNewPresentation(long fieldId, long prese
     return;
   }
 
-  if (_fieldSeriesEntries.find(fieldId) == _fieldSeriesEntries.end()) {
-    std::cerr << "Field not found\n";
-    return;
-  }
-  std::string entry = _fieldSeriesEntries[fieldId];
-  SALOMEDS::SObject_ptr soFieldseries = _studyEditor->findObject(entry.c_str());
-  if (soFieldseries->IsNull()) {
-    std::cerr << "Entry not found\n";
-    return;
-  }
-
   std::string name = MEDFactoryClient::getPresentationManager()->getPresentationProperty(presentationId, "name");
-  SALOMEDS::SObject_var soPresentation = _studyEditor->newObject(soFieldseries);
-  _studyEditor->setName(soPresentation, tr(name.c_str()).toStdString().c_str());
-  _studyEditor->setIcon(soPresentation, tr("ICO_MED_PRESENTATION").toStdString().c_str());
+  name = tr(name.c_str()).toStdString();
+  std::string label = tr("ICO_MED_PRESENTATION").toStdString();
+
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
+  _PTR(Study) studyDS = study->studyDS();
+
+  _salomeModule->engine()->registerPresentation(_CAST(Study, studyDS)->GetStudy(), fieldId, name.c_str(), label.c_str());
+
+  // update Object browser
+  _salomeModule->getApp()->updateObjectBrowser(true);
 }
 
 void DatasourceController::OnAddDatasource()
@@ -593,10 +576,8 @@ DatasourceController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
   if ( event->type == MEDCALC::EVENT_ADD_DATASOURCE ) {
     MEDCALC::DatasourceHandler* datasourceHandler = MEDFactoryClient::getDataManager()->getDatasourceHandler(event->filename);
     this->updateTreeViewWithNewDatasource(datasourceHandler);
-    _salomeModule->updateObjBrowser(true);
   }
   else if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
     this->updateTreeViewWithNewPresentation(event->dataId, event->presentationId);
-    _salomeModule->updateObjBrowser(true);
   }
 }

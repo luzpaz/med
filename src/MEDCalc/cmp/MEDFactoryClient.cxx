@@ -31,7 +31,7 @@ namespace MEDFactoryClient {
     static MEDCALC::MEDFactory_ptr engine;
     if(CORBA::is_nil(engine)){
       Engines::EngineComponent_var component =
-  KERNEL::getLifeCycleCORBA()->FindOrLoad_Component( "FactoryServer","MEDFactory" );
+        KERNEL::getLifeCycleCORBA()->FindOrLoad_Component( "FactoryServer","MEDFactory" );
       engine = MEDCALC::MEDFactory::_narrow(component);
     }
     return engine;
