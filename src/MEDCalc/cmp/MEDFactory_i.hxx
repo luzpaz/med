@@ -27,6 +27,7 @@
 #include CORBA_SERVER_HEADER(MEDDataManager)
 #include CORBA_SERVER_HEADER(MEDCalculator)
 #include CORBA_SERVER_HEADER(MEDPresentationManager)
+#include CORBA_SERVER_HEADER(MEDCommandsHistoryManager)
 #include "SALOME_Component_i.hxx"
 
 #include "MEDCALC.hxx"
@@ -35,6 +36,7 @@ class MEDCALC_EXPORT MEDFactory_i: public POA_MEDCALC::MEDFactory,
 {
 
 public:
+
   MEDFactory_i(CORBA::ORB_ptr orb,
                PortableServer::POA_ptr poa,
                PortableServer::ObjectId * contId,
@@ -46,9 +48,10 @@ public:
   MEDCALC::MEDDataManager_ptr getDataManager();
   /*! Returns the singleton instance of the calculator */
   MEDCALC::MEDCalculator_ptr getCalculator();
-  /*! Returns the singleton instance of the prsentation manager */
+  /*! Returns the singleton instance of the presentation manager */
   MEDCALC::MEDPresentationManager_ptr getPresentationManager();
-
+  /*! Returns the singleton instance of the commands history manager */
+  MEDCALC::MEDCommandsHistoryManager_ptr getCommandsHistoryManager();
 };
 
 extern "C"

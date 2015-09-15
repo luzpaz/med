@@ -20,11 +20,17 @@
 
 #include "XmedConsoleDriver.hxx"
 #include "Utils_SALOME_Exception.hxx"
+#include "MEDModule.hxx"
+#include "MEDCommandsHistoryManager_i.hxx"
+#include "MEDFactoryClient.hxx"
+#include CORBA_CLIENT_HEADER(MED_Gen)
+#include CORBA_CLIENT_HEADER(MEDCommandsHistoryManager)
 
-XmedConsoleDriver::XmedConsoleDriver(SalomeApp_Application * application) {
-
+XmedConsoleDriver::XmedConsoleDriver(MEDModule* salomeModule)
+{
+  _salomeModule = salomeModule;
   bool forcePythonConsole = true;
-  _pyConsole = application->pythonConsole(forcePythonConsole);
+  _pyConsole = _salomeModule->getApp()->pythonConsole(forcePythonConsole);
   if ( !_pyConsole ) {
     const char * msg = "The python console can't be obtained from the SALOME application";
     throw SALOME_Exception(msg);
@@ -42,17 +48,6 @@ void XmedConsoleDriver::setup() {
 
   if ( !_importXmedDone ) {
     QStringList commands;
-    /*
-    // First import xmed to initialize the main objects, in particular
-    // the corba pointer to the event listener.
-    commands+="import xmed";
-    // Set the globals dictionnary so that the fields tools work properly.
-    commands+="xmed.setConsoleGlobals(globals())";
-    // Import the tools required for field operations
-    commands+="from xmed import load, get, put, dup, ls, la, save, view, doc, wipe, remove, clean";
-    // A last one to clear the console screen
-    //commands+="wipe";
-    */
 #ifndef DISABLE_PVVIEWER
     // start PVServer and show render view
     commands+="import pvsimple as pvs";
@@ -77,9 +72,14 @@ void XmedConsoleDriver::setup() {
  * This function sends the specified list of commands to the console.
  */
 void XmedConsoleDriver::exec(const QStringList& commands) {
+  MEDCALC::MEDCommandsHistoryManager_ptr history = MEDFactoryClient::getCommandsHistoryManager();
+
   QStringListIterator it(commands);
+  int i = 0;
   while (it.hasNext()) {
-    _pyConsole->exec(it.next());
+    const QString& command = it.next();
+    _pyConsole->exec(command);
+    // store command in history
+    history->addCommand(command.toStdString().c_str());
   }
-  this->_history.append(commands);
 }

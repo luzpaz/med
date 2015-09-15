@@ -25,7 +25,7 @@
 #include "MEDEventListener_i.hxx"
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MEDDataManager)
-//#include <StandardApp_Module.hxx>
+
 #include <SalomeApp_Module.h>
 #include <SALOME_AppStudyEditor.hxx>
 #include <MEDPresentation.hxx>
@@ -76,8 +76,6 @@ class MEDCALCGUI_EXPORT DatasourceController: public QObject {
   Q_OBJECT
 
 public:
-  //DatasourceController(StandardApp_Module * salomeModule);
-  //DatasourceController(SalomeApp_Module * salomeModule);
   DatasourceController(MEDModule * salomeModule);
   ~DatasourceController();
 
@@ -108,7 +106,6 @@ private:
   void updateTreeViewWithNewPresentation(long fieldId, long presentationId);
 
 private:
-  //StandardApp_Module * _salomeModule;
   MEDModule* _salomeModule;
   SALOME_AppStudyEditor * _studyEditor;
 

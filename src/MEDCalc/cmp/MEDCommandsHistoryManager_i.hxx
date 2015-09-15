@@ -1,4 +1,4 @@
-// Copyright (C) 2011-2015  CEA/DEN, EDF R&D
+// Copyright (C) 2015  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,31 +16,34 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author : Guillaume Boulant (EDF)
 
-#ifndef XMEDCONSOLEDRIVER_HXX
-#define XMEDCONSOLEDRIVER_HXX
+#ifndef MED_COMMANDS_HISTORY_MANAGER_I_HXX
+#define MED_COMMANDS_HISTORY_MANAGER_I_HXX
 
-#include "MEDCALCGUI.hxx"
+#include <SALOMEconfig.h>
+#include CORBA_SERVER_HEADER(MEDCommandsHistoryManager)
+#include "SALOME_GenericObj_i.hh"
 
-#include <PyConsole_Console.h>
+#include "MEDCALC.hxx"
 
-#include <QStringList>
+class MEDCALC_EXPORT MEDCommandsHistoryManager_i
+  : public POA_MEDCALC::MEDCommandsHistoryManager,
+    public SALOME::GenericObj_i
+{
+ public:
+  static MEDCommandsHistoryManager_i* getInstance();
 
-class MEDModule;
+  void addCommand(const char* command);
+  MEDCALC::CommandsList* getCommandsHistory();
+  void clearHistory();
 
-class MEDCALCGUI_EXPORT XmedConsoleDriver {
+ private:
+  MEDCommandsHistoryManager_i();
+  virtual ~MEDCommandsHistoryManager_i();
 
-public:
-  XmedConsoleDriver(MEDModule* salomeModule);
-
-  void setup();
-  void exec(const QStringList& commands);
-
-private:
-  MEDModule* _salomeModule;
-  PyConsole_Console * _pyConsole;
-  bool _importXmedDone;
+ private:
+  static MEDCommandsHistoryManager_i* _instance;
+  MEDCALC::CommandsList* _history;
 };
 
-#endif //XMEDCONSOLEDRIVER_HXX
+#endif

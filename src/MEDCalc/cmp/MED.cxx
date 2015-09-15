@@ -59,6 +59,10 @@ MED::~MED()
   // nothing to do
 }
 
+// Duplicate gui/DatasourceConstants
+#define OBJECT_ID              "objectid"
+#define OBJECT_IS_IN_WORKSPACE "isInWorkspace"
+
 // Duplicate gui/XmedDataModel
 static const int NB_TYPE_OF_FIELDS = 4;
 static const char* mapTypeOfFieldLabel[NB_TYPE_OF_FIELDS] =
@@ -110,7 +114,7 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
       soDatasource->SetAttrString("AttributePixMap", "ICO_DATASOURCE");
       anAttr = studyBuilder->FindOrCreateAttribute(soDatasource, "AttributeParameter");
       aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-      aParam->SetInt("objectid", datasourceHandler.id);
+      aParam->SetInt(OBJECT_ID, datasourceHandler.id);
       useCaseBuilder->AppendTo(soDatasource->GetFather(), soDatasource);
 
       // We can add the meshes as children of the datasource
@@ -124,10 +128,10 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
         soMesh->SetAttrString("AttributePixMap", "ICO_DATASOURCE_MESH");
         anAttr = studyBuilder->FindOrCreateAttribute(soMesh, "AttributeParameter");
         aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-        aParam->SetInt("objectid", meshHandler.id);
+        aParam->SetInt(OBJECT_ID, meshHandler.id);
         anAttr = studyBuilder->FindOrCreateAttribute(soMesh, "AttributeParameter");
         aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-        aParam->SetBool("isInWorkspace", false);
+        aParam->SetBool(OBJECT_IS_IN_WORKSPACE, false);
         useCaseBuilder->AppendTo(soMesh->GetFather(), soMesh);
 
         // We add the field timeseries defined on this mesh, as children of the mesh SObject
@@ -145,10 +149,10 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
           soFieldseries->SetAttrString("AttributePixMap", "ICO_DATASOURCE_FIELD");
           anAttr = studyBuilder->FindOrCreateAttribute(soFieldseries, "AttributeParameter");
           aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-          aParam->SetInt("objectid", fieldseriesHandler.id);
+          aParam->SetInt(OBJECT_ID, fieldseriesHandler.id);
           anAttr = studyBuilder->FindOrCreateAttribute(soFieldseries, "AttributeParameter");
           aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-          aParam->SetBool("isInWorkspace", false);
+          aParam->SetBool(OBJECT_IS_IN_WORKSPACE, false);
 
           useCaseBuilder->AppendTo(soFieldseries->GetFather(), soFieldseries);
           soFieldseries->UnRegister();
@@ -183,7 +187,6 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
     return MED_ORB::OP_ERROR ;
   }
   std::string entry = _fieldSeriesEntries[fieldId];
-  //SALOMEDS::SObject_ptr soFieldseries = _studyEditor->findObject(entry.c_str());
   SALOMEDS::SObject_var sobject = study->FindObjectID(entry.c_str());
   SALOMEDS::SObject_ptr soFieldseries = sobject._retn();
 
@@ -192,12 +195,9 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
     return  MED_ORB::OP_ERROR;
   }
 
-  //SALOMEDS::SObject_var soPresentation = _studyEditor->newObject(soFieldseries);
   SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
   SALOMEDS::SObject_var soPresentation = studyBuilder->NewObject(soFieldseries);
 
-  //_studyEditor->setName(soPresentation, tr(name.c_str()).toStdString().c_str());
-  //_studyEditor->setIcon(soPresentation, tr("ICO_MED_PRESENTATION").toStdString().c_str());
   soPresentation->SetAttrString("AttributeName", name);
   soPresentation->SetAttrString("AttributePixMap", label);
 
@@ -228,7 +228,11 @@ MED::DumpPython(CORBA::Object_ptr theStudy,
 
   TCollection_AsciiString aScript;
 
-  aScript += "dumping MED";
+  MEDCALC::CommandsList* history = MEDFactoryClient::getCommandsHistoryManager()->getCommandsHistory();
+  for (CORBA::ULong i = 0; i < history->length(); ++i) {
+    aScript += (*history)[i];
+    aScript += "\n";
+  }
 
   int aLen = aScript.Length();
   unsigned char* aBuffer = new unsigned char[aLen+1];
@@ -252,7 +256,6 @@ extern "C"
     \param interfaceName SALOME component interface name
     \return CORBA object identifier of the registered servant
   */
-  //PortableServer::ObjectId* MEDEngine_factory( CORBA::ORB_ptr orb,
   PortableServer::ObjectId* MEDEngine_factory(CORBA::ORB_ptr orb,
                                               PortableServer::POA_ptr poa,
                                               PortableServer::ObjectId* contId,

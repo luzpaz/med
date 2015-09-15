@@ -95,7 +95,7 @@ WorkspaceController::WorkspaceController(MEDModule * salomeModule)
   // Initialize the python console. Note that this must be done at
   // last because the setup will try to initiate a connection to the
   // event listener.
-  _consoleDriver = new XmedConsoleDriver(salomeApp);
+  _consoleDriver = new XmedConsoleDriver(salomeModule);
   _consoleDriver->setup();
 }
 

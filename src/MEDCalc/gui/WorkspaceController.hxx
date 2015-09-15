@@ -30,7 +30,6 @@
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MEDDataManager)
-//#include <StandardApp_Module.hxx>
 #include <SalomeApp_Module.h>
 
 #include <vector>
@@ -47,7 +46,6 @@ class MEDCALCGUI_EXPORT WorkspaceController: public TreeGuiManager {
   Q_OBJECT
 
 public:
-  //WorkspaceController(StandardApp_Module * salomeModule);
   WorkspaceController(MEDModule * salomeModule);
   ~WorkspaceController();
 
@@ -67,20 +65,20 @@ signals:
   void workspaceSignal(const MEDCALC::MedEvent * event);
 
 private:
-  XmedConsoleDriver * _consoleDriver;
-  //StandardApp_Module * _salomeModule;
-  MEDModule * _salomeModule;
   void _importItem(QString itemNameId);
   void _importItemList(QStringList itemNameIdList);
   void _importFieldIntoConsole(MEDCALC::FieldHandler * fieldHandler,
-              bool askForOptions,
-              const char * alias=NULL);
+                               bool askForOptions,
+                               const char * alias=NULL);
 
   void _exportItemList(QStringList itemNameIdList);
   void _saveItemList(QStringList itemNameIdList);
   void _removeItemList(QStringList itemNameIdList);
   void _viewItemList(QStringList itemNameIdList);
 
+private:
+  XmedConsoleDriver * _consoleDriver;
+  MEDModule * _salomeModule;
   MEDEventListener_i * _medEventListener;
 
   // This structure is intended to memorized in a bundle the whole set

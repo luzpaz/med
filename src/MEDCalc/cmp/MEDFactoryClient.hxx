@@ -27,6 +27,8 @@
 #include CORBA_CLIENT_HEADER(MEDFactory)
 #include CORBA_CLIENT_HEADER(MEDDataManager)
 #include CORBA_CLIENT_HEADER(MEDCalculator)
+#include CORBA_CLIENT_HEADER(MEDPresentationManager)
+#include CORBA_CLIENT_HEADER(MEDCommandsHistoryManager)
 
 #include "MEDCALC.hxx"
 
@@ -40,6 +42,7 @@ namespace MEDFactoryClient {
   MEDCALC_EXPORT MEDCALC::MEDDataManager_ptr getDataManager();
   MEDCALC_EXPORT MEDCALC::MEDCalculator_ptr getCalculator();
   MEDCALC_EXPORT MEDCALC::MEDPresentationManager_ptr getPresentationManager();
+  MEDCALC_EXPORT MEDCALC::MEDCommandsHistoryManager_ptr getCommandsHistoryManager();
 }
 
 #endif // _MEDFACTORY_CLIENT_HXX_

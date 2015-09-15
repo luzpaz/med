@@ -25,6 +25,7 @@
 #include "MEDDataManager.idl"
 #include "MEDCalculator.idl"
 #include "MEDPresentationManager.idl"
+#include "MEDCommandsHistoryManager.idl"
 
 /*!
  * This module contains the interface required for starting with MED
@@ -42,6 +43,7 @@ module MEDCALC
     MEDCALC::MEDDataManager getDataManager();
     MEDCALC::MEDCalculator getCalculator();
     MEDCALC::MEDPresentationManager getPresentationManager();
+    MEDCALC::MEDCommandsHistoryManager getCommandsHistoryManager();
 
   };
 };

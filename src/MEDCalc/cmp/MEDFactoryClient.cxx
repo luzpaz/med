@@ -70,4 +70,15 @@ namespace MEDFactoryClient {
     return presentationManager;
   }
 
+  /*!
+   * This returns a singleton (static) instance of the MED commands history.
+   */
+  MEDCALC::MEDCommandsHistoryManager_ptr getCommandsHistoryManager() {
+    static MEDCALC::MEDCommandsHistoryManager_ptr commandsHistoryManager;
+    if(CORBA::is_nil(commandsHistoryManager)){
+      commandsHistoryManager = getFactory()->getCommandsHistoryManager();
+    }
+    return commandsHistoryManager;
+  }
+
 }
