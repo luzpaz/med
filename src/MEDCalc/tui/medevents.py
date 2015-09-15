@@ -38,9 +38,9 @@ def connectEventListener():
     __eventListener = salome.orb.string_to_object(eventListenerIOR)
   except SALOME.SALOME_Exception, e:
     medcalc.wrn("The event listener is not running yet")
-    medcalc.msg ="When you'll have loaded the MED GUI, "
-    medcalc.msg+="call explicitely \"medcalc.medevents.connectEventListener()\" "
-    medcalc.msg+="to connect the GUI event listener"
+    msg ="When you'll have loaded the MED GUI, "
+    msg+="call explicitely \"medcalc.medevents.connectEventListener()\" "
+    msg+="to connect the GUI event listener"
     medcalc.inf(msg)
     __eventListener = None
   except Exception, e:
