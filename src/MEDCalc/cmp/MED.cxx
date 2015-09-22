@@ -196,11 +196,12 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
   }
 
   SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
   SALOMEDS::SObject_var soPresentation = studyBuilder->NewObject(soFieldseries);
+  useCaseBuilder->AppendTo(soPresentation->GetFather(), soPresentation);
 
   soPresentation->SetAttrString("AttributeName", name);
   soPresentation->SetAttrString("AttributePixMap", label);
-
 
   result = MED_ORB::OP_OK;
   return result;
