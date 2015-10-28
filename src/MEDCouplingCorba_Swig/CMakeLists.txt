@@ -35,21 +35,18 @@ SET(MEDCouplingCorba_SWIG_DPYS_FILES
 INCLUDE_DIRECTORIES(
   ${PYTHON_INCLUDE_DIRS}
   ${OMNIORB_INCLUDE_DIR} ${OMNIORB_INCLUDE_DIRS}
+  ${MEDTOOL_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/../../idl
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/../MEDCouplingCorba
-  ${CMAKE_CURRENT_SOURCE_DIR}/../MEDCoupling_Swig
-  ${CMAKE_CURRENT_SOURCE_DIR}/../MEDCoupling
-  ${CMAKE_CURRENT_SOURCE_DIR}/../INTERP_KERNEL
-  ${CMAKE_CURRENT_SOURCE_DIR}/../INTERP_KERNEL/Bases
   )
 
 # _ABR_ Ensure dependency mechanism on all SWIG files and headers
-SET (SWIG_MODULE_MEDCouplingCorba_EXTRA_DEPS ${MEDCouplingCorba_SWIG_DPYS_FILES} 
-    ${medcouplingcorba_HEADERS_HXX} 
+SET (SWIG_MODULE_MEDCouplingCorba_EXTRA_DEPS ${MEDCouplingCorba_SWIG_DPYS_FILES}
+    ${medcouplingcorba_HEADERS_HXX}
     ${medcoupling_HEADERS_HXX} ${medcoupling_HEADERS_TXX}
     ${interpkernel_HEADERS_HXX} ${interpkernel_HEADERS_TXX})
-    
+
 SWIG_ADD_MODULE(MEDCouplingCorba python MEDCouplingCorba.i)
 SWIG_LINK_LIBRARIES(MEDCouplingCorba ${PYTHON_LIBRARIES} medcouplingcorba ${PLATFORM_LIBS})
 IF(WIN32)
