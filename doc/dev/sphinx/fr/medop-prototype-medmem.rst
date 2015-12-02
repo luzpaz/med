@@ -65,7 +65,7 @@ Le modèle de classes MEDMEM est structuré autour des notions de MESH
 champs). Ces notions reprennent en partie des concepts du modèle
 MED. Le diagramme ci-dessous présente les classes principales:
 
-.. image:: images/med-uml-main_60pc.png
+.. image:: ../images/med-uml-main_60pc.png
    :align: center
 
 Le conteneur de plus haut niveau dans MEDMEM est la classe MED. La
@@ -309,7 +309,7 @@ données MEDMEM.
 Le schéma ci-dessous représente les éléments informatiques qui
 composent l'architecture CORBA du module MED:
 
-.. image:: images/medmem-corba-layers.png
+.. image:: ../images/medmem-corba-layers.png
    :align: center
 
 Les structures MEDMEM (données physiques) et SALOME_MED (wrapping

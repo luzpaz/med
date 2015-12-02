@@ -131,7 +131,7 @@ Implantation technique
 Le diagramme ci-dessous représente l'organisation des principaux
 paquets logiciels du module MED:
 
-.. image:: images/medmem-layers.png
+.. image:: ../images/medmem-layers.png
    :align: center
 
 Les cadres bleus représentent le lieu d'implantation des
@@ -149,7 +149,7 @@ Architecture technique
 Les schéma ci-dessous représente les objets informatiques qui sont à
 l'oeuvre pour la réalisation des opérations sur les champs:
 
-.. image:: /images/xmed-architecture.png
+.. image:: ../images/xmed-architecture.png
    :align: center
    :alt: Objets mis en oeuvre dans l'interface de manipulation de champs
 
@@ -309,8 +309,8 @@ soit mis à disposition dans l'interface python sous un nom de variable
 à choisir. Les captures d'écran ci-dessous montre la séquence
 graphique en images:
 
-.. |IMG_SELECT| image:: images/medop-gui-selectfield_scale.png
-.. |IMG_ALIAS| image:: images/medop-gui-aliasfield_scale.png
+.. |IMG_SELECT| image:: ../images/medop-gui-selectfield_scale.png
+.. |IMG_ALIAS| image:: ../images/medop-gui-aliasfield_scale.png
 
 +---------------+---------------+
 | |IMG_SELECT|  | |IMG_ALIAS|   |
@@ -540,8 +540,8 @@ est implémentée dans la maquette pour permettre le contrôle visuel
 d'un champ au moyen d'une représentation 3D (une carte spatiale du
 module du champ dans l'exemple implémenté par défaut):
 
-.. |IMG_VISU| image:: images/medop-gui-visufield_scale.png
-.. |IMG_RESULT| image:: images/medop-gui-result_scale.png
+.. |IMG_VISU| image:: ../images/medop-gui-visufield_scale.png
+.. |IMG_RESULT| image:: ../images/medop-gui-result_scale.png
 
 +---------------+---------------+
 | |IMG_VISU|    | |IMG_RESULT|  |

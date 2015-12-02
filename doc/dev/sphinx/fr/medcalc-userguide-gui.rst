@@ -47,7 +47,7 @@ ci-dessous:
   au moyen des fonctions de manipulation fournies par l'interface
   textuelle (console python TUI).
 
-.. image:: images/xmed-gui-withframe.png
+.. image:: ../images/xmed-gui-withframe.png
    :align: center
 
 L'utilisation type des fonctions de manipulation de champs suit un
@@ -89,22 +89,22 @@ Exemple 1: Explorer des sources de données
    * ajouter une source de données
    * fonctions "Extends field series", "Visualize"
 
-.. |ICO_DATASOURCE_ADD| image:: images/ico_datasource_add.png
+.. |ICO_DATASOURCE_ADD| image:: ../images/ico_datasource_add.png
                         :height: 16px
 
-.. |ICO_XMED| image:: images/ico_xmed.png
+.. |ICO_XMED| image:: ../images/ico_xmed.png
               :height: 16px
 
-.. |ICO_DATASOURCE_EXPAND| image:: images/ico_datasource_expandfield.png
+.. |ICO_DATASOURCE_EXPAND| image:: ../images/ico_datasource_expandfield.png
                            :height: 16px
 
-.. |ICO_DATASOURCE_VIEW| image:: images/ico_datasource_view.png
+.. |ICO_DATASOURCE_VIEW| image:: ../images/ico_datasource_view.png
                          :height: 16px
 
 Au démarrage, le module de manipulation de champs, identifié par
 l'icône |ICO_XMED|, présente une interface vierge:
 
-.. image:: images/xmed-gui-start.png
+.. image:: ../images/xmed-gui-start.png
    :align: center
    :width: 800px
 
@@ -113,7 +113,7 @@ données med dans le "dataspace". Pour cela, on clique sur l'icône "Add
 datasource" |ICO_DATASOURCE_ADD| qui propose de sélectionner un
 fichier med:
 
-.. image:: images/xmed-gui-datasource-selectfile.png
+.. image:: ../images/xmed-gui-datasource-selectfile.png
    :align: center
    :width: 800px
 
@@ -130,11 +130,11 @@ au moyen de la commande "Expand field timeseries"
 champs. Le résultat est affiché sur l'image centrale. La liste des
 itérations du champ ``Pulse`` peut être consultée.
 
-.. |IMG_DATASOURCE_EXPLORE| image:: images/xmed-gui-datasource-explore-zoom.png
+.. |IMG_DATASOURCE_EXPLORE| image:: ../images/xmed-gui-datasource-explore-zoom.png
                             :height: 340px
-.. |IMG_DATASOURCE_MENUCON| image:: images/xmed-gui-datasource-menucontextuel-zoom.png
+.. |IMG_DATASOURCE_MENUCON| image:: ../images/xmed-gui-datasource-menucontextuel-zoom.png
                             :height: 340px
-.. |IMG_DATASOURCE_EXPANDF| image:: images/xmed-gui-datasource-expand-zoom.png
+.. |IMG_DATASOURCE_EXPANDF| image:: ../images/xmed-gui-datasource-expand-zoom.png
                             :height: 340px
 
 +--------------------------+--------------------------+--------------------------+
@@ -154,7 +154,7 @@ viewer de SALOME. Pour cela, on sélectionne le pas de temps à
 visualiser et on utilise la commande "Visualize" |ICO_DATASOURCE_VIEW|
 disponible dans le menu contextuel associé:
 
-.. image:: images/xmed-gui-datasource-visualize-zoom.png
+.. image:: ../images/xmed-gui-datasource-visualize-zoom.png
    :align: center
    :width: 800px
 
@@ -172,9 +172,9 @@ Exemple 2: Rassembler des champs issus de différentes sources
    * fonction "Use in workspace"
    * fonction "Save"
 
-.. |ICO_DATASOURCE_USE| image:: images/ico_datasource_use.png
+.. |ICO_DATASOURCE_USE| image:: ../images/ico_datasource_use.png
                         :height: 16px
-.. |ICO_WORKSPACE_SAVE| image:: images/ico_workspace_save.png
+.. |ICO_WORKSPACE_SAVE| image:: ../images/ico_workspace_save.png
                         :height: 16px
 
 L'objectif est de récupérer des données issues de différents fichiers
@@ -189,7 +189,7 @@ deuxième source contient le maillage ``My2DMesh`` sur lequel sont
 définis deux champs de noms respectifs ``testfield1`` et
 ``testfield2``:
 
-.. image:: images/xmed-userguide-example2-datasource.png
+.. image:: ../images/xmed-userguide-example2-datasource.png
    :align: center
    :width: 800px
 
@@ -202,7 +202,7 @@ sélectionne les champs et on utilise la commande "Use in workspace"
 champs sélectionnés apparaissent dans l'arborescence de l'espace de
 travail:
 
-.. image:: images/xmed-userguide-example2-workspace.png
+.. image:: ../images/xmed-userguide-example2-workspace.png
    :align: center
    :width: 800px
 
@@ -211,7 +211,7 @@ La sauvegarde de l'espace de travail est faite au moyen de la commande
 d'outils du module. Une fenêtre de dialogue invite l'utilisateur à
 spécifier le nom du fichier de sauvegarde:
 
-.. image:: images/xmed-userguide-example2-workspace-save.png
+.. image:: ../images/xmed-userguide-example2-workspace-save.png
    :align: center
    :width: 800px
 
@@ -251,7 +251,7 @@ précédent) et la commande ouvre alors une fenêtre de dialogue qui
 permet de préciser les données sur lesquelles on souhaite
 effectivement travailler et comment on veut les manoeuvrer:
 
-.. image:: images/xmed-gui-datasource-useinworkspace-alias.png
+.. image:: ../images/xmed-gui-datasource-useinworkspace-alias.png
    :align: center
    :width: 800px
 
@@ -271,7 +271,7 @@ champ. Dans cet exemple, ``<alias>`` vaut ``f3``, positionné ainsi par
 l'utilisateur pour rappeler que la variable correspond au pas de temps
 n°3:
 
-.. image:: images/xmed-gui-workspace.png
+.. image:: ../images/xmed-gui-workspace.png
    :align: center
    :width: 800px
 
@@ -347,7 +347,7 @@ permet d'afficher la carte scalaire du champ dans le viewer::
 
 Donne:
 
-.. image:: images/xmed-gui-workspace-view.png
+.. image:: ../images/xmed-gui-workspace-view.png
    :align: center
    :width: 800px
 
@@ -439,7 +439,7 @@ remplacer le maillage support d'un champ par un autre à partir du
 moment où les deux maillages sont géométriquement identiques,
 c'est-à-dire que les noeuds ont les mêmes coordonnées spatiales.
 
-.. |ICO_DATASOURCE_CHG| image:: images/ico_datasource_changeUnderlyingMesh.png
+.. |ICO_DATASOURCE_CHG| image:: ../images/ico_datasource_changeUnderlyingMesh.png
                         :height: 16px
 
 Dans l'exemple proposé, l'utilisateur sélectionne le premier pas de
@@ -453,7 +453,7 @@ fenêtre de dialogue ci-dessous s'affiche et invite l'utilisateur à
 choisir le nouveau maillage support par sélection dans l'arborescence
 du "dataspace":
 
-.. image:: images/xmed-gui-datasource-changeUnderlyingMesh.png
+.. image:: ../images/xmed-gui-datasource-changeUnderlyingMesh.png
    :align: center
 
 Dans cet exemple, on sélectionne le maillage ``Grid_80x80_01`` support
@@ -461,7 +461,7 @@ du champ ``StiffExp_01``, avec lequel on souhaite faire la
 comparaison. Après validation, l'arborescence du workspace contient le
 champ ``StiffExp_02`` défini sur le maillage ``Grid_80x80_01``:
 
-.. image:: images/xmed-gui-datasource-changeUnderlyingMesh_wsview.png
+.. image:: ../images/xmed-gui-datasource-changeUnderlyingMesh_wsview.png
    :align: center
 
 .. note:: La fonction "Change underlying mesh" ne modifie pas le champ
@@ -552,7 +552,7 @@ des images qui représentent une grandeur physique en niveaux de gris
 sur un plan de coupe donné. L'image ci-dessous représente par exemple
 une vue interne du corps humain faite par IRM:
 
-.. image:: images/xmed-irm.png
+.. image:: ../images/xmed-irm.png
    :align: center
    :width: 600px
 
@@ -561,7 +561,7 @@ cartesienne. Elle peut donc être modélisée sous la forme d'un champ
 scalaire dont les valeurs sont définies aux cellules d'un maillage
 réglés de même taille que l'image (en nombre de pixels):
 
-.. image:: images/xmed-irm-field.png
+.. image:: ../images/xmed-irm-field.png
    :align: center
    :width: 600px
 
@@ -573,7 +573,7 @@ conservé)::
 
   $ <xmed_root_dir>/bin/salome/xmed/image2med.py -i myimage.png -m myfield.med
 
-.. |ICO_IMAGESOURCE| image:: images/ico_imagesource.png
+.. |ICO_IMAGESOURCE| image:: ../images/ico_imagesource.png
                         :height: 16px
 
 Cette opération de conversion peut être faite automatiquement dans
@@ -582,7 +582,7 @@ Source" |ICO_IMAGESOURCE| disponible dans la barre d'outils. Cette
 commande ouvre la fenêtre suivante pour inviter l'utilisateur à
 choisir un fichier image:
 
-.. image:: images/medop_image2med_dialog.png
+.. image:: ../images/medop_image2med_dialog.png
    :align: center
 
 Le nom du fichier med résultat est proposé par défaut (changement de
@@ -597,7 +597,7 @@ désignent les champs créés à partir des deux images, on représente ``r
 = i1 + 5*(i2-i1)`` où le facteur 5 est arbitraire et sert à amplifier
 la zone d'intérêt (en haut de l'oeil gauche):
 
-.. image:: images/xmed-irm-diff.png
+.. image:: ../images/xmed-irm-diff.png
    :align: center
    :width: 600px
 
@@ -605,13 +605,13 @@ L'exemple ci-dessous est le résultat du chargement d'une image
 tomographique issue du projet MAP (Charles Toulemonde,
 EDF/R&D/MMC). L'image tomographique:
 
-.. image:: images/champ_altitude_MAP.png
+.. image:: ../images/champ_altitude_MAP.png
    :align: center
    :width: 600px
 
 Le résultat du chargement:
 
-.. image:: images/medop_image2med_tomographie.png
+.. image:: ../images/medop_image2med_tomographie.png
    :align: center
    :width: 800px
 
@@ -636,14 +636,14 @@ Pour cela, il faut sélectionner dans l'espace de travail les champs à
 exporter, puis déclencher la fonction d'export depuis le menu
 contextuel associé:
 
-.. image:: images/medop_exportparavis.png
+.. image:: ../images/medop_exportparavis.png
    :align: center
 
 Les champs sélectionnés sont regroupés dans une entrée MED du
 navigateur PARAVIS, et le premier champ est affiché sous forme de
 carte de champ:
 
-.. image:: images/medop_exportparavis_result.png
+.. image:: ../images/medop_exportparavis_result.png
    :align: center
    :width: 800px
 
@@ -662,14 +662,14 @@ Toutes les opérations menées au moyen de l'interface graphique peuvent
 être réalisées (avec plus ou moins de facilité) avec l'interface
 textuelle. Le module de manipulation de champs peut même être utilisé
 exclusivement en mode texte.
-..
- Pour cela, on lance la commande::
+
+Pour cela, on lance la commande::
 
  $ <path/to/appli>/medop.sh
-..
- Cette commande ouvre une console de commandes ``medop>``. Un fichier
- med peut être chargé et travaillé, par exemple pour créer des champs à
- partir des données du fichier.
+
+Cette commande ouvre une console de commandes ``medop>``. Un fichier
+med peut être chargé et travaillé, par exemple pour créer des champs à
+partir des données du fichier.
 
 Que l'on soit en mode texte pur ou en mode graphique, un séquence de
 travail type dans la console peut ressembler au jeu d'instructions

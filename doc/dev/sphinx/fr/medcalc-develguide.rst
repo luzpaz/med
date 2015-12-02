@@ -110,7 +110,7 @@ Une bibliothèque de fonctions pour le traitement de données
 La figure ci-dessous montre la structure des paquets logiciels qui
 constituent la bibliothèque:
 
-.. image:: images/medlayers.png
+.. image:: ../images/medlayers.png
    :align: center
 
 Elle comprend en particulier les paquets suivants:

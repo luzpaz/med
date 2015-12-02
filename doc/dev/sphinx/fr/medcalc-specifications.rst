@@ -305,7 +305,7 @@ Spécifications générales
 Le diagramme ci-dessous représente un découpage fonctionnel qui rend
 compte de l'expression des besoins:
 
-.. image:: images/xmed-functions.png
+.. image:: ../images/xmed-functions.png
    :align: center
 
 On peut identifier les fonctionnalités suivantes:
@@ -634,7 +634,7 @@ La figure ci-dessous en donne une représentation imagée avec le
 support de l'interface graphique du module (interface non définitive
 affichée ici pour illustration des spécifications):
 
-.. image:: images/xmed-gui-withframe.png
+.. image:: ../images/xmed-gui-withframe.png
    :align: center
 
 .. note:: Techniquement, les données sources sont rangées dans l'étude
@@ -669,7 +669,7 @@ l'interface textuelle:
   ``timeseries.med``) pour faire apparaître ensuite le menu contextuel
   et choisir l'option "Use in workspace":
 
-.. image:: images/xmed-gui-datasource-contextmenu_70pc.png
+.. image:: ../images/xmed-gui-datasource-contextmenu_70pc.png
    :align: center
 
 * Cette capture montre une fenêtre de dialogue qui invite
@@ -678,7 +678,7 @@ l'interface textuelle:
   l'espace de travail (par défaut, le nom complet du champ est
   proposé). Ici, l'utilisateur spécifie ``f4``:
 
-.. image:: images/xmed-gui-datasource-useinworkspace_70pc.png
+.. image:: ../images/xmed-gui-datasource-useinworkspace_70pc.png
    :align: center
 
 * La validation de la fenêtre provoque l'ajout du champs dans l'espace
@@ -686,7 +686,7 @@ l'interface textuelle:
   définit une variable python de nom ``f4`` qui permet la manipulation
   du champ:
 
-.. image:: images/xmed-gui-datasource-useinworkspace-result_70pc.png
+.. image:: ../images/xmed-gui-datasource-useinworkspace-result_70pc.png
    :align: center
 
 Modalités d'utilisation
@@ -776,13 +776,13 @@ fonction de visualisation:
 * Sélection d'un champ pour faire apparaitre le menu contextuel et
   choisir l'option "Visualize":
 
-.. image:: images/xmed-gui-datasource-visualize_70pc.png
+.. image:: ../images/xmed-gui-datasource-visualize_70pc.png
    :align: center
 
 * Cette option déclenche l'affichage d'une carte de champ sur le cadre
   d'affichage des viewers SALOME:
 
-.. image:: images/xmed-gui-datasource-visualize-result_70pc.png
+.. image:: ../images/xmed-gui-datasource-visualize-result_70pc.png
    :align: center
 
 Cette fonction est également disponible en ligne de commandes de
@@ -870,7 +870,7 @@ hypothèses techniques suivantes:
 L'implantation technique des développements est représentée sur la
 figure ci-dessous:
 
-.. image:: images/xmed-implantation.png
+.. image:: ../images/xmed-implantation.png
    :align: center
 
 Le schéma représente les packages logiciels qui composent le module
