@@ -27,7 +27,6 @@
 #include <SALOMEDS_SObject.hxx>
 
 #include <Utils_ExceptHandlers.hxx>
-#include <TCollection_AsciiString.hxx>
 
 #include <string>
 
@@ -227,7 +226,7 @@ MED::DumpPython(CORBA::Object_ptr theStudy,
     return new Engines::TMPFile(0);
   }
 
-  TCollection_AsciiString aScript;
+  std::string aScript;
 
   MEDCALC::CommandsList* history = MEDFactoryClient::getCommandsHistoryManager()->getCommandsHistory();
   for (CORBA::ULong i = 0; i < history->length(); ++i) {
@@ -235,9 +234,9 @@ MED::DumpPython(CORBA::Object_ptr theStudy,
     aScript += "\n";
   }
 
-  int aLen = aScript.Length();
+  int aLen = aScript.size();
   unsigned char* aBuffer = new unsigned char[aLen+1];
-  strcpy((char*)aBuffer, aScript.ToCString());
+  strcpy((char*)aBuffer, aScript.c_str());
 
   CORBA::Octet* anOctetBuf =  (CORBA::Octet*)aBuffer;
   Engines::TMPFile_var aStreamFile = new Engines::TMPFile(aLen+1, aLen+1, anOctetBuf, 1);

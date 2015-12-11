@@ -42,7 +42,7 @@ SET(medcouplingclient_SOURCES
   )
 
 ADD_LIBRARY(medcouplingclient SHARED ${medcouplingclient_SOURCES})
-TARGET_LINK_LIBRARIES(medcouplingclient ${MEDCOUPLING_LIBRARY} SalomeIDLMED ${OMNIORB_LIBRARIES} ${PLATFORM_LIBS})
+TARGET_LINK_LIBRARIES(medcouplingclient ${MEDCoupling_medcoupling} SalomeIDLMED ${OMNIORB_LIBRARIES} ${PLATFORM_LIBS})
 INSTALL(TARGETS medcouplingclient EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
 FILE(GLOB medcouplingclient_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")

@@ -55,11 +55,11 @@ SET(COMMON_LIBS
   ${KERNEL_TOOLSDS} ${KERNEL_SalomeHDFPersist} ${KERNEL_SalomeContainer} ${KERNEL_SalomeCommunication}
   ${KERNEL_SalomeKernelHelpers} ${KERNEL_SalomeLifeCycleCORBA} ${KERNEL_SALOMELocalTrace} ${KERNEL_SALOMEBasics}
   ${KERNEL_SalomeGenericObj}
-  ${MEDCOUPLING_LIBRARIES}
   ${MEDFILE_C_LIBRARIES}
   ${HDF5_LIBRARIES}
   ${OMNIORB_LIBRARIES}
   ${PYTHON_LIBRARIES}
+  ${MEDCoupling_medcoupling} ${MEDCoupling_medloader} ${MEDCoupling_medcouplingremapper}
 )
 
 # This undefines the macros MIN and MAX which are specified in the windows headers

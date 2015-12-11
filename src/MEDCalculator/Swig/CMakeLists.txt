@@ -38,7 +38,7 @@ SET(medcalculatorspython_SOURCES
   )
 
 ADD_LIBRARY(medcalculatorspython SHARED ${medcalculatorspython_SOURCES})
-TARGET_LINK_LIBRARIES(medcalculatorspython ${INTERPKERNEL_LIBRARY} ${PYTHON_LIBRARIES})
+TARGET_LINK_LIBRARIES(medcalculatorspython ${MEDCoupling_interpkernel} ${PYTHON_LIBRARIES})
 INSTALL(TARGETS medcalculatorspython DESTINATION ${SALOME_INSTALL_LIBS})
 
 SET_SOURCE_FILES_PROPERTIES(MEDCalculator.i PROPERTIES CPLUSPLUS ON)

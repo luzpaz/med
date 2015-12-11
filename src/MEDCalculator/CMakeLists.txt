@@ -48,7 +48,7 @@ SET(medcalculator_SOURCES
 )
 
 ADD_LIBRARY(medcalculator SHARED ${medcalculator_SOURCES})
-TARGET_LINK_LIBRARIES(medcalculator ${MEDLOADER_LIBRARY} medcouplingcorba ${KERNEL_LDFLAGS}
+TARGET_LINK_LIBRARIES(medcalculator ${MEDCoupling_medloader} medcouplingcorba ${KERNEL_LDFLAGS}
   ${KERNEL_SALOMELocalTrace} ${KERNEL_SalomeNS} ${KERNEL_OpUtil}
   ${OMNIORB_LIBRARIES} ${PLATFORM_LIBRARIES})
 INSTALL(TARGETS medcalculator DESTINATION ${SALOME_INSTALL_LIBS})

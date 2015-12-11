@@ -56,7 +56,7 @@ SET(medcouplingcorba_SOURCES
   )
 
 ADD_LIBRARY(medcouplingcorba SHARED ${medcouplingcorba_SOURCES})
-TARGET_LINK_LIBRARIES(medcouplingcorba ${MEDCOUPLING_LIBRARY} SalomeIDLMED ${PLATFORM_LIBS})
+TARGET_LINK_LIBRARIES(medcouplingcorba ${MEDCoupling_medcoupling} SalomeIDLMED ${PLATFORM_LIBS})
 INSTALL(TARGETS medcouplingcorba EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
 FILE(GLOB medcouplingcorba_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
