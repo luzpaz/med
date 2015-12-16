@@ -25,9 +25,9 @@
   <section name="MED">
     <!-- Major module parameters -->
     <parameter name="name" value="MED"/>
-    <parameter name="icon" value="MEDOP.png"/>
+    <parameter name="icon" value="MEDCalc.png"/>
     <parameter name="documentation" value="med_help"/>
-    <parameter name="library"       value="MEDOPGUI"/>
+    <parameter name="library"       value="MEDCALCGUI"/>
     <parameter name="version"       value="@SALOMEMED_VERSION@"/>
   </section>
   <section name="med_help" >

@@ -35,7 +35,7 @@ textuelle sous les noms de variables f1 et f2. L'image montre le
 contrôle visuel du résultat de l'opération f1+f2-(f1-f2)^2 tapée en
 ligne de commande:
 
-.. image:: images/medop-gui-result.png
+.. image:: ../images/medop-gui-result.png
    :align: center
 
 La séquence ci-après montre le cas d'utilisation complet en
@@ -51,16 +51,16 @@ images:
    l'opération ``f1+f2-(f1-f2)^2`` et contrôle visuel du résultat,
    récupéré ici dans une variable de nom ``result``.
 
-.. |IMG_SELECT| image:: images/medop-gui-selectfield_scale.png
-.. |IMG_ALIAS| image:: images/medop-gui-aliasfield_scale.png
-.. |IMG_VISU| image:: images/medop-gui-visufield_scale.png
-.. |IMG_RESULT| image:: images/medop-gui-result_scale.png
+.. |IMG_SELECT| image:: ../images/medop-gui-selectfield_scale.png
+.. |IMG_ALIAS| image:: ../images/medop-gui-aliasfield_scale.png
+.. |IMG_VISU| image:: ../images/medop-gui-visufield_scale.png
+.. |IMG_RESULT| image:: ../images/medop-gui-result_scale.png
 
-+---------------+---------------+ 
++---------------+---------------+
 | |IMG_SELECT|  | |IMG_ALIAS|   |
-+---------------+---------------+ 
++---------------+---------------+
 | |IMG_VISU|    | |IMG_RESULT|  |
-+---------------+---------------+ 
++---------------+---------------+
 
 La solution technique est construite sur les principes suivants:
 

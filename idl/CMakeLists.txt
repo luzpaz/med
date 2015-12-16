@@ -26,12 +26,15 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(SalomeIDLMED_IDLSOURCES
+  MED_Gen.idl
+  MEDCommandsHistoryManager.idl
   MEDCouplingCorbaServant.idl
   ParaMEDCouplingCorbaServant.idl
   MEDDataManager.idl
   MEDCalculator.idl
   MEDEventListener.idl
-  MEDOPFactory.idl
+  MEDPresentationManager.idl
+  MEDFactory.idl
 )
 
 IF(SALOME_USE_MPI)

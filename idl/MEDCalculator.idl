@@ -25,16 +25,16 @@
 #include "SALOME_GenericObj.idl"
 #include "MEDDataManager.idl"
 
-module MEDOP
+module MEDCALC
 {
-  
+
   /*!
    * This constants may be used for the value of an argument of a
    * function of the interface to specify that the function must
    * consider a default value.
    */
-  typedef long medopNumber;
-  const medopNumber NBCOMP_DEFAULT=-1;
+  typedef long medcalcNumber;
+  const medcalcNumber NBCOMP_DEFAULT=-1;
 
   interface MEDCalculator: SALOME::GenericObj
   {
@@ -64,7 +64,7 @@ module MEDOP
     /* FieldHandler ini(in double value) raises (SALOME::SALOME_Exception); */
 
     /*! Transformation of the field f using a custom function */
-    FieldHandler fct(in FieldHandler f, in string function, in medopNumber nbResComponents)
+    FieldHandler fct(in FieldHandler f, in string function, in medcalcNumber nbResComponents)
       raises (SALOME::SALOME_Exception);
 
   };

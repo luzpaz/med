@@ -25,19 +25,23 @@
 
 #include "SALOME_GenericObj.idl"
 
-module MEDOP
+module MEDCALC
 {
   enum MedEventType {
-    EVENT_ADDNEW_FIELD,
-    EVENT_DELETE_FIELD,
+    EVENT_PUT_IN_WORKSPACE,
+    EVENT_REMOVE_FROM_WORKSPACE,
     EVENT_UPDATE_FIELD,
     EVENT_CLEAN_WORKSPACE,
+    EVENT_ADD_DATASOURCE,
+    EVENT_ADD_PRESENTATION,
     EVENT_UNKNOWN
   };
 
   struct MedEvent {
     MedEventType  type;
-    long          fieldid;
+    long          dataId;
+    string        filename;
+    long          presentationId;
   };
 
   interface MEDEventListener: SALOME::GenericObj {

@@ -123,10 +123,10 @@ SET(MED_RESOURCES_FILES
   Old_H_Traces_Se79_COUPLEX1.med
   Old_maillage_chemvalIV_cas1_40elts.med
   pointe_nomorereadable21.med
-  pointe.med
-  poly3D.med
+#  pointe.med
+#  poly3D.med
   polyedres.med
-  polygones.med
+#  polygones.med
   recoll_bord.med
   test19.med
   test_2D.med
@@ -134,68 +134,68 @@ SET(MED_RESOURCES_FILES
   TimeStamps.med
   zzzz121b.med
   zzzz121b_without_tr6.med
-  UnitTetra.med
-  GeneralTetra.med
-  NudgedSimpler.med
-  NudgedTetra.med
-  CornerTetra.med
-  SimpleIncludedTetra.med
-  SimpleIncludingTetra.med
-  Test2D.med
-  Test2Dpoly.med
-  Test3D.med
-  Test3Dpoly.med
-  UnitTetraDegenT.med
-  DegenEdgeXY.med
-  DegenFaceXYZ.med
-  DegenTranslatedInPlane.med
-  ComplexIncludedTetra.med
-  ComplexIncludingTetra.med
-  HalfstripOnly.med
-  HalfstripOnly2.med
-  SimpleHalfstripOnly.med
-  GenTetra1.med
-  GenTetra2.med
-  TrickyTetra1.med
-  LargeUnitTetra.med
+  # UnitTetra.med
+  # GeneralTetra.med
+  # NudgedSimpler.med
+  # NudgedTetra.med
+  # CornerTetra.med
+  # SimpleIncludedTetra.med
+  # SimpleIncludingTetra.med
+  # Test2D.med
+  # Test2Dpoly.med
+  # Test3D.med
+  # Test3Dpoly.med
+  # UnitTetraDegenT.med
+  # DegenEdgeXY.med
+  # DegenFaceXYZ.med
+  # DegenTranslatedInPlane.med
+  # ComplexIncludedTetra.med
+  # ComplexIncludingTetra.med
+  # HalfstripOnly.med
+  # HalfstripOnly2.med
+  # SimpleHalfstripOnly.med
+  # GenTetra1.med
+  # GenTetra2.med
+  # TrickyTetra1.med
+  # LargeUnitTetra.med
   LargeInconsistentTetra.med
-  DividedUnitTetraSimpler.med
-  DividedUnitTetra.med
-  NudgedDividedUnitTetra.med
-  NudgedDividedUnitTetraSimpler.med
-  DividedGenTetra1.med
-  DividedGenTetra2.med
-  Box1.med
-  Box2.med
-  Box3.med
-  Box1Moderate.med
-  Box2Moderate.med
-  BoxModSmall1.med
-  BoxModSmall2.med
-  BoxEvenSmaller1.med
-  TinyBox.med
-  BoxHexa1.med
-  BoxHexa2.med
-  MovedHexaBox1.med
-  MovedHexaBox2.med
-  BoxTetra2.med
-  square1.med
-  square1_split
-  square1_split1.med
-  square1_split2.med
-  square1_split3.med
-  square2.med
-  square2_split
-  square2_split1.med
-  square2_split2.med
+  # DividedUnitTetraSimpler.med
+  # DividedUnitTetra.med
+  # NudgedDividedUnitTetra.med
+  # NudgedDividedUnitTetraSimpler.med
+  # DividedGenTetra1.med
+  # DividedGenTetra2.med
+  # Box1.med
+  # Box2.med
+  # Box3.med
+  # Box1Moderate.med
+  # Box2Moderate.med
+  # BoxModSmall1.med
+  # BoxModSmall2.med
+  # BoxEvenSmaller1.med
+  # TinyBox.med
+  # BoxHexa1.med
+  # BoxHexa2.med
+  # MovedHexaBox1.med
+  # MovedHexaBox2.med
+  # BoxTetra2.med
+  # square1.med
+#  square1_split
+#  square1_split1.med
+#  square1_split2.med
+#  square1_split3.med
+#  square2.med
+#  square2_split
+#  square2_split1.med
+#  square2_split2.med
   testStructCart3D.med
-  Mesh3D_10_2d1.med
-  Mesh3D_10_2d2.med
-  Mesh3D_11.med
-  Pol1.fig
-  Pol2.fig
-  Pol3.fig
-  Pol4.fig
+#  Mesh3D_10_2d1.med
+#  Mesh3D_10_2d2.med
+#  Mesh3D_11.med
+#  Pol1.fig
+#  Pol2.fig
+#  Pol3.fig
+#  Pol4.fig
   blow5_ascii.case
   blow5_ascii.geo
   blow5_ascii_cd_displacement
@@ -203,10 +203,10 @@ SET(MED_RESOURCES_FILES
   blow5_ascii_pd_displacement
   blow5_ascii_pd_thickness
   test_2D.sauve
-  allPillesTest.sauv
-  BDC-714.sauv
-  portico_3subs.sauv
-  agitateur.med
+#  allPillesTest.sauv
+#  BDC-714.sauv
+#  portico_3subs.sauv
+#  agitateur.med
   )
 
 IF(MED_ENABLE_GUI)
@@ -225,7 +225,9 @@ IF(MED_ENABLE_GUI)
     )
 ENDIF(MED_ENABLE_GUI)
 
-INSTALL(FILES ${MED_RESOURCES_FILES} DESTINATION ${SALOME_MED_INSTALL_RES_DATA})
+IF(SALOME_MED_WITH_FILE_EXAMPLES)
+  INSTALL(FILES ${MED_RESOURCES_FILES} DESTINATION ${SALOME_MED_INSTALL_RES_DATA})
+ENDIF(SALOME_MED_WITH_FILE_EXAMPLES)
 
 MESSAGE(STATUS "Creation of ${CMAKE_CURRENT_BINARY_DIR}/MEDCatalog.xml")
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/MEDCatalog.xml.in ${CMAKE_CURRENT_BINARY_DIR}/MEDCatalog.xml @ONLY)

@@ -28,7 +28,7 @@
 #include "SALOME_GenericObj.idl"
 #include "SALOME_Exception.idl"
 
-module MEDOP
+module MEDCALC
 {
   struct DatasourceHandler {
     long id;
@@ -116,7 +116,9 @@ module MEDOP
     //==========================================================
     // Datasource management
     //==========================================================
-    DatasourceHandler addDatasource(in string filepath);
+    DatasourceHandler loadDatasource(in string filepath);
+    DatasourceHandler getDatasourceHandler(in string filepath);
+    DatasourceHandler getDatasourceHandlerFromID(in long sourceid);
 
     //==========================================================
     // Mesh data management
