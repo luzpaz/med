@@ -30,7 +30,7 @@
 #include "MEDDataManager_i.hxx"
 
 #include "MEDCALC.hxx"
-class MEDCALC_EXPORT MEDCalculator_i: public POA_MEDCALC::MEDCalculator,
+class MEDCalculator_i: public POA_MEDCALC::MEDCalculator,
             public SALOME::GenericObj_i
 {
 public:
@@ -40,15 +40,15 @@ public:
   // Functions specified in the IDL interface
   // ===========================================================
   //
-  MEDCALC::FieldHandler * add(const MEDCALC::FieldHandler & f1_hdl, const MEDCALC::FieldHandler & f2_hdl);
-  MEDCALC::FieldHandler * sub(const MEDCALC::FieldHandler & f1_hdl, const MEDCALC::FieldHandler & f2_hdl);
-  MEDCALC::FieldHandler * mul(const MEDCALC::FieldHandler & f1_hdl, const MEDCALC::FieldHandler & f2_hdl);
-  MEDCALC::FieldHandler * div(const MEDCALC::FieldHandler & f1_hdl, const MEDCALC::FieldHandler & f2_hdl);
-  MEDCALC::FieldHandler * pow(const MEDCALC::FieldHandler & f_hdl, CORBA::Long power);
-  MEDCALC::FieldHandler * lin(const MEDCALC::FieldHandler & f_hdl, double factor, double offset);
-  MEDCALC::FieldHandler * dup(const MEDCALC::FieldHandler & f_hdl);
+  MEDCALC_EXPORT MEDCALC::FieldHandler * add(const MEDCALC::FieldHandler & f1_hdl, const MEDCALC::FieldHandler & f2_hdl);
+  MEDCALC_EXPORT MEDCALC::FieldHandler * sub(const MEDCALC::FieldHandler & f1_hdl, const MEDCALC::FieldHandler & f2_hdl);
+  MEDCALC_EXPORT MEDCALC::FieldHandler * mul(const MEDCALC::FieldHandler & f1_hdl, const MEDCALC::FieldHandler & f2_hdl);
+  MEDCALC_EXPORT MEDCALC::FieldHandler * div(const MEDCALC::FieldHandler & f1_hdl, const MEDCALC::FieldHandler & f2_hdl);
+  MEDCALC_EXPORT MEDCALC::FieldHandler * pow(const MEDCALC::FieldHandler & f_hdl, CORBA::Long power);
+  MEDCALC_EXPORT MEDCALC::FieldHandler * lin(const MEDCALC::FieldHandler & f_hdl, double factor, double offset);
+  MEDCALC_EXPORT MEDCALC::FieldHandler * dup(const MEDCALC::FieldHandler & f_hdl);
 
-  MEDCALC::FieldHandler * fct(const MEDCALC::FieldHandler & f_hdl,
+  MEDCALC_EXPORT MEDCALC::FieldHandler * fct(const MEDCALC::FieldHandler & f_hdl,
           const char * function, CORBA::Long nbResComponents);
 
   //

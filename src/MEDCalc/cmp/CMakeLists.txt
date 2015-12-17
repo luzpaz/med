@@ -52,9 +52,9 @@ SET(MEDEngine_SOURCES
 SET(COMMON_LIBS
   ${PLATFORM_LIBRARIES}
   SalomeIDLMED
-  ${KERNEL_TOOLSDS} ${KERNEL_SalomeHDFPersist} ${KERNEL_SalomeContainer} ${KERNEL_SalomeCommunication}
+  ${KERNEL_TOOLSDS} ${KERNEL_SalomeDS} ${KERNEL_SalomeHDFPersist} ${KERNEL_SalomeContainer} ${KERNEL_SalomeCommunication}
   ${KERNEL_SalomeKernelHelpers} ${KERNEL_SalomeLifeCycleCORBA} ${KERNEL_SALOMELocalTrace} ${KERNEL_SALOMEBasics}
-  ${KERNEL_SalomeGenericObj}
+  ${KERNEL_SalomeGenericObj} ${GUI_PyInterp}
   ${MEDFILE_C_LIBRARIES}
   ${HDF5_LIBRARIES}
   ${OMNIORB_LIBRARIES}

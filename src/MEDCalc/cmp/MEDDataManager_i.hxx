@@ -57,7 +57,7 @@ typedef map<long,MEDCouplingUMesh*> MeshMap;
 typedef map<long,MEDCouplingUMesh*>::iterator MeshMapIterator;
 
 #include "MEDCALC.hxx"
-class MEDCALC_EXPORT MEDDataManager_i: public POA_MEDCALC::MEDDataManager,
+class MEDDataManager_i: public POA_MEDCALC::MEDDataManager,
                                        public SALOME::GenericObj_i
 {
 public:
@@ -69,43 +69,43 @@ public:
   //
   // -----------------------------------------------------------
   // Datasource management
-  MEDCALC::DatasourceHandler * loadDatasource(const char *filepath);
-  MEDCALC::DatasourceHandler * getDatasourceHandler(const char *filepath);
-  MEDCALC::DatasourceHandler * getDatasourceHandlerFromID(CORBA::Long sourceId);
+  MEDCALC_EXPORT MEDCALC::DatasourceHandler * loadDatasource(const char *filepath);
+  MEDCALC_EXPORT MEDCALC::DatasourceHandler * getDatasourceHandler(const char *filepath);
+  MEDCALC_EXPORT MEDCALC::DatasourceHandler * getDatasourceHandlerFromID(CORBA::Long sourceId);
 
   // -----------------------------------------------------------
   // Mesh management
-  MEDCALC::MeshHandlerList * getMeshList(CORBA::Long datasourceId);
-  MEDCALC::MeshHandler * getMesh(CORBA::Long meshId);
+  MEDCALC_EXPORT MEDCALC::MeshHandlerList * getMeshList(CORBA::Long datasourceId);
+  MEDCALC_EXPORT MEDCALC::MeshHandler * getMesh(CORBA::Long meshId);
 
   // -----------------------------------------------------------
   // Field management
-  MEDCALC::FieldseriesHandlerList * getFieldseriesListOnMesh(CORBA::Long meshId);
-  MEDCALC::FieldHandlerList * getFieldListInFieldseries(CORBA::Long fieldseriesId);
+  MEDCALC_EXPORT MEDCALC::FieldseriesHandlerList * getFieldseriesListOnMesh(CORBA::Long meshId);
+  MEDCALC_EXPORT MEDCALC::FieldHandlerList * getFieldListInFieldseries(CORBA::Long fieldseriesId);
 
-  MEDCALC::FieldHandler *     getFieldHandler(CORBA::Long fieldHandlerId);
-  char *                    getFieldRepresentation(CORBA::Long fieldHandlerId);
-  MEDCALC::FieldHandlerList * getFieldHandlerList();
+  MEDCALC_EXPORT MEDCALC::FieldHandler *     getFieldHandler(CORBA::Long fieldHandlerId);
+  MEDCALC_EXPORT char *                    getFieldRepresentation(CORBA::Long fieldHandlerId);
+  MEDCALC_EXPORT MEDCALC::FieldHandlerList * getFieldHandlerList();
 
-  void                      saveFields(const char * filepath,
+  MEDCALC_EXPORT void      saveFields(const char * filepath,
                                        const MEDCALC::FieldIdList & fieldIdList);
-  void                      markAsPersistent(CORBA::Long fieldHandlerId, bool persistent);
-  void                      savePersistentFields(const char * filepath);
+  MEDCALC_EXPORT void      markAsPersistent(CORBA::Long fieldHandlerId, bool persistent);
+  MEDCALC_EXPORT void      savePersistentFields(const char * filepath);
 
 
-  void updateFieldMetadata(CORBA::Long  fieldHandlerId,
+  MEDCALC_EXPORT void updateFieldMetadata(CORBA::Long  fieldHandlerId,
                            const char * fieldname,
                            CORBA::Long  iteration,
                            CORBA::Long  order,
                            const char * source);
 
-  void changeUnderlyingMesh(CORBA::Long fieldHandlerId, CORBA::Long meshHandlerId);
-  MEDCALC::FieldHandler* interpolateField(CORBA::Long fieldHandlerId, CORBA::Long meshHandlerId, const MEDCALC::InterpolationParameters& params);
+  MEDCALC_EXPORT void changeUnderlyingMesh(CORBA::Long fieldHandlerId, CORBA::Long meshHandlerId);
+  MEDCALC_EXPORT MEDCALC::FieldHandler* interpolateField(CORBA::Long fieldHandlerId, CORBA::Long meshHandlerId, const MEDCALC::InterpolationParameters& params);
 
-  void   setEventListenerIOR(const char * ior);
-  char * getEventListenerIOR();
+  MEDCALC_EXPORT void   setEventListenerIOR(const char * ior);
+  MEDCALC_EXPORT char * getEventListenerIOR();
 
-  void serverlog();
+  MEDCALC_EXPORT void serverlog();
 
   //
   // ===========================================================

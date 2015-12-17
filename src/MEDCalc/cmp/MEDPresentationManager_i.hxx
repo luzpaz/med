@@ -35,16 +35,16 @@ typedef ::CORBA::Long TypeID;
 
 class MEDPresentation;
 
-class MEDCALC_EXPORT MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
+class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
                                                public SALOME::GenericObj_i
 {
  public:
 
   static MEDPresentationManager_i* getInstance();
 
-  TypeID makeScalarMap(const MEDCALC::ScalarMapParameters&);
-  void setPresentationProperty(TypeID presentationID, const char * propName, const char * propValue);
-  char* getPresentationProperty(TypeID presentationID, const char* propName);
+  MEDCALC_EXPORT TypeID makeScalarMap(const MEDCALC::ScalarMapParameters&);
+  MEDCALC_EXPORT void setPresentationProperty(TypeID presentationID, const char * propName, const char * propValue);
+  MEDCALC_EXPORT char* getPresentationProperty(TypeID presentationID, const char* propName);
 
  private:
   MEDPresentationManager_i();

@@ -26,16 +26,16 @@
 
 #include "MEDCALC.hxx"
 
-class MEDCALC_EXPORT MEDCommandsHistoryManager_i
+class MEDCommandsHistoryManager_i
   : public POA_MEDCALC::MEDCommandsHistoryManager,
     public SALOME::GenericObj_i
 {
  public:
   static MEDCommandsHistoryManager_i* getInstance();
 
-  void addCommand(const char* command);
-  MEDCALC::CommandsList* getCommandsHistory();
-  void clearHistory();
+  MEDCALC_EXPORT void addCommand(const char* command);
+  MEDCALC_EXPORT MEDCALC::CommandsList* getCommandsHistory();
+  MEDCALC_EXPORT void clearHistory();
 
  private:
   MEDCommandsHistoryManager_i();

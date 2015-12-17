@@ -37,6 +37,10 @@ IF(NOT SalomeMED_FIND_QUIETLY)
   MESSAGE(STATUS "Found Salome MED: ${MED_ROOT_DIR}")
 ENDIF()
 
+FIND_LIBRARY(medcouplingcorba medcouplingcorba ${MED_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(medcouplingclient medcouplingclient ${MED_ROOT_DIR}/lib/salome)
+FIND_LIBRARY(SalomeIDLMED SalomeIDLMED ${MED_ROOT_DIR}/lib/salome)
+
 FOREACH(_res ${SalomeMED_EXTRA_ENV})
   SALOME_ACCUMULATE_ENVIRONMENT(${_res} "${SalomeMED_EXTRA_ENV_${_res}}")
 ENDFOREACH()
