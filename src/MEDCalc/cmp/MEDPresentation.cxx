@@ -21,7 +21,7 @@
 #include "MEDFactoryClient.hxx"
 #include "MEDPresentation.hxx"
 #include "MEDCouplingRefCountObject.hxx"
-#include <PyInterp_Utils.h>
+//#include <PyInterp_Utils.h>
 #include <iostream>
 
 MEDPresentation::MEDPresentation(MEDCALC::FieldHandler* fieldHdl, std::string name)
@@ -116,7 +116,7 @@ void MEDPresentationScalarMap::internalGeneratePipeline()
   std::cout << "\tfileName: " <<  fileName << std::endl;
 
   {  // PyLock protected section
-    PyLockWrapper lock;
+    //PyLockWrapper lock;
 
     PyRun_SimpleString("print 'hello world'");
     std::string cmd = std::string(
