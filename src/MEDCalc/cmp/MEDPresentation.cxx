@@ -21,7 +21,6 @@
 #include "MEDFactoryClient.hxx"
 #include "MEDPresentation.hxx"
 #include "MEDCouplingRefCountObject.hxx"
-//#include <PyInterp_Utils.h>
 #include <iostream>
 
 MEDPresentation::MEDPresentation(MEDCALC::FieldHandler* fieldHdl, std::string name)
@@ -115,24 +114,23 @@ void MEDPresentationScalarMap::internalGeneratePipeline()
   fileName = fileName.substr(7, fileName.size());
   std::cout << "\tfileName: " <<  fileName << std::endl;
 
-  {  // PyLock protected section
-    //PyLockWrapper lock;
+  PyGILState_STATE _gil_state = PyGILState_Ensure();
 
-    PyRun_SimpleString("print 'hello world'");
-    std::string cmd = std::string(
+  PyRun_SimpleString("print 'hello world'");
+  std::string cmd = std::string(
         "import pvsimple as pvs;"
         "__obj1 = pvs.MEDReader(FileName='") + fileName + std::string("');"
         "__disp1 = pvs.Show(__obj1);"
         "pvs.ColorBy(__disp1, ('") + fieldType + std::string("', '") + fieldName + std::string("'));"
         "pvs.GetActiveViewOrCreate('RenderView').ResetCamera()");
 
-    std::cerr << "Python command:" << std::endl;
-    std::cerr << cmd << std::endl;
-    PyRun_SimpleString(cmd.c_str());
-    // Retrieve Python object for internal storage:
-    PyObject * obj = getPythonObjectFromMain("__obj1");
-    PyObject * disp = getPythonObjectFromMain("__disp1");
-    pushInternal(obj, disp);
-  }
+  std::cerr << "Python command:" << std::endl;
+  std::cerr << cmd << std::endl;
+  PyRun_SimpleString(cmd.c_str());
+  // Retrieve Python object for internal storage:
+  PyObject * obj = getPythonObjectFromMain("__obj1");
+  PyObject * disp = getPythonObjectFromMain("__disp1");
+  pushInternal(obj, disp);
 
+  PyGILState_Release(_gil_state);
 }

@@ -54,7 +54,7 @@ SET(COMMON_LIBS
   SalomeIDLMED
   ${KERNEL_TOOLSDS} ${KERNEL_SalomeDS} ${KERNEL_SalomeHDFPersist} ${KERNEL_SalomeContainer} ${KERNEL_SalomeCommunication}
   ${KERNEL_SalomeKernelHelpers} ${KERNEL_SalomeLifeCycleCORBA} ${KERNEL_SALOMELocalTrace} ${KERNEL_SALOMEBasics}
-  ${KERNEL_SalomeGenericObj} ${GUI_PyInterp}
+  ${KERNEL_SalomeGenericObj}
   ${MEDFILE_C_LIBRARIES}
   ${HDF5_LIBRARIES}
   ${OMNIORB_LIBRARIES}
