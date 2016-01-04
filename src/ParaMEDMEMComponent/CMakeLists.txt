@@ -35,7 +35,7 @@ SET(paramedmemcompo_SOURCES
 
 ADD_LIBRARY(paramedmemcompo SHARED ${paramedmemcompo_SOURCES})
 TARGET_LINK_LIBRARIES(paramedmemcompo medcouplingcorba paramedmem)
-INSTALL(TARGETS paramedmemcompo DESTINATION ${SALOME_INSTALL_LIBS})
+INSTALL(TARGETS paramedmemcompo EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
 FILE(GLOB paramedmemcompo_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
 INSTALL(FILES ${paramedmemcompo_HEADERS_HXX} DESTINATION ${SALOME_INSTALL_HEADERS})
