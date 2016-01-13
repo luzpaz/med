@@ -266,7 +266,7 @@ SET(CPPUNIT_ROOT_DIR "${CPPUNIT_ROOT_DIR}")
 SET(GRAPHVIZ_ROOT_DIR "${GRAPHVIZ_ROOT_DIR}")
 SET(DOXYGEN_ROOT_DIR "${DOXYGEN_ROOT_DIR}")
 SET(SPHINX_ROOT_DIR "${SPHINX_ROOT_DIR}")
-IF(NOT SALOME_BUILD_WITH_QT5)
+IF(NOT SALOME_GUI_BUILD_WITH_QT5)
   SET(QT_ROOT_DIR "${QT4_ROOT_DIR}")
 ELSE()
   SET(QT_ROOT_DIR "${QT5_ROOT_DIR}")
@@ -278,11 +278,11 @@ ENDIF()
 SET(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/${INSTALL_INCLUDE_DIR}")
 
 # Build variables that will be expanded when configuring Salome<MODULE>Config.cmake:
-IF(NOT SALOME_BUILD_WITH_QT5)
+IF(NOT SALOME_GUI_BUILD_WITH_QT5)
    SALOME_CONFIGURE_PREPARE(MEDCoupling Qt4 MPI omniORB CppUnit Graphviz Doxygen Sphinx  
                          						PThread Python)
  ELSE()                     
-	SALOME_CONFIGURE_PREPARE(MEDCoupling Qt5 MPI omniORB CppUnit Graphviz Doxygen Sphinx  
+   SALOME_CONFIGURE_PREPARE(MEDCoupling Qt5 MPI omniORB CppUnit Graphviz Doxygen Sphinx  
                          						PThread Python)
 ENDIF()
 
