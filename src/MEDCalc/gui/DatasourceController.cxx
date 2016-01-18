@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -117,6 +117,31 @@ void DatasourceController::createActions() {
   label = tr("LAB_VISUALIZE_SCALARMAP");
   icon  = tr("ICO_DATASOURCE_VIEW");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeScalarMap()),icon);
+  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
+
+  label = tr("LAB_VISUALIZE_CONTOUR");
+  icon  = tr("ICO_DATASOURCE_VIEW");
+  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeContour()),icon);
+  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
+
+  label = tr("LAB_VISUALIZE_VECTORFIELD");
+  icon  = tr("ICO_DATASOURCE_VIEW");
+  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeVectorField()),icon);
+  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
+
+  label = tr("LAB_VISUALIZE_SLICES");
+  icon  = tr("ICO_DATASOURCE_VIEW");
+  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeSlices()),icon);
+  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
+
+  label = tr("LAB_VISUALIZE_DEFLECTIONSHAPE");
+  icon  = tr("ICO_DATASOURCE_VIEW");
+  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeDeflectionShape()),icon);
+  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
+
+  label = tr("LAB_VISUALIZE_POINTSPRITE");
+  icon  = tr("ICO_DATASOURCE_VIEW");
+  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizePointSprite()),icon);
   _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
 
   // Use in workspace
@@ -336,6 +361,26 @@ void DatasourceController::visualize(DatasourceEvent::EventType eventType) {
 
 void DatasourceController::OnVisualizeScalarMap() {
   this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_SCALAR_MAP);
+}
+
+void DatasourceController::OnVisualizeContour() {
+  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_CONTOUR);
+}
+
+void DatasourceController::OnVisualizeVectorField() {
+  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_VECTOR_FIELD);
+}
+
+void DatasourceController::OnVisualizeSlices() {
+  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_SLICES);
+}
+
+void DatasourceController::OnVisualizeDeflectionShape() {
+  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE);
+}
+
+void DatasourceController::OnVisualizePointSprite() {
+  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_POINT_SPRITE);
 }
 
 void DatasourceController::OnUseInWorkspace() {

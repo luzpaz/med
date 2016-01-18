@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -461,6 +461,16 @@ void WorkspaceController::_viewItemList(QStringList itemNameIdList) {
   _consoleDriver->exec(commands);
 }
 
+QString
+WorkspaceController::_getViewMode() {
+#define stringify( name ) # name
+
+  QString viewMode = stringify(MEDCALC::VIEW_MODE_NEW_LAYOUT); // :TODO: change this (get value from dedicated dialog)
+  viewMode.replace("::", ".");
+
+  return viewMode;
+}
+
 /**
  * This slot can process the event coming from the
  * DatasourceController. The connection between the datasource signal
@@ -506,14 +516,45 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
           QCHARSTAR(event->objectalias));
   }
   else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_SCALAR_MAP ) {
-    QStringList commands;
-
-#define stringify( name ) # name
-    QString viewMode = stringify(MEDCALC::VIEW_MODE_NEW_LAYOUT); // :TODO: change this (get value from dedicated dialog)
-    viewMode.replace("::", ".");
-
+    QString viewMode = _getViewMode();
     MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
     commands += QString("medcalc.MakeScalarMap(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_CONTOUR ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakeContour(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_VECTOR_FIELD ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakeVectorField(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_SLICES ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakeSlices(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakeDeflectionShape(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_POINT_SPRITE ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakePointSprite(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
     _consoleDriver->exec(commands);
   }
   else if ( event->eventtype == DatasourceEvent::EVENT_ADD_DATASOURCE ) {

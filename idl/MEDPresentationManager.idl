@@ -1,4 +1,4 @@
-// Copyright (C) 2005-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2005-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -37,10 +37,42 @@ module MEDCALC
     MEDPresentationViewMode viewMode;
   };
 
+  // A contour is an isoline in 2D and an isosurface in 3D
+  struct ContourParameters {
+    long fieldHandlerId;
+    MEDPresentationViewMode viewMode;
+  };
+
+  struct VectorFieldParameters {
+    long fieldHandlerId;
+    MEDPresentationViewMode viewMode;
+  };
+
+  struct SlicesParameters {
+    long fieldHandlerId;
+    MEDPresentationViewMode viewMode;
+  };
+
+  struct DeflectionShapeParameters {
+    long fieldHandlerId;
+    MEDPresentationViewMode viewMode;
+  };
+
+  struct PointSpriteParameters {
+    long fieldHandlerId;
+    MEDPresentationViewMode viewMode;
+  };
+
   interface MEDPresentationManager : SALOME::GenericObj
   {
 
     long makeScalarMap(in ScalarMapParameters params);
+    long makeContour(in ContourParameters params);
+    long makeVectorField(in VectorFieldParameters params);
+    long makeSlices(in SlicesParameters params);
+    long makeDeflectionShape(in DeflectionShapeParameters params);
+    long makePointSprite(in PointSpriteParameters params);
+
     void setPresentationProperty(in long presId, in string propName, in string propValue);
     string getPresentationProperty(in long presId, in string propName);
 

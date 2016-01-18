@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2015  CEA/DEN, EDF R&D
+# Copyright (C) 2012-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -37,6 +37,13 @@ SET(COMMON_SOURCES
   MEDCalculator_i.cxx
   MEDPresentationManager_i.cxx
   MEDPresentation.cxx
+  # presentations
+  MEDPresentationScalarMap.cxx
+  MEDPresentationContour.cxx
+  MEDPresentationVectorField.cxx
+  MEDPresentationSlices.cxx
+  MEDPresentationDeflectionShape.cxx
+  MEDPresentationPointSprite.cxx
 )
 
 SET(MEDFactoryEngine_SOURCES

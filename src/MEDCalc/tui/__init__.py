@@ -1,4 +1,4 @@
-# Copyright (C) 2015  CEA/DEN, EDF R&D
+# Copyright (C) 2015, 2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ from medio import LoadImageAsDataSource
 
 # Presentations
 from medpresentation import MakeScalarMap
-from medpresentation import MakeIsoSurface
+from medpresentation import MakeContour
 from medpresentation import MakeVectorField
 from medpresentation import MakeSlices
 from medpresentation import MakeDeflectionShape

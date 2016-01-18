@@ -1,4 +1,4 @@
-// Copyright (C) 2011-2015  CEA/DEN, EDF R&D
+// Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -66,22 +66,6 @@ protected:
 
   ///! Presentation properties <key,value>
   std::map<std::string, std::string> _properties;
-};
-
-class MEDCALC_EXPORT MEDPresentationScalarMap :  public MEDPresentation
-{
-public:
-  MEDPresentationScalarMap(MEDCALC::FieldHandler* fieldHdl, bool wireframe) :
-    MEDPresentation(fieldHdl, "MEDPresentationScalarMap"),
-    _isWireframe(wireframe)
-  {}
-  virtual ~MEDPresentationScalarMap() {}
-
-protected:
-  virtual void internalGeneratePipeline();
-
-private:
-  bool _isWireframe;
 };
 
 #endif /* SRC_MEDCALC_CMP_MEDPRESENTATION_HXX_ */

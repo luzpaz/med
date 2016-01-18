@@ -8,6 +8,26 @@
       <translation>Carte scalaire</translation>
     </message>
     <message>
+      <source>MEDPresentationContour</source>
+      <translation>Contour</translation>
+    </message>
+    <message>
+      <source>MEDPresentationVectorField</source>
+      <translation>Champ de vecteurs</translation>
+    </message>
+    <message>
+      <source>MEDPresentationSlices</source>
+      <translation>Coupes</translation>
+    </message>
+    <message>
+      <source>MEDPresentationDeflectionShape</source>
+      <translation>Déformée</translation>
+    </message>
+    <message>
+      <source>MEDPresentationPointSprite</source>
+      <translation>Point Sprite</translation>
+    </message>
+    <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="45"/>
       <source>LAB_ADD_DATA_SOURCE</source>
       <translation>Importer des données MED</translation>
@@ -35,6 +55,26 @@
     <message>
       <source>LAB_VISUALIZE_SCALARMAP</source>
       <translation>Carte scalaire</translation>
+    </message>
+    <message>
+      <source>LAB_VISUALIZE_CONTOUR</source>
+      <translation>Contour</translation>
+    </message>
+    <message>
+      <source>LAB_VISUALIZE_VECTORFIELD</source>
+      <translation>Champ de vecteurs</translation>
+    </message>
+    <message>
+      <source>LAB_VISUALIZE_SLICES</source>
+      <translation>Coupes</translation>
+    </message>
+    <message>
+      <source>LAB_VISUALIZE_DEFLECTIONSHAPE</source>
+      <translation>Déformée</translation>
+    </message>
+    <message>
+      <source>LAB_VISUALIZE_POINTSPRITE</source>
+      <translation>Point sprite</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="69"/>

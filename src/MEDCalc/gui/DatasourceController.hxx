@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -54,7 +54,13 @@ typedef struct {
     EVENT_IMPORT_OBJECT, // Simply import the object in the workspace
     EVENT_USE_OBJECT,    // Import in the workspace AND define a proxy
                          // variable in the tui console to use it
+    // presentations
+    EVENT_VIEW_OBJECT_CONTOUR,
+    EVENT_VIEW_OBJECT_DEFLECTION_SHAPE,
+    EVENT_VIEW_OBJECT_POINT_SPRITE,
     EVENT_VIEW_OBJECT_SCALAR_MAP,
+    EVENT_VIEW_OBJECT_SLICES,
+    EVENT_VIEW_OBJECT_VECTOR_FIELD,
     // these ones forward actions to workspace (and then to python console)
     EVENT_ADD_DATASOURCE,
     EVENT_ADD_IMAGE_AS_DATASOURCE,
@@ -95,6 +101,11 @@ protected slots:
   void OnAddImagesource();
   void OnExpandField();
   void OnVisualizeScalarMap();
+  void OnVisualizeContour();
+  void OnVisualizeVectorField();
+  void OnVisualizeSlices();
+  void OnVisualizeDeflectionShape();
+  void OnVisualizePointSprite();
   void OnUseInWorkspace();
   void OnChangeUnderlyingMesh();
   void OnInterpolateField();

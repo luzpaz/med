@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -43,6 +43,12 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   static MEDPresentationManager_i* getInstance();
 
   MEDCALC_EXPORT TypeID makeScalarMap(const MEDCALC::ScalarMapParameters&);
+  MEDCALC_EXPORT TypeID makeContour(const MEDCALC::ContourParameters&);
+  MEDCALC_EXPORT TypeID makeVectorField(const MEDCALC::VectorFieldParameters&);
+  MEDCALC_EXPORT TypeID makeSlices(const MEDCALC::SlicesParameters&);
+  MEDCALC_EXPORT TypeID makeDeflectionShape(const MEDCALC::DeflectionShapeParameters&);
+  MEDCALC_EXPORT TypeID makePointSprite(const MEDCALC::PointSpriteParameters&);
+
   MEDCALC_EXPORT void setPresentationProperty(TypeID presentationID, const char * propName, const char * propValue);
   MEDCALC_EXPORT char* getPresentationProperty(TypeID presentationID, const char* propName);
 

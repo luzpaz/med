@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2015  CEA/DEN, EDF R&D
+# Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -36,22 +36,37 @@ def MakeScalarMap(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
   notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
-def MakeIsoSurface():
+def MakeContour(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
   print "Not implemented yet"
+  #params = MEDCALC.ContourParameters(proxy.id, viewMode)
+  #presentation_id = __manager.makeContour(params)
+  #notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
-def MakeVectorField():
+def MakeVectorField(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
   print "Not implemented yet"
+  #params = MEDCALC.VectorFieldParameters(proxy.id, viewMode)
+  #presentation_id = __manager.makeVectorField(params)
+  #notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
-def MakeSlices():
+def MakeSlices(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
   print "Not implemented yet"
+  #params = MEDCALC.SlicesParameters(proxy.id, viewMode)
+  #presentation_id = __manager.makeSlices(params)
+  #notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
-def MakeDeflectionShape():
+def MakeDeflectionShape(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
   print "Not implemented yet"
+  #params = MEDCALC.DeflectionShapeParameters(proxy.id, viewMode)
+  #presentation_id = __manager.makeDeflectionShape(params)
+  #notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
-def MakePointSprite():
+def MakePointSprite(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
   print "Not implemented yet"
+  #params = MEDCALC.PointSpriteParameters(proxy.id, viewMode)
+  #presentation_id = __manager.makePointSprite(params)
+  #notifyGui_addPresentation(proxy.id, presentation_id)
 #
