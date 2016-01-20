@@ -25,7 +25,7 @@
 #include "MEDCoupling1GTUMesh.hxx"
 #include "MEDCoupling1SGTUMeshClient.hxx"
 #include "MEDCoupling1DGTUMeshClient.hxx"
-#include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCouplingMappedExtrudedMesh.hxx"
 #include "MEDCouplingExtrudedMeshClient.hxx"
 #include "MEDCouplingCMesh.hxx"
 #include "MEDCouplingCMeshClient.hxx"
@@ -186,11 +186,11 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingM1D()
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingExtruded()
 {
   SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr meshPtr=_objC->getExtrudedMesh();
-  MEDCoupling::MEDCouplingExtrudedMesh *meshFromDistant=MEDCoupling::MEDCouplingExtrudedMeshClient::New(meshPtr);
+  MEDCoupling::MEDCouplingMappedExtrudedMesh *meshFromDistant=MEDCoupling::MEDCouplingExtrudedMeshClient::New(meshPtr);
   meshPtr->UnRegister();
   CORBA::release(meshPtr);
   MEDCoupling::MEDCouplingUMesh *meshRef2;
-  MEDCoupling::MEDCouplingExtrudedMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(meshRef2);
+  MEDCoupling::MEDCouplingMappedExtrudedMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(meshRef2);
   CPPUNIT_ASSERT(meshFromDistant->isEqual(meshRef,1e-12));
   CPPUNIT_ASSERT(meshFromDistant->getMesh2D()->isEqual(meshRef2,1e-12));
   meshRef2->decrRef();

@@ -19,7 +19,7 @@
 // Author : Anthony Geay (CEA/DEN)
 
 #include "MEDCouplingMeshFieldFactoryComponent.hxx"
-#include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCouplingMappedExtrudedMesh.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldTemplate.hxx"
 #include "MEDCouplingMultiFields.hxx"
@@ -165,7 +165,7 @@ namespace SALOME_TEST
     myCoords->setInfoOnComponent(2,"ZZZ [m]");
     myCoords->decrRef();
     //
-    targetMesh->checkCoherency();
+    targetMesh->checkConsistencyLight();
     return targetMesh;
   }
 
@@ -173,18 +173,18 @@ namespace SALOME_TEST
   {
     MEDCoupling::MEDCouplingUMesh *meshM1D=MEDCoupling::MEDCouplingUMesh::New("wonderfull -1 D mesh",-1);
     meshM1D->setDescription("buildM1DMesh");
-    meshM1D->checkCoherency();
+    meshM1D->checkConsistencyLight();
     return meshM1D;
   }
 
-  MEDCoupling::MEDCouplingExtrudedMesh *MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(MEDCoupling::MEDCouplingUMesh *&m2D)
+  MEDCoupling::MEDCouplingMappedExtrudedMesh *MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(MEDCoupling::MEDCouplingUMesh *&m2D)
   {
     m2D=build2DMesh();
     m2D->changeSpaceDimension(3);
     MEDCoupling::MEDCouplingUMesh *m1D=build1DMesh();
     MEDCoupling::MEDCouplingUMesh *retu=m2D->buildExtrudedMesh(m1D,0);
     m1D->decrRef();
-    MEDCoupling::MEDCouplingExtrudedMesh *ret=MEDCoupling::MEDCouplingExtrudedMesh::New(retu,m2D,2);
+    MEDCoupling::MEDCouplingMappedExtrudedMesh *ret=MEDCoupling::MEDCouplingMappedExtrudedMesh::New(retu,m2D,2);
     ret->setName("ExtrudedTestForCorbaTest");
     ret->setDescription("buildExtrudedMesh");
     retu->decrRef();
@@ -215,7 +215,7 @@ namespace SALOME_TEST
     a1->decrRef();
     a2->decrRef();
     //
-    targetMesh->checkCoherency();
+    targetMesh->checkConsistencyLight();
     //
     return targetMesh;
   }
@@ -255,7 +255,7 @@ namespace SALOME_TEST
     int structure[2]={4,5};
     targetMesh->setNodeGridStructure(structure,structure+2);
     //
-    targetMesh->checkCoherency();
+    targetMesh->checkConsistencyLight();
     //
     return targetMesh;
   }
@@ -274,7 +274,7 @@ namespace SALOME_TEST
     std::copy(conn,conn+16,a2->getPointer());
     targetMesh->setNodalConnectivity(a2); a2->decrRef();
     //
-    targetMesh->checkCoherency();
+    targetMesh->checkConsistencyLight();
     //
     return targetMesh;
   }
@@ -296,7 +296,7 @@ namespace SALOME_TEST
     std::copy(conni,conni+5,a3->getPointer());
     targetMesh->setNodalConnectivity(a2,a3); a2->decrRef(); a3->decrRef();
     //
-    targetMesh->checkCoherency();
+    targetMesh->checkConsistencyLight();
     //
     return targetMesh;
   }
@@ -315,7 +315,7 @@ namespace SALOME_TEST
     array->decrRef();
     std::fill(tmp,tmp+mesh->getNumberOfCells()*6,7.);
     mesh->decrRef();
-    fieldOnCells->checkCoherency();
+    fieldOnCells->checkConsistencyLight();
     return fieldOnCells;
   }
 
@@ -334,7 +334,7 @@ namespace SALOME_TEST
     array->decrRef();
     std::fill(tmp,tmp+mesh->getNumberOfNodes()*5,7.1234);
     mesh->decrRef();
-    fieldOnNodes->checkCoherency();
+    fieldOnNodes->checkConsistencyLight();
     return fieldOnNodes;
   }
 
@@ -342,7 +342,7 @@ namespace SALOME_TEST
   {
     MEDCoupling::MEDCouplingUMesh *mesh=build3DMesh();
     MEDCoupling::MEDCouplingFieldDouble *fieldOnCells=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::NO_TIME);
-    fieldOnCells->setNature(MEDCoupling::ConservativeVolumic);
+    fieldOnCells->setNature(MEDCoupling::IntensiveMaximum);
     fieldOnCells->setName("toto");
     fieldOnCells->setDescription("my wonderful 3D field toto2");
     fieldOnCells->setMesh(mesh);
@@ -353,7 +353,7 @@ namespace SALOME_TEST
     array->decrRef();
     std::fill(tmp,tmp+mesh->getNumberOfCells()*6,7.);
     mesh->decrRef();
-    fieldOnCells->checkCoherency();
+    fieldOnCells->checkConsistencyLight();
     return fieldOnCells;
   }
 
@@ -374,7 +374,7 @@ namespace SALOME_TEST
     std::fill(tmp,tmp+mesh->getNumberOfCells()*3,7.);
     mesh->decrRef();
     fieldOnCells->setTime(6.7,1,4);
-    fieldOnCells->checkCoherency();
+    fieldOnCells->checkConsistencyLight();
     return fieldOnCells;
   }
 
@@ -395,7 +395,7 @@ namespace SALOME_TEST
     mesh->decrRef();
     fieldOnCells->setStartTime(6.7,1,4);
     fieldOnCells->setEndTime(7.2,2,8);
-    fieldOnCells->checkCoherency();
+    fieldOnCells->checkConsistencyLight();
     return fieldOnCells;
   }
 
@@ -424,7 +424,7 @@ namespace SALOME_TEST
     std::copy(arr2,arr2+20,tmp);
     fieldOnCells->setStartTime(6.7,25,26);
     fieldOnCells->setEndTime(17.2,125,126);
-    fieldOnCells->checkCoherency();
+    fieldOnCells->checkConsistencyLight();
     return fieldOnCells;
   }
 
@@ -463,7 +463,7 @@ namespace SALOME_TEST
     f->setTimeUnit("ms");
     f->setDescription("mmmmmmmmmmmm");
     array->decrRef();
-    f->checkCoherency();
+    f->checkConsistencyLight();
     return f;
   }
 
@@ -486,7 +486,7 @@ namespace SALOME_TEST
     f->setArray(array);
     array->decrRef();
     //
-    f->checkCoherency();
+    f->checkConsistencyLight();
     m->decrRef();
     return f;
   }
@@ -494,7 +494,7 @@ namespace SALOME_TEST
   MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldVectorOnExtrudedWT()
   {
     MEDCoupling::MEDCouplingUMesh *m2D=0;
-    MEDCoupling::MEDCouplingExtrudedMesh *ext=buildExtrudedMesh(m2D);
+    MEDCoupling::MEDCouplingMappedExtrudedMesh *ext=buildExtrudedMesh(m2D);
     //
     MEDCoupling::MEDCouplingFieldDouble *f=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::ONE_TIME);
     f->setTime(6.8,11,8);
@@ -512,7 +512,7 @@ namespace SALOME_TEST
     f->setArray(array);
     array->decrRef();
     //
-    f->checkCoherency();
+    f->checkConsistencyLight();
     //
     m2D->decrRef();
     ext->decrRef();
@@ -539,7 +539,7 @@ namespace SALOME_TEST
     f->setArray(array);
     array->decrRef();
     //
-    f->checkCoherency();
+    f->checkConsistencyLight();
     //
     return f;
   }
@@ -557,7 +557,7 @@ namespace SALOME_TEST
   {
     MEDCoupling::MEDCouplingFieldDouble *f1=buildFieldNodeScalarOn2DNT();
     MEDCoupling::MEDCouplingFieldTemplate *f2=MEDCoupling::MEDCouplingFieldTemplate::New(*f1);
-    f2->setNature(MEDCoupling::ConservativeVolumic);
+    f2->setNature(MEDCoupling::IntensiveMaximum);
     f1->decrRef();
     return f2;
   }
@@ -566,7 +566,7 @@ namespace SALOME_TEST
   {
     MEDCoupling::MEDCouplingFieldDouble *f1=buildFieldGaussPt2DWT();
     MEDCoupling::MEDCouplingFieldTemplate *f2=MEDCoupling::MEDCouplingFieldTemplate::New(*f1);
-    f2->setNature(MEDCoupling::Integral);
+    f2->setNature(MEDCoupling::ExtensiveMaximum);
     f1->decrRef();
     return f2;
   }
@@ -575,7 +575,7 @@ namespace SALOME_TEST
   {
     MEDCoupling::MEDCouplingFieldDouble *f1=buildFieldGaussPtNE2DWT();
     MEDCoupling::MEDCouplingFieldTemplate *f2=MEDCoupling::MEDCouplingFieldTemplate::New(*f1);
-    f2->setNature(MEDCoupling::IntegralGlobConstraint);
+    f2->setNature(MEDCoupling::ExtensiveConservation);
     f1->decrRef();
     return f2;
   }
@@ -772,7 +772,7 @@ namespace SALOME_TEST
     std::vector<MEDCoupling::MEDCouplingFieldDouble *> fs(5);
     fs[0]=f0; fs[1]=f1; fs[2]=f2; fs[3]=f3; fs[4]=f4;
     MEDCoupling::MEDCouplingFieldOverTime *ret=MEDCoupling::MEDCouplingFieldOverTime::New(fs);
-    ret->checkCoherency();
+    ret->checkConsistencyLight();
     //
     m1->decrRef();
     m2->decrRef();

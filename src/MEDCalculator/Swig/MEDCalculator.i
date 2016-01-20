@@ -188,7 +188,7 @@ namespace MEDCoupling
                PyObject *obj2=PyTuple_GetItem(obj,2);
                convertPyObjToRS2(obj2,cr,"for 3rd tuple element for components of field");
              }
-           MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=self->operator()(tr,pr,cr);
+           MCAuto<MEDCalculatorDBFieldReal> ret=self->operator()(tr,pr,cr);
            if(PyInt_Check(val))
              {
                (*ret)=double(PyInt_AS_LONG(val));
@@ -425,7 +425,7 @@ def MEDCouplingIMeshnew(cls,*args):
     return _MEDCalculator.MEDCouplingIMesh____new___(cls,args)
 def MEDCouplingExtrudedMeshnew(cls,*args):
     import _MEDCalculator
-    return _MEDCalculator.MEDCouplingExtrudedMesh____new___(cls,args)
+    return _MEDCalculator.MEDCouplingMappedExtrudedMesh____new___(cls,args)
 %}
 
 %pythoncode %{

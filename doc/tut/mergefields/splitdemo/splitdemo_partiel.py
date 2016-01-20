@@ -34,7 +34,7 @@ for fn in fns:
     m=MEDFileMesh.New(fn)
     m=m.getMeshAtLevel(0)
     m.writeVTK(outs[i])
-    mns[i]=m.deepCpy()
+    mns[i]=m.deepCopy()
     if splitview:
         m.translate([scal*elt for elt in trs[i]])
     f=MEDCouplingFieldDouble.New(ON_CELLS,NO_TIME)
@@ -42,7 +42,7 @@ for fn in fns:
     da=DataArrayDouble.New()
     da.alloc(m.getNumberOfCells(),1)
     da.fillWithValue(i)
-    dds[i]=da.deepCpy()
+    dds[i]=da.deepCopy()
     f.setArray(da)
     fs[i]=f
     i+=1

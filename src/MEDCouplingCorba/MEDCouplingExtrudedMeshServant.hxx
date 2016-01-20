@@ -29,16 +29,16 @@
 
 namespace MEDCoupling
 {
-  class MEDCouplingExtrudedMesh;
+  class MEDCouplingMappedExtrudedMesh;
 
   class MEDCOUPLINGCORBA_EXPORT MEDCouplingExtrudedMeshServant : MEDCouplingMeshServant, public virtual POA_SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface
   {
   public:
-    typedef MEDCouplingExtrudedMesh CppType;
-    MEDCouplingExtrudedMeshServant(const MEDCouplingExtrudedMesh *cppPointerOfMesh);
+    typedef MEDCouplingMappedExtrudedMesh CppType;
+    MEDCouplingExtrudedMeshServant(const MEDCouplingMappedExtrudedMesh *cppPointerOfMesh);
     ~MEDCouplingExtrudedMeshServant();
   private:
-    const MEDCouplingExtrudedMesh *getPointer() const { return (const MEDCouplingExtrudedMesh *)(_cpp_pointer); }
+    const MEDCouplingMappedExtrudedMesh *getPointer() const { return (const MEDCouplingMappedExtrudedMesh *)(_cpp_pointer); }
   };
 }
 

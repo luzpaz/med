@@ -37,7 +37,7 @@
 #include "MEDCouplingFieldTemplate.hxx"
 #include "MEDCouplingMultiFields.hxx"
 #include "MEDCouplingFieldOverTime.hxx"
-#include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCouplingMappedExtrudedMesh.hxx"
 #include "MEDCouplingCurveLinearMesh.hxx"
 #include "MEDCoupling1GTUMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
@@ -119,7 +119,7 @@ namespace SALOME_TEST
   SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getExtrudedMesh()
   {
     MEDCoupling::MEDCouplingUMesh *m2D;
-    MEDCoupling::MEDCouplingExtrudedMesh *m1=MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(m2D);
+    MEDCoupling::MEDCouplingMappedExtrudedMesh *m1=MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(m2D);
     m2D->decrRef();
     MEDCoupling::MEDCouplingExtrudedMeshServant *m=new MEDCoupling::MEDCouplingExtrudedMeshServant(m1);
     m1->decrRef();

@@ -30,12 +30,12 @@
 
 namespace MEDCoupling
 {
-  class MEDCouplingExtrudedMesh;
+  class MEDCouplingMappedExtrudedMesh;
 
   class MEDCOUPLINGCLIENT_EXPORT MEDCouplingExtrudedMeshClient
   {
   public:
-    static MEDCouplingExtrudedMesh *New(SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr mesh);
+    static MEDCouplingMappedExtrudedMesh *New(SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr mesh);
   };
 }
 

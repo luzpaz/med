@@ -58,25 +58,25 @@ std::vector<const BigMemoryObject *> MEDCalculatorDBField::getDirectChildrenWith
 
 MEDCalculatorDBField *MEDCalculatorDBField::operator+(double val) const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldCst> par2=new MEDCalculatorDBFieldCst(val);
+  MCAuto<MEDCalculatorDBFieldCst> par2=new MEDCalculatorDBFieldCst(val);
   return (*this)+(*par2);
 }
 
 MEDCalculatorDBField *MEDCalculatorDBField::operator-(double val) const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldCst> par2=new MEDCalculatorDBFieldCst(val);
+  MCAuto<MEDCalculatorDBFieldCst> par2=new MEDCalculatorDBFieldCst(val);
   return (*this)-(*par2);
 }
 
 MEDCalculatorDBField *MEDCalculatorDBField::operator*(double val) const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldCst> par2=new MEDCalculatorDBFieldCst(val);
+  MCAuto<MEDCalculatorDBFieldCst> par2=new MEDCalculatorDBFieldCst(val);
   return (*this)*(*par2);
 }
 
 MEDCalculatorDBField *MEDCalculatorDBField::operator/(double val) const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldCst> par2=new MEDCalculatorDBFieldCst(val);
+  MCAuto<MEDCalculatorDBFieldCst> par2=new MEDCalculatorDBFieldCst(val);
   return (*this)/(*par2);
 }
 
@@ -147,13 +147,13 @@ void MEDCalculatorDBFieldReal::display() const throw(INTERP_KERNEL::Exception)
 {
   fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
-  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> > fs2(ids.size());
+  std::vector< MCAuto<MEDCouplingFieldDouble> > fs2(ids.size());
   int ii=0;
   for(std::vector<int>::const_iterator iter=ids.begin();iter!=ids.end();iter++)
     fs2[ii++]=_time_steps[*iter]->getFieldWithoutQuestion(_c_labels.size(),_c);
   std::vector<MEDCouplingFieldDouble *> fs(fs2.size());
   std::copy(fs2.begin(),fs2.end(),fs.begin());
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldOverTime> fot=MEDCouplingFieldOverTime::New(fs);
+  MCAuto<MEDCouplingFieldOverTime> fot=MEDCouplingFieldOverTime::New(fs);
   //
   int argc=0;
   CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
@@ -207,14 +207,14 @@ MEDCalculatorDBFieldReal::MEDCalculatorDBFieldReal(const MEDCalculatorBrowserFie
   int sz=steps.size();
   for(int i=0;i<sz;i++)
     {
-      MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBSliceField> elt(new MEDCalculatorDBSliceField(steps[i].getTimeStep(),steps[i].getOrder()));
+      MCAuto<MEDCalculatorDBSliceField> elt(new MEDCalculatorDBSliceField(steps[i].getTimeStep(),steps[i].getOrder()));
       _time_steps.push_back(elt);
     }
 }
 
 const MEDCalculatorDBFieldReal& MEDCalculatorDBFieldReal::operator=(const MEDCalculatorDBFieldReal& other) throw(INTERP_KERNEL::Exception)
 {
-  checkCoherency(other);
+  checkConsistencyLight(other);
   std::vector<int> ids=_t.getIds(_time_steps.size());
   std::vector<int> ids2=other._t.getIds(other._time_steps.size());
   unsigned int sz=ids.size();
@@ -229,7 +229,7 @@ const MEDCalculatorDBFieldReal& MEDCalculatorDBFieldReal::operator=(const MEDCal
 
 const MEDCalculatorDBFieldReal& MEDCalculatorDBFieldReal::operator=(double val) throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> other=buildCstFieldFromThis(val);
+  MCAuto<MEDCalculatorDBFieldReal> other=buildCstFieldFromThis(val);
   return (*this)=*other;
 }
 
@@ -244,7 +244,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator+(const MEDCalculatorDBF
       const MEDCalculatorDBFieldCst *otherc=dynamic_cast<const MEDCalculatorDBFieldCst *>(other2);
       if(otherc)
         {
-          MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> othercr=buildCstFieldFromThis(otherc->getValue());
+          MCAuto<MEDCalculatorDBFieldReal> othercr=buildCstFieldFromThis(otherc->getValue());
           MEDCalculatorDBField *ret=add(*othercr);
           return ret;
         }
@@ -255,8 +255,8 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator+(const MEDCalculatorDBF
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::add(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception)
 {
-  checkCoherency(other);
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  checkConsistencyLight(other);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
   DataArrayInt *cellCor,*nodeCor;
@@ -294,7 +294,7 @@ bool MEDCalculatorDBFieldReal::isEqual(const MEDCalculatorDBField& other, double
       const MEDCalculatorDBFieldCst *otherc=dynamic_cast<const MEDCalculatorDBFieldCst *>(other2);
       if(otherc)
         {
-          MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> othercr=buildCstFieldFromThis(otherc->getValue());
+          MCAuto<MEDCalculatorDBFieldReal> othercr=buildCstFieldFromThis(otherc->getValue());
           bool ret=isEqualSameType(*othercr,precM,precF);
           return ret;
         }
@@ -341,7 +341,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator-(const MEDCalculatorDBF
       const MEDCalculatorDBFieldCst *otherc=dynamic_cast<const MEDCalculatorDBFieldCst *>(other2);
       if(otherc)
         {
-          MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> othercr=buildCstFieldFromThis(otherc->getValue());
+          MCAuto<MEDCalculatorDBFieldReal> othercr=buildCstFieldFromThis(otherc->getValue());
           MEDCalculatorDBField *ret=substract(*othercr);
           return ret;
         }
@@ -352,8 +352,8 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator-(const MEDCalculatorDBF
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::substract(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception)
 {
-  checkCoherency(other);
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  checkConsistencyLight(other);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
   DataArrayInt *cellCor,*nodeCor;
@@ -391,7 +391,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator*(const MEDCalculatorDBF
       const MEDCalculatorDBFieldCst *otherc=dynamic_cast<const MEDCalculatorDBFieldCst *>(other2);
       if(otherc)
         {
-          MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> othercr=buildCstFieldFromThis(otherc->getValue());
+          MCAuto<MEDCalculatorDBFieldReal> othercr=buildCstFieldFromThis(otherc->getValue());
           MEDCalculatorDBField *ret=multiply(*othercr);
           return ret;
         }
@@ -402,8 +402,8 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator*(const MEDCalculatorDBF
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::multiply(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception)
 {
-  checkCoherency(other);
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  checkConsistencyLight(other);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
   DataArrayInt *cellCor,*nodeCor;
@@ -441,7 +441,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator/(const MEDCalculatorDBF
       const MEDCalculatorDBFieldCst *otherc=dynamic_cast<const MEDCalculatorDBFieldCst *>(other2);
       if(otherc)
         {
-          MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> othercr=buildCstFieldFromThis(otherc->getValue());
+          MCAuto<MEDCalculatorDBFieldReal> othercr=buildCstFieldFromThis(otherc->getValue());
           MEDCalculatorDBField *ret=divide(*othercr);
           return ret;
         }
@@ -452,8 +452,8 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator/(const MEDCalculatorDBF
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::divide(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception)
 {
-  checkCoherency(other);
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  checkConsistencyLight(other);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
   DataArrayInt *cellCor,*nodeCor;
@@ -487,8 +487,8 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator^(const MEDCalculatorDBF
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::dot(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception)
 {
-  checkCoherency(other);
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  checkConsistencyLight(other);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
@@ -507,8 +507,8 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::dot(const MEDCalculatorDBFieldRe
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::crossProduct(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception)
 {
-  checkCoherency(other);
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  checkConsistencyLight(other);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
@@ -527,7 +527,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::crossProduct(const MEDCalculator
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::doublyContractedProduct() const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
@@ -542,7 +542,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::doublyContractedProduct() const 
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::determinant() const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
@@ -557,7 +557,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::determinant() const throw(INTERP
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::eigenValues() const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
@@ -578,7 +578,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::eigenValues() const throw(INTERP
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::eigenVectors() const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
@@ -599,7 +599,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::eigenVectors() const throw(INTER
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::inverse() const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
@@ -620,7 +620,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::inverse() const throw(INTERP_KER
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::trace() const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
@@ -635,7 +635,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::trace() const throw(INTERP_KERNE
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::deviator() const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
@@ -656,7 +656,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::deviator() const throw(INTERP_KE
 
 MEDCalculatorDBField *MEDCalculatorDBFieldReal::magnitude() const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   std::vector<int> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
@@ -679,7 +679,7 @@ void MEDCalculatorDBFieldReal::applyFunc(const char *func) throw(INTERP_KERNEL::
 
 MEDCalculatorDBFieldReal *MEDCalculatorDBFieldReal::buildCstFieldFromThis(double val) const
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
+  MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   ret->_p=_p;
   ret->_c_labels.resize(_c.getSize(_c_labels.size()));
   std::vector<int> stps=_t.getIds(_time_steps.size());
@@ -696,7 +696,7 @@ MEDCalculatorDBFieldReal *MEDCalculatorDBFieldReal::buildCstFieldFromThis(double
   return ret;
 }
 
-void MEDCalculatorDBFieldReal::checkCoherency(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception)
+void MEDCalculatorDBFieldReal::checkConsistencyLight(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception)
 {
   if(_type!=other._type)
     throw INTERP_KERNEL::Exception("Types of field mismatch !");
@@ -714,7 +714,7 @@ void MEDCalculatorDBFieldReal::fetchData() const throw(INTERP_KERNEL::Exception)
   std::vector<int> idsInGlobalToFetch;
   for(int i=0;i<sz;i++)
     {
-      MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBSliceField> elt=_time_steps[ids[i]];
+      MCAuto<MEDCalculatorDBSliceField> elt=_time_steps[ids[i]];
       if(!elt->isFetched())
         {
           int dt,it;
@@ -728,7 +728,7 @@ void MEDCalculatorDBFieldReal::fetchData() const throw(INTERP_KERNEL::Exception)
   sz=fs.size();
   for(int i=0;i<sz;i++)
     {
-      MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBSliceField> elt=_time_steps[idsInGlobalToFetch[i]];
+      MCAuto<MEDCalculatorDBSliceField> elt=_time_steps[idsInGlobalToFetch[i]];
       elt->setField(fs[i]);
     }
 }
@@ -791,7 +791,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator+(const MEDCalculatorDBFi
   const MEDCalculatorDBFieldCst *otherc=dynamic_cast<const MEDCalculatorDBFieldCst *>(other2);
   if(otherc)
     {
-      MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldCst> ret=new MEDCalculatorDBFieldCst(*this);
+      MCAuto<MEDCalculatorDBFieldCst> ret=new MEDCalculatorDBFieldCst(*this);
       ret->_val=_val+otherc->_val;
       ret->incrRef();
       return ret;
@@ -801,7 +801,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator+(const MEDCalculatorDBFi
       const MEDCalculatorDBFieldReal *otherr=dynamic_cast<const MEDCalculatorDBFieldReal *>(other2);
       if(otherr)
         {
-          MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> thisr=otherr->buildCstFieldFromThis(_val);
+          MCAuto<MEDCalculatorDBFieldReal> thisr=otherr->buildCstFieldFromThis(_val);
           MEDCalculatorDBField *ret=(*thisr)+other;
           return ret;
         }
@@ -816,7 +816,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator-(const MEDCalculatorDBFi
   const MEDCalculatorDBFieldCst *otherc=dynamic_cast<const MEDCalculatorDBFieldCst *>(other2);
   if(otherc)
     {
-      MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldCst> ret=new MEDCalculatorDBFieldCst(*this);
+      MCAuto<MEDCalculatorDBFieldCst> ret=new MEDCalculatorDBFieldCst(*this);
       ret->_val=_val-otherc->_val;
       ret->incrRef();
       return ret;
@@ -826,7 +826,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator-(const MEDCalculatorDBFi
       const MEDCalculatorDBFieldReal *otherr=dynamic_cast<const MEDCalculatorDBFieldReal *>(other2);
       if(otherr)
         {
-          MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> thisr=otherr->buildCstFieldFromThis(_val);
+          MCAuto<MEDCalculatorDBFieldReal> thisr=otherr->buildCstFieldFromThis(_val);
           MEDCalculatorDBField *ret=(*thisr)-other;
           return ret;
         }
@@ -841,7 +841,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator*(const MEDCalculatorDBFi
   const MEDCalculatorDBFieldCst *otherc=dynamic_cast<const MEDCalculatorDBFieldCst *>(other2);
   if(otherc)
     {
-      MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldCst> ret=new MEDCalculatorDBFieldCst(*this);
+      MCAuto<MEDCalculatorDBFieldCst> ret=new MEDCalculatorDBFieldCst(*this);
       ret->_val=_val*otherc->_val;
       ret->incrRef();
       return ret;
@@ -851,7 +851,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator*(const MEDCalculatorDBFi
       const MEDCalculatorDBFieldReal *otherr=dynamic_cast<const MEDCalculatorDBFieldReal *>(other2);
       if(otherr)
         {
-          MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> thisr=otherr->buildCstFieldFromThis(_val);
+          MCAuto<MEDCalculatorDBFieldReal> thisr=otherr->buildCstFieldFromThis(_val);
           MEDCalculatorDBField *ret=(*thisr)*other;
           return ret;
         }
@@ -866,7 +866,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator/(const MEDCalculatorDBFi
   const MEDCalculatorDBFieldCst *otherc=dynamic_cast<const MEDCalculatorDBFieldCst *>(other2);
   if(otherc)
     {
-      MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldCst> ret=new MEDCalculatorDBFieldCst(*this);
+      MCAuto<MEDCalculatorDBFieldCst> ret=new MEDCalculatorDBFieldCst(*this);
       ret->_val=_val/otherc->_val;
       ret->incrRef();
       return ret;
@@ -876,7 +876,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator/(const MEDCalculatorDBFi
       const MEDCalculatorDBFieldReal *otherr=dynamic_cast<const MEDCalculatorDBFieldReal *>(other2);
       if(otherr)
         {
-          MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> thisr=otherr->buildCstFieldFromThis(_val);
+          MCAuto<MEDCalculatorDBFieldReal> thisr=otherr->buildCstFieldFromThis(_val);
           MEDCalculatorDBField *ret=(*thisr)/other;
           return ret;
         }
@@ -896,7 +896,7 @@ bool MEDCalculatorDBFieldCst::isEqual(const MEDCalculatorDBField& other, double 
       const MEDCalculatorDBFieldReal *otherr=dynamic_cast<const MEDCalculatorDBFieldReal *>(other2);
       if(otherr)
         {
-          MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldReal> thisr=otherr->buildCstFieldFromThis(_val);
+          MCAuto<MEDCalculatorDBFieldReal> thisr=otherr->buildCstFieldFromThis(_val);
           bool ret=thisr->isEqual(other,precM,precF);
           return ret;
         }

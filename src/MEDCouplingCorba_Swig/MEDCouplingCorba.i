@@ -126,8 +126,8 @@ namespace MEDCoupling
              return buildServantAndActivate<MEDCoupling1SGTUMeshServant>(dynamic_cast<const MEDCoupling1SGTUMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh))
              return buildServantAndActivate<MEDCoupling1DGTUMeshServant>(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh));
-           if(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh))
-             return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingMappedExtrudedMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingMappedExtrudedMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh))
              return buildServantAndActivate<MEDCouplingCMeshServant>(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingIMesh *>(cppPointerOfMesh))
@@ -147,8 +147,8 @@ namespace MEDCoupling
              return buildServantAndActivate2<MEDCoupling1SGTUMeshServant>(dynamic_cast<const MEDCoupling1SGTUMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh))
              return buildServantAndActivate2<MEDCoupling1DGTUMeshServant>(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh));
-           if(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh))
-             return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingMappedExtrudedMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingMappedExtrudedMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh))
              return buildServantAndActivate2<MEDCouplingCMeshServant>(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingIMesh *>(cppPointerOfMesh))
@@ -216,12 +216,12 @@ namespace MEDCoupling
   public:
     %extend
        {
-         static PyObject *_this(const MEDCouplingExtrudedMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
+         static PyObject *_this(const MEDCouplingMappedExtrudedMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const MEDCouplingExtrudedMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
+         static PyObject *_this2(const MEDCouplingMappedExtrudedMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
          }
@@ -425,7 +425,7 @@ def MEDCouplingIMeshnew(cls,*args):
     return _MEDCouplingCorba.MEDCouplingIMesh____new___(cls,args)
 def MEDCouplingExtrudedMeshnew(cls,*args):
     import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCouplingExtrudedMesh____new___(cls,args)
+    return _MEDCouplingCorba.MEDCouplingMappedExtrudedMesh____new___(cls,args)
 %}
 
 %include "MEDCouplingFinalize.i"

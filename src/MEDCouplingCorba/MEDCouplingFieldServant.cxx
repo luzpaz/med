@@ -32,7 +32,7 @@
 #include "MEDCouplingCMesh.hxx"
 #include "MEDCouplingIMesh.hxx"
 #include "MEDCouplingCurveLinearMesh.hxx"
-#include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCouplingMappedExtrudedMesh.hxx"
 #include "MEDCoupling1GTUMesh.hxx"
 
 using namespace MEDCoupling;
@@ -64,7 +64,7 @@ SALOME_MED::MEDCouplingMeshCorbaInterface_ptr MEDCouplingFieldServant::BuildCorb
       SALOME_MED::MEDCouplingIMeshCorbaInterface_ptr ret=retServ->_this();//let this line even if it seems fool
       return ret;
     }
-  const MEDCouplingExtrudedMesh *eMesh=dynamic_cast<const MEDCouplingExtrudedMesh *>(mesh);
+  const MEDCouplingMappedExtrudedMesh *eMesh=dynamic_cast<const MEDCouplingMappedExtrudedMesh *>(mesh);
   if(eMesh)
     {
       MEDCouplingExtrudedMeshServant *retServ=new MEDCouplingExtrudedMeshServant(eMesh);

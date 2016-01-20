@@ -780,17 +780,17 @@ MEDCoupling::NatureOfField MEDDataManager_i::_getNatureOfField(const char* field
   if (nature == "NoNature") {
     return NoNature;
   }
-  else if (nature == "ConservativeVolumic") {
-    return ConservativeVolumic;
+  else if (nature == "IntensiveMaximum") {
+    return IntensiveMaximum;
   }
-  else if (nature == "Integral") {
-    return Integral;
+  else if (nature == "ExtensiveMaximum") {
+    return ExtensiveMaximum;
   }
-  else if (nature == "IntegralGlobConstraint") {
-    return IntegralGlobConstraint;
+  else if (nature == "ExtensiveConservation") {
+    return ExtensiveConservation;
   }
-  else if (nature == "RevIntegral") {
-    return RevIntegral;
+  else if (nature == "IntensiveConservation") {
+    return IntensiveConservation;
   }
 
   std::string message("Error when trying to interpolate field: ");

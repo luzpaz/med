@@ -26,7 +26,7 @@
 #include "MEDCalculatorDBRangeSelection.hxx"
 
 #include "MEDCouplingRefCountObject.hxx"
-#include "MEDCouplingAutoRefCountObjectPtr.hxx"
+#include "MCAuto.hxx"
 
 #include "InterpKernelException.hxx"
 
@@ -94,7 +94,7 @@ namespace MEDCoupling
     bool isEqual(const MEDCalculatorDBField& other, double precM, double precF) const;
     bool isEqualSameType(const MEDCalculatorDBFieldReal& other, double precM, double precF) const;
     MEDCalculatorDBFieldReal *buildCstFieldFromThis(double val) const;
-    void checkCoherency(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception);
+    void checkConsistencyLight(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception);
     void fetchData() const throw(INTERP_KERNEL::Exception);
     TypeOfField getType() const { return _type; }
     int getNumberOfSteps() const;
@@ -117,7 +117,7 @@ namespace MEDCoupling
     MEDCalculatorDBRangeSelection _p;
     std::vector<std::string> _c_labels;
     MEDCalculatorDBRangeSelection _c;
-    std::vector< MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBSliceField> > _time_steps;
+    std::vector< MCAuto<MEDCalculatorDBSliceField> > _time_steps;
   };
 
   class MEDCALCULATOR_EXPORT MEDCalculatorDBFieldCst : public MEDCalculatorDBField

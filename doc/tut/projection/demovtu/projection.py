@@ -23,11 +23,11 @@ from MEDCouplingRemapper import *
 ms=MEDFileMesh.New("MeshSource.med") ; ms=ms.getMeshAtLevel(0)
 mt=MEDFileMesh.New("MeshTarget.med") ; mt=mt.getMeshAtLevel(0)
 fs=ms.fillFromAnalytic(ON_CELLS,1,"319.*cos(((x)*(x)*3+(y-0.52)*(y-0.52)+(z-0.1)*(z-0.1))*7)")
-fs.setNature(ConservativeVolumic)
+fs.setNature(IntensiveMaximum)
 fs.setName("Temperature")
 MEDCouplingFieldDouble.WriteVTK("MeshSource.vtu",[fs])
 
-mt2=mt.deepCpy()
+mt2=mt.deepCopy()
 mt2.translate([0.4,0.,0.])
 mt2.writeVTK("MeshTarget.vtu")
 #

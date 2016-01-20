@@ -30,7 +30,7 @@ msource  = MEDLoader.ReadUMeshFromFile("meshsource.med","meshsource",0)
 equation = "319.*cos(((x)*(x)*3+(y-0.52)*(y-0.52)+(z-0.1)*(z-0.1))*7)"
 fsource=msource.fillFromAnalytic(ON_CELLS,1,equation)
 fsource.setName("Temperature")
-fsource.setNature(ConservativeVolumic)
+fsource.setNature(IntensiveMaximum)
 
 # Read the target mesh
 mtarget = MEDLoader.ReadUMeshFromFile("meshtarget.med","meshtarget",0)

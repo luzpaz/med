@@ -133,13 +133,13 @@ class MEDCouplingCorbaServBasicsTest:
         myCoords.setInfoOnComponent(0,"X [m]");
         myCoords.setInfoOnComponent(1,"YY [Pm]");
         myCoords.setInfoOnComponent(2,"ZZZ [m]");
-        targetMesh.checkCoherency();
+        targetMesh.checkConsistencyLight();
         return targetMesh;
 
     def buildM1DMesh(self):
         meshM1D=MEDCouplingUMesh.New("wonderfull -1 D mesh",-1);
         meshM1D.setDescription("buildM1DMesh");
-        meshM1D.checkCoherency();
+        meshM1D.checkConsistencyLight();
         return meshM1D;
 
     def buildExtrudedMesh(self):
@@ -147,7 +147,7 @@ class MEDCouplingCorbaServBasicsTest:
         m2D.changeSpaceDimension(3);
         m1D=self.build1DMesh();
         retu=m2D.buildExtrudedMesh(m1D,0);
-        ret=MEDCouplingExtrudedMesh.New(retu,m2D,2);
+        ret=MEDCouplingMappedExtrudedMesh.New(retu,m2D,2);
         ret.setName("ExtrudedTestForCorbaTest");
         ret.setDescription("buildExtrudedMesh");
         return ret;
@@ -171,7 +171,7 @@ class MEDCouplingCorbaServBasicsTest:
         targetMesh.setCoordsAt(1,a2);
         #
         #
-        targetMesh.checkCoherency();
+        targetMesh.checkConsistencyLight();
         #
         return targetMesh;
 
@@ -201,7 +201,7 @@ class MEDCouplingCorbaServBasicsTest:
         targetMesh.setCoords(a1);
         targetMesh.setNodeGridStructure([4,5]);
         #
-        targetMesh.checkCoherency();
+        targetMesh.checkConsistencyLight();
         #
         return targetMesh;
 
@@ -216,7 +216,7 @@ class MEDCouplingCorbaServBasicsTest:
         a2=DataArrayInt([6,0,3,5,3,0,1,4,1,2,7,4,8,7,2,9],4*4,1)
         targetMesh.setNodalConnectivity(a2)
         #
-        targetMesh.checkCoherency();
+        targetMesh.checkConsistencyLight();
         #
         return targetMesh;
 
@@ -232,7 +232,7 @@ class MEDCouplingCorbaServBasicsTest:
         a3=DataArrayInt([0,4,8,12,15],5,1)
         targetMesh.setNodalConnectivity(a2,a3)
         #
-        targetMesh.checkCoherency();
+        targetMesh.checkConsistencyLight();
         #
         return targetMesh;
         
@@ -246,7 +246,7 @@ class MEDCouplingCorbaServBasicsTest:
         tmp=mesh.getNumberOfCells()*6*[7.]
         array.setValues(tmp,mesh.getNumberOfCells(),6);
         fieldOnCells.setArray(array)
-        fieldOnCells.checkCoherency();
+        fieldOnCells.checkConsistencyLight();
         return fieldOnCells;
 
     def buildFieldNodeScalarOn2DNT(self):
@@ -260,13 +260,13 @@ class MEDCouplingCorbaServBasicsTest:
         tmp=mesh.getNumberOfNodes()*5*[7.1234]
         array.setValues(tmp,mesh.getNumberOfNodes(),5);
         fieldOnNodes.setArray(array);
-        fieldOnNodes.checkCoherency();
+        fieldOnNodes.checkConsistencyLight();
         return fieldOnNodes;
 
     def buildFieldScalarOn3DNT(self):
         mesh=self.build3DMesh();
         fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,NO_TIME);
-        fieldOnCells.setNature(ConservativeVolumic);
+        fieldOnCells.setNature(IntensiveMaximum);
         fieldOnCells.setName("toto");
         fieldOnCells.setDescription("my wonderful 3D field toto2");
         fieldOnCells.setMesh(mesh);
@@ -274,7 +274,7 @@ class MEDCouplingCorbaServBasicsTest:
         tmp=mesh.getNumberOfCells()*6*[7.]
         array.setValues(tmp,mesh.getNumberOfCells(),6);
         fieldOnCells.setArray(array);
-        fieldOnCells.checkCoherency();
+        fieldOnCells.checkConsistencyLight();
         return fieldOnCells;
 
     def buildFieldScalarOn3DSurfWT(self):
@@ -290,7 +290,7 @@ class MEDCouplingCorbaServBasicsTest:
         array.setInfoOnComponents(["aaa","bbbb","ccccc"])
         fieldOnCells.setArray(array);
         fieldOnCells.setTime(6.7,1,4);
-        fieldOnCells.checkCoherency();
+        fieldOnCells.checkConsistencyLight();
         return fieldOnCells;
 
     def buildFieldScalarOn3DSurfCOTI(self):
@@ -306,7 +306,7 @@ class MEDCouplingCorbaServBasicsTest:
         fieldOnCells.setArray(array);
         fieldOnCells.setStartTime(6.7,1,4);
         fieldOnCells.setEndTime(7.2,2,8);
-        fieldOnCells.checkCoherency();
+        fieldOnCells.checkConsistencyLight();
         return fieldOnCells;
 
     def buildFieldScalarOn2DLT(self):
@@ -326,7 +326,7 @@ class MEDCouplingCorbaServBasicsTest:
         fieldOnCells.setEndArray(array)
         fieldOnCells.setStartTime(6.7,25,26);
         fieldOnCells.setEndTime(17.2,125,126);
-        fieldOnCells.checkCoherency();
+        fieldOnCells.checkConsistencyLight();
         return fieldOnCells;
 
     def buildFieldGaussPt2DWT(self):
@@ -363,7 +363,7 @@ class MEDCouplingCorbaServBasicsTest:
         f.setName("MyFirstFieldOnGaussPoint");
         f.setTimeUnit("ms");
         f.setDescription("mmmmmmmmmmmm");
-        f.checkCoherency();
+        f.checkConsistencyLight();
         return f;
 
     def buildFieldGaussPtNE2DWT(self):
@@ -383,7 +383,7 @@ class MEDCouplingCorbaServBasicsTest:
         array.setInfoOnComponent(1,"Density [kg/m^3]");
         f.setArray(array);
         #
-        f.checkCoherency();
+        f.checkConsistencyLight();
         return f;
 
     def buildFieldVectorOnExtrudedWT(self):
@@ -405,7 +405,7 @@ class MEDCouplingCorbaServBasicsTest:
         array.setInfoOnComponent(1,"Density [kg/m^3]");
         f.setArray(array);
         #
-        f.checkCoherency();
+        f.checkConsistencyLight();
         return f
 
     def buildFieldVectorOnCMeshWT(self):
@@ -427,7 +427,7 @@ class MEDCouplingCorbaServBasicsTest:
         array.setInfoOnComponent(1,"Density [kg/m^3]");
         f.setArray(array);
         #
-        f.checkCoherency();
+        f.checkConsistencyLight();
         return f
 
     def buildFieldTemplateCellOn2D(self):
@@ -439,19 +439,19 @@ class MEDCouplingCorbaServBasicsTest:
     def buildFieldTemplateNodeOn2D(self):
         f1=self.buildFieldNodeScalarOn2DNT();
         f2=MEDCouplingFieldTemplate.New(f1);
-        f2.setNature(ConservativeVolumic);
+        f2.setNature(IntensiveMaximum);
         return f2
             
     def buildFieldTemplateGaussPtOn2D(self):
         f1=self.buildFieldGaussPt2DWT();
         f2=MEDCouplingFieldTemplate.New(f1);
-        f2.setNature(Integral);
+        f2.setNature(ExtensiveMaximum);
         return f2
 
     def buildFieldTemplateGaussNEOn2D(self):
         f1=self.buildFieldGaussPtNE2DWT();
         f2=MEDCouplingFieldTemplate.New(f1);
-        f2.setNature(IntegralGlobConstraint);
+        f2.setNature(ExtensiveConservation);
         return f2
 
     def buildMultiFields1(self):
@@ -611,7 +611,7 @@ class MEDCouplingCorbaServBasicsTest:
         f4.setName("f4");
         f4.setTime(2.7,25,26);
         ret=MEDCouplingFieldOverTime.New([f0,f1,f2,f3,f4]);
-        ret.checkCoherency();
+        ret.checkConsistencyLight();
         return ret;
 
     def buildFileNameForIOR(self):
@@ -648,7 +648,7 @@ def testMesh():
     myCoords=DataArrayDouble.New()
     myCoords.setValues(coords,nbOfNodes,3);
     mesh.setCoords(myCoords);
-    mesh.checkCoherency();
+    mesh.checkConsistencyLight();
     myFalseConn=DataArrayInt.New()
     myFalseConn.setValues(tab4,6,4)
     return mesh
@@ -659,7 +659,7 @@ def testField():
     nbOfCells=mesh.getNumberOfCells()
     field=MEDCouplingFieldDouble.New(ON_CELLS)
     field.setMesh(mesh)
-    field.setNature(Integral)
+    field.setNature(ExtensiveMaximum)
     myCoords=DataArrayDouble.New()
     sampleTab=[]
     for i in range(nbOfCells*9):

@@ -28,7 +28,7 @@ namespace MEDCoupling
   class MEDCouplingUMesh;
   class MEDCouplingFieldDouble;
   class MEDCouplingFieldTemplate;
-  class MEDCouplingExtrudedMesh;
+  class MEDCouplingMappedExtrudedMesh;
   class MEDCoupling1DGTUMesh;
   class MEDCoupling1SGTUMesh;
   class MEDCouplingCMesh;
@@ -51,7 +51,7 @@ namespace SALOME_TEST
     static MEDCoupling::MEDCouplingUMesh *build3DSurfMesh();
     static MEDCoupling::MEDCouplingUMesh *build0DMesh();
     static MEDCoupling::MEDCouplingUMesh *buildM1DMesh();
-    static MEDCoupling::MEDCouplingExtrudedMesh *buildExtrudedMesh(MEDCoupling::MEDCouplingUMesh *&m2D);
+    static MEDCoupling::MEDCouplingMappedExtrudedMesh *buildExtrudedMesh(MEDCoupling::MEDCouplingUMesh *&m2D);
     static MEDCoupling::MEDCouplingCMesh *buildCMesh();
     static MEDCoupling::MEDCouplingIMesh *buildIMesh();
     static MEDCoupling::MEDCouplingCurveLinearMesh *buildCLMesh();

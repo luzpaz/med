@@ -366,7 +366,7 @@ namespace MEDCoupling
   public:
     %extend
       {
-        static MEDCouplingExtrudedMesh *New(PyObject *meshPtr) throw(INTERP_KERNEL::Exception)
+        static MEDCouplingMappedExtrudedMesh *New(PyObject *meshPtr) throw(INTERP_KERNEL::Exception)
         {
           PyObject* pdict=PyDict_New();
           PyDict_SetItemString(pdict,"__builtins__",PyEval_GetBuiltins());
@@ -387,7 +387,7 @@ namespace MEDCoupling
             throw INTERP_KERNEL::Exception("error corba pointer is not a SALOME_MED.MEDCouplingExtrudedMeshInterface_ptr !");
           Py_DECREF(pdict);
           Py_DECREF(iorMesh);
-          MEDCouplingExtrudedMesh *ret=MEDCouplingExtrudedMeshClient::New(meshPtrCppC);
+          MEDCouplingMappedExtrudedMesh *ret=MEDCouplingExtrudedMeshClient::New(meshPtrCppC);
           return ret;
         } 
       }
@@ -665,7 +665,7 @@ def MEDCouplingIMeshnew(cls,*args):
     return _MEDCouplingClient.MEDCouplingIMesh____new___(cls,args)
 def MEDCouplingExtrudedMeshnew(cls,*args):
     import _MEDCouplingClient
-    return _MEDCouplingClient.MEDCouplingExtrudedMesh____new___(cls,args)
+    return _MEDCouplingClient.MEDCouplingMappedExtrudedMesh____new___(cls,args)
 %}
 
 %include "MEDCouplingFinalize.i"

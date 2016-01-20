@@ -142,7 +142,7 @@ void MEDCoupling::MEDCalculatorBasicsTest::generateAFile1(const char *fName)
   da->setInfoOnComponent(0,"aaa [a]"); da->setInfoOnComponent(1,"bbb [b]"); da->setInfoOnComponent(2,"ccc [c]");
   da->setInfoOnComponent(3,"ddd [d]"); da->setInfoOnComponent(4,"eee [e]"); da->setInfoOnComponent(5,"fff [f]");
   da->setInfoOnComponent(6,"ggg [g]");
-  f->checkCoherency();
+  f->checkConsistencyLight();
   for(int i=0;i<nbOfTimeSteps;i++)
     {
       double *pt=da->getPointer();

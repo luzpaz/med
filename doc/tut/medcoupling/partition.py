@@ -41,7 +41,7 @@ a=DataArrayDouble.New([1.,1.,1.,-1.,-1.,-1.,-1.,-1.])
 field=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME)
 field.setMesh(m3D)
 field.setArray(a)
-field.checkCoherency()
+field.checkConsistencyLight()
 field.setName("f")
 
 # Save the field (and associated mesh) 
@@ -61,7 +61,7 @@ MEDLoader.WriteField("partition_input.med",field,True)
 # _T1A
 L=0.
 arr = field.getArray()
-ids = arr.getIdsInRange(L,1e300)
+ids = arr.findIdsInRange(L,1e300)
 m3DSub = field.getMesh()[ids]
 skin = m3DSub.computeSkin()
 MEDLoader.WriteUMesh("partition_skin.med",skin,True);
@@ -73,7 +73,7 @@ MEDLoader.WriteUMesh("partition_skin.med",skin,True);
 # SALOME V650 requires a more complicated syntax.
 m2D,desc,descI,revDesc,revDescI=m3DSub.buildDescendingConnectivity()
 numberOf3DVolSharing=revDescI.deltaShiftIndex()
-ids2D=numberOf3DVolSharing.getIdsEqual(1)
+ids2D=numberOf3DVolSharing.findIdsEqual(1)
 skin_V650=m2D[ids2D]
 # We can check if the two skins are identical
 print "Are two meshes equal between V660 and V650 ?",skin.isEqual(skin_V650,1e-12)
