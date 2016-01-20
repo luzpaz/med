@@ -34,7 +34,7 @@
 
 #include <iostream>
 
-void ParaMEDMEM::MEDCalculatorBasicsTest::testLightStruct1()
+void MEDCoupling::MEDCalculatorBasicsTest::testLightStruct1()
 {
   const char fname[]="/export/home/geay/MEDStdAlone/Salome5/V5_1_main/MED/MED_INSTALL_DEBUG/share/salome/resources/med/TimeStamps_import22.med";
   MEDCalculatorBrowserLiteStruct lt(fname);
@@ -42,7 +42,7 @@ void ParaMEDMEM::MEDCalculatorBasicsTest::testLightStruct1()
   //std::cout << lt.str() << std::endl;
 }
 
-void ParaMEDMEM::MEDCalculatorBasicsTest::testRangeSelection1()
+void MEDCoupling::MEDCalculatorBasicsTest::testRangeSelection1()
 {
   MEDCalculatorDBRangeSelection sel1(":");
   std::vector<int> v=sel1.getIds(6);
@@ -81,7 +81,7 @@ void ParaMEDMEM::MEDCalculatorBasicsTest::testRangeSelection1()
   CPPUNIT_ASSERT(exc); exc=false;
 }
 
-void ParaMEDMEM::MEDCalculatorBasicsTest::testDBField1()
+void MEDCoupling::MEDCalculatorBasicsTest::testDBField1()
 {
   const char fName[]="hfile1.med";
   generateAFile1(fName);
@@ -108,7 +108,7 @@ void ParaMEDMEM::MEDCalculatorBasicsTest::testDBField1()
   Power->decrRef();
 }
 
-void ParaMEDMEM::MEDCalculatorBasicsTest::generateAFile1(const char *fName)
+void MEDCoupling::MEDCalculatorBasicsTest::generateAFile1(const char *fName)
 {
   double targetCoords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
   int targetConn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
@@ -130,7 +130,7 @@ void ParaMEDMEM::MEDCalculatorBasicsTest::generateAFile1(const char *fName)
   m->setCoords(myCoords);
   myCoords->decrRef();
   //
-  MEDLoader::WriteUMesh(fName,m,true);
+  WriteUMesh(fName,m,true);
   static const int nbOfTimeSteps=10;
   static const int nbOfComponents=7;
   MEDCouplingFieldDouble *f=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
@@ -150,83 +150,83 @@ void ParaMEDMEM::MEDCalculatorBasicsTest::generateAFile1(const char *fName)
         for(int k=0;k<nbOfComponents;k++,pt++)
           *pt=(i+1)*100.+(j+1)*10.+k+1;
       f->setTime(i*0.1,i,-i);
-      MEDLoader::WriteFieldUsingAlreadyWrittenMesh(fName,f);
+      WriteFieldUsingAlreadyWrittenMesh(fName,f);
     }
   da->decrRef();
   f->decrRef();
   m->decrRef();
 }
 
-void ParaMEDMEM::MEDCalculatorBasicsTest::testSPython1()
+void MEDCoupling::MEDCalculatorBasicsTest::testSPython1()
 {
   std::string s1,s2;
   bool b;
   s1="12:3";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   CPPUNIT_ASSERT(!b);
   CPPUNIT_ASSERT_EQUAL(s2,s1);
   s1="12:";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   CPPUNIT_ASSERT(!b);
   CPPUNIT_ASSERT_EQUAL(s2,s1);
   s1="12";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   CPPUNIT_ASSERT(b);
   CPPUNIT_ASSERT_EQUAL(s2,s1);
   s1="";
-  CPPUNIT_ASSERT(!ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(!MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   s1="          ";
-  CPPUNIT_ASSERT(!ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(!MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   s1=":";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   CPPUNIT_ASSERT(!b);
   CPPUNIT_ASSERT_EQUAL(s2,s1);
   s1=":12";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   CPPUNIT_ASSERT(!b);
   CPPUNIT_ASSERT_EQUAL(s2,s1);
   s1=":12:";
-  CPPUNIT_ASSERT(!ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(!MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   s1=":12   23";
-  CPPUNIT_ASSERT(!ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(!MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   // some ' ' char
   s1="  12  : 3  ";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   CPPUNIT_ASSERT(!b);
   CPPUNIT_ASSERT_EQUAL(s2,std::string("12:3"));
   s1="  12  : 3";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   CPPUNIT_ASSERT(!b);
   CPPUNIT_ASSERT_EQUAL(s2,std::string("12:3"));
   s1="  12  :3  ";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   CPPUNIT_ASSERT(!b);
   CPPUNIT_ASSERT_EQUAL(s2,std::string("12:3"));
   s1="  12: 3  ";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   CPPUNIT_ASSERT(!b);
   CPPUNIT_ASSERT_EQUAL(s2,std::string("12:3"));
   s1="12  : 3  ";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isElementInParenthesisMatching(s1,s2,b));
   CPPUNIT_ASSERT(!b);
   CPPUNIT_ASSERT_EQUAL(s2,std::string("12:3"));
 }
 
-void ParaMEDMEM::MEDCalculatorBasicsTest::testSPython2()
+void MEDCoupling::MEDCalculatorBasicsTest::testSPython2()
 {
   std::string s1,s2;
   s1="  12:3  , : ,4  ";
-  CPPUNIT_ASSERT(ParaMEDMEM::SPythonParser::isParenthesisMatching(s1,s2));
+  CPPUNIT_ASSERT(MEDCoupling::SPythonParser::isParenthesisMatching(s1,s2));
   CPPUNIT_ASSERT_EQUAL(s2,std::string("\"12:3\",\":\",4"));
 }
 
-void ParaMEDMEM::MEDCalculatorBasicsTest::testSPython3()
+void MEDCoupling::MEDCalculatorBasicsTest::testSPython3()
 {
   std::string s1,s2;
   s1="(  12:3  , : ,4  )";
-  s2=ParaMEDMEM::SPythonInterpreter::strip(s1);
+  s2=MEDCoupling::SPythonInterpreter::strip(s1);
   CPPUNIT_ASSERT_EQUAL(s2,std::string("(12:3,:,4)"));
   s1=" (  12:3  , : ,4  )  ";
-  s2=ParaMEDMEM::SPythonInterpreter::strip(s1);
+  s2=MEDCoupling::SPythonInterpreter::strip(s1);
   CPPUNIT_ASSERT_EQUAL(s2,std::string("(12:3,:,4)"));
 }

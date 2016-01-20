@@ -27,7 +27,7 @@
 //  This class corresponds to a MED mesh of a file
 //  It contains the mesh name and a flag to know if it's selected or not
 //  It's used only for selecting mesh, out of all fields.
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCALCULATOR_EXPORT MEDCalculatorBrowserMesh
   {

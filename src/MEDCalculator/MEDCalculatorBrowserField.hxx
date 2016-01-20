@@ -33,7 +33,7 @@
 //  This class correspond to a MED field of a file
 //  It contains the field name, the components, the time steps and selection methods
 //  It's used to select a field, it's components and time steps
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCalculatorBrowserStep;//  top prevent cross include
   class MEDCALCULATOR_EXPORT MEDCalculatorBrowserField

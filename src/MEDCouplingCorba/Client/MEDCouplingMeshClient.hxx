@@ -28,7 +28,7 @@
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
 #include "MEDCouplingClient.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingMesh;
 

@@ -21,7 +21,7 @@
 #include "MEDCoupling1DGTUMeshServant.hxx"
 #include "MEDCoupling1GTUMesh.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCoupling1DGTUMeshServant::MEDCoupling1DGTUMeshServant(const MEDCoupling1DGTUMesh *cppPointerOfMesh):MEDCoupling1GTUMeshServant(cppPointerOfMesh)
 {

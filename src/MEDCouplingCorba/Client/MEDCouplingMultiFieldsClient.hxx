@@ -29,7 +29,7 @@
 #include "MEDCouplingClient.hxx"
 #include "MEDCouplingMultiFields.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingMultiFieldsClient : public MEDCouplingMultiFields
   {

@@ -29,7 +29,7 @@
 #include "MEDCouplingRefCountServant.hxx"
 #include "MEDCouplingCorba.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingMesh;
 

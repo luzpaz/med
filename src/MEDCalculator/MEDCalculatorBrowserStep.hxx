@@ -28,7 +28,7 @@
 //  This class corresponds to a time step (dt,it) of a field
 //  It contains the time step (dt) and the corresponding time value
 //  It also contains methods for selecting or unselecting this time step and it hold the name of the supporting mesh.
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCALCULATOR_EXPORT MEDCalculatorBrowserStep
   {

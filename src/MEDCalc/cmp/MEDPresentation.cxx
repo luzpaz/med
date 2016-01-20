@@ -77,12 +77,12 @@ PyObject * MEDPresentation::getPythonObjectFromMain(const char * python_var)
 
 std::string MEDPresentation::getFieldTypeString()
 {
-  ParaMEDMEM::TypeOfField typ = (ParaMEDMEM::TypeOfField)_fieldHandler->type;
+  MEDCoupling::TypeOfField typ = (MEDCoupling::TypeOfField)_fieldHandler->type;
   switch(typ)
   {
-    case ParaMEDMEM::ON_CELLS:
+    case MEDCoupling::ON_CELLS:
       return "CELLS";
-    case ParaMEDMEM::ON_NODES:
+    case MEDCoupling::ON_NODES:
       return "NODES";
     default:
       std::cerr << "MEDPresentation::getFieldTypeString() -- Not implemented ! Gauss points?";

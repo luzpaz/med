@@ -29,7 +29,7 @@
 #include "MEDCoupling1GTUMeshServant.hxx"
 #include "MEDCouplingCorba.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCoupling1DGTUMesh;
 

@@ -23,7 +23,7 @@
 
 #include <vector>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 DataArrayDouble *DataArrayDoubleClient::New(SALOME_MED::DataArrayDoubleCorbaInterface_ptr dadPtr)
 {

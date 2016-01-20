@@ -25,7 +25,7 @@
 
 #include <iostream>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingRefCountServant::MEDCouplingRefCountServant(const RefCountObject *pointer, const TimeLabel *pointer2):_ref_counter(1),
                                                                                                                  _cpp_pointer(pointer),

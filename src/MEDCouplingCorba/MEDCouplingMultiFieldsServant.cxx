@@ -26,7 +26,7 @@
 #include "MEDCouplingFieldTemplate.hxx"
 #include "MEDCouplingMemArray.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingMultiFieldsServant::MEDCouplingMultiFieldsServant(const MEDCouplingMultiFields *cppPointer):MEDCouplingRefCountServant(cppPointer,cppPointer)
 {

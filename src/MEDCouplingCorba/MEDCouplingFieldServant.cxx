@@ -35,7 +35,7 @@
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCoupling1GTUMesh.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingFieldServant::MEDCouplingFieldServant(const MEDCouplingField *cppPointerOfMesh):MEDCouplingRefCountServant(cppPointerOfMesh,cppPointerOfMesh)
 {

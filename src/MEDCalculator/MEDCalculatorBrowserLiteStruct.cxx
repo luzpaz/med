@@ -28,7 +28,7 @@
 #include <deque>
 #include <string>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 //  Default constructor
 MEDCalculatorBrowserLiteStruct::MEDCalculatorBrowserLiteStruct() : _any_selection(false)
@@ -50,10 +50,10 @@ MEDCalculatorBrowserLiteStruct::~MEDCalculatorBrowserLiteStruct()
 MEDCalculatorBrowserLiteStruct::MEDCalculatorBrowserLiteStruct(const char *f) : _file(f), _any_selection(false)
 {
   computeBaseName();
-  std::vector<std::string> meshNames=MEDLoader::GetMeshNames(_file.c_str());
+  std::vector<std::string> meshNames=GetMeshNames(_file.c_str());
   for(std::vector<std::string>::const_iterator iter=meshNames.begin();iter!=meshNames.end();iter++)
     _meshes.push_back(MEDCalculatorBrowserMesh((*iter).c_str()));
-  std::vector<std::string> fieldNames=MEDLoader::GetAllFieldNames(_file.c_str());
+  std::vector<std::string> fieldNames=GetAllFieldNames(_file.c_str());
   for(std::vector<std::string>::const_iterator iter=fieldNames.begin();iter!=fieldNames.end();iter++)
     _fields.push_back(MEDCalculatorBrowserField(_file.c_str(),(*iter).c_str()));
 }

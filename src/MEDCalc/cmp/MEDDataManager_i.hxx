@@ -29,7 +29,7 @@
 #include "MEDCouplingRemapper.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingFieldDouble.hxx"
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 /*! This map is used for lifecycle management of fields used in this operator */
 #include <map>
@@ -161,7 +161,7 @@ private:
   long getUMeshId(const MEDCouplingMesh * mesh);
 
   INTERP_KERNEL::IntersectionType _getIntersectionType(const char* intersType);
-  ParaMEDMEM::NatureOfField _getNatureOfField(const char* fieldNature);
+  MEDCoupling::NatureOfField _getNatureOfField(const char* fieldNature);
 
 };
 

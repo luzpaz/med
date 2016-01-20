@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 //  Default constructor
 MEDCalculatorBrowserMesh::MEDCalculatorBrowserMesh() : _selection(false)

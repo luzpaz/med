@@ -25,7 +25,7 @@
 #include <iostream>
 #include <fstream>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 int mainCorbaServ(int argc, char **argv);
 

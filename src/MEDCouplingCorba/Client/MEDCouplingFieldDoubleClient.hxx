@@ -29,7 +29,7 @@
 #include "MEDCouplingClient.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingFieldDoubleClient : public MEDCouplingFieldDouble
   {

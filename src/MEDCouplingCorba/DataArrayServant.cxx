@@ -21,7 +21,7 @@
 #include "DataArrayServant.hxx"
 #include "MEDCouplingMemArray.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 DataArrayServant::DataArrayServant(const DataArray *cppPointer):MEDCouplingRefCountServant(cppPointer,cppPointer)
 {

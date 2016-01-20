@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <sstream>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 const char SPythonPredParser::FIELD_TYPE_STR[]="MEDCalculatorDBField";
 

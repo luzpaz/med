@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCalculatorBrowserField;
   class MEDCalculatorDBFieldReal;

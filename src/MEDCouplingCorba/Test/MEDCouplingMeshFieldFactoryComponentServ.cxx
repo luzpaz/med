@@ -64,8 +64,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get1DMesh()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build1DMesh();
-    ParaMEDMEM::MEDCouplingUMeshServant *m=new ParaMEDMEM::MEDCouplingUMeshServant(m1);
+    MEDCoupling::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build1DMesh();
+    MEDCoupling::MEDCouplingUMeshServant *m=new MEDCoupling::MEDCouplingUMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -73,8 +73,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get2DMesh()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build2DMesh();
-    ParaMEDMEM::MEDCouplingUMeshServant *m=new ParaMEDMEM::MEDCouplingUMeshServant(m1);
+    MEDCoupling::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build2DMesh();
+    MEDCoupling::MEDCouplingUMeshServant *m=new MEDCoupling::MEDCouplingUMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -82,8 +82,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get3DMesh()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build3DMesh();
-    ParaMEDMEM::MEDCouplingUMeshServant *m=new ParaMEDMEM::MEDCouplingUMeshServant(m1);
+    MEDCoupling::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build3DMesh();
+    MEDCoupling::MEDCouplingUMeshServant *m=new MEDCoupling::MEDCouplingUMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -91,8 +91,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get3DSurfMesh()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build3DSurfMesh();
-    ParaMEDMEM::MEDCouplingUMeshServant *m=new ParaMEDMEM::MEDCouplingUMeshServant(m1);
+    MEDCoupling::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build3DSurfMesh();
+    MEDCoupling::MEDCouplingUMeshServant *m=new MEDCoupling::MEDCouplingUMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -100,8 +100,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get0DMesh()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build0DMesh();
-    ParaMEDMEM::MEDCouplingUMeshServant *m=new ParaMEDMEM::MEDCouplingUMeshServant(m1);
+    MEDCoupling::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build0DMesh();
+    MEDCoupling::MEDCouplingUMeshServant *m=new MEDCoupling::MEDCouplingUMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -109,8 +109,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getM1DMesh()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::buildM1DMesh();
-    ParaMEDMEM::MEDCouplingUMeshServant *m=new ParaMEDMEM::MEDCouplingUMeshServant(m1);
+    MEDCoupling::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::buildM1DMesh();
+    MEDCoupling::MEDCouplingUMeshServant *m=new MEDCoupling::MEDCouplingUMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -118,10 +118,10 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getExtrudedMesh()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m2D;
-    ParaMEDMEM::MEDCouplingExtrudedMesh *m1=MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(m2D);
+    MEDCoupling::MEDCouplingUMesh *m2D;
+    MEDCoupling::MEDCouplingExtrudedMesh *m1=MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(m2D);
     m2D->decrRef();
-    ParaMEDMEM::MEDCouplingExtrudedMeshServant *m=new ParaMEDMEM::MEDCouplingExtrudedMeshServant(m1);
+    MEDCoupling::MEDCouplingExtrudedMeshServant *m=new MEDCoupling::MEDCouplingExtrudedMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -129,8 +129,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getCMesh()
   {
-    ParaMEDMEM::MEDCouplingCMesh *m1=MEDCouplingCorbaServBasicsTest::buildCMesh();
-    ParaMEDMEM::MEDCouplingCMeshServant *m=new ParaMEDMEM::MEDCouplingCMeshServant(m1);
+    MEDCoupling::MEDCouplingCMesh *m1=MEDCouplingCorbaServBasicsTest::buildCMesh();
+    MEDCoupling::MEDCouplingCMeshServant *m=new MEDCoupling::MEDCouplingCMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -138,8 +138,8 @@ namespace SALOME_TEST
   
   SALOME_MED::MEDCouplingIMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getIMesh()
   {
-    ParaMEDMEM::MEDCouplingIMesh *m1=MEDCouplingCorbaServBasicsTest::buildIMesh();
-    ParaMEDMEM::MEDCouplingIMeshServant *m=new ParaMEDMEM::MEDCouplingIMeshServant(m1);
+    MEDCoupling::MEDCouplingIMesh *m1=MEDCouplingCorbaServBasicsTest::buildIMesh();
+    MEDCoupling::MEDCouplingIMeshServant *m=new MEDCoupling::MEDCouplingIMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingIMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -147,8 +147,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getCLMesh()
   {
-    ParaMEDMEM::MEDCouplingCurveLinearMesh *m1=MEDCouplingCorbaServBasicsTest::buildCLMesh();
-    ParaMEDMEM::MEDCouplingCurveLinearMeshServant *m=new ParaMEDMEM::MEDCouplingCurveLinearMeshServant(m1);
+    MEDCoupling::MEDCouplingCurveLinearMesh *m1=MEDCouplingCorbaServBasicsTest::buildCLMesh();
+    MEDCoupling::MEDCouplingCurveLinearMeshServant *m=new MEDCoupling::MEDCouplingCurveLinearMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -156,8 +156,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get1SGTUMesh()
   {
-    ParaMEDMEM::MEDCoupling1SGTUMesh *m1=MEDCouplingCorbaServBasicsTest::build1SGTUMesh();
-    ParaMEDMEM::MEDCoupling1SGTUMeshServant *m=new ParaMEDMEM::MEDCoupling1SGTUMeshServant(m1);
+    MEDCoupling::MEDCoupling1SGTUMesh *m1=MEDCouplingCorbaServBasicsTest::build1SGTUMesh();
+    MEDCoupling::MEDCoupling1SGTUMeshServant *m=new MEDCoupling::MEDCoupling1SGTUMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -165,8 +165,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get1DGTUMesh()
   {
-    ParaMEDMEM::MEDCoupling1DGTUMesh *m1=MEDCouplingCorbaServBasicsTest::build1DGTUMesh();
-    ParaMEDMEM::MEDCoupling1DGTUMeshServant *m=new ParaMEDMEM::MEDCoupling1DGTUMeshServant(m1);
+    MEDCoupling::MEDCoupling1DGTUMesh *m1=MEDCouplingCorbaServBasicsTest::build1DGTUMesh();
+    MEDCoupling::MEDCoupling1DGTUMeshServant *m=new MEDCoupling::MEDCoupling1DGTUMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -174,8 +174,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldScalarOn2DNT()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DNT();
-    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    MEDCoupling::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DNT();
+    MEDCoupling::MEDCouplingFieldDoubleServant *m=new MEDCoupling::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -183,8 +183,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldNodeScalarOn2DNT()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldNodeScalarOn2DNT();
-    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    MEDCoupling::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldNodeScalarOn2DNT();
+    MEDCoupling::MEDCouplingFieldDoubleServant *m=new MEDCoupling::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -192,8 +192,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldScalarOn3DNT()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DNT();
-    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    MEDCoupling::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DNT();
+    MEDCoupling::MEDCouplingFieldDoubleServant *m=new MEDCoupling::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -201,8 +201,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldScalarOn3DSurfWT()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfWT();
-    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    MEDCoupling::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfWT();
+    MEDCoupling::MEDCouplingFieldDoubleServant *m=new MEDCoupling::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -210,8 +210,8 @@ namespace SALOME_TEST
   
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldScalarOn3DSurfCOTI()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfCOTI();
-    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    MEDCoupling::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfCOTI();
+    MEDCoupling::MEDCouplingFieldDoubleServant *m=new MEDCoupling::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -219,8 +219,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldScalarOn2DLT()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DLT();
-    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    MEDCoupling::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DLT();
+    MEDCoupling::MEDCouplingFieldDoubleServant *m=new MEDCoupling::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -228,8 +228,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldGaussPt2DWT()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldGaussPt2DWT();
-    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    MEDCoupling::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldGaussPt2DWT();
+    MEDCoupling::MEDCouplingFieldDoubleServant *m=new MEDCoupling::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -237,8 +237,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldGaussPtNE2DWT()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldGaussPtNE2DWT();
-    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    MEDCoupling::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldGaussPtNE2DWT();
+    MEDCoupling::MEDCouplingFieldDoubleServant *m=new MEDCoupling::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -246,8 +246,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldVectorOnExtrudedWT()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldVectorOnExtrudedWT();
-    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    MEDCoupling::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldVectorOnExtrudedWT();
+    MEDCoupling::MEDCouplingFieldDoubleServant *m=new MEDCoupling::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -255,8 +255,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldVectorOnCMeshWT()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldVectorOnCMeshWT();
-    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    MEDCoupling::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldVectorOnCMeshWT();
+    MEDCoupling::MEDCouplingFieldDoubleServant *m=new MEDCoupling::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -264,8 +264,8 @@ namespace SALOME_TEST
   
   SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateCellOn2D()
   {
-    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateCellOn2D();
-    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    MEDCoupling::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateCellOn2D();
+    MEDCoupling::MEDCouplingFieldTemplateServant *m=new MEDCoupling::MEDCouplingFieldTemplateServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -273,8 +273,8 @@ namespace SALOME_TEST
   
   SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateNodeOn2D()
   {
-    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateNodeOn2D();
-    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    MEDCoupling::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateNodeOn2D();
+    MEDCoupling::MEDCouplingFieldTemplateServant *m=new MEDCoupling::MEDCouplingFieldTemplateServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -282,8 +282,8 @@ namespace SALOME_TEST
   
   SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateGaussPtOn2D()
   {
-    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussPtOn2D();
-    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    MEDCoupling::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussPtOn2D();
+    MEDCoupling::MEDCouplingFieldTemplateServant *m=new MEDCoupling::MEDCouplingFieldTemplateServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -291,8 +291,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateGaussNEOn2D()
   {
-    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussNEOn2D();
-    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    MEDCoupling::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussNEOn2D();
+    MEDCoupling::MEDCouplingFieldTemplateServant *m=new MEDCoupling::MEDCouplingFieldTemplateServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
     return ret;
@@ -300,8 +300,8 @@ namespace SALOME_TEST
 
   SALOME_MED::MEDCouplingMultiFieldsCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getMultiFields1()
   {
-    ParaMEDMEM::MEDCouplingMultiFields *fields=MEDCouplingCorbaServBasicsTest::buildMultiFields1();
-    ParaMEDMEM::MEDCouplingMultiFieldsServant *s=new ParaMEDMEM::MEDCouplingMultiFieldsServant(fields);
+    MEDCoupling::MEDCouplingMultiFields *fields=MEDCouplingCorbaServBasicsTest::buildMultiFields1();
+    MEDCoupling::MEDCouplingMultiFieldsServant *s=new MEDCoupling::MEDCouplingMultiFieldsServant(fields);
     fields->decrRef();
     SALOME_MED::MEDCouplingMultiFieldsCorbaInterface_ptr ret=s->_this();
     return ret;
@@ -309,56 +309,56 @@ namespace SALOME_TEST
 
   SALOME_MED::DataArrayDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayDouble1()
   {
-    ParaMEDMEM::DataArrayDouble *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayDouble1();
-    ParaMEDMEM::DataArrayDoubleServant *retServ=new ParaMEDMEM::DataArrayDoubleServant(retCpp);
+    MEDCoupling::DataArrayDouble *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayDouble1();
+    MEDCoupling::DataArrayDoubleServant *retServ=new MEDCoupling::DataArrayDoubleServant(retCpp);
     retCpp->decrRef();
     return retServ->_this();
   }
 
   SALOME_MED::DataArrayDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayDouble2()
   {
-    ParaMEDMEM::DataArrayDouble *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayDouble2();
-    ParaMEDMEM::DataArrayDoubleServant *retServ=new ParaMEDMEM::DataArrayDoubleServant(retCpp);
+    MEDCoupling::DataArrayDouble *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayDouble2();
+    MEDCoupling::DataArrayDoubleServant *retServ=new MEDCoupling::DataArrayDoubleServant(retCpp);
     retCpp->decrRef();
     return retServ->_this();
   }
 
   SALOME_MED::DataArrayDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayDouble3()
   {
-    ParaMEDMEM::DataArrayDouble *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayDouble3();
-    ParaMEDMEM::DataArrayDoubleServant *retServ=new ParaMEDMEM::DataArrayDoubleServant(retCpp);
+    MEDCoupling::DataArrayDouble *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayDouble3();
+    MEDCoupling::DataArrayDoubleServant *retServ=new MEDCoupling::DataArrayDoubleServant(retCpp);
     retCpp->decrRef();
     return retServ->_this();
   }
 
   SALOME_MED::DataArrayIntCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayInt1()
   {
-    ParaMEDMEM::DataArrayInt *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayInt1();
-    ParaMEDMEM::DataArrayIntServant *retServ=new ParaMEDMEM::DataArrayIntServant(retCpp);
+    MEDCoupling::DataArrayInt *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayInt1();
+    MEDCoupling::DataArrayIntServant *retServ=new MEDCoupling::DataArrayIntServant(retCpp);
     retCpp->decrRef();
     return retServ->_this();
   }
 
   SALOME_MED::DataArrayIntCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayInt2()
   {
-    ParaMEDMEM::DataArrayInt *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayInt2();
-    ParaMEDMEM::DataArrayIntServant *retServ=new ParaMEDMEM::DataArrayIntServant(retCpp);
+    MEDCoupling::DataArrayInt *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayInt2();
+    MEDCoupling::DataArrayIntServant *retServ=new MEDCoupling::DataArrayIntServant(retCpp);
     retCpp->decrRef();
     return retServ->_this();
   }
 
   SALOME_MED::DataArrayIntCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayInt3()
   {
-    ParaMEDMEM::DataArrayInt *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayInt3();
-    ParaMEDMEM::DataArrayIntServant *retServ=new ParaMEDMEM::DataArrayIntServant(retCpp);
+    MEDCoupling::DataArrayInt *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayInt3();
+    MEDCoupling::DataArrayIntServant *retServ=new MEDCoupling::DataArrayIntServant(retCpp);
     retCpp->decrRef();
     return retServ->_this();
   }
 
   SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getMultiFields2()
   {
-    ParaMEDMEM::MEDCouplingFieldOverTime *fot=MEDCouplingCorbaServBasicsTest::buildMultiFields2();
-    ParaMEDMEM::MEDCouplingFieldOverTimeServant *retServ=new ParaMEDMEM::MEDCouplingFieldOverTimeServant(fot);
+    MEDCoupling::MEDCouplingFieldOverTime *fot=MEDCouplingCorbaServBasicsTest::buildMultiFields2();
+    MEDCoupling::MEDCouplingFieldOverTimeServant *retServ=new MEDCoupling::MEDCouplingFieldOverTimeServant(fot);
     fot->decrRef();
     return retServ->_this();
   }

@@ -30,7 +30,7 @@
 #include "MEDCouplingMultiFieldsServant.hxx"
 #include "MEDCouplingFieldOverTime.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCOUPLINGCORBA_EXPORT MEDCouplingFieldOverTimeServant : public MEDCouplingMultiFieldsServant,
                                                                   public virtual POA_SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface

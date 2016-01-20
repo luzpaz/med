@@ -26,7 +26,7 @@
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
 #include "MEDCouplingCorba.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class TimeLabel;
   class RefCountObject;

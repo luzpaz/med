@@ -34,7 +34,7 @@
 
 #include <cmath>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCalculatorDBFieldReal *MEDCalculatorDBField::New(const MEDCalculatorBrowserField& ls)
 {
@@ -125,20 +125,20 @@ void MEDCalculatorDBFieldReal::write(const char *fName, bool writeFromScratch) c
   int status=MEDLoaderBase::getStatusOfFile(fName);
   if(!writeFromScratch && status==MEDLoaderBase::EXIST_RW)
     {
-      std::vector<std::string> ms=MEDLoader::GetMeshNames(fName);
+      std::vector<std::string> ms=GetMeshNames(fName);
       if(std::find(ms.begin(),ms.end(),mesh->getName())!=ms.end())
         {
           std::ostringstream oss; oss << "In file \"" << fName << "\" the mesh with name \"" << mesh->getName() << "\" already exists !"; 
           throw INTERP_KERNEL::Exception(oss.str().c_str());
         }
-      std::vector<std::string> fs=MEDLoader::GetAllFieldNames(fName);
+      std::vector<std::string> fs=GetAllFieldNames(fName);
       if(std::find(fs.begin(),fs.end(),field->getName())!=fs.end())
         {
           std::ostringstream oss; oss << "In file \"" << fName << "\" the field with name \"" << field->getName() << "\" already exists !"; 
           throw INTERP_KERNEL::Exception(oss.str().c_str());
         }
     }
-  MEDLoader::WriteUMesh(fName,mesh,writeFromScratch);
+  WriteUMesh(fName,mesh,writeFromScratch);
   for(std::vector<int>::const_iterator iter=ids.begin();iter!=ids.end();iter++)
     _time_steps[*iter]->write(fName,_name,_description);
 }
@@ -724,7 +724,7 @@ void MEDCalculatorDBFieldReal::fetchData() const throw(INTERP_KERNEL::Exception)
           idsInGlobalToFetch.push_back(ids[i]);
         }
     }
-  std::vector<MEDCouplingFieldDouble *> fs=MEDLoader::ReadFieldsOnSameMesh(_type,_file_name.c_str(),_mesh_name.c_str(),0,_field_name.c_str(),idstoFetch);
+  std::vector<MEDCouplingFieldDouble *> fs=ReadFieldsOnSameMesh(_type,_file_name.c_str(),_mesh_name.c_str(),0,_field_name.c_str(),idstoFetch);
   sz=fs.size();
   for(int i=0;i<sz;i++)
     {

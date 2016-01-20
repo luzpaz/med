@@ -21,6 +21,6 @@
 #include "CppUnitTest.hxx"
 #include "MEDCalculatorBasicsTest.hxx"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( ParaMEDMEM::MEDCalculatorBasicsTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( MEDCoupling::MEDCalculatorBasicsTest );
 
 #include "BasicMainTest.hxx"

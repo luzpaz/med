@@ -24,7 +24,7 @@
 #include <limits>
 #include <sstream>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 const char MEDCalculatorDBRangeSelection::ALL_ELTS[]=":";
 

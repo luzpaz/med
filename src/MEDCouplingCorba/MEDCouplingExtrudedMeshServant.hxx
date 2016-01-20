@@ -27,7 +27,7 @@
 #include "MEDCouplingMeshServant.hxx"
 #include "MEDCouplingCorba.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingExtrudedMesh;
 

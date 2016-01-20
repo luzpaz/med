@@ -29,7 +29,7 @@
 
 #include <vector>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingFieldOverTimeClient::MEDCouplingFieldOverTimeClient(SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface_ptr field):_df(0)
 {

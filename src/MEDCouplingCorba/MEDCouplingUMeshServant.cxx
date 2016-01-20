@@ -21,7 +21,7 @@
 #include "MEDCouplingUMeshServant.hxx"
 #include "MEDCouplingUMesh.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingUMeshServant::MEDCouplingUMeshServant(const MEDCouplingUMesh *cppPointerOfMesh):MEDCouplingPointSetServant(cppPointerOfMesh)
 {

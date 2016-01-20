@@ -25,7 +25,7 @@
 
 #include <vector>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingCMesh *MEDCouplingCMeshClient::New(SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr meshPtr)
 {

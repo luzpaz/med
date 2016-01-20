@@ -29,7 +29,7 @@
 #include "MEDCouplingCorba.hxx"
 #include "DataArrayServant.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class DataArrayInt;
 

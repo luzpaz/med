@@ -32,7 +32,7 @@
 
 #include <vector>
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class RefCountObject;
   class MEDCouplingMultiFields;

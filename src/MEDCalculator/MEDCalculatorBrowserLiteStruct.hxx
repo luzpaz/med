@@ -31,7 +31,7 @@
 //  This class correspond to a MED File
 //  It contains fields and meshes from a file
 //  It also has methods for selecting/unselecting meshes, field and components from fields
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCALCULATOR_EXPORT MEDCalculatorBrowserLiteStruct
   {

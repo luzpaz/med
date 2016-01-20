@@ -23,7 +23,7 @@
 #include "MEDCouplingMesh.hxx"
 #include "MEDCouplingMemArray.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingMeshServant::MEDCouplingMeshServant(const MEDCouplingMesh *cppPointerOfMesh):MEDCouplingRefCountServant(cppPointerOfMesh,cppPointerOfMesh)
 {

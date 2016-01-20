@@ -26,7 +26,7 @@
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingAutoRefCountObjectPtr.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCalculatorDBSliceField::MEDCalculatorDBSliceField(int iter, int order):_iteration(iter),_order(order),_field(0),_work(0)
 {
@@ -73,7 +73,7 @@ void MEDCalculatorDBSliceField::write(const char *fName, const std::string& n, c
   MEDCouplingFieldDouble *myF=const_cast<MEDCouplingFieldDouble *>(_field);
   myF->setName(n.c_str());
   myF->setDescription(d.c_str());
-  MEDLoader::WriteFieldUsingAlreadyWrittenMesh(fName,_field);
+  WriteFieldUsingAlreadyWrittenMesh(fName,_field);
   myF->setName(kn.c_str());
   myF->setDescription(kd.c_str());
 }
@@ -95,7 +95,7 @@ MEDCalculatorDBSliceField::~MEDCalculatorDBSliceField()
 MEDCouplingFieldDouble *MEDCalculatorDBSliceField::getField(TypeOfField type, const std::string& fname, const std::string& mname, const std::string& fieldName) const
 {
   if(!_field)
-    _field=MEDLoader::ReadField(type,fname.c_str(),mname.c_str(),0,fieldName.c_str(),_iteration,_order);
+    _field=ReadField(type,fname.c_str(),mname.c_str(),0,fieldName.c_str(),_iteration,_order);
   return _field;
 }
 

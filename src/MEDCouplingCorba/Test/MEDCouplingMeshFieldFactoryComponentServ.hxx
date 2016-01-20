@@ -28,7 +28,7 @@
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServantTest)
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingUMesh;
 }
