@@ -25,9 +25,8 @@
 class MEDCALC_EXPORT MEDPresentationVectorField : public MEDPresentation
 {
 public:
-  MEDPresentationVectorField(MEDCALC::FieldHandler* fieldHdl, bool wireframe) :
-    MEDPresentation(fieldHdl, "MEDPresentationVectorField"),
-    _isWireframe(wireframe)
+  MEDPresentationVectorField(const MEDCALC::VectorFieldParameters& params) :
+    MEDPresentation(params.fieldHandlerId, "MEDPresentationVectorField")
   {}
   virtual ~MEDPresentationVectorField() {}
 
@@ -35,7 +34,7 @@ protected:
   virtual void internalGeneratePipeline();
 
 private:
-  bool _isWireframe;
+  MEDCALC::VectorFieldParameters _params;
 };
 
 #endif

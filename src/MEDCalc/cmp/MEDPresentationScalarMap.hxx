@@ -25,9 +25,8 @@
 class MEDCALC_EXPORT MEDPresentationScalarMap : public MEDPresentation
 {
 public:
-  MEDPresentationScalarMap(MEDCALC::FieldHandler* fieldHdl, bool wireframe) :
-    MEDPresentation(fieldHdl, "MEDPresentationScalarMap"),
-    _isWireframe(wireframe)
+  MEDPresentationScalarMap(const MEDCALC::ScalarMapParameters& params) :
+    MEDPresentation(params.fieldHandlerId, "MEDPresentationScalarMap")
   {}
   virtual ~MEDPresentationScalarMap() {}
 
@@ -35,7 +34,7 @@ protected:
   virtual void internalGeneratePipeline();
 
 private:
-  bool _isWireframe;
+  MEDCALC::ScalarMapParameters _params;
 };
 
 #endif

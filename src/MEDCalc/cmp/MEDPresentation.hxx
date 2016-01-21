@@ -21,6 +21,7 @@
 #ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_HXX_
 #define SRC_MEDCALC_CMP_MEDPRESENTATION_HXX_
 
+#include "MEDCouplingRefCountObject.hxx"
 #include <Python.h>
 #include "MEDCALC.hxx"
 
@@ -38,25 +39,35 @@ class MEDCALC_EXPORT MEDPresentation
 
 public:
 
+  typedef ::CORBA::Long TypeID;
+
   virtual ~MEDPresentation() {}
 
   void setProperty(const std::string& propName, const std::string& propValue);
   const std::string getProperty(const std::string& propName);
-  std::string getFieldTypeString();
 
 protected:
 
-  MEDPresentation(MEDCALC::FieldHandler* fieldHdl, std::string name);
+  MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::string name);
 
-  void generatePipeline();
   virtual void internalGeneratePipeline() = 0;
   PyObject * getPythonObjectFromMain(const char * var);
   void pushInternal(PyObject * obj, PyObject * disp = NULL);
 
+private:
+
+  void generatePipeline(); // reserved to friend class MEDPresentationManager
+  std::string getFieldTypeString(ParaMEDMEM::TypeOfField fieldType);
+
 protected:
 
-  ///! field reference - borrowed.
-  MEDCALC::FieldHandler* _fieldHandler;
+  std::string _fileName;
+  std::string _fieldName;
+  std::string _fieldType;
+
+private:
+
+  MEDPresentation::TypeID _fieldHandlerId;
 
   ///! Pipeline elements
   std::vector< PyObject * > _pipeline;

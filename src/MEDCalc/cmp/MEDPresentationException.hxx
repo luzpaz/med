@@ -1,4 +1,4 @@
-// Copyright (C) 2016  CEA/DEN, EDF R&D
+// Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,25 +16,35 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 
-#ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_POINTSPRITE_HXX_
-#define SRC_MEDCALC_CMP_MEDPRESENTATION_POINTSPRITE_HXX_
+#ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_EXCEPTION_HXX_
+#define SRC_MEDCALC_CMP_MEDPRESENTATION_EXCEPTION_HXX_
 
 #include "MEDCALC.hxx"
-#include "MEDPresentation.hxx"
+#include <iostream>
+#include <sstream>
+#include <exception>
 
-class MEDCALC_EXPORT MEDPresentationPointSprite : public MEDPresentation
+class MEDCALC_EXPORT MEDPresentationException
+  : public std::exception
 {
 public:
-  MEDPresentationPointSprite(const MEDCALC::PointSpriteParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationPointSprite")
-  {}
-  virtual ~MEDPresentationPointSprite() {}
 
-protected:
-  virtual void internalGeneratePipeline();
+  MEDPresentationException(const char* msg) {
+    std::ostringstream oss;
+    oss << "Error: " << msg;
+    this->_msg = oss.str();
+  }
+
+  virtual ~MEDPresentationException() throw() {}
+
+  virtual const char* what() const throw() {
+    return this->_msg.c_str();
+  }
 
 private:
-  MEDCALC::PointSpriteParameters _params;
+
+  std::string _msg;
+
 };
 
-#endif
+#endif /* SRC_MEDCALC_CMP_MEDPRESENTATION_EXCEPTION_HXX_ */

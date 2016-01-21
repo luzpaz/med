@@ -25,9 +25,8 @@
 class MEDCALC_EXPORT MEDPresentationContour : public MEDPresentation
 {
 public:
-  MEDPresentationContour(MEDCALC::FieldHandler* fieldHdl, bool wireframe) :
-    MEDPresentation(fieldHdl, "MEDPresentationContour"),
-    _isWireframe(wireframe)
+  MEDPresentationContour(const MEDCALC::ContourParameters& params) :
+    MEDPresentation(params.fieldHandlerId, "MEDPresentationContour")
   {}
   virtual ~MEDPresentationContour() {}
 
@@ -35,7 +34,7 @@ protected:
   virtual void internalGeneratePipeline();
 
 private:
-  bool _isWireframe;
+  MEDCALC::ContourParameters _params;
 };
 
 #endif

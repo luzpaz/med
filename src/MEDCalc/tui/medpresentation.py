@@ -44,10 +44,9 @@ def MakeContour(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
 #
 
 def MakeVectorField(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
-  print "Not implemented yet"
-  #params = MEDCALC.VectorFieldParameters(proxy.id, viewMode)
-  #presentation_id = __manager.makeVectorField(params)
-  #notifyGui_addPresentation(proxy.id, presentation_id)
+  params = MEDCALC.VectorFieldParameters(proxy.id, viewMode)
+  presentation_id = __manager.makeVectorField(params)
+  notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
 def MakeSlices(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
@@ -58,15 +57,13 @@ def MakeSlices(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
 #
 
 def MakeDeflectionShape(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
-  print "Not implemented yet"
-  #params = MEDCALC.DeflectionShapeParameters(proxy.id, viewMode)
-  #presentation_id = __manager.makeDeflectionShape(params)
-  #notifyGui_addPresentation(proxy.id, presentation_id)
+  params = MEDCALC.DeflectionShapeParameters(proxy.id, viewMode)
+  presentation_id = __manager.makeDeflectionShape(params)
+  notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
 def MakePointSprite(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
-  print "Not implemented yet"
-  #params = MEDCALC.PointSpriteParameters(proxy.id, viewMode)
-  #presentation_id = __manager.makePointSprite(params)
-  #notifyGui_addPresentation(proxy.id, presentation_id)
+  params = MEDCALC.PointSpriteParameters(proxy.id, viewMode)
+  presentation_id = __manager.makePointSprite(params)
+  notifyGui_addPresentation(proxy.id, presentation_id)
 #

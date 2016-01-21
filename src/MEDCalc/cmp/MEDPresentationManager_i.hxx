@@ -26,14 +26,11 @@
 #include "SALOME_GenericObj_i.hh"
 
 #include "MEDDataManager_i.hxx"
+#include "MEDPresentation.hxx"
 #include "MEDCALC.hxx"
 
 #include <vector>
 #include <string>
-
-typedef ::CORBA::Long TypeID;
-
-class MEDPresentation;
 
 class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
                                                public SALOME::GenericObj_i
@@ -42,30 +39,37 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
 
   static MEDPresentationManager_i* getInstance();
 
-  MEDCALC_EXPORT TypeID makeScalarMap(const MEDCALC::ScalarMapParameters&);
-  MEDCALC_EXPORT TypeID makeContour(const MEDCALC::ContourParameters&);
-  MEDCALC_EXPORT TypeID makeVectorField(const MEDCALC::VectorFieldParameters&);
-  MEDCALC_EXPORT TypeID makeSlices(const MEDCALC::SlicesParameters&);
-  MEDCALC_EXPORT TypeID makeDeflectionShape(const MEDCALC::DeflectionShapeParameters&);
-  MEDCALC_EXPORT TypeID makePointSprite(const MEDCALC::PointSpriteParameters&);
+  MEDCALC_EXPORT MEDPresentation::TypeID makeScalarMap(const MEDCALC::ScalarMapParameters&);
+  MEDCALC_EXPORT MEDPresentation::TypeID makeContour(const MEDCALC::ContourParameters&);
+  MEDCALC_EXPORT MEDPresentation::TypeID makeVectorField(const MEDCALC::VectorFieldParameters&);
+  MEDCALC_EXPORT MEDPresentation::TypeID makeSlices(const MEDCALC::SlicesParameters&);
+  MEDCALC_EXPORT MEDPresentation::TypeID makeDeflectionShape(const MEDCALC::DeflectionShapeParameters&);
+  MEDCALC_EXPORT MEDPresentation::TypeID makePointSprite(const MEDCALC::PointSpriteParameters&);
 
-  MEDCALC_EXPORT void setPresentationProperty(TypeID presentationID, const char * propName, const char * propValue);
-  MEDCALC_EXPORT char* getPresentationProperty(TypeID presentationID, const char* propName);
+  MEDCALC_EXPORT void setPresentationProperty(MEDPresentation::TypeID presentationID, const char * propName, const char * propValue);
+  MEDCALC_EXPORT char* getPresentationProperty(MEDPresentation::TypeID presentationID, const char* propName);
 
  private:
   MEDPresentationManager_i();
   virtual ~MEDPresentationManager_i();
+
+  static MEDPresentation::TypeID GenerateID();
+
+  // Create a new presentation instance and return its unique ID
+  template<typename PresentationType, typename PresentationParameters>
+  MEDPresentation::TypeID _makePresentation(PresentationParameters params);
 
  private :
 
   // The MEDPresentationManager is a singleton, whose instance can be obtained
   // using the getInstance static method.
   static MEDPresentationManager_i * _instance;
-  static TypeID GenerateID();
 
   // Owns a list of MEDPresentation objects
-  std::map< TypeID, MEDPresentation * > _presentations;
+  std::map< MEDPresentation::TypeID, MEDPresentation * > _presentations;
 
 };
+
+#include "MEDPresentationManager_i.txx"
 
 #endif // _MED_PRESENTATION_MANAGER_I_HXX_

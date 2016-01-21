@@ -25,9 +25,8 @@
 class MEDCALC_EXPORT MEDPresentationDeflectionShape : public MEDPresentation
 {
 public:
-  MEDPresentationDeflectionShape(MEDCALC::FieldHandler* fieldHdl, bool wireframe) :
-    MEDPresentation(fieldHdl, "MEDPresentationDeflectionShape"),
-    _isWireframe(wireframe)
+  MEDPresentationDeflectionShape(const MEDCALC::DeflectionShapeParameters& params) :
+    MEDPresentation(params.fieldHandlerId, "MEDPresentationDeflectionShape")
   {}
   virtual ~MEDPresentationDeflectionShape() {}
 
@@ -35,7 +34,7 @@ protected:
   virtual void internalGeneratePipeline();
 
 private:
-  bool _isWireframe;
+  MEDCALC::DeflectionShapeParameters _params;
 };
 
 #endif

@@ -20,12 +20,28 @@
 
 #include "MEDFactoryClient.hxx"
 #include "MEDPresentation.hxx"
+#include "MEDPresentationException.hxx"
 #include "MEDCouplingRefCountObject.hxx"
 #include <iostream>
 
-MEDPresentation::MEDPresentation(MEDCALC::FieldHandler* fieldHdl, std::string name)
-    : _fieldHandler(fieldHdl), _pipeline(0), _display(0), _properties()
+MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::string name)
+    : _fieldHandlerId(fieldHandlerId), _pipeline(0), _display(0), _properties()
 {
+  MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
+  MEDCALC::FieldHandler* fieldHandler = dataManager->getFieldHandler(fieldHandlerId);
+  MEDCALC::MeshHandler* meshHandler = dataManager->getMesh(fieldHandler->meshid);
+  MEDCALC::DatasourceHandler* dataSHandler = dataManager->getDatasourceHandlerFromID(meshHandler->sourceid);
+
+  _fileName = dataSHandler->uri;
+  _fieldName = fieldHandler->fieldname;
+  _fieldType = getFieldTypeString((ParaMEDMEM::TypeOfField) fieldHandler->type);
+
+  if (_fileName.substr(0, 7) != std::string("file://")) {
+    const char* msg = "Data source is not a file! Can not proceed.";
+    throw MEDPresentationException(msg);
+  }
+  _fileName = _fileName.substr(7, _fileName.size());
+
   setProperty("name", name);
 }
 
@@ -75,15 +91,14 @@ PyObject * MEDPresentation::getPythonObjectFromMain(const char * python_var)
   return PyDict_GetItemString(global_dict, python_var);
 }
 
-std::string MEDPresentation::getFieldTypeString()
+std::string MEDPresentation::getFieldTypeString(ParaMEDMEM::TypeOfField fieldType)
 {
-  ParaMEDMEM::TypeOfField typ = (ParaMEDMEM::TypeOfField)_fieldHandler->type;
-  switch(typ)
+  switch(fieldType)
   {
     case ParaMEDMEM::ON_CELLS:
       return "CELLS";
     case ParaMEDMEM::ON_NODES:
-      return "NODES";
+      return "POINTS";
     default:
       std::cerr << "MEDPresentation::getFieldTypeString() -- Not implemented ! Gauss points?";
       return "";

@@ -25,9 +25,8 @@
 class MEDCALC_EXPORT MEDPresentationSlices : public MEDPresentation
 {
 public:
-  MEDPresentationSlices(MEDCALC::FieldHandler* fieldHdl, bool wireframe) :
-    MEDPresentation(fieldHdl, "MEDPresentationSlices"),
-    _isWireframe(wireframe)
+  MEDPresentationSlices(const MEDCALC::SlicesParameters& params) :
+    MEDPresentation(params.fieldHandlerId, "MEDPresentationSlices")
   {}
   virtual ~MEDPresentationSlices() {}
 
@@ -35,7 +34,7 @@ protected:
   virtual void internalGeneratePipeline();
 
 private:
-  bool _isWireframe;
+  MEDCALC::SlicesParameters _params;
 };
 
 #endif
