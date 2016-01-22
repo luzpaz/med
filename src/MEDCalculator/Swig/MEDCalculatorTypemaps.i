@@ -20,17 +20,17 @@
 
 #include <limits>
 
-static PyObject* convertMEDCalculatorDBField(ParaMEDMEM::MEDCalculatorDBField *f, int owner)
+static PyObject* convertMEDCalculatorDBField(MEDCoupling::MEDCalculatorDBField *f, int owner)
 {
   PyObject *ret=0;
-  if(dynamic_cast<ParaMEDMEM::MEDCalculatorDBFieldReal *>(f))
-    ret=SWIG_NewPointerObj((void*)f,SWIGTYPE_p_ParaMEDMEM__MEDCalculatorDBFieldReal,owner);
-  if(dynamic_cast<ParaMEDMEM::MEDCalculatorDBFieldCst *>(f))
-    ret=SWIG_NewPointerObj((void*)f,SWIGTYPE_p_ParaMEDMEM__MEDCalculatorDBFieldCst,owner);
+  if(dynamic_cast<MEDCoupling::MEDCalculatorDBFieldReal *>(f))
+    ret=SWIG_NewPointerObj((void*)f,SWIGTYPE_p_MEDCoupling__MEDCalculatorDBFieldReal,owner);
+  if(dynamic_cast<MEDCoupling::MEDCalculatorDBFieldCst *>(f))
+    ret=SWIG_NewPointerObj((void*)f,SWIGTYPE_p_MEDCoupling__MEDCalculatorDBFieldCst,owner);
   return ret;
 }
 
-void convertPyObjToRS(PyObject *o, ParaMEDMEM::MEDCalculatorDBRangeSelection& rs)
+void convertPyObjToRS(PyObject *o, MEDCoupling::MEDCalculatorDBRangeSelection& rs)
 {
   if(PyInt_Check(o))
     {
@@ -47,7 +47,7 @@ void convertPyObjToRS(PyObject *o, ParaMEDMEM::MEDCalculatorDBRangeSelection& rs
   PyErr_SetString(PyExc_TypeError,"Range selection must be an integer or a string !");
 }
 
-void convertPyObjToRS2(PyObject *o, ParaMEDMEM::MEDCalculatorDBRangeSelection& rs, const char *msg)
+void convertPyObjToRS2(PyObject *o, MEDCoupling::MEDCalculatorDBRangeSelection& rs, const char *msg)
 {
   if(PyInt_Check(o))
     {

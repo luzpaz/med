@@ -22,7 +22,7 @@
 #include "MEDCouplingPointSet.hxx"
 #include "DataArrayDoubleServant.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingPointSetServant::MEDCouplingPointSetServant(const MEDCouplingPointSet *cppPointerOfMesh):MEDCouplingMeshServant(cppPointerOfMesh)
 {

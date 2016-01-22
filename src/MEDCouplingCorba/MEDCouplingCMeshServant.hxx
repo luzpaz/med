@@ -27,7 +27,7 @@
 #include "MEDCouplingStructuredMeshServant.hxx"
 #include "MEDCouplingCorba.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingCMesh;
 

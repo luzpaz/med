@@ -21,7 +21,7 @@
 #include "DataArrayIntServant.hxx"
 #include "MEDCouplingMemArray.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 DataArrayIntServant::DataArrayIntServant(const DataArrayInt *cppPointer):DataArrayServant(cppPointer)
 {

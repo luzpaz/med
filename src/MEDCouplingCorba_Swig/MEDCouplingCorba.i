@@ -36,12 +36,12 @@
 #include "DataArrayIntServant.hxx"
 #include "MEDCouplingCorbaTypemaps.i"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 %}
 
 %include "MEDCouplingCommon.i"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingFieldDoubleServant
   {
@@ -126,8 +126,8 @@ namespace ParaMEDMEM
              return buildServantAndActivate<MEDCoupling1SGTUMeshServant>(dynamic_cast<const MEDCoupling1SGTUMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh))
              return buildServantAndActivate<MEDCoupling1DGTUMeshServant>(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh));
-           if(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh))
-             return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingMappedExtrudedMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingMappedExtrudedMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh))
              return buildServantAndActivate<MEDCouplingCMeshServant>(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingIMesh *>(cppPointerOfMesh))
@@ -147,8 +147,8 @@ namespace ParaMEDMEM
              return buildServantAndActivate2<MEDCoupling1SGTUMeshServant>(dynamic_cast<const MEDCoupling1SGTUMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh))
              return buildServantAndActivate2<MEDCoupling1DGTUMeshServant>(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh));
-           if(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh))
-             return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingMappedExtrudedMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingMappedExtrudedMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh))
              return buildServantAndActivate2<MEDCouplingCMeshServant>(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingIMesh *>(cppPointerOfMesh))
@@ -216,12 +216,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCouplingExtrudedMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
+         static PyObject *_this(const MEDCouplingMappedExtrudedMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const MEDCouplingExtrudedMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
+         static PyObject *_this2(const MEDCouplingMappedExtrudedMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
          }
@@ -315,117 +315,117 @@ namespace ParaMEDMEM
 }
 
 %pythoncode %{
-def ParaMEDMEMDataArrayDoublenew(cls,*args):
+def MEDCouplingDataArrayDoublenew(cls,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDouble____new___(cls,args)
-def ParaMEDMEMDataArrayDoubleIadd(self,*args):
+def MEDCouplingDataArrayDoubleIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDouble____iadd___(self, self, *args)
-def ParaMEDMEMDataArrayDoubleIsub(self,*args):
+def MEDCouplingDataArrayDoubleIsub(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDouble____isub___(self, self, *args)
-def ParaMEDMEMDataArrayDoubleImul(self,*args):
+def MEDCouplingDataArrayDoubleImul(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDouble____imul___(self, self, *args)
-def ParaMEDMEMDataArrayDoubleIdiv(self,*args):
+def MEDCouplingDataArrayDoubleIdiv(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDouble____idiv___(self, self, *args)
-def ParaMEDMEMDataArrayDoubleIpow(self,*args):
+def MEDCouplingDataArrayDoubleIpow(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDouble____ipow___(self, self, *args)
-def ParaMEDMEMMEDCouplingFieldDoublenew(cls,*args):
+def MEDCouplingFieldDoublenew(cls,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingFieldDouble____new___(cls,args)
-def ParaMEDMEMMEDCouplingFieldDoubleIadd(self,*args):
+def MEDCouplingFieldDoubleIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingFieldDouble____iadd___(self, self, *args)
-def ParaMEDMEMMEDCouplingFieldDoubleIsub(self,*args):
+def MEDCouplingFieldDoubleIsub(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingFieldDouble____isub___(self, self, *args)
-def ParaMEDMEMMEDCouplingFieldDoubleImul(self,*args):
+def MEDCouplingFieldDoubleImul(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingFieldDouble____imul___(self, self, *args)
-def ParaMEDMEMMEDCouplingFieldDoubleIdiv(self,*args):
+def MEDCouplingFieldDoubleIdiv(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingFieldDouble____idiv___(self, self, *args)
-def ParaMEDMEMMEDCouplingFieldDoubleIpow(self,*args):
+def MEDCouplingFieldDoubleIpow(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingFieldDouble____ipow___(self, self, *args)
-def ParaMEDMEMDataArrayIntnew(cls,*args):
+def MEDCouplingDataArrayIntnew(cls,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____new___(cls,args)
-def ParaMEDMEMDataArrayIntIadd(self,*args):
+def MEDCouplingDataArrayIntIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____iadd___(self, self, *args)
-def ParaMEDMEMDataArrayIntIsub(self,*args):
+def MEDCouplingDataArrayIntIsub(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____isub___(self, self, *args)
-def ParaMEDMEMDataArrayIntImul(self,*args):
+def MEDCouplingDataArrayIntImul(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____imul___(self, self, *args)
-def ParaMEDMEMDataArrayIntIdiv(self,*args):
+def MEDCouplingDataArrayIntIdiv(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____idiv___(self, self, *args)
-def ParaMEDMEMDataArrayIntImod(self,*args):
+def MEDCouplingDataArrayIntImod(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____imod___(self, self, *args)
-def ParaMEDMEMDataArrayIntIpow(self,*args):
+def MEDCouplingDataArrayIntIpow(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____ipow___(self, self, *args)
-def ParaMEDMEMDataArrayDoubleTupleIadd(self,*args):
+def MEDCouplingDataArrayDoubleTupleIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDoubleTuple____iadd___(self, self, *args)
-def ParaMEDMEMDataArrayDoubleTupleIsub(self,*args):
+def MEDCouplingDataArrayDoubleTupleIsub(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDoubleTuple____isub___(self, self, *args)
-def ParaMEDMEMDataArrayDoubleTupleImul(self,*args):
+def MEDCouplingDataArrayDoubleTupleImul(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDoubleTuple____imul___(self, self, *args)
-def ParaMEDMEMDataArrayDoubleTupleIdiv(self,*args):
+def MEDCouplingDataArrayDoubleTupleIdiv(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDoubleTuple____idiv___(self, self, *args)
-def ParaMEDMEMDataArrayIntTupleIadd(self,*args):
+def MEDCouplingDataArrayIntTupleIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayIntTuple____iadd___(self, self, *args)
-def ParaMEDMEMDataArrayIntTupleIsub(self,*args):
+def MEDCouplingDataArrayIntTupleIsub(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayIntTuple____isub___(self, self, *args)
-def ParaMEDMEMDataArrayIntTupleImul(self,*args):
+def MEDCouplingDataArrayIntTupleImul(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayIntTuple____imul___(self, self, *args)
-def ParaMEDMEMDataArrayIntTupleIdiv(self,*args):
+def MEDCouplingDataArrayIntTupleIdiv(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayIntTuple____idiv___(self, self, *args)
-def ParaMEDMEMDataArrayIntTupleImod(self,*args):
+def MEDCouplingDataArrayIntTupleImod(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayIntTuple____imod___(self, self, *args)
-def ParaMEDMEMDenseMatrixIadd(self,*args):
+def MEDCouplingDenseMatrixIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DenseMatrix____iadd___(self, self, *args)
-def ParaMEDMEMDenseMatrixIsub(self,*args):
+def MEDCouplingDenseMatrixIsub(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DenseMatrix____isub___(self, self, *args)
-def ParaMEDMEMMEDCouplingUMeshnew(cls,*args):
+def MEDCouplingUMeshnew(cls,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingUMesh____new___(cls,args)
-def ParaMEDMEMMEDCoupling1DGTUMeshnew(cls,*args):
+def MEDCoupling1DGTUMeshnew(cls,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCoupling1DGTUMesh____new___(cls,args)
-def ParaMEDMEMMEDCoupling1SGTUMeshnew(cls,*args):
+def MEDCoupling1SGTUMeshnew(cls,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCoupling1SGTUMesh____new___(cls,args)
-def ParaMEDMEMMEDCouplingCurveLinearMeshnew(cls,*args):
+def MEDCouplingCurveLinearMeshnew(cls,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingCurveLinearMesh____new___(cls,args)
-def ParaMEDMEMMEDCouplingCMeshnew(cls,*args):
+def MEDCouplingCMeshnew(cls,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingCMesh____new___(cls,args)
-def ParaMEDMEMMEDCouplingIMeshnew(cls,*args):
+def MEDCouplingIMeshnew(cls,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingIMesh____new___(cls,args)
-def ParaMEDMEMMEDCouplingExtrudedMeshnew(cls,*args):
+def MEDCouplingExtrudedMeshnew(cls,*args):
     import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCouplingExtrudedMesh____new___(cls,args)
+    return _MEDCouplingCorba.MEDCouplingMappedExtrudedMesh____new___(cls,args)
 %}
 
 %include "MEDCouplingFinalize.i"

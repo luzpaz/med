@@ -21,7 +21,7 @@
 #include "MEDCouplingFieldDoubleServant.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingFieldDoubleServant::MEDCouplingFieldDoubleServant(const MEDCouplingFieldDouble *cppPointerOfMesh):MEDCouplingFieldServant(cppPointerOfMesh)
 {

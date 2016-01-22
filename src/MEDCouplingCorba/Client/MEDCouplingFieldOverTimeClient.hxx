@@ -29,7 +29,7 @@
 #include "MEDCouplingClient.hxx"
 #include "MEDCouplingFieldOverTime.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingDefinitionTime;
 

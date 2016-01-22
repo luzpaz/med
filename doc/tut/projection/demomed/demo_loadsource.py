@@ -19,7 +19,7 @@
 
 # _T1A
 from MEDLoader import MEDLoader, ON_CELLS
-from MEDCouplingRemapper import MEDCouplingRemapper, ConservativeVolumic
+from MEDCouplingRemapper import MEDCouplingRemapper, IntensiveMaximum
 
 # Read the source mesh and the source field
 it,dt = (-1,-1)
@@ -27,7 +27,7 @@ msource = MEDLoader.ReadUMeshFromFile("fieldsource.med","meshsource",0)
 fsource = MEDLoader.ReadField(ON_CELLS,"fieldsource.med","meshsource",0,
                               "Temperature",it,dt)
 fsource.setMesh(msource)
-fsource.setNature(ConservativeVolumic)
+fsource.setNature(IntensiveMaximum)
 
 # Read the target mesh
 mtarget = MEDLoader.ReadUMeshFromFile("meshtarget.med","meshtarget",0)

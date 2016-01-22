@@ -25,7 +25,7 @@
 
 #include <vector>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingFieldTemplate *MEDCouplingFieldTemplateClient::New(SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr fieldPtr)
 {

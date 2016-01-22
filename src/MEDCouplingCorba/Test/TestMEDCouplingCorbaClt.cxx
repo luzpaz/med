@@ -36,7 +36,7 @@
 #include <iostream>
 #include <fstream>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 CPPUNIT_TEST_SUITE_REGISTRATION( SALOME_TEST::MEDCouplingCorbaServBasicsTestClt );
 

@@ -22,7 +22,7 @@
 
 #include "MEDCouplingIMesh.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingIMeshServant::MEDCouplingIMeshServant(const MEDCouplingIMesh *cppPointerOfMesh):MEDCouplingStructuredMeshServant(cppPointerOfMesh)
 {

@@ -469,7 +469,7 @@ requires the usage of interpolation algorithms provided by the
 Some comments on this code:
 
 * The physical property to be preserved by this interpolation is
-  specified using the keyword :tt:`ConservativeVolumic`
+  specified using the keyword :tt:`IntensiveMaximum`
 * The parameter :tt:`P0P0` given at the preparation step of the
   remapper specifies that the interpolation is done from CELLS (P0) to
   CELLS (P0).

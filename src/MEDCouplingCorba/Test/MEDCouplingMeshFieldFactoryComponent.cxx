@@ -19,7 +19,7 @@
 // Author : Anthony Geay (CEA/DEN)
 
 #include "MEDCouplingMeshFieldFactoryComponent.hxx"
-#include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCouplingMappedExtrudedMesh.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldTemplate.hxx"
 #include "MEDCouplingMultiFields.hxx"
@@ -36,11 +36,11 @@
 
 namespace SALOME_TEST
 {
-  ParaMEDMEM::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build1DMesh()
+  MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build1DMesh()
   {
     double coords[4]={ 0.0, 0.3, 0.75, 1.0 };
     int conn[2*3]={ 0,1, 1,2, 2,3 };
-    ParaMEDMEM::MEDCouplingUMesh *mesh=ParaMEDMEM::MEDCouplingUMesh::New("1DMeshForCorba",1);
+    MEDCoupling::MEDCouplingUMesh *mesh=MEDCoupling::MEDCouplingUMesh::New("1DMeshForCorba",1);
     mesh->setDescription("build1DMesh");
     mesh->allocateCells(3);
     mesh->setTime(5.6,7,8);
@@ -49,7 +49,7 @@ namespace SALOME_TEST
     mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,conn+2);
     mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,conn+4);
     mesh->finishInsertingCells();
-    ParaMEDMEM::DataArrayDouble *myCoords=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *myCoords=MEDCoupling::DataArrayDouble::New();
     myCoords->alloc(4,1);
     std::copy(coords,coords+4,myCoords->getPointer());
     mesh->setCoords(myCoords);
@@ -65,11 +65,11 @@ namespace SALOME_TEST
     return mesh;
   }
 
-  ParaMEDMEM::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build2DMesh()
+  MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build2DMesh()
   {
     double targetCoords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
     int targetConn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
-    ParaMEDMEM::MEDCouplingUMesh *targetMesh=ParaMEDMEM::MEDCouplingUMesh::New();
+    MEDCoupling::MEDCouplingUMesh *targetMesh=MEDCoupling::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(2);
     targetMesh->setName("MyMesh2D");
     targetMesh->setDescription("build2DMesh");
@@ -80,7 +80,7 @@ namespace SALOME_TEST
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,targetConn+10);
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,targetConn+14);
     targetMesh->finishInsertingCells();
-    ParaMEDMEM::DataArrayDouble *myCoords=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *myCoords=MEDCoupling::DataArrayDouble::New();
     myCoords->alloc(9,2);
     std::copy(targetCoords,targetCoords+18,myCoords->getPointer());
     targetMesh->setCoords(myCoords);
@@ -88,14 +88,14 @@ namespace SALOME_TEST
     return targetMesh;
   }
 
-  ParaMEDMEM::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build3DMesh()
+  MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build3DMesh()
   {
     double targetCoords[81]={ 0., 0., 0., 50., 0., 0. , 200., 0., 0.  , 0., 50., 0., 50., 50., 0. , 200., 50., 0.,   0., 200., 0., 50., 200., 0. , 200., 200., 0. ,
                               0., 0., 50., 50., 0., 50. , 200., 0., 50.  , 0., 50., 50., 50., 50., 50. , 200., 50., 50.,   0., 200., 50., 50., 200., 50. , 200., 200., 50. ,
                               0., 0., 200., 50., 0., 200. , 200., 0., 200.  , 0., 50., 200., 50., 50., 200. , 200., 50., 200.,   0., 200., 200., 50., 200., 200. , 200., 200., 200. };
     int targetConn[64]={0,1,4,3,9,10,13,12, 1,2,5,4,10,11,14,13, 3,4,7,6,12,13,16,15, 4,5,8,7,13,14,17,16,
                         9,10,13,12,18,19,22,21, 10,11,14,13,19,20,23,22, 12,13,16,15,21,22,25,24, 13,14,17,16,22,23,26,25};
-    ParaMEDMEM::MEDCouplingUMesh *targetMesh=ParaMEDMEM::MEDCouplingUMesh::New();
+    MEDCoupling::MEDCouplingUMesh *targetMesh=MEDCoupling::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(3);
     targetMesh->setName("MyMesh3D");
     targetMesh->setDescription("build3DMesh");
@@ -103,7 +103,7 @@ namespace SALOME_TEST
     for(int i=0;i<8;i++)
       targetMesh->insertNextCell(INTERP_KERNEL::NORM_HEXA8,8,targetConn+8*i);
     targetMesh->finishInsertingCells();
-    ParaMEDMEM::DataArrayDouble *myCoords=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *myCoords=MEDCoupling::DataArrayDouble::New();
     myCoords->alloc(27,3);
     std::copy(targetCoords,targetCoords+81,myCoords->getPointer());
     targetMesh->setCoords(myCoords);
@@ -112,11 +112,11 @@ namespace SALOME_TEST
     return targetMesh;
   }
 
-  ParaMEDMEM::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build3DSurfMesh()
+  MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build3DSurfMesh()
   {
     double targetCoords[27]={-0.3,-0.3,0.5, 0.2,-0.3,1., 0.7,-0.3,1.5, -0.3,0.2,0.5, 0.2,0.2,1., 0.7,0.2,1.5, -0.3,0.7,0.5, 0.2,0.7,1., 0.7,0.7,1.5};
     int targetConn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
-    ParaMEDMEM::MEDCouplingUMesh *targetMesh=ParaMEDMEM::MEDCouplingUMesh::New();
+    MEDCoupling::MEDCouplingUMesh *targetMesh=MEDCoupling::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(2);
     targetMesh->setName("MyMesh3DSurf");
     targetMesh->setDescription("build3DSurfMesh");
@@ -127,7 +127,7 @@ namespace SALOME_TEST
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,targetConn+10);
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,targetConn+14);
     targetMesh->finishInsertingCells();
-    ParaMEDMEM::DataArrayDouble *myCoords=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *myCoords=MEDCoupling::DataArrayDouble::New();
     myCoords->alloc(9,3);
     std::copy(targetCoords,targetCoords+27,myCoords->getPointer());
     targetMesh->setCoords(myCoords);
@@ -138,11 +138,11 @@ namespace SALOME_TEST
     return targetMesh;
   }
 
-  ParaMEDMEM::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build0DMesh()
+  MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build0DMesh()
   {
     double targetCoords[27]={-0.3,-0.3,0.5, 0.2,-0.3,1., 0.7,-0.3,1.5, -0.3,0.2,0.5, 0.2,0.2,1., 0.7,0.2,1.5, -0.3,0.7,0.5, 0.2,0.7,1., 0.7,0.7,1.5};
     const int targetConn[]={0,1,2,3,4,5,7,6};
-    ParaMEDMEM::MEDCouplingUMesh *targetMesh=ParaMEDMEM::MEDCouplingUMesh::New();
+    MEDCoupling::MEDCouplingUMesh *targetMesh=MEDCoupling::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(0);
     targetMesh->allocateCells(8);
     targetMesh->setName("Wonderfull 0D mesh");
@@ -156,7 +156,7 @@ namespace SALOME_TEST
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_POINT1,1,targetConn+6);
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_POINT1,1,targetConn+7);
     targetMesh->finishInsertingCells();
-    ParaMEDMEM::DataArrayDouble *myCoords=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *myCoords=MEDCoupling::DataArrayDouble::New();
     myCoords->alloc(9,3);
     std::copy(targetCoords,targetCoords+27,myCoords->getPointer());
     targetMesh->setCoords(myCoords);
@@ -165,45 +165,45 @@ namespace SALOME_TEST
     myCoords->setInfoOnComponent(2,"ZZZ [m]");
     myCoords->decrRef();
     //
-    targetMesh->checkCoherency();
+    targetMesh->checkConsistencyLight();
     return targetMesh;
   }
 
-  ParaMEDMEM::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::buildM1DMesh()
+  MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::buildM1DMesh()
   {
-    ParaMEDMEM::MEDCouplingUMesh *meshM1D=ParaMEDMEM::MEDCouplingUMesh::New("wonderfull -1 D mesh",-1);
+    MEDCoupling::MEDCouplingUMesh *meshM1D=MEDCoupling::MEDCouplingUMesh::New("wonderfull -1 D mesh",-1);
     meshM1D->setDescription("buildM1DMesh");
-    meshM1D->checkCoherency();
+    meshM1D->checkConsistencyLight();
     return meshM1D;
   }
 
-  ParaMEDMEM::MEDCouplingExtrudedMesh *MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(ParaMEDMEM::MEDCouplingUMesh *&m2D)
+  MEDCoupling::MEDCouplingMappedExtrudedMesh *MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(MEDCoupling::MEDCouplingUMesh *&m2D)
   {
     m2D=build2DMesh();
     m2D->changeSpaceDimension(3);
-    ParaMEDMEM::MEDCouplingUMesh *m1D=build1DMesh();
-    ParaMEDMEM::MEDCouplingUMesh *retu=m2D->buildExtrudedMesh(m1D,0);
+    MEDCoupling::MEDCouplingUMesh *m1D=build1DMesh();
+    MEDCoupling::MEDCouplingUMesh *retu=m2D->buildExtrudedMesh(m1D,0);
     m1D->decrRef();
-    ParaMEDMEM::MEDCouplingExtrudedMesh *ret=ParaMEDMEM::MEDCouplingExtrudedMesh::New(retu,m2D,2);
+    MEDCoupling::MEDCouplingMappedExtrudedMesh *ret=MEDCoupling::MEDCouplingMappedExtrudedMesh::New(retu,m2D,2);
     ret->setName("ExtrudedTestForCorbaTest");
     ret->setDescription("buildExtrudedMesh");
     retu->decrRef();
     return ret;
   }
 
-  ParaMEDMEM::MEDCouplingCMesh *MEDCouplingCorbaServBasicsTest::buildCMesh()
+  MEDCoupling::MEDCouplingCMesh *MEDCouplingCorbaServBasicsTest::buildCMesh()
   {
-    ParaMEDMEM::MEDCouplingCMesh *targetMesh=ParaMEDMEM::MEDCouplingCMesh::New();
+    MEDCoupling::MEDCouplingCMesh *targetMesh=MEDCoupling::MEDCouplingCMesh::New();
     targetMesh->setTime(2.3,4,5);
     targetMesh->setTimeUnit("us");
     targetMesh->setName("Example of CMesh");
     targetMesh->setDescription("buildCMesh");
-    ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *a1=MEDCoupling::DataArrayDouble::New();
     a1->alloc(5,1);
     a1->setInfoOnComponent(0,"SmthX");
     const double a1Data[5]={3.,4.,5.,6.,7.};
     std::copy(a1Data,a1Data+5,a1->getPointer());
-    ParaMEDMEM::DataArrayDouble *a2=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *a2=MEDCoupling::DataArrayDouble::New();
     a2->alloc(6,1);
     a2->setInfoOnComponent(0,"SmthZ");
     const double a2Data[6]={2.78,3.,4.,5.,6.,7.};
@@ -215,15 +215,15 @@ namespace SALOME_TEST
     a1->decrRef();
     a2->decrRef();
     //
-    targetMesh->checkCoherency();
+    targetMesh->checkConsistencyLight();
     //
     return targetMesh;
   }
     
 
-  ParaMEDMEM::MEDCouplingIMesh *MEDCouplingCorbaServBasicsTest::buildIMesh()
+  MEDCoupling::MEDCouplingIMesh *MEDCouplingCorbaServBasicsTest::buildIMesh()
   {
-    ParaMEDMEM::MEDCouplingIMesh *targetMesh(ParaMEDMEM::MEDCouplingIMesh::New());
+    MEDCoupling::MEDCouplingIMesh *targetMesh(MEDCoupling::MEDCouplingIMesh::New());
     targetMesh->setTime(2.3,4,5);
     targetMesh->setTimeUnit("us");
     targetMesh->setName("Example of IMesh");
@@ -239,14 +239,14 @@ namespace SALOME_TEST
     return targetMesh;
   }
 
-  ParaMEDMEM::MEDCouplingCurveLinearMesh *MEDCouplingCorbaServBasicsTest::buildCLMesh()
+  MEDCoupling::MEDCouplingCurveLinearMesh *MEDCouplingCorbaServBasicsTest::buildCLMesh()
   {
-    ParaMEDMEM::MEDCouplingCurveLinearMesh *targetMesh=ParaMEDMEM::MEDCouplingCurveLinearMesh::New();
+    MEDCoupling::MEDCouplingCurveLinearMesh *targetMesh=MEDCoupling::MEDCouplingCurveLinearMesh::New();
     targetMesh->setTime(2.3,4,5);
     targetMesh->setTimeUnit("us");
     targetMesh->setName("Example of Cuve linear mesh");
     targetMesh->setDescription("buildCLMesh");
-    ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *a1=MEDCoupling::DataArrayDouble::New();
     a1->alloc(3*20,1);
     a1->iota(7.);
     a1->rearrange(3);
@@ -255,117 +255,117 @@ namespace SALOME_TEST
     int structure[2]={4,5};
     targetMesh->setNodeGridStructure(structure,structure+2);
     //
-    targetMesh->checkCoherency();
+    targetMesh->checkConsistencyLight();
     //
     return targetMesh;
   }
 
-  ParaMEDMEM::MEDCoupling1SGTUMesh *MEDCouplingCorbaServBasicsTest::build1SGTUMesh()
+  MEDCoupling::MEDCoupling1SGTUMesh *MEDCouplingCorbaServBasicsTest::build1SGTUMesh()
   {
-    ParaMEDMEM::MEDCoupling1SGTUMesh *targetMesh=ParaMEDMEM::MEDCoupling1SGTUMesh::New("Mesh1SGT",INTERP_KERNEL::NORM_QUAD4);
+    MEDCoupling::MEDCoupling1SGTUMesh *targetMesh=MEDCoupling::MEDCoupling1SGTUMesh::New("Mesh1SGT",INTERP_KERNEL::NORM_QUAD4);
     targetMesh->setTime(2.3,44,-55);
     targetMesh->setTimeUnit("us");
     targetMesh->setDescription("My Description of 1SGTU");
-    ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New(); a1->alloc(10,3); a1->setInfoOnComponent(0,"X1 [m]");  a1->setInfoOnComponent(1,"YY2 [km]"); a1->setInfoOnComponent(2,"ZZZ3 [km]");
+    MEDCoupling::DataArrayDouble *a1=MEDCoupling::DataArrayDouble::New(); a1->alloc(10,3); a1->setInfoOnComponent(0,"X1 [m]");  a1->setInfoOnComponent(1,"YY2 [km]"); a1->setInfoOnComponent(2,"ZZZ3 [km]");
     const double coords[30]={1.,1.,0.,2.,1.,0.,3.,1.,0.,1.,0.,0.,2.,0.,0.,0.,0.,0.,0.,1.,0.,3.,0.,0.,4.,0.,0.,4.,1.,0.};
     const int conn[16]={6,0,3,5,3,0,1,4,1,2,7,4,8,7,2,9};
     std::copy(coords,coords+30,a1->getPointer()); targetMesh->setCoords(a1); a1->decrRef();
-    ParaMEDMEM::DataArrayInt *a2(ParaMEDMEM::DataArrayInt::New()); a2->alloc(4*4,1);
+    MEDCoupling::DataArrayInt *a2(MEDCoupling::DataArrayInt::New()); a2->alloc(4*4,1);
     std::copy(conn,conn+16,a2->getPointer());
     targetMesh->setNodalConnectivity(a2); a2->decrRef();
     //
-    targetMesh->checkCoherency();
+    targetMesh->checkConsistencyLight();
     //
     return targetMesh;
   }
   
-  ParaMEDMEM::MEDCoupling1DGTUMesh *MEDCouplingCorbaServBasicsTest::build1DGTUMesh()
+  MEDCoupling::MEDCoupling1DGTUMesh *MEDCouplingCorbaServBasicsTest::build1DGTUMesh()
   {
-    ParaMEDMEM::MEDCoupling1DGTUMesh *targetMesh=ParaMEDMEM::MEDCoupling1DGTUMesh::New("Mesh1DGT",INTERP_KERNEL::NORM_POLYGON);
+    MEDCoupling::MEDCoupling1DGTUMesh *targetMesh=MEDCoupling::MEDCoupling1DGTUMesh::New("Mesh1DGT",INTERP_KERNEL::NORM_POLYGON);
     targetMesh->setTime(2.3,55,-66);
     targetMesh->setTimeUnit("us");
     targetMesh->setDescription("My Description of 1DGTU");
-    ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New(); a1->alloc(10,3); a1->setInfoOnComponent(0,"X1 [m]");  a1->setInfoOnComponent(1,"YY2 [km]"); a1->setInfoOnComponent(2,"ZZZ3 [km]");
+    MEDCoupling::DataArrayDouble *a1=MEDCoupling::DataArrayDouble::New(); a1->alloc(10,3); a1->setInfoOnComponent(0,"X1 [m]");  a1->setInfoOnComponent(1,"YY2 [km]"); a1->setInfoOnComponent(2,"ZZZ3 [km]");
     const double coords[30]={1.,1.,0.,2.,1.,0.,3.,1.,0.,1.,0.,0.,2.,0.,0.,0.,0.,0.,0.,1.,0.,3.,0.,0.,4.,0.,0.,4.,1.,0.};
     const int conn[15]={6,0,3,5,3,0,1,4,1,2,7,4,8,7,2};
     const int conni[5]={0,4,8,12,15};
     std::copy(coords,coords+30,a1->getPointer()); targetMesh->setCoords(a1); a1->decrRef();
-    ParaMEDMEM::DataArrayInt *a2(ParaMEDMEM::DataArrayInt::New()); a2->alloc(15,1);
+    MEDCoupling::DataArrayInt *a2(MEDCoupling::DataArrayInt::New()); a2->alloc(15,1);
     std::copy(conn,conn+15,a2->getPointer());
-    ParaMEDMEM::DataArrayInt *a3(ParaMEDMEM::DataArrayInt::New()); a3->alloc(5,1);
+    MEDCoupling::DataArrayInt *a3(MEDCoupling::DataArrayInt::New()); a3->alloc(5,1);
     std::copy(conni,conni+5,a3->getPointer());
     targetMesh->setNodalConnectivity(a2,a3); a2->decrRef(); a3->decrRef();
     //
-    targetMesh->checkCoherency();
+    targetMesh->checkConsistencyLight();
     //
     return targetMesh;
   }
 
-  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DNT()
+  MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DNT()
   {
-    ParaMEDMEM::MEDCouplingUMesh *mesh=build2DMesh();
-    ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::NO_TIME);
+    MEDCoupling::MEDCouplingUMesh *mesh=build2DMesh();
+    MEDCoupling::MEDCouplingFieldDouble *fieldOnCells=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::NO_TIME);
     fieldOnCells->setTimeUnit("ms");
     fieldOnCells->setName("toto");
     fieldOnCells->setMesh(mesh);
-    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array=MEDCoupling::DataArrayDouble::New();
     array->alloc(mesh->getNumberOfCells(),6);
     fieldOnCells->setArray(array);
     double *tmp=array->getPointer();
     array->decrRef();
     std::fill(tmp,tmp+mesh->getNumberOfCells()*6,7.);
     mesh->decrRef();
-    fieldOnCells->checkCoherency();
+    fieldOnCells->checkConsistencyLight();
     return fieldOnCells;
   }
 
-  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldNodeScalarOn2DNT()
+  MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldNodeScalarOn2DNT()
   {
-    ParaMEDMEM::MEDCouplingUMesh *mesh=build2DMesh();
-    ParaMEDMEM::MEDCouplingFieldDouble *fieldOnNodes=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_NODES,ParaMEDMEM::NO_TIME);
+    MEDCoupling::MEDCouplingUMesh *mesh=build2DMesh();
+    MEDCoupling::MEDCouplingFieldDouble *fieldOnNodes=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_NODES,MEDCoupling::NO_TIME);
     fieldOnNodes->setName("toto2");
     fieldOnNodes->setTimeUnit("s");
     fieldOnNodes->setDescription("my wonderful field toto2");
     fieldOnNodes->setMesh(mesh);
-    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array=MEDCoupling::DataArrayDouble::New();
     array->alloc(mesh->getNumberOfNodes(),5);
     fieldOnNodes->setArray(array);
     double *tmp=array->getPointer();
     array->decrRef();
     std::fill(tmp,tmp+mesh->getNumberOfNodes()*5,7.1234);
     mesh->decrRef();
-    fieldOnNodes->checkCoherency();
+    fieldOnNodes->checkConsistencyLight();
     return fieldOnNodes;
   }
 
-  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DNT()
+  MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DNT()
   {
-    ParaMEDMEM::MEDCouplingUMesh *mesh=build3DMesh();
-    ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::NO_TIME);
-    fieldOnCells->setNature(ParaMEDMEM::ConservativeVolumic);
+    MEDCoupling::MEDCouplingUMesh *mesh=build3DMesh();
+    MEDCoupling::MEDCouplingFieldDouble *fieldOnCells=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::NO_TIME);
+    fieldOnCells->setNature(MEDCoupling::IntensiveMaximum);
     fieldOnCells->setName("toto");
     fieldOnCells->setDescription("my wonderful 3D field toto2");
     fieldOnCells->setMesh(mesh);
-    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array=MEDCoupling::DataArrayDouble::New();
     array->alloc(mesh->getNumberOfCells(),6);
     fieldOnCells->setArray(array);
     double *tmp=array->getPointer();
     array->decrRef();
     std::fill(tmp,tmp+mesh->getNumberOfCells()*6,7.);
     mesh->decrRef();
-    fieldOnCells->checkCoherency();
+    fieldOnCells->checkConsistencyLight();
     return fieldOnCells;
   }
 
-  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfWT()
+  MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfWT()
   {
-    ParaMEDMEM::MEDCouplingUMesh *mesh=build3DSurfMesh();
-    ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    MEDCoupling::MEDCouplingUMesh *mesh=build3DSurfMesh();
+    MEDCoupling::MEDCouplingFieldDouble *fieldOnCells=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::ONE_TIME);
     fieldOnCells->setName("toto25");
     fieldOnCells->setDescription("my wonderful 3D surf field toto25");
     fieldOnCells->setTimeUnit("us");
     fieldOnCells->setMesh(mesh);
-    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array=MEDCoupling::DataArrayDouble::New();
     array->alloc(mesh->getNumberOfCells(),3);
     array->setInfoOnComponent(0,"aaa"); array->setInfoOnComponent(1,"bbbb"); array->setInfoOnComponent(2,"ccccc");
     fieldOnCells->setArray(array);
@@ -374,19 +374,19 @@ namespace SALOME_TEST
     std::fill(tmp,tmp+mesh->getNumberOfCells()*3,7.);
     mesh->decrRef();
     fieldOnCells->setTime(6.7,1,4);
-    fieldOnCells->checkCoherency();
+    fieldOnCells->checkConsistencyLight();
     return fieldOnCells;
   }
 
-  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfCOTI()
+  MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfCOTI()
   {
-    ParaMEDMEM::MEDCouplingUMesh *mesh=build3DSurfMesh();
-    ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::CONST_ON_TIME_INTERVAL);
+    MEDCoupling::MEDCouplingUMesh *mesh=build3DSurfMesh();
+    MEDCoupling::MEDCouplingFieldDouble *fieldOnCells=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::CONST_ON_TIME_INTERVAL);
     fieldOnCells->setName("toto26");
     fieldOnCells->setDescription("my wonderful 3D surf field toto26");
     fieldOnCells->setTimeUnit("us");
     fieldOnCells->setMesh(mesh);
-    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array=MEDCoupling::DataArrayDouble::New();
     array->alloc(mesh->getNumberOfCells(),3);
     fieldOnCells->setArray(array);
     double *tmp=array->getPointer();
@@ -395,26 +395,26 @@ namespace SALOME_TEST
     mesh->decrRef();
     fieldOnCells->setStartTime(6.7,1,4);
     fieldOnCells->setEndTime(7.2,2,8);
-    fieldOnCells->checkCoherency();
+    fieldOnCells->checkConsistencyLight();
     return fieldOnCells;
   }
 
-  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DLT()
+  MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DLT()
   {
-    ParaMEDMEM::MEDCouplingUMesh *mesh=build2DMesh();
-    ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::LINEAR_TIME);
+    MEDCoupling::MEDCouplingUMesh *mesh=build2DMesh();
+    MEDCoupling::MEDCouplingFieldDouble *fieldOnCells=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::LINEAR_TIME);
     fieldOnCells->setName("toto27");
     fieldOnCells->setDescription("my wonderful 2D field toto27");
     fieldOnCells->setTimeUnit("ms");
     fieldOnCells->setMesh(mesh);
-    ParaMEDMEM::DataArrayDouble *array1=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array1=MEDCoupling::DataArrayDouble::New();
     array1->alloc(mesh->getNumberOfCells(),4);
     fieldOnCells->setArray(array1);
     double *tmp=array1->getPointer();
     array1->decrRef();
     const double arr1[20]={1.2,1.02,1.002,1.0002, 3.4,3.04,3.004,3.0004, 5.6,5.06,5.006,5.0006, 7.8,7.08,7.008,7.0008, 9.1,9.01,9.001,9.0001};
     std::copy(arr1,arr1+20,tmp);
-    ParaMEDMEM::DataArrayDouble *array2=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array2=MEDCoupling::DataArrayDouble::New();
     array2->alloc(mesh->getNumberOfCells(),4);
     fieldOnCells->setEndArray(array2);
     tmp=array2->getPointer();
@@ -424,11 +424,11 @@ namespace SALOME_TEST
     std::copy(arr2,arr2+20,tmp);
     fieldOnCells->setStartTime(6.7,25,26);
     fieldOnCells->setEndTime(17.2,125,126);
-    fieldOnCells->checkCoherency();
+    fieldOnCells->checkConsistencyLight();
     return fieldOnCells;
   }
 
-  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldGaussPt2DWT()
+  MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldGaussPt2DWT()
   {
     const double _a=0.446948490915965;
     const double _b=0.091576213509771;
@@ -441,8 +441,8 @@ namespace SALOME_TEST
     std::vector<double> _refCoo1(refCoo1,refCoo1+6);
     std::vector<double> _gsCoo1(gsCoo1,gsCoo1+12);
     std::vector<double> _wg1(wg1,wg1+6);
-    ParaMEDMEM::MEDCouplingUMesh *m=build2DMesh();
-    ParaMEDMEM::MEDCouplingFieldDouble *f=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_GAUSS_PT,ParaMEDMEM::ONE_TIME);
+    MEDCoupling::MEDCouplingUMesh *m=build2DMesh();
+    MEDCoupling::MEDCouplingFieldDouble *f=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_GAUSS_PT,MEDCoupling::ONE_TIME);
     f->setTime(6.7,1,4);
     f->setMesh(m);
     m->decrRef();
@@ -451,7 +451,7 @@ namespace SALOME_TEST
     std::vector<double> _refCoo2(refCoo2,refCoo2+8);
     _gsCoo1.resize(4); _wg1.resize(2);
     f->setGaussLocalizationOnType(INTERP_KERNEL::NORM_QUAD4,_refCoo2,_gsCoo1,_wg1);
-    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array=MEDCoupling::DataArrayDouble::New();
     array->alloc(18,2);
     array->setInfoOnComponent(0,"Power [MW]");
     array->setInfoOnComponent(1,"Density [kg/m^3]");
@@ -463,20 +463,20 @@ namespace SALOME_TEST
     f->setTimeUnit("ms");
     f->setDescription("mmmmmmmmmmmm");
     array->decrRef();
-    f->checkCoherency();
+    f->checkConsistencyLight();
     return f;
   }
 
-  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldGaussPtNE2DWT()
+  MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldGaussPtNE2DWT()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m=build2DMesh();
-    ParaMEDMEM::MEDCouplingFieldDouble *f=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_GAUSS_NE,ParaMEDMEM::ONE_TIME);
+    MEDCoupling::MEDCouplingUMesh *m=build2DMesh();
+    MEDCoupling::MEDCouplingFieldDouble *f=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_GAUSS_NE,MEDCoupling::ONE_TIME);
     f->setTime(6.8,11,8);
     f->setMesh(m);
     f->setTimeUnit("ms");
     f->setName("MyFirstFieldOnNE");
     f->setDescription("MyDescriptionNE");
-    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array=MEDCoupling::DataArrayDouble::New();
     array->alloc(18,2);
     array->setInfoOnComponent(0,"Power [MW]");
     array->setInfoOnComponent(1,"Density [kg/m^3]");
@@ -486,22 +486,22 @@ namespace SALOME_TEST
     f->setArray(array);
     array->decrRef();
     //
-    f->checkCoherency();
+    f->checkConsistencyLight();
     m->decrRef();
     return f;
   }
 
-  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldVectorOnExtrudedWT()
+  MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldVectorOnExtrudedWT()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m2D=0;
-    ParaMEDMEM::MEDCouplingExtrudedMesh *ext=buildExtrudedMesh(m2D);
+    MEDCoupling::MEDCouplingUMesh *m2D=0;
+    MEDCoupling::MEDCouplingMappedExtrudedMesh *ext=buildExtrudedMesh(m2D);
     //
-    ParaMEDMEM::MEDCouplingFieldDouble *f=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    MEDCoupling::MEDCouplingFieldDouble *f=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::ONE_TIME);
     f->setTime(6.8,11,8);
     f->setMesh(ext);
     f->setName("MyFieldOnExtruM");
     f->setDescription("desc of MyFiOnExtruM");
-    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array=MEDCoupling::DataArrayDouble::New();
     int nbOfCells=ext->getNumberOfCells();
     array->alloc(nbOfCells,2);
     array->setInfoOnComponent(0,"Power [MW]");
@@ -512,23 +512,23 @@ namespace SALOME_TEST
     f->setArray(array);
     array->decrRef();
     //
-    f->checkCoherency();
+    f->checkConsistencyLight();
     //
     m2D->decrRef();
     ext->decrRef();
     return f;
   }
 
-  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldVectorOnCMeshWT()
+  MEDCoupling::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldVectorOnCMeshWT()
   {
-    ParaMEDMEM::MEDCouplingCMesh *m=buildCMesh();
-    ParaMEDMEM::MEDCouplingFieldDouble *f=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    MEDCoupling::MEDCouplingCMesh *m=buildCMesh();
+    MEDCoupling::MEDCouplingFieldDouble *f=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::ONE_TIME);
     f->setTime(6.8,11,8);
     f->setMesh(m);
     m->decrRef();
     f->setName("MyFieldOnCMesh");
     f->setDescription("desc of MyFiOnCMesh");
-    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *array=MEDCoupling::DataArrayDouble::New();
     int nbOfCells=m->getNumberOfCells();
     array->alloc(nbOfCells,2);
     array->setInfoOnComponent(0,"Power [GW]");
@@ -539,52 +539,52 @@ namespace SALOME_TEST
     f->setArray(array);
     array->decrRef();
     //
-    f->checkCoherency();
+    f->checkConsistencyLight();
     //
     return f;
   }
 
-  ParaMEDMEM::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateCellOn2D()
+  MEDCoupling::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateCellOn2D()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *f1=buildFieldScalarOn2DNT();
-    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(*f1);
-    f2->setNature(ParaMEDMEM::NoNature);
+    MEDCoupling::MEDCouplingFieldDouble *f1=buildFieldScalarOn2DNT();
+    MEDCoupling::MEDCouplingFieldTemplate *f2=MEDCoupling::MEDCouplingFieldTemplate::New(*f1);
+    f2->setNature(MEDCoupling::NoNature);
     f1->decrRef();
     return f2;
   }
 
-  ParaMEDMEM::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateNodeOn2D()
+  MEDCoupling::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateNodeOn2D()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *f1=buildFieldNodeScalarOn2DNT();
-    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(*f1);
-    f2->setNature(ParaMEDMEM::ConservativeVolumic);
+    MEDCoupling::MEDCouplingFieldDouble *f1=buildFieldNodeScalarOn2DNT();
+    MEDCoupling::MEDCouplingFieldTemplate *f2=MEDCoupling::MEDCouplingFieldTemplate::New(*f1);
+    f2->setNature(MEDCoupling::IntensiveMaximum);
     f1->decrRef();
     return f2;
   }
 
-  ParaMEDMEM::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussPtOn2D()
+  MEDCoupling::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussPtOn2D()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *f1=buildFieldGaussPt2DWT();
-    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(*f1);
-    f2->setNature(ParaMEDMEM::Integral);
+    MEDCoupling::MEDCouplingFieldDouble *f1=buildFieldGaussPt2DWT();
+    MEDCoupling::MEDCouplingFieldTemplate *f2=MEDCoupling::MEDCouplingFieldTemplate::New(*f1);
+    f2->setNature(MEDCoupling::ExtensiveMaximum);
     f1->decrRef();
     return f2;
   }
 
-  ParaMEDMEM::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussNEOn2D()
+  MEDCoupling::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussNEOn2D()
   {
-    ParaMEDMEM::MEDCouplingFieldDouble *f1=buildFieldGaussPtNE2DWT();
-    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(*f1);
-    f2->setNature(ParaMEDMEM::IntegralGlobConstraint);
+    MEDCoupling::MEDCouplingFieldDouble *f1=buildFieldGaussPtNE2DWT();
+    MEDCoupling::MEDCouplingFieldTemplate *f2=MEDCoupling::MEDCouplingFieldTemplate::New(*f1);
+    f2->setNature(MEDCoupling::ExtensiveConservation);
     f1->decrRef();
     return f2;
   }
 
-  ParaMEDMEM::MEDCouplingMultiFields *MEDCouplingCorbaServBasicsTest::buildMultiFields1()
+  MEDCoupling::MEDCouplingMultiFields *MEDCouplingCorbaServBasicsTest::buildMultiFields1()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m1=build2DMesh();
+    MEDCoupling::MEDCouplingUMesh *m1=build2DMesh();
     m1->setName("m1");
-    ParaMEDMEM::MEDCouplingUMesh *m2=build2DMesh();
+    MEDCoupling::MEDCouplingUMesh *m2=build2DMesh();
     m2->setName("m2");
     const double vals0[]={-0.7,-1.,-2.,-3.,-4.};
     const double vals1[]={0.,1.,2.,3.,4.,0.1,0.2,0.3,0.4};
@@ -592,11 +592,11 @@ namespace SALOME_TEST
     const double vals2[]={5.,6.,7.,8.,9.};
     const double vals4[]={15.,16.,17.,18.,19.};
     //
-    ParaMEDMEM::DataArrayDouble *d0=ParaMEDMEM::DataArrayDouble::New(); d0->alloc(5,1); std::copy(vals0,vals0+5,d0->getPointer());
-    ParaMEDMEM::DataArrayDouble *d1=ParaMEDMEM::DataArrayDouble::New(); d1->alloc(9,1); std::copy(vals1,vals1+9,d1->getPointer());
-    ParaMEDMEM::DataArrayDouble *d1_1=ParaMEDMEM::DataArrayDouble::New(); d1_1->alloc(9,1); std::copy(vals1_1,vals1_1+9,d1_1->getPointer());
-    ParaMEDMEM::DataArrayDouble *d2=ParaMEDMEM::DataArrayDouble::New(); d2->alloc(5,1); std::copy(vals2,vals2+5,d2->getPointer());
-    ParaMEDMEM::DataArrayDouble *d4=ParaMEDMEM::DataArrayDouble::New(); d4->alloc(5,1); std::copy(vals4,vals4+5,d4->getPointer());
+    MEDCoupling::DataArrayDouble *d0=MEDCoupling::DataArrayDouble::New(); d0->alloc(5,1); std::copy(vals0,vals0+5,d0->getPointer());
+    MEDCoupling::DataArrayDouble *d1=MEDCoupling::DataArrayDouble::New(); d1->alloc(9,1); std::copy(vals1,vals1+9,d1->getPointer());
+    MEDCoupling::DataArrayDouble *d1_1=MEDCoupling::DataArrayDouble::New(); d1_1->alloc(9,1); std::copy(vals1_1,vals1_1+9,d1_1->getPointer());
+    MEDCoupling::DataArrayDouble *d2=MEDCoupling::DataArrayDouble::New(); d2->alloc(5,1); std::copy(vals2,vals2+5,d2->getPointer());
+    MEDCoupling::DataArrayDouble *d4=MEDCoupling::DataArrayDouble::New(); d4->alloc(5,1); std::copy(vals4,vals4+5,d4->getPointer());
     //
     d0->setName("d0"); d1->setName("d1"); d1_1->setName("d1_1"); d2->setName("d2"); d4->setName("d4");
     d0->setInfoOnComponent(0,"c1");
@@ -605,37 +605,37 @@ namespace SALOME_TEST
     d2->setInfoOnComponent(0,"c5");
     d4->setInfoOnComponent(0,"c7");
     //
-    ParaMEDMEM::MEDCouplingFieldDouble *f0=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    MEDCoupling::MEDCouplingFieldDouble *f0=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::ONE_TIME);
     f0->setMesh(m1);
     f0->setArray(d0);
     f0->setTime(0.2,5,6);
     f0->setName("f0");
-    ParaMEDMEM::MEDCouplingFieldDouble *f1=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_NODES,ParaMEDMEM::LINEAR_TIME);
+    MEDCoupling::MEDCouplingFieldDouble *f1=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_NODES,MEDCoupling::LINEAR_TIME);
     f1->setMesh(m1);
-    std::vector<ParaMEDMEM::DataArrayDouble *> d1s(2); d1s[0]=d1; d1s[1]=d1_1;
+    std::vector<MEDCoupling::DataArrayDouble *> d1s(2); d1s[0]=d1; d1s[1]=d1_1;
     f1->setArrays(d1s);
     f1->setStartTime(0.7,7,8);
     f1->setEndTime(1.2,9,10);
     f1->setName("f1");
-    ParaMEDMEM::MEDCouplingFieldDouble *f2=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::CONST_ON_TIME_INTERVAL);
+    MEDCoupling::MEDCouplingFieldDouble *f2=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::CONST_ON_TIME_INTERVAL);
     f2->setMesh(m2);
     f2->setArray(d2);
     f2->setTime(1.2,11,12);
     f2->setEndTime(1.5,13,14);
     f2->setName("f2");
-    ParaMEDMEM::MEDCouplingFieldDouble *f3=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    MEDCoupling::MEDCouplingFieldDouble *f3=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::ONE_TIME);
     f3->setMesh(m1);
     f3->setArray(d2);
     f3->setTime(1.7,15,16);
     f3->setName("f3");
-    ParaMEDMEM::MEDCouplingFieldDouble *f4=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::NO_TIME);
+    MEDCoupling::MEDCouplingFieldDouble *f4=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::NO_TIME);
     f4->setMesh(m2);
     f4->setArray(d4);
     f4->setName("f4");
     //
-    std::vector<ParaMEDMEM::MEDCouplingFieldDouble *> fs(5);
+    std::vector<MEDCoupling::MEDCouplingFieldDouble *> fs(5);
     fs[0]=f0; fs[1]=f1; fs[2]=f2; fs[3]=f3; fs[4]=f4;
-    ParaMEDMEM::MEDCouplingMultiFields *ret=ParaMEDMEM::MEDCouplingMultiFields::New(fs);
+    MEDCoupling::MEDCouplingMultiFields *ret=MEDCoupling::MEDCouplingMultiFields::New(fs);
     //
     m1->decrRef();
     m2->decrRef();
@@ -653,9 +653,9 @@ namespace SALOME_TEST
     return ret;
   }
 
-  ParaMEDMEM::DataArrayDouble *MEDCouplingCorbaServBasicsTest::buildArrayDouble1()
+  MEDCoupling::DataArrayDouble *MEDCouplingCorbaServBasicsTest::buildArrayDouble1()
   {
-    ParaMEDMEM::DataArrayDouble *ret=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *ret=MEDCoupling::DataArrayDouble::New();
     ret->alloc(4,3);
     const double vals[12]={2.4,3.2,5.6,9.6,47.6,20.4,24.6,278.1,2.01,3.3,2.4,9.4};
     std::copy(vals,vals+12,ret->getPointer());
@@ -666,16 +666,16 @@ namespace SALOME_TEST
     return ret;
   }
 
-  ParaMEDMEM::DataArrayDouble *MEDCouplingCorbaServBasicsTest::buildArrayDouble2()
+  MEDCoupling::DataArrayDouble *MEDCouplingCorbaServBasicsTest::buildArrayDouble2()
   {
-    ParaMEDMEM::DataArrayDouble *ret=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *ret=MEDCoupling::DataArrayDouble::New();
     ret->setName("titi");
     return ret;
   }
 
-  ParaMEDMEM::DataArrayDouble *MEDCouplingCorbaServBasicsTest::buildArrayDouble3()
+  MEDCoupling::DataArrayDouble *MEDCouplingCorbaServBasicsTest::buildArrayDouble3()
   {
-    ParaMEDMEM::DataArrayDouble *ret=ParaMEDMEM::DataArrayDouble::New();
+    MEDCoupling::DataArrayDouble *ret=MEDCoupling::DataArrayDouble::New();
     ret->setName("titi");
     ret->alloc(0,3);
     ret->setInfoOnComponent(0,"sss");
@@ -684,9 +684,9 @@ namespace SALOME_TEST
     return ret;
   }
 
-  ParaMEDMEM::DataArrayInt *MEDCouplingCorbaServBasicsTest::buildArrayInt1()
+  MEDCoupling::DataArrayInt *MEDCouplingCorbaServBasicsTest::buildArrayInt1()
   {
-    ParaMEDMEM::DataArrayInt *ret=ParaMEDMEM::DataArrayInt::New();
+    MEDCoupling::DataArrayInt *ret=MEDCoupling::DataArrayInt::New();
     ret->alloc(4,3);
     const int vals[12]={2,3,5,9,47,20,24,278,2,3,2,9};
     std::copy(vals,vals+12,ret->getPointer());
@@ -697,16 +697,16 @@ namespace SALOME_TEST
     return ret;
   }
 
-  ParaMEDMEM::DataArrayInt *MEDCouplingCorbaServBasicsTest::buildArrayInt2()
+  MEDCoupling::DataArrayInt *MEDCouplingCorbaServBasicsTest::buildArrayInt2()
   {
-    ParaMEDMEM::DataArrayInt *ret=ParaMEDMEM::DataArrayInt::New();
+    MEDCoupling::DataArrayInt *ret=MEDCoupling::DataArrayInt::New();
     ret->setName("titi");
     return ret;
   }
 
-  ParaMEDMEM::DataArrayInt *MEDCouplingCorbaServBasicsTest::buildArrayInt3()
+  MEDCoupling::DataArrayInt *MEDCouplingCorbaServBasicsTest::buildArrayInt3()
   {
-    ParaMEDMEM::DataArrayInt *ret=ParaMEDMEM::DataArrayInt::New();
+    MEDCoupling::DataArrayInt *ret=MEDCoupling::DataArrayInt::New();
     ret->setName("titi");
     ret->alloc(0,3);
     ret->setInfoOnComponent(0,"sss");
@@ -715,11 +715,11 @@ namespace SALOME_TEST
     return ret;
   }
 
-  ParaMEDMEM::MEDCouplingFieldOverTime *MEDCouplingCorbaServBasicsTest::buildMultiFields2()
+  MEDCoupling::MEDCouplingFieldOverTime *MEDCouplingCorbaServBasicsTest::buildMultiFields2()
   {
-    ParaMEDMEM::MEDCouplingUMesh *m1=build2DMesh();
+    MEDCoupling::MEDCouplingUMesh *m1=build2DMesh();
     m1->setName("m1");
-    ParaMEDMEM::MEDCouplingUMesh *m2=build2DMesh();
+    MEDCoupling::MEDCouplingUMesh *m2=build2DMesh();
     m2->setName("m2");
     const double vals0[]={-0.7,-1.,-2.,-3.,-4.};
     const double vals1[]={0.,1.,2.,3.,4.};
@@ -727,11 +727,11 @@ namespace SALOME_TEST
     const double vals2[]={5.,6.,7.,8.,9.};
     const double vals4[]={15.,16.,17.,18.,19.};
     //
-    ParaMEDMEM::DataArrayDouble *d0=ParaMEDMEM::DataArrayDouble::New(); d0->alloc(5,1); std::copy(vals0,vals0+5,d0->getPointer());
-    ParaMEDMEM::DataArrayDouble *d1=ParaMEDMEM::DataArrayDouble::New(); d1->alloc(5,1); std::copy(vals1,vals1+5,d1->getPointer());
-    ParaMEDMEM::DataArrayDouble *d1_1=ParaMEDMEM::DataArrayDouble::New(); d1_1->alloc(5,1); std::copy(vals1_1,vals1_1+5,d1_1->getPointer());
-    ParaMEDMEM::DataArrayDouble *d2=ParaMEDMEM::DataArrayDouble::New(); d2->alloc(5,1); std::copy(vals2,vals2+5,d2->getPointer());
-    ParaMEDMEM::DataArrayDouble *d4=ParaMEDMEM::DataArrayDouble::New(); d4->alloc(5,1); std::copy(vals4,vals4+5,d4->getPointer());
+    MEDCoupling::DataArrayDouble *d0=MEDCoupling::DataArrayDouble::New(); d0->alloc(5,1); std::copy(vals0,vals0+5,d0->getPointer());
+    MEDCoupling::DataArrayDouble *d1=MEDCoupling::DataArrayDouble::New(); d1->alloc(5,1); std::copy(vals1,vals1+5,d1->getPointer());
+    MEDCoupling::DataArrayDouble *d1_1=MEDCoupling::DataArrayDouble::New(); d1_1->alloc(5,1); std::copy(vals1_1,vals1_1+5,d1_1->getPointer());
+    MEDCoupling::DataArrayDouble *d2=MEDCoupling::DataArrayDouble::New(); d2->alloc(5,1); std::copy(vals2,vals2+5,d2->getPointer());
+    MEDCoupling::DataArrayDouble *d4=MEDCoupling::DataArrayDouble::New(); d4->alloc(5,1); std::copy(vals4,vals4+5,d4->getPointer());
     //
     d0->setName("d0"); d1->setName("d1"); d1_1->setName("d1_1"); d2->setName("d2"); d4->setName("d4");
     d0->setInfoOnComponent(0,"c1");
@@ -740,39 +740,39 @@ namespace SALOME_TEST
     d2->setInfoOnComponent(0,"c5");
     d4->setInfoOnComponent(0,"c7");
     //
-    ParaMEDMEM::MEDCouplingFieldDouble *f0=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    MEDCoupling::MEDCouplingFieldDouble *f0=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::ONE_TIME);
     f0->setMesh(m1);
     f0->setArray(d0);
     f0->setTime(0.2,5,6);
     f0->setName("f0");
-    ParaMEDMEM::MEDCouplingFieldDouble *f1=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::LINEAR_TIME);
+    MEDCoupling::MEDCouplingFieldDouble *f1=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::LINEAR_TIME);
     f1->setMesh(m1);
-    std::vector<ParaMEDMEM::DataArrayDouble *> d1s(2); d1s[0]=d1; d1s[1]=d1_1;
+    std::vector<MEDCoupling::DataArrayDouble *> d1s(2); d1s[0]=d1; d1s[1]=d1_1;
     f1->setArrays(d1s);
     f1->setStartTime(0.7,7,8);
     f1->setEndTime(1.2,9,10);
     f1->setName("f1");
-    ParaMEDMEM::MEDCouplingFieldDouble *f2=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::CONST_ON_TIME_INTERVAL);
+    MEDCoupling::MEDCouplingFieldDouble *f2=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::CONST_ON_TIME_INTERVAL);
     f2->setMesh(m2);
     f2->setArray(d2);
     f2->setTime(1.2,11,12);
     f2->setEndTime(1.5,13,14);
     f2->setName("f2");
-    ParaMEDMEM::MEDCouplingFieldDouble *f3=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    MEDCoupling::MEDCouplingFieldDouble *f3=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::ONE_TIME);
     f3->setMesh(m1);
     f3->setArray(d2);
     f3->setTime(1.7,15,16);
     f3->setName("f3");
-    ParaMEDMEM::MEDCouplingFieldDouble *f4=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    MEDCoupling::MEDCouplingFieldDouble *f4=MEDCoupling::MEDCouplingFieldDouble::New(MEDCoupling::ON_CELLS,MEDCoupling::ONE_TIME);
     f4->setMesh(m2);
     f4->setArray(d4);
     f4->setName("f4");
     f4->setTime(2.7,25,26);
     //
-    std::vector<ParaMEDMEM::MEDCouplingFieldDouble *> fs(5);
+    std::vector<MEDCoupling::MEDCouplingFieldDouble *> fs(5);
     fs[0]=f0; fs[1]=f1; fs[2]=f2; fs[3]=f3; fs[4]=f4;
-    ParaMEDMEM::MEDCouplingFieldOverTime *ret=ParaMEDMEM::MEDCouplingFieldOverTime::New(fs);
-    ret->checkCoherency();
+    MEDCoupling::MEDCouplingFieldOverTime *ret=MEDCoupling::MEDCouplingFieldOverTime::New(fs);
+    ret->checkConsistencyLight();
     //
     m1->decrRef();
     m2->decrRef();

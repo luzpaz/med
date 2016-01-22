@@ -25,7 +25,7 @@
 #include <string>
 
 #include "MEDCouplingFieldDouble.hxx"
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCalculator_i * MEDCalculator_i::_instance = NULL;
 

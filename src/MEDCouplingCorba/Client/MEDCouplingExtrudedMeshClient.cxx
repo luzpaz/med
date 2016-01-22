@@ -20,16 +20,16 @@
 
 #include "MEDCouplingExtrudedMeshClient.hxx"
 #include "MEDCouplingMeshClient.hxx"
-#include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCouplingMappedExtrudedMesh.hxx"
 #include "MEDCouplingMemArray.hxx"
 
 #include <vector>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
-MEDCouplingExtrudedMesh *MEDCouplingExtrudedMeshClient::New(SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr meshPtr)
+MEDCouplingMappedExtrudedMesh *MEDCouplingExtrudedMeshClient::New(SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr meshPtr)
 {
-  MEDCouplingExtrudedMesh *ret=MEDCouplingExtrudedMesh::New();
+  MEDCouplingMappedExtrudedMesh *ret=MEDCouplingMappedExtrudedMesh::New();
   MEDCouplingMeshClient::fillMeshFromCorbaData(ret,meshPtr);
   return ret;
 }

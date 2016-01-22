@@ -22,7 +22,7 @@
 
 #include <sstream>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCalculatorBrowserStep::~MEDCalculatorBrowserStep()
 {

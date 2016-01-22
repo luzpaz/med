@@ -23,7 +23,7 @@
 
 #include <vector>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 DataArrayInt *DataArrayIntClient::New(SALOME_MED::DataArrayIntCorbaInterface_ptr dadPtr)
 {

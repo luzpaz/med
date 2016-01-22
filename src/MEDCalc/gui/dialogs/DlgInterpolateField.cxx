@@ -31,7 +31,7 @@ DlgInterpolateField::DlgInterpolateField(SALOME_AppStudyEditor * studyEditor,
   this->ui.comboBoxMethod->addItems(methods);
 
   QStringList natures;
-  natures << "NoNature" << "ConservativeVolumic" << "Integral" << "IntegralGlobConstraint" << "RevIntegral";
+  natures << "NoNature" << "IntensiveMaximum" << "ExtensiveMaximum" << "ExtensiveConservation" << "IntensiveConservation";
   this->ui.comboBoxNature->addItems(natures);
 
   connect(this->ui.btnSelectMesh, SIGNAL(clicked()), this, SLOT(OnSelectMesh()));

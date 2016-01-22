@@ -25,7 +25,7 @@
 #include <sstream>
 #include <algorithm>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 const char *SPythonInterpreter::INDENT_TOKEN[]={"def","class","for","if","while","try","except"};
 

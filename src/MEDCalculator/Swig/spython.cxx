@@ -34,7 +34,7 @@ void runInFileAndQuit(PyObject *glob, PyObject *loc, const char *fileName)
   std::ifstream ifs(fileName);
   ifs.exceptions( std::ifstream::badbit );
   char *line=new char[MAX_LINE+1];
-  ParaMEDMEM::SPythonInterpreter interp(glob,loc);
+  MEDCoupling::SPythonInterpreter interp(glob,loc);
   bool isspython;
   while(!ifs.eof())
     {
@@ -49,7 +49,7 @@ void runInInteractiveMode(PyObject *glob, PyObject *loc)
 {
   std::string s;
   char *line=new char[MAX_LINE+1];
-  ParaMEDMEM::SPythonInterpreter interp(glob,loc);
+  MEDCoupling::SPythonInterpreter interp(glob,loc);
   bool isInterp=true;
   while(true)
     {

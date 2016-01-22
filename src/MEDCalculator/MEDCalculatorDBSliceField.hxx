@@ -28,7 +28,7 @@
 
 #include <string>
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingFieldDouble;
   class MEDCouplingMesh;

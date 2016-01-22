@@ -24,9 +24,9 @@
 #include "MEDLoader.hxx"
 
 #include "MEDCouplingFieldDouble.hxx"
-#include "MEDCouplingAutoRefCountObjectPtr.hxx"
+#include "MCAuto.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCalculatorDBSliceField::MEDCalculatorDBSliceField(int iter, int order):_iteration(iter),_order(order),_field(0),_work(0)
 {
@@ -73,7 +73,7 @@ void MEDCalculatorDBSliceField::write(const char *fName, const std::string& n, c
   MEDCouplingFieldDouble *myF=const_cast<MEDCouplingFieldDouble *>(_field);
   myF->setName(n.c_str());
   myF->setDescription(d.c_str());
-  MEDLoader::WriteFieldUsingAlreadyWrittenMesh(fName,_field);
+  WriteFieldUsingAlreadyWrittenMesh(fName,_field);
   myF->setName(kn.c_str());
   myF->setDescription(kd.c_str());
 }
@@ -95,7 +95,7 @@ MEDCalculatorDBSliceField::~MEDCalculatorDBSliceField()
 MEDCouplingFieldDouble *MEDCalculatorDBSliceField::getField(TypeOfField type, const std::string& fname, const std::string& mname, const std::string& fieldName) const
 {
   if(!_field)
-    _field=MEDLoader::ReadField(type,fname.c_str(),mname.c_str(),0,fieldName.c_str(),_iteration,_order);
+    _field=ReadField(type,fname.c_str(),mname.c_str(),0,fieldName.c_str(),_iteration,_order);
   return _field;
 }
 
@@ -122,7 +122,7 @@ void MEDCalculatorDBSliceField::assign(const MEDCalculatorDBSliceField* other, i
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
   std::vector<int> oIds=otherC.getIds(sizeCOther);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=other->_field->keepSelectedComponents(oIds);
+  MCAuto<MEDCouplingFieldDouble> f1=other->_field->keepSelectedComponents(oIds);
   _field->setSelectedComponents(f1,tIds);
 }
 
@@ -134,8 +134,8 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::add(const MEDCalculatorDBS
     throw INTERP_KERNEL::Exception("Slice::add : not implemented yet node/cell permutation !");
   std::vector<int> tIds=thisC.getIds(sizeCThis);
   std::vector<int> oIds=otherC.getIds(sizeCOther);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
   MEDCouplingFieldDouble *f3=(*f1)+(*f2);
   return new MEDCalculatorDBSliceField(f3);
@@ -149,8 +149,8 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::substract(const MEDCalcula
     throw INTERP_KERNEL::Exception("Slice::substract : not implemented yet node/cell permutation !");
   std::vector<int> tIds=thisC.getIds(sizeCThis);
   std::vector<int> oIds=otherC.getIds(sizeCOther);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
   MEDCouplingFieldDouble *f3=(*f1)-(*f2);
   return new MEDCalculatorDBSliceField(f3);
@@ -164,8 +164,8 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::multiply(const MEDCalculat
     throw INTERP_KERNEL::Exception("Slice::multiply : not implemented yet node/cell permutation !");
   std::vector<int> tIds=thisC.getIds(sizeCThis);
   std::vector<int> oIds=otherC.getIds(sizeCOther);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
   MEDCouplingFieldDouble *f3=(*f1)*(*f2);
   return new MEDCalculatorDBSliceField(f3);
@@ -179,8 +179,8 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::divide(const MEDCalculator
     throw INTERP_KERNEL::Exception("Slice::divide : not implemented yet node/cell permutation !");
   std::vector<int> tIds=thisC.getIds(sizeCThis);
   std::vector<int> oIds=otherC.getIds(sizeCOther);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
   MEDCouplingFieldDouble *f3=(*f1)/(*f2);
   return new MEDCalculatorDBSliceField(f3);
@@ -191,8 +191,8 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::dot(const MEDCalculatorDBS
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
   std::vector<int> oIds=otherC.getIds(sizeCOther);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
   MEDCouplingFieldDouble *f3=f1->dot(*f2);
   return new MEDCalculatorDBSliceField(f3);
@@ -203,8 +203,8 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::crossProduct(const MEDCalc
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
   std::vector<int> oIds=otherC.getIds(sizeCOther);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
   MEDCouplingFieldDouble *f3=f1->crossProduct(*f2);
   return new MEDCalculatorDBSliceField(f3);
@@ -213,7 +213,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::crossProduct(const MEDCalc
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::doublyContractedProduct(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->doublyContractedProduct();
   return new MEDCalculatorDBSliceField(f2);
 }
@@ -221,7 +221,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::doublyContractedProduct(in
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::determinant(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->determinant();
   return new MEDCalculatorDBSliceField(f2);
 }
@@ -229,7 +229,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::determinant(int sizeCThis,
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenValues(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->eigenValues();
   return new MEDCalculatorDBSliceField(f2);
 }
@@ -237,7 +237,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenValues(int sizeCThis,
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenVectors(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->eigenVectors();
   return new MEDCalculatorDBSliceField(f2);
 }
@@ -245,7 +245,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenVectors(int sizeCThis
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::inverse(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->inverse();
   return new MEDCalculatorDBSliceField(f2);
 }
@@ -253,7 +253,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::inverse(int sizeCThis, con
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::trace(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->trace();
   return new MEDCalculatorDBSliceField(f2);
 }
@@ -261,7 +261,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::trace(int sizeCThis, const
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::deviator(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->deviator();
   return new MEDCalculatorDBSliceField(f2);
 }
@@ -269,7 +269,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::deviator(int sizeCThis, co
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::magnitude(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->magnitude();
   return new MEDCalculatorDBSliceField(f2);
 }
@@ -277,7 +277,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::magnitude(int sizeCThis, c
 void MEDCalculatorDBSliceField::applyFunc(const char *func, int sizeCThis, const MEDCalculatorDBRangeSelection& thisC)
 {
   std::vector<int> tIds=thisC.getIds(sizeCThis);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   f1->applyFunc(func);
   _field->setSelectedComponents(f1,tIds);
 }
@@ -290,8 +290,8 @@ bool MEDCalculatorDBSliceField::isEqual(const MEDCalculatorDBSliceField* other, 
     throw INTERP_KERNEL::Exception("Slice::isEqual : not implemented yet node/cell permutation !");
   std::vector<int> tIds=thisC.getIds(sizeCThis);
   std::vector<int> oIds=otherC.getIds(sizeCOther);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
+  MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
+  MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
   return f1->isEqualWithoutConsideringStr(f2,0,prec);
 }

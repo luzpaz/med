@@ -23,7 +23,7 @@
 
 #include "MEDCouplingMemArray.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingFieldTemplateServant::MEDCouplingFieldTemplateServant(const MEDCouplingFieldTemplate *cppPointerOfMesh):MEDCouplingFieldServant(cppPointerOfMesh)
 {

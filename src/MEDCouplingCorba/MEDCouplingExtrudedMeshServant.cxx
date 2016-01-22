@@ -20,11 +20,11 @@
 
 #include "MEDCouplingExtrudedMeshServant.hxx"
 
-#include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCouplingMappedExtrudedMesh.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
-MEDCouplingExtrudedMeshServant::MEDCouplingExtrudedMeshServant(const MEDCouplingExtrudedMesh *cppPointerOfMesh):MEDCouplingMeshServant(cppPointerOfMesh)
+MEDCouplingExtrudedMeshServant::MEDCouplingExtrudedMeshServant(const MEDCouplingMappedExtrudedMesh *cppPointerOfMesh):MEDCouplingMeshServant(cppPointerOfMesh)
 {
 }
 

@@ -29,7 +29,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingUMesh;
 }
@@ -131,7 +131,7 @@ namespace SALOME_TEST
     static void *checkCorbaField2DNTMultiFetchingMTStatic(void *stack);
   private:
     static SALOME_TEST::MEDCouplingMeshFieldFactory_ptr _objC;
-    static ParaMEDMEM::MEDCouplingUMesh *_mesh_from_distant;
+    static MEDCoupling::MEDCouplingUMesh *_mesh_from_distant;
   public:
     static int _argc;
     static char **_argv;

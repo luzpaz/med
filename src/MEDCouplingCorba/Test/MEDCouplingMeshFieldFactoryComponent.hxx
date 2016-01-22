@@ -23,12 +23,12 @@
 
 #include <string>
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingUMesh;
   class MEDCouplingFieldDouble;
   class MEDCouplingFieldTemplate;
-  class MEDCouplingExtrudedMesh;
+  class MEDCouplingMappedExtrudedMesh;
   class MEDCoupling1DGTUMesh;
   class MEDCoupling1SGTUMesh;
   class MEDCouplingCMesh;
@@ -45,40 +45,40 @@ namespace SALOME_TEST
   class MEDCouplingCorbaServBasicsTest
   {
   public:
-    static ParaMEDMEM::MEDCouplingUMesh *build1DMesh();
-    static ParaMEDMEM::MEDCouplingUMesh *build2DMesh();
-    static ParaMEDMEM::MEDCouplingUMesh *build3DMesh();
-    static ParaMEDMEM::MEDCouplingUMesh *build3DSurfMesh();
-    static ParaMEDMEM::MEDCouplingUMesh *build0DMesh();
-    static ParaMEDMEM::MEDCouplingUMesh *buildM1DMesh();
-    static ParaMEDMEM::MEDCouplingExtrudedMesh *buildExtrudedMesh(ParaMEDMEM::MEDCouplingUMesh *&m2D);
-    static ParaMEDMEM::MEDCouplingCMesh *buildCMesh();
-    static ParaMEDMEM::MEDCouplingIMesh *buildIMesh();
-    static ParaMEDMEM::MEDCouplingCurveLinearMesh *buildCLMesh();
-    static ParaMEDMEM::MEDCoupling1SGTUMesh *build1SGTUMesh();
-    static ParaMEDMEM::MEDCoupling1DGTUMesh *build1DGTUMesh();
-    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn2DNT();
-    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldNodeScalarOn2DNT();
-    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn3DNT();
-    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn3DSurfWT();
-    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn3DSurfCOTI();
-    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn2DLT();
-    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldGaussPt2DWT();
-    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldGaussPtNE2DWT();
-    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldVectorOnExtrudedWT();
-    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldVectorOnCMeshWT();
-    static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateCellOn2D();
-    static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateNodeOn2D();
-    static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateGaussPtOn2D();
-    static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateGaussNEOn2D();
-    static ParaMEDMEM::MEDCouplingMultiFields *buildMultiFields1();
-    static ParaMEDMEM::DataArrayDouble *buildArrayDouble1();
-    static ParaMEDMEM::DataArrayDouble *buildArrayDouble2();
-    static ParaMEDMEM::DataArrayDouble *buildArrayDouble3();
-    static ParaMEDMEM::DataArrayInt *buildArrayInt1();
-    static ParaMEDMEM::DataArrayInt *buildArrayInt2();
-    static ParaMEDMEM::DataArrayInt *buildArrayInt3();
-    static ParaMEDMEM::MEDCouplingFieldOverTime *buildMultiFields2();
+    static MEDCoupling::MEDCouplingUMesh *build1DMesh();
+    static MEDCoupling::MEDCouplingUMesh *build2DMesh();
+    static MEDCoupling::MEDCouplingUMesh *build3DMesh();
+    static MEDCoupling::MEDCouplingUMesh *build3DSurfMesh();
+    static MEDCoupling::MEDCouplingUMesh *build0DMesh();
+    static MEDCoupling::MEDCouplingUMesh *buildM1DMesh();
+    static MEDCoupling::MEDCouplingMappedExtrudedMesh *buildExtrudedMesh(MEDCoupling::MEDCouplingUMesh *&m2D);
+    static MEDCoupling::MEDCouplingCMesh *buildCMesh();
+    static MEDCoupling::MEDCouplingIMesh *buildIMesh();
+    static MEDCoupling::MEDCouplingCurveLinearMesh *buildCLMesh();
+    static MEDCoupling::MEDCoupling1SGTUMesh *build1SGTUMesh();
+    static MEDCoupling::MEDCoupling1DGTUMesh *build1DGTUMesh();
+    static MEDCoupling::MEDCouplingFieldDouble *buildFieldScalarOn2DNT();
+    static MEDCoupling::MEDCouplingFieldDouble *buildFieldNodeScalarOn2DNT();
+    static MEDCoupling::MEDCouplingFieldDouble *buildFieldScalarOn3DNT();
+    static MEDCoupling::MEDCouplingFieldDouble *buildFieldScalarOn3DSurfWT();
+    static MEDCoupling::MEDCouplingFieldDouble *buildFieldScalarOn3DSurfCOTI();
+    static MEDCoupling::MEDCouplingFieldDouble *buildFieldScalarOn2DLT();
+    static MEDCoupling::MEDCouplingFieldDouble *buildFieldGaussPt2DWT();
+    static MEDCoupling::MEDCouplingFieldDouble *buildFieldGaussPtNE2DWT();
+    static MEDCoupling::MEDCouplingFieldDouble *buildFieldVectorOnExtrudedWT();
+    static MEDCoupling::MEDCouplingFieldDouble *buildFieldVectorOnCMeshWT();
+    static MEDCoupling::MEDCouplingFieldTemplate *buildFieldTemplateCellOn2D();
+    static MEDCoupling::MEDCouplingFieldTemplate *buildFieldTemplateNodeOn2D();
+    static MEDCoupling::MEDCouplingFieldTemplate *buildFieldTemplateGaussPtOn2D();
+    static MEDCoupling::MEDCouplingFieldTemplate *buildFieldTemplateGaussNEOn2D();
+    static MEDCoupling::MEDCouplingMultiFields *buildMultiFields1();
+    static MEDCoupling::DataArrayDouble *buildArrayDouble1();
+    static MEDCoupling::DataArrayDouble *buildArrayDouble2();
+    static MEDCoupling::DataArrayDouble *buildArrayDouble3();
+    static MEDCoupling::DataArrayInt *buildArrayInt1();
+    static MEDCoupling::DataArrayInt *buildArrayInt2();
+    static MEDCoupling::DataArrayInt *buildArrayInt3();
+    static MEDCoupling::MEDCouplingFieldOverTime *buildMultiFields2();
     static std::string buildFileNameForIOR();
   };
 }

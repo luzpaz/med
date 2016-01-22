@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <functional>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 //  Default constructor
 //  Set field name to nm and selection to flase
@@ -50,25 +50,25 @@ MEDCalculatorBrowserField::~MEDCalculatorBrowserField()
 //  Then, read the Med structur to fill time steps, components and meshes
 MEDCalculatorBrowserField::MEDCalculatorBrowserField(const char *fname, const char *fieldName) : _name(fieldName), _file_name(fname), _selection(false)
 {
-  std::vector< std::string > meshNames=MEDLoader::GetMeshNamesOnField(fname,fieldName);
-  std::vector< std::pair< std::pair<int,int>, double > > dtits=MEDLoader::GetAllFieldIterations(fname, fieldName);
+  std::vector< std::string > meshNames=GetMeshNamesOnField(fname,fieldName);
+  std::vector< std::pair< std::pair<int,int>, double > > dtits=GetAllFieldIterations(fname, fieldName);
   for(std::vector<std::pair< std::pair<int,int>, double > >::const_iterator iter=dtits.begin();iter!=dtits.end();iter++)
     {
       _steps.push_back(MEDCalculatorBrowserStep((*iter).first.first,(*iter).first.second,(*iter).second,meshNames[0]));
     }
-  std::vector<TypeOfField> types=MEDLoader::GetTypesOfField(fname,meshNames[0].c_str(),fieldName);
+  std::vector<TypeOfField> types=GetTypesOfField(fname,meshNames[0].c_str(),fieldName);
   if(types.empty())
     throw INTERP_KERNEL::Exception("MEDCalculatorBrowserField::MEDCalculatorBrowserField : the file is not loadable using MED File 3 API ! Problably presence of field on edges faces...");
   _type=types[0];//To improve
   MEDCouplingFieldDouble *tmpf=0;
   try
     {
-      tmpf=MEDLoader::ReadField(_type,fname,meshNames[0].c_str(),0,fieldName,dtits[0].first.first,dtits[0].first.second);
+      tmpf=ReadField(_type,fname,meshNames[0].c_str(),0,fieldName,dtits[0].first.first,dtits[0].first.second);
     }
   catch(INTERP_KERNEL::Exception& e)
     {
       if(_type==ON_CELLS)
-        tmpf=MEDLoader::ReadField(_type,fname,meshNames[0].c_str(),-1,fieldName,dtits[0].first.first,dtits[0].first.second);
+        tmpf=ReadField(_type,fname,meshNames[0].c_str(),-1,fieldName,dtits[0].first.first,dtits[0].first.second);
       else
         throw e;
     }
@@ -81,7 +81,7 @@ MEDCalculatorBrowserField::MEDCalculatorBrowserField(const char *fname, const ch
       _components.push_back(c);
     }
   tmpf->decrRef();
-  _corresponding_meshes=MEDLoader::GetMeshNamesOnField(fname,fieldName);
+  _corresponding_meshes=GetMeshNamesOnField(fname,fieldName);
 }
 
 //  Equal to string operator,

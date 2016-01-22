@@ -23,7 +23,7 @@
 #include "MEDCoupling1SGTUMeshClient.hxx"
 #include "MEDCoupling1DGTUMeshClient.hxx"
 #include "MEDCouplingExtrudedMeshClient.hxx"
-#include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCouplingMappedExtrudedMesh.hxx"
 #include "MEDCouplingCMeshClient.hxx"
 #include "MEDCouplingCurveLinearMeshClient.hxx"
 #include "MEDCouplingIMeshClient.hxx"
@@ -35,7 +35,7 @@
 
 #include <vector>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingMesh *MEDCouplingMeshClient::New(SALOME_MED::MEDCouplingMeshCorbaInterface_ptr meshPtr)
 {

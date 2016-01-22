@@ -37,7 +37,7 @@
 #include <string>
 #include <vector>
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   typedef enum
     {

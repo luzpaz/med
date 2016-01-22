@@ -21,7 +21,7 @@
 #include "MEDCouplingStructuredMeshServant.hxx"
 #include "MEDCouplingStructuredMesh.hxx"
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 MEDCouplingStructuredMeshServant::MEDCouplingStructuredMeshServant(const MEDCouplingStructuredMesh *cppPointerOfMesh):MEDCouplingMeshServant(cppPointerOfMesh)
 {

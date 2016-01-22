@@ -25,7 +25,7 @@
 #include "Basics_Utils.hxx"
 
 #include "MEDLoader.hxx"
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 #include <string>
 #include <vector>
@@ -88,7 +88,7 @@ MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepa
   }
 
   // Then we check that the file is readable by MEDLoader
-  MEDLoader::CheckFileForRead(filepath);
+  CheckFileForRead(filepath);
 
   // Initialise the datasource handler
   MEDCALC::DatasourceHandler * datasourceHandler = new MEDCALC::DatasourceHandler();
@@ -99,7 +99,7 @@ MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepa
   _datasourceHandlerMap[datasourceHandler->id] = datasourceHandler;
 
   // We start by read the list of meshes (spatial supports of fields)
-  vector<string> meshNames = MEDLoader::GetMeshNames(filepath);
+  vector<string> meshNames = GetMeshNames(filepath);
   int nbOfMeshes = meshNames.size();
   for (int iMesh = 0; iMesh < nbOfMeshes; iMesh++) {
     const char * meshName = meshNames[iMesh].c_str();
@@ -115,7 +115,7 @@ MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepa
     // For each mesh, we can read the list of the names of the
     // associated fields, i.e. fields whose spatial support is this
     // mesh.
-    vector<string> fieldNames = MEDLoader::GetAllFieldNamesOnMesh(filepath,
+    vector<string> fieldNames = GetAllFieldNamesOnMesh(filepath,
                   meshName);
     int nbOfFields = fieldNames.size();
     for (int iField = 0; iField < nbOfFields; iField++) {
@@ -136,7 +136,7 @@ MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepa
       // to determine the types of spatial discretization defined for
       // this field and to chooose one.
 
-      vector<TypeOfField> listOfTypes = MEDLoader::GetTypesOfField(filepath,
+      vector<TypeOfField> listOfTypes = GetTypesOfField(filepath,
                    meshName,
                    fieldName);
       int nbOfTypes = listOfTypes.size();
@@ -146,7 +146,7 @@ MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepa
   // Then, we can get the iterations associated to this field on
   // this type of spatial discretization:
   std::vector< std::pair<int,int> > fieldIterations =
-    MEDLoader::GetFieldIterations(listOfTypes[iType],
+    GetFieldIterations(listOfTypes[iType],
           filepath,
           meshName,
           fieldName);
@@ -391,14 +391,14 @@ void MEDDataManager_i::saveFields(const char * filepath,
 
   try {
     bool writeFromScratch = true;
-    MEDLoader::WriteField(filepath, fieldDouble, writeFromScratch);
+    WriteField(filepath, fieldDouble, writeFromScratch);
 
     writeFromScratch = false;
     for(CORBA::ULong i=1; i<fieldIdList.length(); i++) {
       fieldHandlerId = fieldIdList[i];
       fieldHandler = getFieldHandler(fieldHandlerId);
       fieldDouble = getFieldDouble(fieldHandler);
-      MEDLoader::WriteField(filepath, fieldDouble, writeFromScratch);
+      WriteField(filepath, fieldDouble, writeFromScratch);
     }
   }
   catch (INTERP_KERNEL::Exception &ex) {
@@ -537,7 +537,7 @@ MEDCouplingUMesh * MEDDataManager_i::getUMesh(long meshHandlerId) {
     std::string filepath(source_to_file((_datasourceHandlerMap[sourceid])->uri));
     const char * meshName = _meshHandlerMap[meshHandlerId]->name;
     int meshDimRelToMax = 0;
-    myMesh = MEDLoader::ReadUMeshFromFile(filepath,meshName,meshDimRelToMax);
+    myMesh = ReadUMeshFromFile(filepath,meshName,meshDimRelToMax);
     _meshMap[meshHandlerId] = myMesh;
   }
   return myMesh;
@@ -613,7 +613,7 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDCALC::FieldHa
   LOG("getFieldDouble: field "<<fieldHandler->fieldname<<" loaded from file "<<filepath);
   TypeOfField type = (TypeOfField)fieldHandler->type;
   int meshDimRelToMax = 0;
-  MEDCouplingFieldDouble * myField = MEDLoader::ReadField(type,
+  MEDCouplingFieldDouble * myField = ReadField(type,
                 filepath,
                 meshName,
                 meshDimRelToMax,
@@ -775,22 +775,22 @@ INTERP_KERNEL::IntersectionType MEDDataManager_i::_getIntersectionType(const cha
   throw KERNEL::createSalomeException(message.c_str());
 }
 
-ParaMEDMEM::NatureOfField MEDDataManager_i::_getNatureOfField(const char* fieldNature) {
+MEDCoupling::NatureOfField MEDDataManager_i::_getNatureOfField(const char* fieldNature) {
   std::string nature(fieldNature);
   if (nature == "NoNature") {
     return NoNature;
   }
-  else if (nature == "ConservativeVolumic") {
-    return ConservativeVolumic;
+  else if (nature == "IntensiveMaximum") {
+    return IntensiveMaximum;
   }
-  else if (nature == "Integral") {
-    return Integral;
+  else if (nature == "ExtensiveMaximum") {
+    return ExtensiveMaximum;
   }
-  else if (nature == "IntegralGlobConstraint") {
-    return IntegralGlobConstraint;
+  else if (nature == "ExtensiveConservation") {
+    return ExtensiveConservation;
   }
-  else if (nature == "RevIntegral") {
-    return RevIntegral;
+  else if (nature == "IntensiveConservation") {
+    return IntensiveConservation;
   }
 
   std::string message("Error when trying to interpolate field: ");
@@ -810,7 +810,7 @@ MEDCALC::FieldHandler* MEDDataManager_i::interpolateField(CORBA::Long fieldHandl
   std::string method(params.method);
   double defaultValue = params.defaultValue;
   bool reverse = params.reverse;
-  ParaMEDMEM::NatureOfField nature = this->_getNatureOfField(params.nature);
+  MEDCoupling::NatureOfField nature = this->_getNatureOfField(params.nature);
 
   // 1. Build remapper between sourceMesh and targetMesh (compute interpolation matrix)
   MEDCouplingRemapper remapper;

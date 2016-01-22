@@ -29,7 +29,7 @@
 #include "MEDCouplingPointSetServant.hxx"
 #include "MEDCouplingCorba.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MEDCouplingUMesh;
 
