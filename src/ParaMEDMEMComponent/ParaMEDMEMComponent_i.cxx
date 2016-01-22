@@ -21,7 +21,7 @@
 #include "utilities.h"
 #include "Utils_SALOME_Exception.hxx"
 using namespace std;
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 typedef struct
 {

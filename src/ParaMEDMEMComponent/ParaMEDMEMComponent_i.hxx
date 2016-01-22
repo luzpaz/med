@@ -62,7 +62,7 @@ typedef struct
   SALOME_MED::ParaMEDMEMComponent_ptr compo;
 } thread_st;
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class ParaMEDMEMComponent_i : public virtual POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i
   {

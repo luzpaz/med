@@ -19,7 +19,7 @@
 
 #include "ParaMEDCouplingUMeshServant.hxx"
 #include "utilities.h"
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 ParaMEDCouplingUMeshServant::ParaMEDCouplingUMeshServant(CORBA::ORB_ptr orb,MEDCouplingUMesh* mesh):MEDCouplingUMeshServant(mesh),MPIObject_i()
 {

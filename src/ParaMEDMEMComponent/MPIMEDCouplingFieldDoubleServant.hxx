@@ -29,7 +29,7 @@
 
 void * th_getdatabympi(void *st);
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class MPIMEDCouplingFieldDoubleServant : public virtual POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,
                                            public ParaMEDCouplingFieldDoubleServant

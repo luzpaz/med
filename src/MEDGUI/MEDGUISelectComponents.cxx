@@ -35,7 +35,7 @@
 #include <QCheckBox>
 #include <QLineEdit>
 
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 //  Constructor
 //  Initialize qt part and private var part

@@ -20,7 +20,7 @@
 #include "MPIMEDCouplingFieldDoubleServant.hxx"
 #include "utilities.h"
 using namespace std;
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 typedef struct
 {
