@@ -34,7 +34,7 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::st
 
   _fileName = dataSHandler->uri;
   _fieldName = fieldHandler->fieldname;
-  _fieldType = getFieldTypeString((ParaMEDMEM::TypeOfField) fieldHandler->type);
+  _fieldType = getFieldTypeString((MEDCoupling::TypeOfField) fieldHandler->type);
 
   if (_fileName.substr(0, 7) != std::string("file://")) {
     const char* msg = "Data source is not a file! Can not proceed.";

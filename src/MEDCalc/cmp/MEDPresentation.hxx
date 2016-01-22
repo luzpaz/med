@@ -57,7 +57,7 @@ protected:
 private:
 
   void generatePipeline(); // reserved to friend class MEDPresentationManager
-  std::string getFieldTypeString(ParaMEDMEM::TypeOfField fieldType);
+  std::string getFieldTypeString(MEDCoupling::TypeOfField fieldType);
 
 protected:
 
