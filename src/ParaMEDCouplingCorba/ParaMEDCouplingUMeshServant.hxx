@@ -25,7 +25,7 @@
 #include "MPIObject_i.hxx"
 #include "MEDCouplingUMeshServant.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class ParaMEDCouplingUMeshServant : public virtual POA_SALOME_MED::ParaMEDCouplingUMeshCorbaInterface,
                                       public MEDCouplingUMeshServant,

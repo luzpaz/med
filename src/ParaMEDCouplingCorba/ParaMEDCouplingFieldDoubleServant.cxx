@@ -19,7 +19,7 @@
 
 #include "ParaMEDCouplingFieldDoubleServant.hxx"
 #include "utilities.h"
-using namespace ParaMEDMEM;
+using namespace MEDCoupling;
 
 ParaMEDCouplingFieldDoubleServant::ParaMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,MEDCouplingFieldDouble* field):MEDCouplingFieldDoubleServant(field)
 {

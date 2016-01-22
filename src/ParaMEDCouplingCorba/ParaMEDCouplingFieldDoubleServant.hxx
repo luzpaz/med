@@ -26,7 +26,7 @@
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldDoubleServant.hxx"
 
-namespace ParaMEDMEM
+namespace MEDCoupling
 {
   class ParaMEDCouplingFieldDoubleServant : public virtual POA_SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface,
                                             public MEDCouplingFieldDoubleServant,
