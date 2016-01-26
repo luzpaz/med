@@ -26,7 +26,7 @@ class MEDCALC_EXPORT MEDPresentationSlices : public MEDPresentation
 {
 public:
   MEDPresentationSlices(const MEDCALC::SlicesParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationSlices")
+    MEDPresentation(params.fieldHandlerId, "MEDPresentationSlices"), _params(params)
   {}
   virtual ~MEDPresentationSlices() {}
 

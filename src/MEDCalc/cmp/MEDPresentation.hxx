@@ -49,6 +49,7 @@ public:
 protected:
 
   MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::string name);
+  std::string getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode);
 
   virtual void internalGeneratePipeline() = 0;
   PyObject * getPythonObjectFromMain(const char * var);

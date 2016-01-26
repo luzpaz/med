@@ -26,7 +26,7 @@ class MEDCALC_EXPORT MEDPresentationVectorField : public MEDPresentation
 {
 public:
   MEDPresentationVectorField(const MEDCALC::VectorFieldParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationVectorField")
+    MEDPresentation(params.fieldHandlerId, "MEDPresentationVectorField"), _params(params)
   {}
   virtual ~MEDPresentationVectorField() {}
 

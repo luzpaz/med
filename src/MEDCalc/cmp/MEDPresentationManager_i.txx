@@ -17,8 +17,8 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef _MED_PRESENTATION_MANAGER_I_TPP_
-#define _MED_PRESENTATION_MANAGER_I_TPP_
+#ifndef _MED_PRESENTATION_MANAGER_I_TXX_
+#define _MED_PRESENTATION_MANAGER_I_TXX_
 
 template<typename PresentationType, typename PresentationParameters>
 MEDPresentation::TypeID
@@ -40,4 +40,4 @@ MEDPresentationManager_i::_makePresentation(PresentationParameters params)
   return newID;
 }
 
-#endif // _MED_PRESENTATION_MANAGER_I_TPP_
+#endif // _MED_PRESENTATION_MANAGER_I_TXX_

@@ -31,10 +31,11 @@ SET(MEDCALCGUI_SOURCES
   MEDEventListener_i.cxx
   MEDModule.cxx
   DatasourceController.cxx
+  PresentationController.cxx
   factory.cxx
 )
 
-SET(MEDCALCGUI_HEADERS MEDModule.hxx MEDEventListener_i.hxx WorkspaceController.hxx DatasourceController.hxx)
+SET(MEDCALCGUI_HEADERS MEDModule.hxx MEDEventListener_i.hxx WorkspaceController.hxx DatasourceController.hxx PresentationController.hxx)
 QT_WRAP_MOC(MEDCALCGUI_HEADERS_MOC ${MEDCALCGUI_HEADERS})
 
 

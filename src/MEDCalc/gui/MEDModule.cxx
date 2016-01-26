@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -173,6 +173,7 @@ MEDModule::createModuleWidgets() {
   _workspaceController = new WorkspaceController(this);
   _xmedDataModel  = new XmedDataModel();
   _workspaceController->setDataModel(_xmedDataModel);
+  _presentationController = new PresentationController(this);
 
   connect(_datasourceController, SIGNAL(datasourceSignal(const DatasourceEvent *)),
     _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent *)));
@@ -183,10 +184,9 @@ MEDModule::createModuleWidgets() {
 
 void
 MEDModule::createModuleActions() {
-  // Creating actions concerning the dataspace
   _datasourceController->createActions();
-  // Creating actions concerning the workspace
   _workspaceController->createActions();
+  _presentationController->createActions();
 }
 
 int
@@ -232,4 +232,10 @@ MEDModule::addActionInPopupMenu(int actionId,const QString& menus,const QString&
   else
     mgr->insert ( this->action( actionId ), parentId, 0 );
   mgr->setRule( this->action( actionId ), rule, QtxPopupMgr::VisibleRule );
+}
+
+MEDCALC::MEDPresentationViewMode
+MEDModule::getSelectedViewMode()
+{
+  return _presentationController->getSelectedViewMode();
 }

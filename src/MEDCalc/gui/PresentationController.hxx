@@ -15,26 +15,33 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
-#ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_POINTSPRITE_HXX_
-#define SRC_MEDCALC_CMP_MEDPRESENTATION_POINTSPRITE_HXX_
+#ifndef PRESENTATION_CONTROLLER_HXX
+#define PRESENTATION_CONTROLLER_HXX
 
-#include "MEDCALC.hxx"
-#include "MEDPresentation.hxx"
+#include <QtGui>
+#include "MEDCALCGUI.hxx"
 
-class MEDCALC_EXPORT MEDPresentationPointSprite : public MEDPresentation
-{
+#include <SALOMEconfig.h>
+#include CORBA_SERVER_HEADER(MEDPresentationManager)
+
+class MEDModule;
+
+class MEDCALCGUI_EXPORT PresentationController : public QObject {
+  Q_OBJECT
+
 public:
-  MEDPresentationPointSprite(const MEDCALC::PointSpriteParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationPointSprite"), _params(params)
-  {}
-  virtual ~MEDPresentationPointSprite() {}
+  PresentationController(MEDModule* salomeModule);
+  ~PresentationController();
 
-protected:
-  virtual void internalGeneratePipeline();
+  void createActions();
+
+  MEDCALC::MEDPresentationViewMode getSelectedViewMode();
 
 private:
-  MEDCALC::PointSpriteParameters _params;
+  MEDModule* _salomeModule;
+
 };
 
-#endif
+#endif /* PRESENTATION_CONTROLLER_HXX */

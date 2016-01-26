@@ -463,12 +463,13 @@ void WorkspaceController::_viewItemList(QStringList itemNameIdList) {
 
 QString
 WorkspaceController::_getViewMode() {
-#define stringify( name ) # name
-
-  QString viewMode = stringify(MEDCALC::VIEW_MODE_NEW_LAYOUT); // :TODO: change this (get value from dedicated dialog)
-  viewMode.replace("::", ".");
-
-  return viewMode;
+  MEDCALC::MEDPresentationViewMode viewMode = _salomeModule->getSelectedViewMode();
+  switch(viewMode) {
+  case MEDCALC::VIEW_MODE_REPLACE: return "MEDCALC.VIEW_MODE_REPLACE";
+  case MEDCALC::VIEW_MODE_OVERLAP: return "MEDCALC.VIEW_MODE_OVERLAP";
+  case MEDCALC::VIEW_MODE_NEW_LAYOUT: return "MEDCALC.VIEW_MODE_NEW_LAYOUT";
+  case MEDCALC::VIEW_MODE_SPLIT_VIEW: return "MEDCALC.VIEW_MODE_SPLIT_VIEW";
+  }
 }
 
 /**

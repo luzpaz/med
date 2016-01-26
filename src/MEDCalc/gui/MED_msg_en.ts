@@ -2,31 +2,42 @@
 <!DOCTYPE TS>
 <TS version="2.0">
   <context>
+    <name>PresentationController</name>
+    <message>
+      <source>LAB_VIEW_MODE_REPLACE</source>
+      <translation>Replace</translation>
+    </message>
+    <message>
+      <source>TIP_VIEW_MODE_REPLACE</source>
+      <translation>Replace</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_OVERLAP</source>
+      <translation>Overlap</translation>
+    </message>
+    <message>
+      <source>TIP_VIEW_MODE_OVERLAP</source>
+      <translation>Overlap</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_NEW_LAYOUT</source>
+      <translation>New layout</translation>
+    </message>
+    <message>
+      <source>TIP_VIEW_MODE_NEW_LAYOUT</source>
+      <translation>New layout</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_SPLIT_VIEW</source>
+      <translation>Split</translation>
+    </message>
+    <message>
+      <source>TIP_VIEW_MODE_SPLIT_VIEW</source>
+      <translation>Split</translation>
+    </message>
+  </context>
+  <context>
     <name>DatasourceController</name>
-    <message>
-      <source>MEDPresentationScalarMap</source>
-      <translation>Scalar map</translation>
-    </message>
-    <message>
-      <source>MEDPresentationContour</source>
-      <translation>Contour</translation>
-    </message>
-    <message>
-      <source>MEDPresentationVectorField</source>
-      <translation>Vector field</translation>
-    </message>
-    <message>
-      <source>MEDPresentationSlices</source>
-      <translation>Slices</translation>
-    </message>
-    <message>
-      <source>MEDPresentationDeflectionShape</source>
-      <translation>Deflection shape</translation>
-    </message>
-    <message>
-      <source>MEDPresentationPointSprite</source>
-      <translation>Point sprite</translation>
-    </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="45"/>
       <source>LAB_ADD_DATA_SOURCE</source>

@@ -104,3 +104,23 @@ std::string MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldTy
       return "";
   }
 }
+
+std::string
+MEDPresentation::getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode)
+{
+  std::string cmd = std::string("pvs._DisableFirstRenderCameraReset();");
+  if (viewMode == MEDCALC::VIEW_MODE_OVERLAP) {
+    cmd += std::string("__view1 = pvs.GetActiveViewOrCreate('RenderView');");
+  } else if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
+    cmd += std::string("__view1 = pvs.GetActiveViewOrCreate('RenderView');");
+    cmd += std::string("pvs.active_objects.source and pvs.Hide(view=__view1);");
+    cmd += std::string("pvs.Render();");
+  } else if (viewMode == MEDCALC::VIEW_MODE_NEW_LAYOUT) {
+    cmd += std::string("__layout1 = pvs.servermanager.misc.ViewLayout(registrationGroup='layouts');");
+    cmd += std::string("__view1 = pvs.CreateView('RenderView');");
+  } else if (viewMode == MEDCALC::VIEW_MODE_SPLIT_VIEW) {
+    cmd += std::string("__view1 = pvs.CreateView('RenderView');");
+  }
+  cmd += std::string("__view1.ResetCamera();");
+  return cmd;
+}

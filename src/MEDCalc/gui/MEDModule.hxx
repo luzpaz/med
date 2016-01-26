@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,9 +29,11 @@
 #include "WorkspaceController.hxx"
 #include "XmedDataModel.hxx"
 #include "DatasourceController.hxx"
+#include "PresentationController.hxx"
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MED_Gen)
+#include CORBA_SERVER_HEADER(MEDPresentationManager)
 
 class SalomeApp_Application;
 
@@ -67,6 +69,8 @@ public:
                            const QString& tooltip=QString());
   void addActionInPopupMenu(int actionId,const QString& menus="",const QString& rule="client='ObjectBrowser'");
 
+  MEDCALC::MEDPresentationViewMode getSelectedViewMode();
+
 public slots:
   virtual bool                    activateModule( SUIT_Study* theStudy );
   virtual bool                    deactivateModule( SUIT_Study* theStudy );
@@ -80,6 +84,7 @@ private:
   DatasourceController * _datasourceController;
   WorkspaceController *  _workspaceController;
   XmedDataModel *        _xmedDataModel;
+  PresentationController *  _presentationController;
   static MED_ORB::MED_Gen_var myEngine;
 };
 

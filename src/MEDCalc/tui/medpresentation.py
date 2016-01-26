@@ -26,21 +26,15 @@ __manager = medcalc.medcorba.factory.getPresentationManager()
 def MakeScalarMap(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
   # Create the presentation instance in CORBA engine
   # The engine in turn creates the ParaView pipeline elements
-
-  print "In MakeScalarMap (Python)"
-
-  print "viewMode:", viewMode, " [", type(viewMode), "]"
-
   params = MEDCALC.ScalarMapParameters(proxy.id, viewMode)
   presentation_id = __manager.makeScalarMap(params)
   notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
 def MakeContour(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
-  print "Not implemented yet"
-  #params = MEDCALC.ContourParameters(proxy.id, viewMode)
-  #presentation_id = __manager.makeContour(params)
-  #notifyGui_addPresentation(proxy.id, presentation_id)
+  params = MEDCALC.ContourParameters(proxy.id, viewMode)
+  presentation_id = __manager.makeContour(params)
+  notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
 def MakeVectorField(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
@@ -50,10 +44,9 @@ def MakeVectorField(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
 #
 
 def MakeSlices(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):
-  print "Not implemented yet"
-  #params = MEDCALC.SlicesParameters(proxy.id, viewMode)
-  #presentation_id = __manager.makeSlices(params)
-  #notifyGui_addPresentation(proxy.id, presentation_id)
+  params = MEDCALC.SlicesParameters(proxy.id, viewMode)
+  presentation_id = __manager.makeSlices(params)
+  notifyGui_addPresentation(proxy.id, presentation_id)
 #
 
 def MakeDeflectionShape(proxy, viewMode=MEDCALC.VIEW_MODE_REPLACE):

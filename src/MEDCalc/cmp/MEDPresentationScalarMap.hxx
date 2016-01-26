@@ -26,7 +26,7 @@ class MEDCALC_EXPORT MEDPresentationScalarMap : public MEDPresentation
 {
 public:
   MEDPresentationScalarMap(const MEDCALC::ScalarMapParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationScalarMap")
+    MEDPresentation(params.fieldHandlerId, "MEDPresentationScalarMap"), _params(params)
   {}
   virtual ~MEDPresentationScalarMap() {}
 

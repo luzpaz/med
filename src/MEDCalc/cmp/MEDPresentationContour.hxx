@@ -26,7 +26,7 @@ class MEDCALC_EXPORT MEDPresentationContour : public MEDPresentation
 {
 public:
   MEDPresentationContour(const MEDCALC::ContourParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationContour")
+    MEDPresentation(params.fieldHandlerId, "MEDPresentationContour"), _params(params)
   {}
   virtual ~MEDPresentationContour() {}
 

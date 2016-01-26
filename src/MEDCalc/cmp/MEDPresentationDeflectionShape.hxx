@@ -26,7 +26,7 @@ class MEDCALC_EXPORT MEDPresentationDeflectionShape : public MEDPresentation
 {
 public:
   MEDPresentationDeflectionShape(const MEDCALC::DeflectionShapeParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationDeflectionShape")
+    MEDPresentation(params.fieldHandlerId, "MEDPresentationDeflectionShape"), _params(params)
   {}
   virtual ~MEDPresentationDeflectionShape() {}
 
