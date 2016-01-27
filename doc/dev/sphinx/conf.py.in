@@ -103,10 +103,8 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'classic'
+html_theme = 'basic'
 html_theme_options = {
-    "stickysidebar": "false",
-    "rightsidebar": "false",
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
