@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2016  CEA/DEN, EDF R&D
+# Copyright (C) 2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,26 +17,18 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-ADD_SUBDIRECTORY(testfiles)
-ADD_SUBDIRECTORY(presentations)
-
 SET(MED_RESOURCES_FILES
-  datasource_add.png
-  datasource_changeUnderlyingMesh.png
-  datasource_interpolateField.png
-  datasource_expandfield.png
-  datasource_field.png
-  datasource_mesh.png
-  datasource.png
-  datasource_use.png
-  datasource_view.png
-  fileimport-32.png
-  folder.png
-  image_add.png
-  MEDCalc.png
-  MEDCalc_small.png
-  workspace_clean.png
-  workspace_save.png
-  pqAppIcon16.png
+  pqGlyph16.png
+  pqGlyph24.png
+  pqIsosurface16.png
+  pqIsosurface24.png
+  pqNodeMapData16.png
+  pqNodeMapData24.png
+  pqSlice16.png
+  pqSlice24.png
+  pqWarp16.png
+  pqWarp24.png
+  scalarmap16.png
+  scalarmap24.png
   )
 INSTALL(FILES ${MED_RESOURCES_FILES} DESTINATION ${SALOME_MED_INSTALL_RES_DATA})

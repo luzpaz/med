@@ -67,7 +67,7 @@ typedef struct {
     EVENT_ADD_PRESENTATION
   };
   int eventtype;
-  XmedDataObject * objectdata;
+  XmedDataObject* objectdata;
   QString objectalias;
 } DatasourceEvent;
 
@@ -82,7 +82,7 @@ class MEDCALCGUI_EXPORT DatasourceController: public QObject {
   Q_OBJECT
 
 public:
-  DatasourceController(MEDModule * salomeModule);
+  DatasourceController(MEDModule* salomeModule);
   ~DatasourceController();
 
   void createActions();
@@ -91,37 +91,29 @@ public slots:
   // Callback connected to dialog box validation signals
   void OnChangeUnderlyingMeshInputValidated();
   void OnInterpolateFieldInputValidated();
-  void processWorkspaceEvent(const MEDCALC::MedEvent * event);
+  void processWorkspaceEvent(const MEDCALC::MedEvent* event);
 
 signals:
-  void datasourceSignal(const DatasourceEvent * event);
+  void datasourceSignal(const DatasourceEvent* event);
 
 protected slots:
   void OnAddDatasource();
   void OnAddImagesource();
   void OnExpandField();
-  void OnVisualizeScalarMap();
-  void OnVisualizeContour();
-  void OnVisualizeVectorField();
-  void OnVisualizeSlices();
-  void OnVisualizeDeflectionShape();
-  void OnVisualizePointSprite();
   void OnUseInWorkspace();
   void OnChangeUnderlyingMesh();
   void OnInterpolateField();
 
 private:
-  void visualize(DatasourceEvent::EventType);
   void addDatasource(const char* filename);
   void updateTreeViewWithNewDatasource(const MEDCALC::DatasourceHandler*);
-  void updateTreeViewWithNewPresentation(long fieldId, long presentationId);
 
 private:
   MEDModule* _salomeModule;
-  SALOME_AppStudyEditor * _studyEditor;
+  SALOME_AppStudyEditor* _studyEditor; // borrowed to MEDModule
 
-  DlgChangeUnderlyingMesh * _dlgChangeUnderlyingMesh;
-  DlgInterpolateField * _dlgInterpolateField;
+  DlgChangeUnderlyingMesh* _dlgChangeUnderlyingMesh;
+  DlgInterpolateField* _dlgInterpolateField;
 
 };
 

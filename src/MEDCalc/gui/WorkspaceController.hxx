@@ -26,6 +26,7 @@
 #include "MEDEventListener_i.hxx"
 #include "XmedConsoleDriver.hxx"
 #include "DatasourceController.hxx"
+#include "PresentationController.hxx"
 #include "MEDCALCGUI.hxx"
 
 #include <SALOMEconfig.h>
@@ -46,7 +47,7 @@ class MEDCALCGUI_EXPORT WorkspaceController: public TreeGuiManager {
   Q_OBJECT
 
 public:
-  WorkspaceController(MEDModule * salomeModule);
+  WorkspaceController(MEDModule* salomeModule);
   ~WorkspaceController();
 
   void createActions();
@@ -56,20 +57,21 @@ public slots:
   void processItemList(QStringList itemNameIdList, int actionId);
 
   // Internal slots
-  void processMedEvent(const MEDCALC::MedEvent * event);
-  void processDatasourceEvent(const DatasourceEvent * event);
+  void processMedEvent(const MEDCALC::MedEvent* event);
+  void processDatasourceEvent(const DatasourceEvent* event);
+  void processPresentationEvent(const PresentationEvent* event);
   void OnSaveWorkspace();
   void OnCleanWorkspace();
 
 signals:
-  void workspaceSignal(const MEDCALC::MedEvent * event);
+  void workspaceSignal(const MEDCALC::MedEvent* event);
 
 private:
   void _importItem(QString itemNameId);
   void _importItemList(QStringList itemNameIdList);
-  void _importFieldIntoConsole(MEDCALC::FieldHandler * fieldHandler,
+  void _importFieldIntoConsole(MEDCALC::FieldHandler* fieldHandler,
                                bool askForOptions,
-                               const char * alias=NULL);
+                               const char* alias=NULL);
 
   void _exportItemList(QStringList itemNameIdList);
   void _saveItemList(QStringList itemNameIdList);
@@ -78,9 +80,9 @@ private:
   QString _getViewMode();
 
 private:
-  XmedConsoleDriver * _consoleDriver;
-  MEDModule * _salomeModule;
-  MEDEventListener_i * _medEventListener;
+  XmedConsoleDriver* _consoleDriver;
+  MEDModule* _salomeModule;
+  MEDEventListener_i* _medEventListener;
 
   // This structure is intended to memorized in a bundle the whole set
   // of integers identifying the actions of the popup menu associated

@@ -35,6 +35,82 @@
       <source>TIP_VIEW_MODE_SPLIT_VIEW</source>
       <translation>Split</translation>
     </message>
+    <message>
+      <source>LAB_PRESENTATION_SCALAR_MAP</source>
+      <translation>Scalar map</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_SCALAR_MAP</source>
+      <translation>Scalar map</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_CONTOUR</source>
+      <translation>Contour</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_CONTOUR</source>
+      <translation>Contour</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_VECTOR_FIELD</source>
+      <translation>Vector field</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_VECTOR_FIELD</source>
+      <translation>Vector field</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_SLICES</source>
+      <translation>Slices</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_SLICES</source>
+      <translation>Slices</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_DEFLECTION_SHAPE</source>
+      <translation>Deflection shape</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_DEFLECTION_SHAPE</source>
+      <translation>Deflection shape</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_POINT_SPRITE</source>
+      <translation>Point sprite</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_POINT_SPRITE</source>
+      <translation>Point sprite</translation>
+    </message>
+    <message>
+      <source>MENU_PRESENTATIONS</source>
+      <translation>Presentations</translation>
+    </message>
+    <message>
+      <source>MEDPresentationScalarMap</source>
+      <translation>Scalar map</translation>
+    </message>
+    <message>
+      <source>MEDPresentationContour</source>
+      <translation>Contour</translation>
+    </message>
+    <message>
+      <source>MEDPresentationVectorField</source>
+      <translation>Vector field</translation>
+    </message>
+    <message>
+      <source>MEDPresentationSlices</source>
+      <translation>Slices</translation>
+    </message>
+    <message>
+      <source>MEDPresentationDeflectionShape</source>
+      <translation>Deflection shape</translation>
+    </message>
+    <message>
+      <source>MEDPresentationPointSprite</source>
+      <translation>Point sprite</translation>
+    </message>
   </context>
   <context>
     <name>DatasourceController</name>
@@ -62,35 +138,6 @@
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="62"/>
       <source>LAB_EXPAND_FIELD</source>
       <translation>Expand field timeseries</translation>
-    </message>
-    <message>
-      <source>LAB_VISUALIZE_SCALARMAP</source>
-      <translation>Scalar map</translation>
-    </message>
-    <message>
-      <source>LAB_VISUALIZE_CONTOUR</source>
-      <translation>Contour</translation>
-    </message>
-    <message>
-      <source>LAB_VISUALIZE_VECTORFIELD</source>
-      <translation>Vector field</translation>
-    </message>
-    <message>
-      <source>LAB_VISUALIZE_SLICES</source>
-      <translation>Slices</translation>
-    </message>
-    <message>
-      <source>LAB_VISUALIZE_DEFLECTIONSHAPE</source>
-      <translation>Deflection shape</translation>
-    </message>
-    <message>
-      <source>LAB_VISUALIZE_POINTSPRITE</source>
-      <translation>Point sprite</translation>
-    </message>
-    <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="69"/>
-      <source>LAB_VISUALIZE</source>
-      <translation>Visualize</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="75"/>

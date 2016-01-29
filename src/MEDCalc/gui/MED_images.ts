@@ -4,10 +4,6 @@
   <context>
     <name>@default</name>
     <message>
-      <source>ICO_MED_PRESENTATION</source>
-      <translation>pqAppIcon16.png</translation>
-    </message>
-    <message>
       <source>ICO_IMPORT_MED</source>
       <translation>datasource_add.png</translation>
     </message>
@@ -44,10 +40,6 @@
       <translation>datasource_use.png</translation>
     </message>
     <message>
-      <source>ICO_DATASOURCE_VIEW</source>
-      <translation>datasource_view.png</translation>
-    </message>
-    <message>
       <source>ICO_FOLDER</source>
       <translation>folder.png</translation>
     </message>
@@ -70,6 +62,54 @@
     <message>
       <source>ICO_WORKSPACE_SAVE</source>
       <translation>workspace_save.png</translation>
+    </message>
+    <message>
+      <source>ICO_PRESENTATION_SCALAR_MAP</source>
+      <translation>scalarmap24.png</translation>
+    </message>
+    <message>
+      <source>ICO_PRESENTATION_CONTOUR</source>
+      <translation>pqIsosurface24.png</translation>
+    </message>
+    <message>
+      <source>ICO_PRESENTATION_VECTOR_FIELD</source>
+      <translation>pqGlyph24.png</translation>
+    </message>
+    <message>
+      <source>ICO_PRESENTATION_SLICES</source>
+      <translation>pqSlice24.png</translation>
+    </message>
+    <message>
+      <source>ICO_PRESENTATION_DEFLECTION_SHAPE</source>
+      <translation>pqWarp24.png</translation>
+    </message>
+    <message>
+      <source>ICO_PRESENTATION_POINT_SPRITE</source>
+      <translation>pqNodeMapData24.png</translation>
+    </message>
+    <message>
+      <source>ICO_MEDPresentationScalarMap</source>
+      <translation>scalarmap16.png</translation>
+    </message>
+    <message>
+      <source>ICO_MEDPresentationContour</source>
+      <translation>pqIsosurface16.png</translation>
+    </message>
+    <message>
+      <source>ICO_MEDPresentationVectorField</source>
+      <translation>pqGlyph16.png</translation>
+    </message>
+    <message>
+      <source>ICO_MEDPresentationSlices</source>
+      <translation>pqSlice16.png</translation>
+    </message>
+    <message>
+      <source>ICO_MEDPresentationDeflectionShape</source>
+      <translation>pqWarp16.png</translation>
+    </message>
+    <message>
+      <source>ICO_MEDPresentationPointSprite</source>
+      <translation>pqNodeMapData16.png</translation>
     </message>
   </context>
 </TS>

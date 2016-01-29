@@ -25,6 +25,7 @@
 #include "MEDCALCGUI.hxx"
 
 #include <SalomeApp_Module.h>
+#include <SALOME_AppStudyEditor.hxx>
 
 #include "WorkspaceController.hxx"
 #include "XmedDataModel.hxx"
@@ -54,26 +55,30 @@ public:
 
   static MED_ORB::MED_Gen_var engine();
 
-  virtual void                    initialize( CAM_Application* app );
-  virtual QString                 engineIOR() const;
+  virtual void initialize(CAM_Application* app);
+  virtual QString engineIOR() const;
 
-  virtual QString                 iconName() const;
+  virtual QString iconName() const;
 
-  virtual void                    windows( QMap<int, int>& theMap ) const;
-  virtual void                    viewManagers( QStringList& theList ) const;
+  virtual void windows(QMap<int, int>& theMap) const;
+  virtual void viewManagers(QStringList& theList) const;
 
   int createStandardAction(const QString& label,
-                           QObject * slotobject,
+                           QObject* slotobject,
                            const char* slotmember,
                            const QString& iconName,
                            const QString& tooltip=QString());
-  void addActionInPopupMenu(int actionId,const QString& menus="",const QString& rule="client='ObjectBrowser'");
+  void addActionInPopupMenu(int actionId,
+                            const QString& menus="",
+                            const QString& rule="client='ObjectBrowser'");
 
   MEDCALC::MEDPresentationViewMode getSelectedViewMode();
 
+  inline SALOME_AppStudyEditor* getStudyEditor() { return _studyEditor; }
+
 public slots:
-  virtual bool                    activateModule( SUIT_Study* theStudy );
-  virtual bool                    deactivateModule( SUIT_Study* theStudy );
+  virtual bool activateModule(SUIT_Study* theStudy);
+  virtual bool deactivateModule(SUIT_Study* theStudy);
 
 private:
   void createModuleWidgets();
@@ -81,10 +86,11 @@ private:
   static void init();
 
 private:
-  DatasourceController * _datasourceController;
-  WorkspaceController *  _workspaceController;
-  XmedDataModel *        _xmedDataModel;
-  PresentationController *  _presentationController;
+  SALOME_AppStudyEditor* _studyEditor;
+  DatasourceController* _datasourceController;
+  WorkspaceController* _workspaceController;
+  XmedDataModel* _xmedDataModel;
+  PresentationController* _presentationController;
   static MED_ORB::MED_Gen_var myEngine;
 };
 

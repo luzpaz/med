@@ -38,7 +38,7 @@
 MED_ORB::MED_Gen_var MEDModule::myEngine;
 
 MEDModule::MEDModule() :
-  SalomeApp_Module("MED")
+  SalomeApp_Module("MED"), _studyEditor(0), _datasourceController(0), _workspaceController(0), _presentationController(0)
 {
   // Note also that we can't use the getApp() function here because
   // the initialize(...) function has not been called yet.
@@ -48,7 +48,14 @@ MEDModule::MEDModule() :
 
 MEDModule::~MEDModule()
 {
-  // nothing to do
+  if (_studyEditor)
+    delete _studyEditor;
+  if (_datasourceController)
+    delete _datasourceController;
+  //if (_workspaceController)
+  //  delete _workspaceController;
+  if (_presentationController)
+    delete _presentationController;
 }
 
 MED_ORB::MED_Gen_var
@@ -169,17 +176,24 @@ MEDModule::deactivateModule( SUIT_Study* theStudy )
  */
 void
 MEDModule::createModuleWidgets() {
+  _studyEditor = new SALOME_AppStudyEditor(getApp());
   _datasourceController = new DatasourceController(this);
   _workspaceController = new WorkspaceController(this);
   _xmedDataModel  = new XmedDataModel();
   _workspaceController->setDataModel(_xmedDataModel);
   _presentationController = new PresentationController(this);
 
-  connect(_datasourceController, SIGNAL(datasourceSignal(const DatasourceEvent *)),
-    _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent *)));
+  connect(_datasourceController, SIGNAL(datasourceSignal(const DatasourceEvent*)),
+    _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent*)));
 
-  connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent *)),
-    _datasourceController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent *)));
+  connect(_presentationController, SIGNAL(presentationSignal(const PresentationEvent*)),
+    _workspaceController, SLOT(processPresentationEvent(const PresentationEvent*)));
+
+  connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent*)),
+    _datasourceController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent*)));
+
+  connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent*)),
+    _presentationController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent*)));
 }
 
 void
@@ -191,7 +205,7 @@ MEDModule::createModuleActions() {
 
 int
 MEDModule::createStandardAction(const QString& label,
-                                QObject * slotobject,
+                                QObject* slotobject,
                                 const char* slotmember,
                                 const QString& iconName,
                                 const QString& tooltip)

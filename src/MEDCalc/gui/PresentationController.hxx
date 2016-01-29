@@ -23,8 +23,27 @@
 #include <QtGui>
 #include "MEDCALCGUI.hxx"
 
+#include "MEDEventListener_i.hxx"
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(MEDPresentationManager)
+#include CORBA_CLIENT_HEADER(MEDDataManager)
+
+#include "XmedDataModel.hxx"
+#include <SALOME_AppStudyEditor.hxx>
+
+typedef struct {
+  enum EventType {
+    EVENT_VIEW_OBJECT_CONTOUR,
+    EVENT_VIEW_OBJECT_DEFLECTION_SHAPE,
+    EVENT_VIEW_OBJECT_POINT_SPRITE,
+    EVENT_VIEW_OBJECT_SCALAR_MAP,
+    EVENT_VIEW_OBJECT_SLICES,
+    EVENT_VIEW_OBJECT_VECTOR_FIELD
+  };
+  int eventtype;
+  XmedDataObject* objectdata;
+  QString objectalias;
+} PresentationEvent;
 
 class MEDModule;
 
@@ -39,8 +58,25 @@ public:
 
   MEDCALC::MEDPresentationViewMode getSelectedViewMode();
 
+signals:
+  void presentationSignal(const PresentationEvent* event);
+
+protected slots:
+  void OnVisualizeScalarMap();
+  void OnVisualizeContour();
+  void OnVisualizeVectorField();
+  void OnVisualizeSlices();
+  void OnVisualizeDeflectionShape();
+  void OnVisualizePointSprite();
+  void processWorkspaceEvent(const MEDCALC::MedEvent* event);
+
+private:
+  void visualize(PresentationEvent::EventType);
+  void updateTreeViewWithNewPresentation(long fieldId, long presentationId);
+
 private:
   MEDModule* _salomeModule;
+  SALOME_AppStudyEditor* _studyEditor; // borrowed to MEDModule
 
 };
 

@@ -53,12 +53,12 @@
 // Datasource controller
 // ==============================================================
 //
-//DatasourceController::DatasourceController(StandardApp_Module * salomeModule)
-DatasourceController::DatasourceController(MEDModule * salomeModule)
+//DatasourceController::DatasourceController(StandardApp_Module* salomeModule)
+DatasourceController::DatasourceController(MEDModule* salomeModule)
 {
   STDLOG("Creating a DatasourceController");
   _salomeModule = salomeModule;
-  _studyEditor = new SALOME_AppStudyEditor(_salomeModule->getApp());
+  _studyEditor = _salomeModule->getStudyEditor();
 
   _dlgChangeUnderlyingMesh = new DlgChangeUnderlyingMesh(_studyEditor);
   connect(_dlgChangeUnderlyingMesh,SIGNAL(inputValidated()),
@@ -72,7 +72,6 @@ DatasourceController::DatasourceController(MEDModule * salomeModule)
 
 DatasourceController::~DatasourceController() {
   STDLOG("Deleting the DatasourceController");
-  delete _studyEditor;
 }
 
 void DatasourceController::createActions() {
@@ -103,6 +102,8 @@ void DatasourceController::createActions() {
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnAddImagesource()),icon,tooltip);
   // _salomeModule->addActionInToolbar(actionId);
   _salomeModule->createTool(actionId, toolbarId);
+  _salomeModule->action(actionId)->setIconVisibleInMenu(true);
+  _salomeModule->createMenu(actionId, menuId, 20);
 
   //
   // Actions for popup menu only
@@ -112,37 +113,6 @@ void DatasourceController::createActions() {
   icon  = tr("ICO_DATASOURCE_EXPAND_FIELD");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnExpandField()),icon);
   _salomeModule->addActionInPopupMenu(actionId);
-
-  // Create a view submenu with usual visualization functions
-  label = tr("LAB_VISUALIZE_SCALARMAP");
-  icon  = tr("ICO_DATASOURCE_VIEW");
-  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeScalarMap()),icon);
-  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
-
-  label = tr("LAB_VISUALIZE_CONTOUR");
-  icon  = tr("ICO_DATASOURCE_VIEW");
-  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeContour()),icon);
-  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
-
-  label = tr("LAB_VISUALIZE_VECTORFIELD");
-  icon  = tr("ICO_DATASOURCE_VIEW");
-  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeVectorField()),icon);
-  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
-
-  label = tr("LAB_VISUALIZE_SLICES");
-  icon  = tr("ICO_DATASOURCE_VIEW");
-  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeSlices()),icon);
-  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
-
-  label = tr("LAB_VISUALIZE_DEFLECTIONSHAPE");
-  icon  = tr("ICO_DATASOURCE_VIEW");
-  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizeDeflectionShape()),icon);
-  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
-
-  label = tr("LAB_VISUALIZE_POINTSPRITE");
-  icon  = tr("ICO_DATASOURCE_VIEW");
-  actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualizePointSprite()),icon);
-  _salomeModule->addActionInPopupMenu(actionId, tr("LAB_VISUALIZE"));
 
   // Use in workspace
   label = tr("LAB_USE_IN_WORKSPACE");
@@ -192,27 +162,6 @@ DatasourceController::updateTreeViewWithNewDatasource(const MEDCALC::DatasourceH
   _PTR(Study) studyDS = study->studyDS();
 
   _salomeModule->engine()->addDatasourceToStudy(_CAST(Study, studyDS)->GetStudy(), *datasourceHandler);
-
-  // update Object browser
-  _salomeModule->getApp()->updateObjectBrowser(true);
-}
-
-void
-DatasourceController::updateTreeViewWithNewPresentation(long fieldId, long presentationId)
-{
-  if (presentationId < 0) {
-    std::cerr << "Unknown presentation\n";
-    return;
-  }
-
-  std::string name = MEDFactoryClient::getPresentationManager()->getPresentationProperty(presentationId, "name");
-  name = tr(name.c_str()).toStdString();
-  std::string label = tr("ICO_MED_PRESENTATION").toStdString();
-
-  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
-  _PTR(Study) studyDS = study->studyDS();
-
-  _salomeModule->engine()->registerPresentation(_CAST(Study, studyDS)->GetStudy(), fieldId, name.c_str(), label.c_str());
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);
@@ -291,7 +240,7 @@ void DatasourceController::OnExpandField()
   _studyEditor->updateActiveStudy();
 
   // Get the selected objects in the study (SObject)
-  SALOME_StudyEditor::SObjectList * listOfSObject = _studyEditor->getSelectedObjects();
+  SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   for (int i=0; i<listOfSObject->size(); i++) {
     SALOMEDS::SObject_var soFieldseries = listOfSObject->at(i);
 
@@ -308,7 +257,7 @@ void DatasourceController::OnExpandField()
     // contextual menu if the selected object is not conform
 
     // Then retrieve the list of fields in this timeseries
-    MEDCALC::FieldHandlerList * fieldHandlerList =
+    MEDCALC::FieldHandlerList* fieldHandlerList =
       MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldseriesId);
 
     // Finally, create an entry for each of the field
@@ -324,71 +273,12 @@ void DatasourceController::OnExpandField()
   _salomeModule->updateObjBrowser(true);
 }
 
-void DatasourceController::visualize(DatasourceEvent::EventType eventType) {
-  // We need a _studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
-
-  // Get the selected objects in the study (SObject)
-  SALOME_StudyEditor::SObjectList * listOfSObject = _studyEditor->getSelectedObjects();
-
-  // For each object, emit a signal to the workspace to request a
-  // visualisation using the tui command (so that the user can see how
-  // to make a view of an object from the tui console).
-  for (int i=0; i<listOfSObject->size(); i++) {
-    SALOMEDS::SObject_var soField = listOfSObject->at(i);
-    int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
-    // If fieldId equals -1, then it means that it is not a field
-    // managed by the MED module, and we stop this function process.
-    if ( fieldId < 0 )
-      continue;
-
-    MEDCALC::FieldHandler * fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
-    if (! fieldHandler) {
-      QMessageBox::warning(_salomeModule->getApp()->desktop(),
-         tr("Operation not allowed"),
-         tr("No field is defined"));
-      return;
-    }
-
-    DatasourceEvent * event = new DatasourceEvent();
-    event->eventtype = eventType;
-    XmedDataObject * dataObject = new XmedDataObject();
-    dataObject->setFieldHandler(*fieldHandler);
-    event->objectdata  = dataObject;
-    emit datasourceSignal(event);
-  }
-}
-
-void DatasourceController::OnVisualizeScalarMap() {
-  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_SCALAR_MAP);
-}
-
-void DatasourceController::OnVisualizeContour() {
-  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_CONTOUR);
-}
-
-void DatasourceController::OnVisualizeVectorField() {
-  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_VECTOR_FIELD);
-}
-
-void DatasourceController::OnVisualizeSlices() {
-  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_SLICES);
-}
-
-void DatasourceController::OnVisualizeDeflectionShape() {
-  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE);
-}
-
-void DatasourceController::OnVisualizePointSprite() {
-  this->visualize(DatasourceEvent::EVENT_VIEW_OBJECT_POINT_SPRITE);
-}
-
 void DatasourceController::OnUseInWorkspace() {
   // We need a studyEditor updated on the active study
   _studyEditor->updateActiveStudy();
 
   // Get the selected objects in the study (SObject)
-  SALOME_StudyEditor::SObjectList * listOfSObject = _studyEditor->getSelectedObjects();
+  SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() == 1 ) {
     // In this case we ask the name of the variable for the python
     // console
@@ -421,7 +311,7 @@ void DatasourceController::OnUseInWorkspace() {
       return;
     }
 
-    MEDCALC::FieldHandler * fieldHandler =
+    MEDCALC::FieldHandler* fieldHandler =
       MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
 
     if (! fieldHandler) {
@@ -441,9 +331,9 @@ void DatasourceController::OnUseInWorkspace() {
     }
     alias = dialog.getAlias();
 
-    DatasourceEvent * event = new DatasourceEvent();
+    DatasourceEvent* event = new DatasourceEvent();
     event->eventtype = DatasourceEvent::EVENT_USE_OBJECT;
-    XmedDataObject * dataObject = new XmedDataObject();
+    XmedDataObject* dataObject = new XmedDataObject();
     dataObject->setFieldHandler(*fieldHandler);
     event->objectdata  = dataObject;
     event->objectalias = alias;
@@ -464,11 +354,11 @@ void DatasourceController::OnUseInWorkspace() {
       bool isInWorkspace = _studyEditor->getParameterBool(soField,OBJECT_IS_IN_WORKSPACE);
       if ( !isInWorkspace ) {
         int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
-        MEDCALC::FieldHandler * fieldHandler =
+        MEDCALC::FieldHandler* fieldHandler =
           MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
-        DatasourceEvent * event = new DatasourceEvent();
+        DatasourceEvent* event = new DatasourceEvent();
         event->eventtype = DatasourceEvent::EVENT_IMPORT_OBJECT;
-        XmedDataObject * dataObject = new XmedDataObject();
+        XmedDataObject* dataObject = new XmedDataObject();
         dataObject->setFieldHandler(*fieldHandler);
         event->objectdata  = dataObject;
         emit datasourceSignal(event);
@@ -496,7 +386,7 @@ void DatasourceController::OnChangeUnderlyingMesh() {
   // Get the selected objects in the study (SObject). In cas of a
   // multiple selection, we consider only the first item. At least one
   // item must be selected.
-  SALOME_StudyEditor::SObjectList * listOfSObject = _studyEditor->getSelectedObjects();
+  SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() > 0 ) {
     SALOMEDS::SObject_var soField = listOfSObject->at(0);
     int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
@@ -514,11 +404,11 @@ void DatasourceController::OnChangeUnderlyingMeshInputValidated() {
   int meshId = _dlgChangeUnderlyingMesh->getMeshId();
   STDLOG("meshId = " << ToString(meshId));
   int fieldId = _dlgChangeUnderlyingMesh->getFieldId();
-  MEDCALC::FieldHandler * fieldHandler =
+  MEDCALC::FieldHandler* fieldHandler =
     MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
 
   // We don't modify the original field but create first a duplicate
-  MEDCALC::FieldHandler * duplicate = MEDFactoryClient::getCalculator()->dup(*fieldHandler);
+  MEDCALC::FieldHandler* duplicate = MEDFactoryClient::getCalculator()->dup(*fieldHandler);
   MEDFactoryClient::getDataManager()->changeUnderlyingMesh(duplicate->id, meshId);
 
   // Request once more the duplicate to update the meta-data on this
@@ -528,9 +418,9 @@ void DatasourceController::OnChangeUnderlyingMeshInputValidated() {
   // >>>
   // WARN: the following is a temporary code for test purpose
   // Automatically add in ws
-  DatasourceEvent * event = new DatasourceEvent();
+  DatasourceEvent* event = new DatasourceEvent();
   event->eventtype = DatasourceEvent::EVENT_IMPORT_OBJECT;
-  XmedDataObject * dataObject = new XmedDataObject();
+  XmedDataObject* dataObject = new XmedDataObject();
   dataObject->setFieldHandler(*duplicate);
   event->objectdata = dataObject;
   emit datasourceSignal(event);
@@ -547,7 +437,7 @@ void DatasourceController::OnInterpolateField() {
   // Get the selected objects in the study (SObject). In case of a
   // multiple selection, we consider only the first item. At least one
   // item must be selected.
-  SALOME_StudyEditor::SObjectList * listOfSObject = _studyEditor->getSelectedObjects();
+  SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() > 0 ) {
     SALOMEDS::SObject_var soField = listOfSObject->at(0);
     int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
@@ -603,9 +493,9 @@ void DatasourceController::OnInterpolateFieldInputValidated() {
   // >>>
   // WARN: the following is a temporary code for test purpose
   // Automatically add in ws
-  DatasourceEvent * event = new DatasourceEvent();
+  DatasourceEvent* event = new DatasourceEvent();
   event->eventtype = DatasourceEvent::EVENT_IMPORT_OBJECT;
-  XmedDataObject * dataObject = new XmedDataObject();
+  XmedDataObject* dataObject = new XmedDataObject();
   dataObject->setFieldHandler(*result);
   event->objectdata = dataObject;
   emit datasourceSignal(event);
@@ -621,8 +511,5 @@ DatasourceController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
   if ( event->type == MEDCALC::EVENT_ADD_DATASOURCE ) {
     MEDCALC::DatasourceHandler* datasourceHandler = MEDFactoryClient::getDataManager()->getDatasourceHandler(event->filename);
     this->updateTreeViewWithNewDatasource(datasourceHandler);
-  }
-  else if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
-    this->updateTreeViewWithNewPresentation(event->dataId, event->presentationId);
   }
 }

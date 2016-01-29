@@ -40,8 +40,8 @@
  * and containing a tree view for rendering a hierarchical data
  * model. This datamodel contains the objects used in the workspace.
  */
-//WorkspaceController::WorkspaceController(StandardApp_Module * salomeModule)
-WorkspaceController::WorkspaceController(MEDModule * salomeModule)
+//WorkspaceController::WorkspaceController(StandardApp_Module* salomeModule)
+WorkspaceController::WorkspaceController(MEDModule* salomeModule)
   : TreeGuiManager(salomeModule->getApp(), "Workspace")
 {
   _salomeModule = salomeModule;
@@ -67,8 +67,8 @@ WorkspaceController::WorkspaceController(MEDModule * salomeModule)
   // with other parts of the application, in particular the python
   // console that could retrieve this IOR using the
   // getEventListenerIOR() function of the MEDDataManager.
-  SalomeApp_Application * salomeApp = salomeModule->getApp();
-  const char * medEventListenerIOR =
+  SalomeApp_Application* salomeApp = salomeModule->getApp();
+  const char* medEventListenerIOR =
     salomeApp->orb()->object_to_string(medEventListenerServant);
   MEDFactoryClient::getDataManager()->setEventListenerIOR(medEventListenerIOR);
 
@@ -178,7 +178,7 @@ void WorkspaceController::_importItemList(QStringList itemNameIdList) {
  * console (see _importItemList).
  */
 void WorkspaceController::_importItem(QString itemNameId) {
-  XmedDataModel * dataModel = (XmedDataModel *)this->getDataModel();
+  XmedDataModel* dataModel = (XmedDataModel*)this->getDataModel();
   if ( dataModel == NULL ) {
     LOG("No data model associated to this tree view");
     return;
@@ -186,8 +186,8 @@ void WorkspaceController::_importItem(QString itemNameId) {
 
   // We can request the dataModel to obtain the dataObject associated
   // to this item (iteNameId is a TreeView id, Qt stuff only).
-  XmedDataObject * dataObject =
-    (XmedDataObject *)dataModel->getDataObject(QS2S(itemNameId));
+  XmedDataObject* dataObject =
+    (XmedDataObject*)dataModel->getDataObject(QS2S(itemNameId));
 
   if ( dataObject == NULL ) {
     LOG("WorkspaceController: WARN! No data object associated to the item "<<itemNameId);
@@ -196,7 +196,7 @@ void WorkspaceController::_importItem(QString itemNameId) {
 
   // Then, we can request this data object to obtain the associated
   // FieldHandler.
-  MEDCALC::FieldHandler * fieldHandler = dataObject->getFieldHandler();
+  MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
   STDLOG("Field: mesh="<<fieldHandler->meshname<<" name="<<fieldHandler->fieldname);
 
   // Finally, we can import the field
@@ -211,14 +211,14 @@ void WorkspaceController::_importItem(QString itemNameId) {
  * options or simply specify the alias (i.e. the name of the python
  * variable).
  */
-void WorkspaceController::_importFieldIntoConsole(MEDCALC::FieldHandler * fieldHandler,
+void WorkspaceController::_importFieldIntoConsole(MEDCALC::FieldHandler* fieldHandler,
               bool askForOptions,
-              const char * alias)
+              const char* alias)
 {
   STDLOG("alias="<<alias);
 
   // By default, the alias is the name of the field
-  QString *effectiveAlias;
+  QString*effectiveAlias;
   if ( alias == NULL ) {
     effectiveAlias = new QString(fieldHandler->fieldname);
   }
@@ -260,11 +260,11 @@ void WorkspaceController::_importFieldIntoConsole(MEDCALC::FieldHandler * fieldH
  * emitted from the MEDEventListener. It processes events coming from
  * the python console.
  */
-void WorkspaceController::processMedEvent(const MEDCALC::MedEvent * event) {
+void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
   STDLOG("WorkspaceController::processMedEvent");
   STDLOG("dataId  :"<<event->dataId);
 
-  XmedDataModel * dataModel = (XmedDataModel *)this->getDataModel();
+  XmedDataModel* dataModel = (XmedDataModel*)this->getDataModel();
   if ( dataModel == NULL ) {
     STDLOG("No data model associated to this tree view");
     return;
@@ -275,16 +275,16 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent * event) {
   }
   else if ( event->type == MEDCALC::EVENT_PUT_IN_WORKSPACE ) {
     STDLOG("add new field");
-    MEDCALC::FieldHandler * fieldHandler =
+    MEDCALC::FieldHandler* fieldHandler =
       MEDFactoryClient::getDataManager()->getFieldHandler(event->dataId);
 
-    XmedDataObject * dataObject = (XmedDataObject *)dataModel->newDataObject();
+    XmedDataObject* dataObject = (XmedDataObject*)dataModel->newDataObject();
     dataObject->setFieldHandler(*fieldHandler);
     this->getDataTreeModel()->addData(dataObject);
   }
   else if ( event->type == MEDCALC::EVENT_REMOVE_FROM_WORKSPACE ) {
     STDLOG("remove field");
-    std::map<string, DataObject *>::iterator itr = dataModel->begin();
+    std::map<string, DataObject*>::iterator itr = dataModel->begin();
     for ( ; itr != dataModel->end(); ++itr) {
       XmedDataObject* obj = dynamic_cast<XmedDataObject*>(itr->second);
       if (obj->getFieldHandler()->id == event->dataId) {
@@ -297,7 +297,7 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent * event) {
   }
   else if ( event->type == MEDCALC::EVENT_CLEAN_WORKSPACE ) {
     STDLOG("clean workspace");
-    std::map<string, DataObject *>::iterator itr = dataModel->begin();
+    std::map<string, DataObject*>::iterator itr = dataModel->begin();
     for ( ; itr != dataModel->end(); ++itr) {
       XmedDataObject* obj = dynamic_cast<XmedDataObject*>(itr->second);
       std::string itemNameId = obj->getNameId();
@@ -319,7 +319,7 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent * event) {
  * name is requested to the user using a file chooser dialog box
  */
 void WorkspaceController::_saveItemList(QStringList itemNameIdList) {
-  XmedDataProcessor * dataProcessor = new XmedDataProcessor(this->getDataModel());
+  XmedDataProcessor* dataProcessor = new XmedDataProcessor(this->getDataModel());
   dataProcessor->process(itemNameIdList);
   MEDCALC::FieldIdList_var fieldIdList = dataProcessor->getResultingFieldIdList();
   delete dataProcessor;
@@ -341,7 +341,7 @@ void WorkspaceController::_saveItemList(QStringList itemNameIdList) {
  * This function remove the selected item from workspace.
  */
 void WorkspaceController::_removeItemList(QStringList itemNameIdList) {
-  XmedDataModel * dataModel = (XmedDataModel *)this->getDataModel();
+  XmedDataModel* dataModel = (XmedDataModel*)this->getDataModel();
   if ( dataModel == NULL ) {
     LOG("No data model associated to this tree view");
     return;
@@ -352,8 +352,8 @@ void WorkspaceController::_removeItemList(QStringList itemNameIdList) {
 
   // We can request the dataModel to obtain the dataObject associated
   // to this item (iteNameId is a TreeView id, Qt stuff only).
-  XmedDataObject * dataObject =
-    (XmedDataObject *)dataModel->getDataObject(QS2S(itemNameId));
+  XmedDataObject* dataObject =
+    (XmedDataObject*)dataModel->getDataObject(QS2S(itemNameId));
 
   if ( dataObject == NULL ) {
     LOG("WorkspaceController: WARN! No data object associated to the item "<<itemNameId);
@@ -362,7 +362,7 @@ void WorkspaceController::_removeItemList(QStringList itemNameIdList) {
 
   // Then, we can request this data object to obtain the associated
   // FieldHandler.
-  MEDCALC::FieldHandler * fieldHandler = dataObject->getFieldHandler();
+  MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
   STDLOG("Field: mesh="<<fieldHandler->meshname<<" name="<<fieldHandler->fieldname);
 
   // Remove the field variable from console
@@ -382,7 +382,7 @@ void WorkspaceController::_removeItemList(QStringList itemNameIdList) {
  * scalar map of the first item to start the job.
  */
 void WorkspaceController::_exportItemList(QStringList itemNameIdList) {
-  XmedDataProcessor * dataProcessor = new XmedDataProcessor(this->getDataModel());
+  XmedDataProcessor* dataProcessor = new XmedDataProcessor(this->getDataModel());
   dataProcessor->process(itemNameIdList);
   MEDCALC::FieldIdList_var fieldIdList = dataProcessor->getResultingFieldIdList();
   delete dataProcessor;
@@ -390,24 +390,24 @@ void WorkspaceController::_exportItemList(QStringList itemNameIdList) {
   // _GBO_ We use a temporary file to proceed with this export to
   // paravis. I'm sure it could be better in a futur version or when I
   // will get a better understanding of paravis API.
-  const char * tmpfilename = "/tmp/medcalc_export2paravis.med";
+  const char* tmpfilename = "/tmp/medcalc_export2paravis.med";
   MEDFactoryClient::getDataManager()->saveFields(tmpfilename, fieldIdList);
 
   // We import the whole file but create a scalar map for the first
   // selected field only (it's just an export to continue the job in
   // paravis)
-  XmedDataModel * dataModel = (XmedDataModel *)this->getDataModel();
+  XmedDataModel* dataModel = (XmedDataModel*)this->getDataModel();
   if ( dataModel == NULL ) {
     STDLOG("No data model associated to this tree view");
     return;
   }
   QString itemNameId = itemNameIdList[0];
-  XmedDataObject * dataObject = (XmedDataObject *)dataModel->getDataObject(QS2S(itemNameId));
+  XmedDataObject* dataObject = (XmedDataObject*)dataModel->getDataObject(QS2S(itemNameId));
   if ( dataObject == NULL ) {
     LOG("WorkspaceController: WARN! No data object associated to the item "<<itemNameId);
     return;
   }
-  MEDCALC::FieldHandler * fieldHandler = dataObject->getFieldHandler();
+  MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
   QStringList commands;
   /*
   commands+=QString("from xmed.driver_pvis import pvis_scalarmap");
@@ -434,7 +434,7 @@ void WorkspaceController::_viewItemList(QStringList itemNameIdList) {
   // __GBO__: In this version, we consider only the first field in the selection
   QString itemNameId = itemNameIdList[0];
 
-  XmedDataModel * dataModel = (XmedDataModel *)this->getDataModel();
+  XmedDataModel* dataModel = (XmedDataModel*)this->getDataModel();
   if ( dataModel == NULL ) {
     LOG("No data model associated to this tree view");
     return;
@@ -442,8 +442,8 @@ void WorkspaceController::_viewItemList(QStringList itemNameIdList) {
 
   // We can request the dataModel to obtain the dataObject associated
   // to this item (iteNameId is a TreeView id, Qt stuff only).
-  XmedDataObject * dataObject =
-    (XmedDataObject *)dataModel->getDataObject(QS2S(itemNameId));
+  XmedDataObject* dataObject =
+    (XmedDataObject*)dataModel->getDataObject(QS2S(itemNameId));
   if ( dataObject == NULL ) {
     LOG("WorkspaceController: WARN! No data object associated to the item "<<itemNameId);
     return;
@@ -451,7 +451,7 @@ void WorkspaceController::_viewItemList(QStringList itemNameIdList) {
 
   // Then, we can request this data object to obtain the associated
   // FieldHandler.
-  MEDCALC::FieldHandler * fieldHandler = dataObject->getFieldHandler();
+  MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
 
   // And finally, we can create the set of medcalc instructions to
   // generate the scalar map on this field.
@@ -477,8 +477,8 @@ WorkspaceController::_getViewMode() {
  * DatasourceController. The connection between the datasource signal
  * and this slot is realized by the main class MEDModule.
  */
-void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) {
-  XmedDataModel * dataModel = (XmedDataModel *)this->getDataModel();
+void WorkspaceController::processDatasourceEvent(const DatasourceEvent* event) {
+  XmedDataModel* dataModel = (XmedDataModel*)this->getDataModel();
   if ( dataModel == NULL ) {
     STDLOG("No data model associated to this tree view");
     return;
@@ -491,7 +491,7 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
   // options such that "change the underlying mesh".
   // <<<
 
-  XmedDataObject * dataObject = event->objectdata;
+  XmedDataObject* dataObject = event->objectdata;
 
   if ( event->eventtype == DatasourceEvent::EVENT_IMPORT_OBJECT ) {
     std::cout << "IMPORT object in workspace: " << dataObject->toString() << std::endl;
@@ -516,48 +516,6 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
           askForOptions,
           QCHARSTAR(event->objectalias));
   }
-  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_SCALAR_MAP ) {
-    QString viewMode = _getViewMode();
-    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
-    QStringList commands;
-    commands += QString("medcalc.MakeScalarMap(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-    _consoleDriver->exec(commands);
-  }
-  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_CONTOUR ) {
-    QString viewMode = _getViewMode();
-    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
-    QStringList commands;
-    commands += QString("medcalc.MakeContour(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-    _consoleDriver->exec(commands);
-  }
-  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_VECTOR_FIELD ) {
-    QString viewMode = _getViewMode();
-    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
-    QStringList commands;
-    commands += QString("medcalc.MakeVectorField(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-    _consoleDriver->exec(commands);
-  }
-  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_SLICES ) {
-    QString viewMode = _getViewMode();
-    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
-    QStringList commands;
-    commands += QString("medcalc.MakeSlices(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-    _consoleDriver->exec(commands);
-  }
-  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE ) {
-    QString viewMode = _getViewMode();
-    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
-    QStringList commands;
-    commands += QString("medcalc.MakeDeflectionShape(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-    _consoleDriver->exec(commands);
-  }
-  else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT_POINT_SPRITE ) {
-    QString viewMode = _getViewMode();
-    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
-    QStringList commands;
-    commands += QString("medcalc.MakePointSprite(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-    _consoleDriver->exec(commands);
-  }
   else if ( event->eventtype == DatasourceEvent::EVENT_ADD_DATASOURCE ) {
     QStringList commands;
     commands += QString("medcalc.LoadDataSource('%1')").arg(event->objectalias);
@@ -571,7 +529,73 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
   else {
     STDLOG("The event "<<event->eventtype<<" is not implemented yet");
   }
+}
+/**
+ * This slot can process the event coming from the
+ * DatasourceController. The connection between the datasource signal
+ * and this slot is realized by the main class MEDModule.
+ */
+void WorkspaceController::processPresentationEvent(const PresentationEvent* event) {
+  XmedDataModel* dataModel = (XmedDataModel*)this->getDataModel();
+  if ( dataModel == NULL ) {
+    STDLOG("No data model associated to this tree view");
+    return;
+  }
 
+  // >>>
+  // __GBO__ To know what to do we should test the type, because the
+  // object could be a mesh, a timeseries or a single field. We test
+  // here the case of a single field. Moreover, there could have
+  // options such that "change the underlying mesh".
+  // <<<
+
+  XmedDataObject* dataObject = event->objectdata;
+
+  if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SCALAR_MAP ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakeScalarMap(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_CONTOUR ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakeContour(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_VECTOR_FIELD ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakeVectorField(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SLICES ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakeSlices(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakeDeflectionShape(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_POINT_SPRITE ) {
+    QString viewMode = _getViewMode();
+    MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+    QStringList commands;
+    commands += QString("medcalc.MakePointSprite(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    _consoleDriver->exec(commands);
+  }
+  else {
+    STDLOG("The event "<<event->eventtype<<" is not implemented yet");
+  }
 }
 
 void WorkspaceController::OnSaveWorkspace() {
