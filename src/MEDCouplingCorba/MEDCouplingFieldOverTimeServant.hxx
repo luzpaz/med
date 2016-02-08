@@ -38,7 +38,7 @@ namespace MEDCoupling
   public:
     typedef MEDCouplingFieldOverTime CppType;
     MEDCouplingFieldOverTimeServant(const MEDCouplingFieldOverTime *cppPointer);
-  protected:
+  public:
     const MEDCouplingFieldOverTime *getPointer() const { return (const MEDCouplingFieldOverTime *)(_cpp_pointer); }
   protected:
     void getTinyInfoAboutTimeDefinition(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da);

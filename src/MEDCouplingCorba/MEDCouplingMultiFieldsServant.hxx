@@ -43,7 +43,7 @@ namespace MEDCoupling
   public:
     typedef MEDCouplingMultiFields CppType;
     MEDCouplingMultiFieldsServant(const MEDCouplingMultiFields *cppPointer);
-  protected:
+  public:
     const MEDCouplingMultiFields *getPointer() const { return (const MEDCouplingMultiFields *)(_cpp_pointer); }
   protected:
     char *getName();

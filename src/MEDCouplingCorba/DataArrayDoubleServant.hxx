@@ -40,10 +40,10 @@ namespace MEDCoupling
     typedef DataArrayDouble CppType;
     DataArrayDoubleServant(const DataArrayDouble *cppPointer);
   protected:
-    const DataArrayDouble *getPointer() const { return (const DataArrayDouble *)(_cpp_pointer); }
     SALOME::StringSeq *GetExportableFormats();
     CORBA::Boolean ExportDataAs(const char *format, SALOME::GenericObj_out exporter);
   public:
+    const DataArrayDouble *getPointer() const { return (const DataArrayDouble *)(_cpp_pointer); }
     void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa);
     void getSerialisationData(SALOME_TYPES::ListOfDouble_out da);
   };

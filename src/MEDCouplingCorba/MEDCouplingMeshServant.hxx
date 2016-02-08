@@ -38,6 +38,7 @@ namespace MEDCoupling
   {
   protected:
     MEDCouplingMeshServant(const MEDCouplingMesh *cppPointerOfMesh);
+  public:
     const MEDCouplingMesh *getPointer() const { return (const MEDCouplingMesh *)(_cpp_pointer); }
   protected:
     char *getName();

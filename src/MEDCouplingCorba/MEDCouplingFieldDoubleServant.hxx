@@ -44,7 +44,7 @@ namespace MEDCoupling
   public:
     typedef MEDCouplingFieldDouble CppType;
     MEDCouplingFieldDoubleServant(const MEDCouplingFieldDouble *cppPointerOfMesh);
-  protected:
+  public:
     const MEDCouplingFieldDouble *getPointer() const { return (const MEDCouplingFieldDouble *)(_cpp_pointer); }
   protected:
     char *getName();

@@ -37,7 +37,7 @@ namespace MEDCoupling
     typedef MEDCouplingCurveLinearMesh CppType;
     MEDCouplingCurveLinearMeshServant(const MEDCouplingCurveLinearMesh *cppPointerOfMesh);
     ~MEDCouplingCurveLinearMeshServant();
-  private:
+  public:
     const MEDCouplingCurveLinearMesh *getPointer() const { return (const MEDCouplingCurveLinearMesh *)(_cpp_pointer); }
   };
 }

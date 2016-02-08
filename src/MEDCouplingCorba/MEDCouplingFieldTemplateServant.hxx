@@ -44,7 +44,7 @@ namespace MEDCoupling
   public:
     typedef MEDCouplingFieldTemplate CppType;
     MEDCouplingFieldTemplateServant(const MEDCouplingFieldTemplate *cppPointerOfMesh);
-  protected:
+  public:
     const MEDCouplingFieldTemplate *getPointer() const { return (const MEDCouplingFieldTemplate *)(_cpp_pointer); }
   protected:
     void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa);

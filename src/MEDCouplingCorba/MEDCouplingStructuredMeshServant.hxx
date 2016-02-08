@@ -41,7 +41,7 @@ namespace MEDCoupling
   protected:
     MEDCouplingStructuredMeshServant(const MEDCouplingStructuredMesh *cppPointerOfMesh);
     ~MEDCouplingStructuredMeshServant();
-  private:
+  public:
     const MEDCouplingStructuredMesh *getPointer() const { return (const MEDCouplingStructuredMesh *)(_cpp_pointer); }
   };
 }

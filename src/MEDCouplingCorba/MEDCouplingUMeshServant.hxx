@@ -38,7 +38,7 @@ namespace MEDCoupling
   public:
     typedef MEDCouplingUMesh CppType;
     MEDCouplingUMeshServant(const MEDCouplingUMesh *cppPointerOfMesh);
-  protected:
+  public:
     const MEDCouplingUMesh *getPointer() const { return (const MEDCouplingUMesh *)_cpp_pointer; }
   };
 }

@@ -40,7 +40,7 @@ namespace MEDCoupling
     DataArrayServant(const DataArray *cppPointer);
     char *getName();
     SALOME_TYPES::ListOfString *getInfoOnComponents();
-  protected:
+  public:
     const DataArray *getPointer() const { return (const DataArray *)(_cpp_pointer); }
   };
 }

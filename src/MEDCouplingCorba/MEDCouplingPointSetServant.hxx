@@ -42,7 +42,7 @@ namespace MEDCoupling
     MEDCouplingPointSetServant(const MEDCouplingPointSet *cppPointerOfMesh);
     ~MEDCouplingPointSetServant();
     SALOME_MED::DataArrayDoubleCorbaInterface_ptr getCoords();
-  private:
+  public:
     const MEDCouplingPointSet *getPointer() const { return (const MEDCouplingPointSet *)(_cpp_pointer); }
   };
 }

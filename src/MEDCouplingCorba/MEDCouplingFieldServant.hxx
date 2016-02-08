@@ -39,8 +39,8 @@ namespace MEDCoupling
   {
   protected:
     MEDCouplingFieldServant(const MEDCouplingField *cppPointerOfMesh);
-    const MEDCouplingField *getPointer() const { return (const MEDCouplingField *)(_cpp_pointer); }
   public:
+    const MEDCouplingField *getPointer() const { return (const MEDCouplingField *)(_cpp_pointer); }
     static SALOME_MED::MEDCouplingMeshCorbaInterface_ptr BuildCorbaRefFromCppPointer(const MEDCouplingMesh *mesh);
   protected:
     SALOME_MED::MEDCouplingMeshCorbaInterface_ptr getMesh();

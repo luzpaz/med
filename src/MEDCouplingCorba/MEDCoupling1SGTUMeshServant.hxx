@@ -38,7 +38,7 @@ namespace MEDCoupling
   public:
     typedef MEDCoupling1SGTUMesh CppType;
     MEDCoupling1SGTUMeshServant(const MEDCoupling1SGTUMesh *cppPointerOfMesh);
-  protected:
+  public:
     const MEDCoupling1SGTUMesh *getPointer() const { return (const MEDCoupling1SGTUMesh *)_cpp_pointer; }
   };
 }

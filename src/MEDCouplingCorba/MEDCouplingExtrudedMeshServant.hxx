@@ -37,7 +37,7 @@ namespace MEDCoupling
     typedef MEDCouplingMappedExtrudedMesh CppType;
     MEDCouplingExtrudedMeshServant(const MEDCouplingMappedExtrudedMesh *cppPointerOfMesh);
     ~MEDCouplingExtrudedMeshServant();
-  private:
+  public:
     const MEDCouplingMappedExtrudedMesh *getPointer() const { return (const MEDCouplingMappedExtrudedMesh *)(_cpp_pointer); }
   };
 }
