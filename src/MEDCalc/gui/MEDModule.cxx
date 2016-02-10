@@ -25,6 +25,7 @@
 #include "SALOME_LifeCycleCORBA.hxx"
 #include "QtxPopupMgr.h"
 
+#include <LightApp_Preferences.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_Session.h>
@@ -120,6 +121,24 @@ MEDModule::viewManagers( QStringList& list ) const
 #ifndef DISABLE_PVVIEWER
   list.append( PVViewer_Viewer::Type() );
 #endif
+}
+
+void
+MEDModule::createPreferences()
+{
+  int genTab = addPreference(tr("PREF_TAB_GENERAL"));
+
+  int themeGroup = addPreference(tr("PREF_THEME_GROUP"), genTab);
+  setPreferenceProperty(themeGroup, "columns", 2);
+  int icons = addPreference(tr("PREF_ICONS"), themeGroup, LightApp_Preferences::Selector, "MEDCalc", "icons" );
+  QStringList iconsThemes;
+  iconsThemes.append(tr("PREF_ICON_THEME_MODERN"));
+  iconsThemes.append(tr("PREF_ICON_THEME_CLASSIC"));
+  QList<QVariant> indices;
+  indices.append(0);
+  indices.append(1);
+  setPreferenceProperty(icons, "strings", iconsThemes);
+  setPreferenceProperty(icons, "indexes", indices);
 }
 
 bool

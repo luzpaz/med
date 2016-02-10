@@ -361,6 +361,26 @@
       <source>MEN_FILE</source>
       <translation>&amp;Fichier</translation>
     </message>
+    <message>
+      <source>PREF_TAB_GENERAL</source>
+      <translation>Général</translation>
+    </message>
+    <message>
+      <source>PREF_THEME_GROUP</source>
+      <translation>Thème</translation>
+    </message>
+    <message>
+      <source>PREF_ICONS</source>
+      <translation>Icones</translation>
+    </message>
+    <message>
+      <source>PREF_ICON_THEME_MODERN</source>
+      <translation>Moderne</translation>
+    </message>
+    <message>
+      <source>PREF_ICON_THEME_CLASSIC</source>
+      <translation>Classique</translation>
+    </message>
   </context>
   <context>
     <name>WorkspaceController</name>

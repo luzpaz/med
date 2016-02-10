@@ -32,6 +32,8 @@
 #include <SALOMEDS_Study.hxx>
 
 #include <SUIT_Desktop.h>
+#include <SUIT_Session.h>
+#include <SUIT_ResourceMgr.h>
 #include <QMessageBox>
 
 static const int OPTIONS_VIEW_MODE_ID = 943;
@@ -50,6 +52,23 @@ PresentationController::PresentationController(MEDModule* salomeModule)
 PresentationController::~PresentationController()
 {
   STDLOG("Deleting the PresentationController");
+}
+
+std::string
+PresentationController::_getIconName(const std::string& name)
+{
+  SUIT_ResourceMgr* mgr = SUIT_Session::session()->resourceMgr();
+  if (!mgr)
+    return name;
+
+  // Read value from preferences and suffix name to select icon theme
+  int theme = mgr->integerValue("MEDCalc", "icons");
+  if (theme == 0) {
+    return name + "_MODERN";
+  } else if (theme == 1) {
+    return name + "_CLASSIC";
+  }
+  return name + "_DEFAULT";
 }
 
 void
@@ -95,7 +114,7 @@ PresentationController::createActions()
   // Presentations
   label   = tr("LAB_PRESENTATION_SCALAR_MAP");
   tooltip = tr("TIP_PRESENTATION_SCALAR_MAP");
-  QString icon = tr("ICO_PRESENTATION_SCALAR_MAP");
+  QString icon = tr(_getIconName("ICO_PRESENTATION_SCALAR_MAP").c_str());
   int actionId;
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeScalarMap()),icon,tooltip);
   _salomeModule->createTool(actionId, toolbarId);
@@ -104,7 +123,7 @@ PresentationController::createActions()
 
   label   = tr("LAB_PRESENTATION_CONTOUR");
   tooltip = tr("TIP_PRESENTATION_CONTOUR");
-  icon    = tr("ICO_PRESENTATION_CONTOUR");
+  icon    = tr(_getIconName("ICO_PRESENTATION_CONTOUR").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeContour()),icon,tooltip);
   _salomeModule->createTool(actionId, toolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
@@ -112,7 +131,7 @@ PresentationController::createActions()
 
   label   = tr("LAB_PRESENTATION_VECTOR_FIELD");
   tooltip = tr("TIP_PRESENTATION_VECTOR_FIELD");
-  icon    = tr("ICO_PRESENTATION_VECTOR_FIELD");
+  icon    = tr(_getIconName("ICO_PRESENTATION_VECTOR_FIELD").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeVectorField()),icon,tooltip);
   _salomeModule->createTool(actionId, toolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
@@ -120,7 +139,7 @@ PresentationController::createActions()
 
   label   = tr("LAB_PRESENTATION_SLICES");
   tooltip = tr("TIP_PRESENTATION_SLICES");
-  icon    = tr("ICO_PRESENTATION_SLICES");
+  icon    = tr(_getIconName("ICO_PRESENTATION_SLICES").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeSlices()),icon,tooltip);
   _salomeModule->createTool(actionId, toolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
@@ -128,7 +147,7 @@ PresentationController::createActions()
 
   label   = tr("LAB_PRESENTATION_DEFLECTION_SHAPE");
   tooltip = tr("TIP_PRESENTATION_DEFLECTION_SHAPE");
-  icon    = tr("ICO_PRESENTATION_DEFLECTION_SHAPE");
+  icon    = tr(_getIconName("ICO_PRESENTATION_DEFLECTION_SHAPE").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeDeflectionShape()),icon,tooltip);
   _salomeModule->createTool(actionId, toolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
@@ -136,7 +155,7 @@ PresentationController::createActions()
 
   label   = tr("LAB_PRESENTATION_POINT_SPRITE");
   tooltip = tr("TIP_PRESENTATION_POINT_SPRITE");
-  icon    = tr("ICO_PRESENTATION_POINT_SPRITE");
+  icon    = tr(_getIconName("ICO_PRESENTATION_POINT_SPRITE").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizePointSprite()),icon,tooltip);
   _salomeModule->createTool(actionId, toolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
@@ -243,6 +262,7 @@ PresentationController::updateTreeViewWithNewPresentation(long fieldId, long pre
 
   std::string name = MEDFactoryClient::getPresentationManager()->getPresentationProperty(presentationId, "name");
   std::string icon = std::string("ICO_") + name;
+  icon = _getIconName(icon);
   name = tr(name.c_str()).toStdString();
   std::string label = tr(icon.c_str()).toStdString();
 

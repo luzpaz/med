@@ -59,7 +59,7 @@ public:
   MEDCALC::MEDPresentationViewMode getSelectedViewMode();
 
 signals:
-  void presentationSignal(const PresentationEvent* event);
+  void presentationSignal(const PresentationEvent*);
 
 protected slots:
   void OnVisualizeScalarMap();
@@ -68,11 +68,12 @@ protected slots:
   void OnVisualizeSlices();
   void OnVisualizeDeflectionShape();
   void OnVisualizePointSprite();
-  void processWorkspaceEvent(const MEDCALC::MedEvent* event);
+  void processWorkspaceEvent(const MEDCALC::MedEvent*);
 
 private:
   void visualize(PresentationEvent::EventType);
-  void updateTreeViewWithNewPresentation(long fieldId, long presentationId);
+  void updateTreeViewWithNewPresentation(long, long);
+  std::string _getIconName(const std::string&);
 
 private:
   MEDModule* _salomeModule;

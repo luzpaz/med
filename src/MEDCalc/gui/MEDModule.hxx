@@ -63,6 +63,8 @@ public:
   virtual void windows(QMap<int, int>& theMap) const;
   virtual void viewManagers(QStringList& theList) const;
 
+  virtual void createPreferences();
+
   int createStandardAction(const QString& label,
                            QObject* slotobject,
                            const char* slotmember,

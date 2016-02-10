@@ -17,18 +17,5 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(MED_RESOURCES_FILES
-  pqGlyph16.png
-  pqGlyph24.png
-  pqIsosurface16.png
-  pqIsosurface24.png
-  pqNodeMapData16.png
-  pqNodeMapData24.png
-  pqSlice16.png
-  pqSlice24.png
-  pqWarp16.png
-  pqWarp24.png
-  scalarmap16.png
-  scalarmap24.png
-  )
-INSTALL(FILES ${MED_RESOURCES_FILES} DESTINATION ${SALOME_MED_INSTALL_RES_DATA})
+ADD_SUBDIRECTORY(modern)
+ADD_SUBDIRECTORY(classic)
