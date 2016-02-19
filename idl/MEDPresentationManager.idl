@@ -25,6 +25,8 @@
 
 module MEDCALC
 {
+  /* Enumerations and constants */
+
   enum MEDPresentationViewMode {
     VIEW_MODE_OVERLAP,
     VIEW_MODE_REPLACE,
@@ -32,15 +34,62 @@ module MEDCALC
     VIEW_MODE_SPLIT_VIEW
   };
 
+  enum MEDPresentationColorMap {
+    COLOR_MAP_BLUE_TO_RED_RAINBOW,
+    COLOR_MAP_COOL_TO_WARM
+  };
+
+  struct ScalarBarRange {
+    // (valMin,valMax) defines the scalar bar range from:
+    //      (-1,timetep): the field values at the chosen timestep
+    //      (-1,-1):      the field values across all timesteps
+    //      (start,end):  a user-input range of values
+    long valMin;
+    long valMax;
+  };
+
+  const string DISPLAY_EUCLIDEAN_NORM = "Euclidean norm";
+
+  enum SliceOrientation {
+    SLICE_NORMAL_TO_X,
+    SLICE_NORMAL_TO_Y,
+    SLICE_NORMAL_TO_Z,
+    SLICE_NORMAL_TO_XY,
+    SLICE_NORMAL_TO_XZ,
+    SLICE_NORMAL_TO_YZ,
+    SLICE_NORMAL_TO_XYZ
+  };
+
+  /* Default values */
+
+  const MEDPresentationViewMode VIEW_MODE_DEFAULT = VIEW_MODE_REPLACE;
+  const MEDPresentationColorMap COLOR_MAP_DEFAULT = COLOR_MAP_BLUE_TO_RED_RAINBOW;
+  //const ScalarBarRange SCALAR_BAR_RANGE_DEFAULT = ;
+  const long SCALAR_BAR_RANGE_VAL_MIN_DEFAULT = -1;
+  const long SCALAR_BAR_RANGE_VAL_MAX_DEFAULT = -1;
+  const string DISPLAY_DEFAULT = DISPLAY_EUCLIDEAN_NORM;
+  const SliceOrientation SLICE_ORIENTATION_DEFAULT = SLICE_NORMAL_TO_Z;
+  const long NB_CONTOURS_DEFAULT = 10;
+  const long NB_SLICES_DEFAULT = 1;
+
+  /* Structs */
+
   struct ScalarMapParameters {
     long fieldHandlerId;
     MEDPresentationViewMode viewMode;
+    string displayedInfo; // DISPLAY_EUCLIDEAN_NORM or any field name
+    ScalarBarRange sbRange;
+    MEDPresentationColorMap colorMap;
   };
 
   // A contour is an isoline in 2D and an isosurface in 3D
   struct ContourParameters {
     long fieldHandlerId;
     MEDPresentationViewMode viewMode;
+    string displayedInfo; // DISPLAY_EUCLIDEAN_NORM or any field name
+    ScalarBarRange sbRange;
+    MEDPresentationColorMap colorMap;
+    long nbContours;
   };
 
   struct VectorFieldParameters {
@@ -51,6 +100,8 @@ module MEDCALC
   struct SlicesParameters {
     long fieldHandlerId;
     MEDPresentationViewMode viewMode;
+    SliceOrientation orientation;
+    long nbSlices;
   };
 
   struct DeflectionShapeParameters {
@@ -61,7 +112,12 @@ module MEDCALC
   struct PointSpriteParameters {
     long fieldHandlerId;
     MEDPresentationViewMode viewMode;
+    string displayedInfo; // DISPLAY_EUCLIDEAN_NORM or any field name
+    ScalarBarRange sbRange;
+    MEDPresentationColorMap colorMap;
   };
+
+  /* Functions */
 
   interface MEDPresentationManager : SALOME::GenericObj
   {
