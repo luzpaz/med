@@ -22,6 +22,7 @@
 #include "MEDModule.hxx"
 #include "Basics_Utils.hxx"
 #include "QtxActionGroup.h"
+#include "QtxActionToolMgr.h"
 #include "MEDFactoryClient.hxx"
 
 #include <SalomeApp_Application.h>
@@ -35,18 +36,26 @@
 #include <SUIT_Session.h>
 #include <SUIT_ResourceMgr.h>
 #include <QMessageBox>
-
-static const int OPTIONS_VIEW_MODE_ID = 943;
-static const int OPTIONS_VIEW_MODE_REPLACE_ID = 944;
-static const int OPTIONS_VIEW_MODE_OVERLAP_ID = 945;
-static const int OPTIONS_VIEW_MODE_NEW_LAYOUT_ID = 946;
-static const int OPTIONS_VIEW_MODE_SPLIT_VIEW_ID = 947;
+#include <QDockWidget>
 
 PresentationController::PresentationController(MEDModule* salomeModule)
 {
   STDLOG("Creating a PresentationController");
   _salomeModule = salomeModule;
   _studyEditor = _salomeModule->getStudyEditor();
+
+  _widgetPresentationParameters = new WidgetPresentationParameters();
+
+  QMainWindow* parent = salomeModule->getApp()->desktop();
+  QDockWidget *dockWidget = new QDockWidget(parent);
+  dockWidget->setVisible(false);
+  dockWidget->setWindowTitle(tr("TITLE_PRESENTATION_PARAMETERS"));
+  dockWidget->setObjectName(tr("TITLE_PRESENTATION_PARAMETERS"));
+  dockWidget->setFeatures(QDockWidget::AllDockWidgetFeatures);
+  dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  dockWidget->setWidget(_widgetPresentationParameters);
+  parent->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+  dockWidget->show();
 }
 
 PresentationController::~PresentationController()
@@ -75,49 +84,17 @@ void
 PresentationController::createActions()
 {
   STDLOG("Creating PresentationController actions");
-  int toolbarId = _salomeModule->createTool("View Mode", "PresentationToolbar");
 
+  int presentationToolbarId = _salomeModule->createTool("View Mode", "PresentationToolbar");
   int presentationMenuId = _salomeModule->createMenu(tr("MENU_PRESENTATIONS"), -1, 1);
 
-  // View Mode
-  QtxActionGroup* ag = _salomeModule->createActionGroup(OPTIONS_VIEW_MODE_ID, true);
-  ag->setText("View mode");
-  ag->setUsesDropDown(true);
-
-  QString label   = tr("LAB_VIEW_MODE_REPLACE");
-  QString tooltip = tr("TIP_VIEW_MODE_REPLACE");
-  QAction* a = _salomeModule->createAction(OPTIONS_VIEW_MODE_REPLACE_ID,label,QIcon(),label,tooltip,0);
-  a->setCheckable(true);
-  a->setChecked(true);
-  ag->add(a);
-
-  label   = tr("LAB_VIEW_MODE_OVERLAP");
-  tooltip = tr("TIP_VIEW_MODE_OVERLAP");
-  a = _salomeModule->createAction(OPTIONS_VIEW_MODE_OVERLAP_ID,label,QIcon(),label,tooltip,0);
-  a->setCheckable(true);
-  ag->add(a);
-
-  label   = tr("LAB_VIEW_MODE_NEW_LAYOUT");
-  tooltip = tr("TIP_VIEW_MODE_NEW_LAYOUT");
-  a = _salomeModule->createAction(OPTIONS_VIEW_MODE_NEW_LAYOUT_ID,label,QIcon(),label,tooltip,0);
-  a->setCheckable(true);
-  ag->add(a);
-
-  label   = tr("LAB_VIEW_MODE_SPLIT_VIEW");
-  tooltip = tr("TIP_VIEW_MODE_SPLIT_VIEW");
-  a = _salomeModule->createAction(OPTIONS_VIEW_MODE_SPLIT_VIEW_ID,label,QIcon(),label,tooltip,0);
-  a->setCheckable(true);
-  ag->add(a);
-
-  _salomeModule->createTool(OPTIONS_VIEW_MODE_ID, toolbarId);
-
   // Presentations
-  label   = tr("LAB_PRESENTATION_SCALAR_MAP");
-  tooltip = tr("TIP_PRESENTATION_SCALAR_MAP");
+  QString label   = tr("LAB_PRESENTATION_SCALAR_MAP");
+  QString tooltip = tr("TIP_PRESENTATION_SCALAR_MAP");
   QString icon = tr(_getIconName("ICO_PRESENTATION_SCALAR_MAP").c_str());
   int actionId;
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeScalarMap()),icon,tooltip);
-  _salomeModule->createTool(actionId, toolbarId);
+  _salomeModule->createTool(actionId, presentationToolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
   _salomeModule->createMenu(actionId, presentationMenuId);
 
@@ -125,7 +102,7 @@ PresentationController::createActions()
   tooltip = tr("TIP_PRESENTATION_CONTOUR");
   icon    = tr(_getIconName("ICO_PRESENTATION_CONTOUR").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeContour()),icon,tooltip);
-  _salomeModule->createTool(actionId, toolbarId);
+  _salomeModule->createTool(actionId, presentationToolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
   _salomeModule->createMenu(actionId, presentationMenuId);
 
@@ -133,7 +110,7 @@ PresentationController::createActions()
   tooltip = tr("TIP_PRESENTATION_VECTOR_FIELD");
   icon    = tr(_getIconName("ICO_PRESENTATION_VECTOR_FIELD").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeVectorField()),icon,tooltip);
-  _salomeModule->createTool(actionId, toolbarId);
+  _salomeModule->createTool(actionId, presentationToolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
   _salomeModule->createMenu(actionId, presentationMenuId);
 
@@ -141,7 +118,7 @@ PresentationController::createActions()
   tooltip = tr("TIP_PRESENTATION_SLICES");
   icon    = tr(_getIconName("ICO_PRESENTATION_SLICES").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeSlices()),icon,tooltip);
-  _salomeModule->createTool(actionId, toolbarId);
+  _salomeModule->createTool(actionId, presentationToolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
   _salomeModule->createMenu(actionId, presentationMenuId);
 
@@ -149,7 +126,7 @@ PresentationController::createActions()
   tooltip = tr("TIP_PRESENTATION_DEFLECTION_SHAPE");
   icon    = tr(_getIconName("ICO_PRESENTATION_DEFLECTION_SHAPE").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeDeflectionShape()),icon,tooltip);
-  _salomeModule->createTool(actionId, toolbarId);
+  _salomeModule->createTool(actionId, presentationToolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
   _salomeModule->createMenu(actionId, presentationMenuId);
 
@@ -157,7 +134,7 @@ PresentationController::createActions()
   tooltip = tr("TIP_PRESENTATION_POINT_SPRITE");
   icon    = tr(_getIconName("ICO_PRESENTATION_POINT_SPRITE").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizePointSprite()),icon,tooltip);
-  _salomeModule->createTool(actionId, toolbarId);
+  _salomeModule->createTool(actionId, presentationToolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
   _salomeModule->createMenu(actionId, presentationMenuId);
 }
@@ -165,18 +142,7 @@ PresentationController::createActions()
 MEDCALC::MEDPresentationViewMode
 PresentationController::getSelectedViewMode()
 {
-  if (_salomeModule->action(OPTIONS_VIEW_MODE_REPLACE_ID)->isChecked()) {
-    return MEDCALC::VIEW_MODE_REPLACE;
-  }
-  else if (_salomeModule->action(OPTIONS_VIEW_MODE_OVERLAP_ID)->isChecked()) {
-    return MEDCALC::VIEW_MODE_OVERLAP;
-  }
-  else if (_salomeModule->action(OPTIONS_VIEW_MODE_NEW_LAYOUT_ID)->isChecked()) {
-    return MEDCALC::VIEW_MODE_NEW_LAYOUT;
-  }
-  else if (_salomeModule->action(OPTIONS_VIEW_MODE_SPLIT_VIEW_ID)->isChecked()) {
-    return MEDCALC::VIEW_MODE_SPLIT_VIEW;
-  }
+  return _widgetPresentationParameters->getViewMode();
 }
 
 void
@@ -212,7 +178,7 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
     XmedDataObject* dataObject = new XmedDataObject();
     dataObject->setFieldHandler(*fieldHandler);
     event->objectdata = dataObject;
-    emit presentationSignal(event);
+    emit presentationSignal(event); // --> WorkspaceController::processPresentationEvent
   }
 }
 

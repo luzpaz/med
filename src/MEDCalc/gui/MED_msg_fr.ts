@@ -4,36 +4,8 @@
   <context>
     <name>PresentationController</name>
     <message>
-      <source>LAB_VIEW_MODE_REPLACE</source>
-      <translation>Remplacer</translation>
-    </message>
-    <message>
-      <source>TIP_VIEW_MODE_REPLACE</source>
-      <translation>Remplacer</translation>
-    </message>
-    <message>
-      <source>LAB_VIEW_MODE_OVERLAP</source>
-      <translation>Superposer</translation>
-    </message>
-    <message>
-      <source>TIP_VIEW_MODE_OVERLAP</source>
-      <translation>Superposer</translation>
-    </message>
-    <message>
-      <source>LAB_VIEW_MODE_NEW_LAYOUT</source>
-      <translation>Nouvel onglet</translation>
-    </message>
-    <message>
-      <source>TIP_VIEW_MODE_NEW_LAYOUT</source>
-      <translation>Nouvel onglet</translation>
-    </message>
-    <message>
-      <source>LAB_VIEW_MODE_SPLIT_VIEW</source>
-      <translation>Scinder</translation>
-    </message>
-    <message>
-      <source>TIP_VIEW_MODE_SPLIT_VIEW</source>
-      <translation>Scinder</translation>
+      <source>TITLE_PRESENTATION_PARAMETERS</source>
+      <translation>Paramètres de presentation</translation>
     </message>
     <message>
       <source>LAB_PRESENTATION_SCALAR_MAP</source>
@@ -115,10 +87,6 @@
   <context>
     <name>DatasourceController</name>
     <message>
-      <source>MEDPresentationScalarMap</source>
-      <translation>Carte scalaire</translation>
-    </message>
-    <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="45"/>
       <source>LAB_ADD_DATA_SOURCE</source>
       <translation>Importer des données MED</translation>
@@ -182,6 +150,61 @@
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="284"/>
       <source>FIELD_ALREADY_DEFINED</source>
       <translation>Ce champ est déjà défini dans l'espace de travail</translation>
+    </message>
+  </context>
+  <context>
+    <name>WidgetPresentationParameters</name>
+    <message>
+      <source>LAB_FIELD</source>
+      <translation>Champ :</translation>
+    </message>
+    <message>
+      <source>LAB_EUCLIDEAN_NORM</source>
+      <translation>Norme euclidienne</translation>
+    </message>
+    <message>
+      <source>LAB_SCALARBAR</source>
+      <translation>Echelle de valeurs :</translation>
+    </message>
+    <message>
+      <source>LAB_RANGE</source>
+      <translation>Intervalle :</translation>
+    </message>
+    <message>
+      <source>LAB_ALL_TIMESTEPS</source>
+      <translation>Tous les pas de temps</translation>
+    </message>
+    <message>
+      <source>LAB_ONE_TIMESTEP</source>
+      <translation>Pas de temps sélectionné</translation>
+    </message>
+    <message>
+      <source>LAB_USER_RANGE</source>
+      <translation>Personnalisé :</translation>
+    </message>
+    <message>
+      <source>LAB_TIMESTEP</source>
+      <translation>Pas de temps :</translation>
+    </message>
+    <message>
+      <source>LAB_MIN_VALUE</source>
+      <translation>Valeur min :</translation>
+    </message>
+    <message>
+      <source>LAB_MAX_VALUE</source>
+      <translation>Valeur max :</translation>
+    </message>
+    <message>
+      <source>LAB_COLOR_MAP</source>
+      <translation>Table de couleurs :</translation>
+    </message>
+    <message>
+      <source>LAB_BLUE_TO_RED</source>
+      <translation>Arc-en-ciel blue vers rouge</translation>
+    </message>
+    <message>
+      <source>LAB_COOL_TO_WARM</source>
+      <translation>Froid vers chaud</translation>
     </message>
   </context>
   <context>
@@ -480,6 +503,26 @@
       <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="60"/>
       <source>FILE_FILTER_ALL</source>
       <translation>Tous les fichiers (*.*)</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE</source>
+      <translation>Mode de rendu :</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_REPLACE</source>
+      <translation>Remplacer</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_OVERLAP</source>
+      <translation>Superposer</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_NEW_LAYOUT</source>
+      <translation>Nouvel onglet</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_SPLIT_VIEW</source>
+      <translation>Scinder</translation>
     </message>
   </context>
 </TS>

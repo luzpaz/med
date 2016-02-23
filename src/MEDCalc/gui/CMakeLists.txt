@@ -24,18 +24,14 @@ INCLUDE(UseQtExt)
 ADD_SUBDIRECTORY(dialogs)
 
 
-SET(MEDCALCGUI_SOURCES
-  XmedConsoleDriver.cxx
-  WorkspaceController.cxx
-  XmedDataModel.cxx
-  MEDEventListener_i.cxx
-  MEDModule.cxx
-  DatasourceController.cxx
-  PresentationController.cxx
-  factory.cxx
-)
+FILE(GLOB MEDCALCGUI_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cxx")
 
-SET(MEDCALCGUI_HEADERS MEDModule.hxx MEDEventListener_i.hxx WorkspaceController.hxx DatasourceController.hxx PresentationController.hxx)
+SET(MEDCALCGUI_HEADERS
+  MEDModule.hxx
+  MEDEventListener_i.hxx
+  WorkspaceController.hxx
+  DatasourceController.hxx
+  PresentationController.hxx)
 QT_WRAP_MOC(MEDCALCGUI_HEADERS_MOC ${MEDCALCGUI_HEADERS})
 
 

@@ -67,7 +67,6 @@ DatasourceController::DatasourceController(MEDModule* salomeModule)
   _dlgInterpolateField = new DlgInterpolateField(_studyEditor);
   connect(_dlgInterpolateField,SIGNAL(inputValidated()),
           this, SLOT(OnInterpolateFieldInputValidated()));
-
 }
 
 DatasourceController::~DatasourceController() {

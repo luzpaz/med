@@ -40,7 +40,6 @@
  * and containing a tree view for rendering a hierarchical data
  * model. This datamodel contains the objects used in the workspace.
  */
-//WorkspaceController::WorkspaceController(StandardApp_Module* salomeModule)
 WorkspaceController::WorkspaceController(MEDModule* salomeModule)
   : TreeGuiManager(salomeModule->getApp(), "Workspace")
 {
@@ -100,7 +99,7 @@ WorkspaceController::WorkspaceController(MEDModule* salomeModule)
 }
 
 WorkspaceController::~WorkspaceController() {
-  std::cout << "WorkspaceController::~WorkspaceController()\n";
+  STDLOG("WorkspaceController::~WorkspaceController()");
   MEDEventListener_i::release();
 }
 
@@ -118,14 +117,12 @@ void WorkspaceController::createActions() {
   QString tooltip = tr("TIP_SAVE_WORKSPACE");
   QString icon    = tr("ICO_WORKSPACE_SAVE");
   int actionId = _salomeModule->createStandardAction(label,this,SLOT(OnSaveWorkspace()),icon,tooltip);
-  //_salomeModule->addActionInToolbar(actionId);
   _salomeModule->createTool(actionId, toolbarId);
 
   label   = tr("LAB_CLEAN_WORKSPACE");
   tooltip = tr("TIP_CLEAN_WORKSPACE");
   icon    = tr("ICO_WORKSPACE_CLEAN");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnCleanWorkspace()),icon,tooltip);
-//_salomeModule->addActionInToolbar(actionId);
   _salomeModule->createTool(actionId, toolbarId);
 }
 
@@ -551,8 +548,12 @@ void WorkspaceController::processPresentationEvent(const PresentationEvent* even
 
   XmedDataObject* dataObject = event->objectdata;
 
+  // --> Send commands to SALOME Python console
   if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SCALAR_MAP ) {
     QString viewMode = _getViewMode();
+    //QString displayedInfo = ; // from PresentationController combobox
+    //QString scalarBarRange = ; // from PresentationController spinbox
+    //QString colorMap = ; // from PresentationController combobox
     MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
     QStringList commands;
     commands += QString("medcalc.MakeScalarMap(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);

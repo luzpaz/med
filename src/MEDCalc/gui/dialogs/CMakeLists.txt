@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2015  CEA/DEN, EDF R&D
+# Copyright (C) 2012-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,14 +21,7 @@ ADD_DEFINITIONS(${OMNIORB_DEFINITIONS})
 
 INCLUDE(UseQtExt)
 
-SET(MEDCALCGUI_dialogs_FORMS
-  GenericDialog.ui
-  DlgAlias.ui
-  DlgUseInWorkspace.ui
-  DlgChangeUnderlyingMesh.ui
-  DlgInterpolateField.ui
-  DlgImageToMed.ui
-)
+FILE(GLOB MEDCALCGUI_dialogs_FORMS "${CMAKE_CURRENT_SOURCE_DIR}/*.ui")
 QT_WRAP_UIC(MEDCALCGUI_dialogs_FORMS_HEADERS ${MEDCALCGUI_dialogs_FORMS})
 
 SET(MEDCALCGUI_dialogs_FILES
@@ -47,6 +40,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${GUI_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/..
+  ${PROJECT_BINARY_DIR}/idl
 )
 
 SET(MEDCALCGUI_dialogs_SOURCES
@@ -56,6 +50,7 @@ SET(MEDCALCGUI_dialogs_SOURCES
   DlgChangeUnderlyingMesh.cxx
   DlgInterpolateField.cxx
   DlgImageToMed.cxx
+  WidgetPresentationParameters.cxx
 )
 
 ADD_LIBRARY(MEDCALCGUI_dialogs SHARED ${MEDCALCGUI_dialogs_SOURCES} ${MEDCALCGUI_dialogs_HEADERS_MOC} ${MEDCALCGUI_dialogs_FORMS_HEADERS})

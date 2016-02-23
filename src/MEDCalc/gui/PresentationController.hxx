@@ -30,6 +30,7 @@
 
 #include "XmedDataModel.hxx"
 #include <SALOME_AppStudyEditor.hxx>
+#include "WidgetPresentationParameters.hxx"
 
 typedef struct {
   enum EventType {
@@ -78,7 +79,7 @@ private:
 private:
   MEDModule* _salomeModule;
   SALOME_AppStudyEditor* _studyEditor; // borrowed to MEDModule
-
+  WidgetPresentationParameters* _widgetPresentationParameters;
 };
 
 #endif /* PRESENTATION_CONTROLLER_HXX */

@@ -4,36 +4,8 @@
   <context>
     <name>PresentationController</name>
     <message>
-      <source>LAB_VIEW_MODE_REPLACE</source>
-      <translation>Replace</translation>
-    </message>
-    <message>
-      <source>TIP_VIEW_MODE_REPLACE</source>
-      <translation>Replace</translation>
-    </message>
-    <message>
-      <source>LAB_VIEW_MODE_OVERLAP</source>
-      <translation>Overlap</translation>
-    </message>
-    <message>
-      <source>TIP_VIEW_MODE_OVERLAP</source>
-      <translation>Overlap</translation>
-    </message>
-    <message>
-      <source>LAB_VIEW_MODE_NEW_LAYOUT</source>
-      <translation>New layout</translation>
-    </message>
-    <message>
-      <source>TIP_VIEW_MODE_NEW_LAYOUT</source>
-      <translation>New layout</translation>
-    </message>
-    <message>
-      <source>LAB_VIEW_MODE_SPLIT_VIEW</source>
-      <translation>Split</translation>
-    </message>
-    <message>
-      <source>TIP_VIEW_MODE_SPLIT_VIEW</source>
-      <translation>Split</translation>
+      <source>TITLE_PRESENTATION_PARAMETERS</source>
+      <translation>Presentation parameters</translation>
     </message>
     <message>
       <source>LAB_PRESENTATION_SCALAR_MAP</source>
@@ -178,6 +150,61 @@
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="284"/>
       <source>FIELD_ALREADY_DEFINED</source>
       <translation>This field is already defined in the workspace</translation>
+    </message>
+  </context>
+  <context>
+    <name>WidgetPresentationParameters</name>
+    <message>
+      <source>LAB_FIELD</source>
+      <translation>Field:</translation>
+    </message>
+    <message>
+      <source>LAB_EUCLIDEAN_NORM</source>
+      <translation>Euclidean norm</translation>
+    </message>
+    <message>
+      <source>LAB_SCALARBAR</source>
+      <translation>Scalar bar:</translation>
+    </message>
+    <message>
+      <source>LAB_RANGE</source>
+      <translation>Range:</translation>
+    </message>
+    <message>
+      <source>LAB_ALL_TIMESTEPS</source>
+      <translation>All timesteps</translation>
+    </message>
+    <message>
+      <source>LAB_ONE_TIMESTEP</source>
+      <translation>Selected timestep</translation>
+    </message>
+    <message>
+      <source>LAB_USER_RANGE</source>
+      <translation>User-specified</translation>
+    </message>
+    <message>
+      <source>LAB_TIMESTEP</source>
+      <translation>Timestep:</translation>
+    </message>
+    <message>
+      <source>LAB_MIN_VALUE</source>
+      <translation>Min value:</translation>
+    </message>
+    <message>
+      <source>LAB_MAX_VALUE</source>
+      <translation>Max value:</translation>
+    </message>
+    <message>
+      <source>LAB_COLOR_MAP</source>
+      <translation>Color map:</translation>
+    </message>
+    <message>
+      <source>LAB_BLUE_TO_RED</source>
+      <translation>Blue to red rainbow</translation>
+    </message>
+    <message>
+      <source>LAB_COOL_TO_WARM</source>
+      <translation>Cool to warm</translation>
     </message>
   </context>
   <context>
@@ -476,6 +503,26 @@
       <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="60"/>
       <source>FILE_FILTER_ALL</source>
       <translation>All files (*.*)</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE</source>
+      <translation>View mode:</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_REPLACE</source>
+      <translation>Replace</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_OVERLAP</source>
+      <translation>Overlap</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_NEW_LAYOUT</source>
+      <translation>New layout</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_SPLIT_VIEW</source>
+      <translation>Split</translation>
     </message>
   </context>
 </TS>
