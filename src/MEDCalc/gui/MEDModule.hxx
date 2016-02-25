@@ -75,6 +75,7 @@ public:
                             const QString& rule="client='ObjectBrowser'");
 
   MEDCALC::MEDPresentationViewMode getSelectedViewMode();
+  MEDCALC::MEDPresentationColorMap getSelectedColorMap();
 
   inline SALOME_AppStudyEditor* getStudyEditor() { return _studyEditor; }
 

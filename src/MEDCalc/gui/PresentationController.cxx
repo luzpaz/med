@@ -145,6 +145,12 @@ PresentationController::getSelectedViewMode()
   return _widgetPresentationParameters->getViewMode();
 }
 
+MEDCALC::MEDPresentationColorMap
+PresentationController::getSelectedColorMap()
+{
+  return _widgetPresentationParameters->getColorMap();
+}
+
 void
 PresentationController::visualize(PresentationEvent::EventType eventType)
 {

@@ -20,7 +20,7 @@ public:
   double getScalarBarTimestep();
   double getScalarBarMinVal();
   double getScalarBarMaxVal();
-  std::string getColorMap();
+  MEDCALC::MEDPresentationColorMap getColorMap();
 
  private:
   Ui_WidgetPresentationParameters ui; // instance of the class defined in ui_WidgetPresentationParameters.h

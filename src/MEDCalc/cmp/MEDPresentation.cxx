@@ -124,3 +124,12 @@ MEDPresentation::getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode)
   cmd += std::string("__view1.ResetCamera();");
   return cmd;
 }
+
+std::string
+MEDPresentation::getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap)
+{
+  switch(colorMap) {
+  case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW: return "Blue to Red Rainbow";
+  case MEDCALC::COLOR_MAP_COOL_TO_WARM: return "Cool to Warm";
+  }
+}

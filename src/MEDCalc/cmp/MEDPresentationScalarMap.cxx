@@ -13,6 +13,8 @@ MEDPresentationScalarMap::internalGeneratePipeline()
   cmd += std::string("pvs.ColorBy(__disp1, ('") + _fieldType + std::string("', '") + _fieldName + std::string("'));");
   cmd += std::string("__disp1.SetScalarBarVisibility(__view1, True);");
   cmd += std::string("__disp1.RescaleTransferFunctionToDataRangeOverTime();");
+  cmd += std::string("__lut = pvs.GetColorTransferFunction('")+_fieldName+std::string("');");
+  cmd += std::string("__lut.ApplyPreset('")+getColorMapCommand(_params.colorMap)+std::string("',True);");
   cmd += std::string("pvs.Render();");
 
   //std::cerr << "Python command:" << std::endl;

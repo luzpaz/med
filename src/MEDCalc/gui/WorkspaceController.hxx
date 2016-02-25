@@ -78,6 +78,7 @@ private:
   void _removeItemList(QStringList itemNameIdList);
   void _viewItemList(QStringList itemNameIdList);
   QString _getViewMode();
+  QString _getColorMap();
 
 private:
   XmedConsoleDriver* _consoleDriver;

@@ -53,8 +53,14 @@ WidgetPresentationParameters::getScalarBarMaxVal()
   return this->ui.doubleSpinBoxMaxVal->value();
 }
 
-std::string
+MEDCALC::MEDPresentationColorMap
 WidgetPresentationParameters::getColorMap()
 {
-  return this->ui.comboBoxColorMap->currentText().toStdString();
+  QString colorMap = this->ui.comboBoxColorMap->currentText();
+  if (colorMap == tr("LAB_BLUE_TO_RED")) {
+    return MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW;
+  }
+  else if (colorMap == tr("LAB_COOL_TO_WARM")) {
+    return MEDCALC::COLOR_MAP_COOL_TO_WARM;
+  }
 }

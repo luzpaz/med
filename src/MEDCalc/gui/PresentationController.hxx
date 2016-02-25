@@ -58,6 +58,7 @@ public:
   void createActions();
 
   MEDCALC::MEDPresentationViewMode getSelectedViewMode();
+  MEDCALC::MEDPresentationColorMap getSelectedColorMap();
 
 signals:
   void presentationSignal(const PresentationEvent*);

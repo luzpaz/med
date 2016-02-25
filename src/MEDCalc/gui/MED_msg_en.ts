@@ -198,14 +198,6 @@
       <source>LAB_COLOR_MAP</source>
       <translation>Color map:</translation>
     </message>
-    <message>
-      <source>LAB_BLUE_TO_RED</source>
-      <translation>Blue to red rainbow</translation>
-    </message>
-    <message>
-      <source>LAB_COOL_TO_WARM</source>
-      <translation>Cool to warm</translation>
-    </message>
   </context>
   <context>
     <name>DlgAlias</name>
@@ -523,6 +515,14 @@
     <message>
       <source>LAB_VIEW_MODE_SPLIT_VIEW</source>
       <translation>Split</translation>
+    </message>
+    <message>
+      <source>LAB_BLUE_TO_RED</source>
+      <translation>Blue to red rainbow</translation>
+    </message>
+    <message>
+      <source>LAB_COOL_TO_WARM</source>
+      <translation>Cool to warm</translation>
     </message>
   </context>
 </TS>

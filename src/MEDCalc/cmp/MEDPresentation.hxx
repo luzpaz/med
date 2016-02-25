@@ -50,10 +50,13 @@ protected:
 
   MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::string name);
   std::string getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode);
+  std::string getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap);
 
   virtual void internalGeneratePipeline() = 0;
   PyObject * getPythonObjectFromMain(const char * var);
   void pushInternal(PyObject * obj, PyObject * disp = NULL);
+
+  MEDPresentation::TypeID getID() { return _fieldHandlerId; }
 
 private:
 

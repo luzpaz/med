@@ -458,17 +458,6 @@ void WorkspaceController::_viewItemList(QStringList itemNameIdList) {
   _consoleDriver->exec(commands);
 }
 
-QString
-WorkspaceController::_getViewMode() {
-  MEDCALC::MEDPresentationViewMode viewMode = _salomeModule->getSelectedViewMode();
-  switch(viewMode) {
-  case MEDCALC::VIEW_MODE_REPLACE: return "MEDCALC.VIEW_MODE_REPLACE";
-  case MEDCALC::VIEW_MODE_OVERLAP: return "MEDCALC.VIEW_MODE_OVERLAP";
-  case MEDCALC::VIEW_MODE_NEW_LAYOUT: return "MEDCALC.VIEW_MODE_NEW_LAYOUT";
-  case MEDCALC::VIEW_MODE_SPLIT_VIEW: return "MEDCALC.VIEW_MODE_SPLIT_VIEW";
-  }
-}
-
 /**
  * This slot can process the event coming from the
  * DatasourceController. The connection between the datasource signal
@@ -527,6 +516,29 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent* event) {
     STDLOG("The event "<<event->eventtype<<" is not implemented yet");
   }
 }
+
+QString
+WorkspaceController::_getViewMode()
+{
+  MEDCALC::MEDPresentationViewMode viewMode = _salomeModule->getSelectedViewMode();
+  switch(viewMode) {
+  case MEDCALC::VIEW_MODE_REPLACE: return "MEDCALC.VIEW_MODE_REPLACE";
+  case MEDCALC::VIEW_MODE_OVERLAP: return "MEDCALC.VIEW_MODE_OVERLAP";
+  case MEDCALC::VIEW_MODE_NEW_LAYOUT: return "MEDCALC.VIEW_MODE_NEW_LAYOUT";
+  case MEDCALC::VIEW_MODE_SPLIT_VIEW: return "MEDCALC.VIEW_MODE_SPLIT_VIEW";
+  }
+}
+
+QString
+WorkspaceController::_getColorMap()
+{
+  MEDCALC::MEDPresentationColorMap colorMap = _salomeModule->getSelectedColorMap();
+  switch(colorMap) {
+  case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW: return "MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW";
+  case MEDCALC::COLOR_MAP_COOL_TO_WARM: return "MEDCALC.COLOR_MAP_COOL_TO_WARM";
+  }
+}
+
 /**
  * This slot can process the event coming from the
  * DatasourceController. The connection between the datasource signal
@@ -553,10 +565,10 @@ void WorkspaceController::processPresentationEvent(const PresentationEvent* even
     QString viewMode = _getViewMode();
     //QString displayedInfo = ; // from PresentationController combobox
     //QString scalarBarRange = ; // from PresentationController spinbox
-    //QString colorMap = ; // from PresentationController combobox
+    QString colorMap = _getColorMap();
     MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
     QStringList commands;
-    commands += QString("medcalc.MakeScalarMap(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("medcalc.MakeScalarMap(accessField(%1), %2, colorMap=%3)").arg(fieldHandler->id).arg(viewMode).arg(colorMap);
     _consoleDriver->exec(commands);
   }
   else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_CONTOUR ) {

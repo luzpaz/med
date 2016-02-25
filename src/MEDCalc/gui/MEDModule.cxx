@@ -272,3 +272,9 @@ MEDModule::getSelectedViewMode()
 {
   return _presentationController->getSelectedViewMode();
 }
+
+MEDCALC::MEDPresentationColorMap
+MEDModule::getSelectedColorMap()
+{
+  return _presentationController->getSelectedColorMap();
+}
