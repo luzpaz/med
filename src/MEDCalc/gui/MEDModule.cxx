@@ -39,7 +39,7 @@
 MED_ORB::MED_Gen_var MEDModule::myEngine;
 
 MEDModule::MEDModule() :
-  SalomeApp_Module("MED"), _studyEditor(0), _datasourceController(0), _workspaceController(0), _presentationController(0)
+  SalomeApp_Module("MED"), _studyEditor(0), _datasourceController(0), _workspaceController(0), _presentationController(0), _processingController(0)
 {
   // Note also that we can't use the getApp() function here because
   // the initialize(...) function has not been called yet.
@@ -57,6 +57,8 @@ MEDModule::~MEDModule()
   //  delete _workspaceController;
   if (_presentationController)
     delete _presentationController;
+  if (_processingController)
+    delete _processingController;
 }
 
 MED_ORB::MED_Gen_var
@@ -201,12 +203,16 @@ MEDModule::createModuleWidgets() {
   _xmedDataModel  = new XmedDataModel();
   _workspaceController->setDataModel(_xmedDataModel);
   _presentationController = new PresentationController(this);
+  _processingController = new ProcessingController(this);
 
   connect(_datasourceController, SIGNAL(datasourceSignal(const DatasourceEvent*)),
     _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent*)));
 
   connect(_presentationController, SIGNAL(presentationSignal(const PresentationEvent*)),
     _workspaceController, SLOT(processPresentationEvent(const PresentationEvent*)));
+
+  connect(_processingController, SIGNAL(processingSignal(const ProcessingEvent*)),
+    _workspaceController, SLOT(processProcessingEvent(const ProcessingEvent*)));
 
   connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent*)),
     _datasourceController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent*)));
@@ -220,6 +226,7 @@ MEDModule::createModuleActions() {
   _datasourceController->createActions();
   _workspaceController->createActions();
   _presentationController->createActions();
+  _processingController->createActions();
 }
 
 int

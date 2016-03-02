@@ -16,12 +16,12 @@
       <translation>datasource_add.png</translation>
     </message>
     <message>
-      <source>ICO_DATASOURCE_CHANGE_MESH</source>
-      <translation>datasource_changeUnderlyingMesh.png</translation>
+      <source>ICO_PROCESSING_CHANGE_MESH</source>
+      <translation>processing_changeUnderlyingMesh.png</translation>
     </message>
     <message>
-      <source>ICO_DATASOURCE_INTERPOLATE_FIELD</source>
-      <translation>datasource_interpolateField.png</translation>
+      <source>ICO_PROCESSING_INTERPOLATE_FIELD</source>
+      <translation>processing_interpolateField.png</translation>
     </message>
     <message>
       <source>ICO_DATASOURCE_EXPAND_FIELD</source>

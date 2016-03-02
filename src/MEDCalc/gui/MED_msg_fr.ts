@@ -85,6 +85,21 @@
     </message>
   </context>
   <context>
+    <name>ProcessingController</name>
+    <message>
+      <source>MENU_PROCESSING</source>
+      <translation>Traitement</translation>
+    </message>
+    <message>
+      <source>LAB_PROCESSING_CHANGE_MESH</source>
+      <translation>Changer le maillage sous-jacent</translation>
+    </message>
+    <message>
+      <source>LAB_PROCESSING_INTERPOLATE_FIELD</source>
+      <translation>Interpoler le champ</translation>
+    </message>
+  </context>
+  <context>
     <name>DatasourceController</name>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="45"/>
@@ -115,16 +130,6 @@
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="75"/>
       <source>LAB_USE_IN_WORKSPACE</source>
       <translation>Utiliser dans l'espace de travail</translation>
-    </message>
-    <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="83"/>
-      <source>LAB_CHANGE_MESH</source>
-      <translation>Changer le maillage sous-jacent</translation>
-    </message>
-    <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="113"/>
-      <source>LAB_INTERPOLATE_FIELD</source>
-      <translation>Interpoler le champ</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="157"/>

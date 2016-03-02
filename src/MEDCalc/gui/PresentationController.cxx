@@ -85,7 +85,7 @@ PresentationController::createActions()
 {
   STDLOG("Creating PresentationController actions");
 
-  int presentationToolbarId = _salomeModule->createTool("View Mode", "PresentationToolbar");
+  int presentationToolbarId = _salomeModule->createTool("Presentations", "PresentationToolbar");
   int presentationMenuId = _salomeModule->createMenu(tr("MENU_PRESENTATIONS"), -1, 1);
 
   // Presentations

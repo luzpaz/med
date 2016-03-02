@@ -17,69 +17,61 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef PRESENTATION_CONTROLLER_HXX
-#define PRESENTATION_CONTROLLER_HXX
+#ifndef PROCESSING_CONTROLLER_HXX
+#define PROCESSING_CONTROLLER_HXX
 
-#include <QtGui>
 #include "MEDCALCGUI.hxx"
 
 #include "MEDEventListener_i.hxx"
 #include <SALOMEconfig.h>
-#include CORBA_SERVER_HEADER(MEDPresentationManager)
 #include CORBA_CLIENT_HEADER(MEDDataManager)
 
-#include "XmedDataModel.hxx"
+#include <QtGui>
+#include <SalomeApp_Module.h>
 #include <SALOME_AppStudyEditor.hxx>
-#include "WidgetPresentationParameters.hxx"
+
+#include "XmedDataModel.hxx"
+#include "DlgChangeUnderlyingMesh.hxx"
+#include "DlgInterpolateField.hxx"
 
 typedef struct {
   enum EventType {
-    EVENT_VIEW_OBJECT_CONTOUR,
-    EVENT_VIEW_OBJECT_DEFLECTION_SHAPE,
-    EVENT_VIEW_OBJECT_POINT_SPRITE,
-    EVENT_VIEW_OBJECT_SCALAR_MAP,
-    EVENT_VIEW_OBJECT_SLICES,
-    EVENT_VIEW_OBJECT_VECTOR_FIELD
+    EVENT_IMPORT_OBJECT,
+    EVENT_PROCESS_INTERPOLATE_FIELD,
+    EVENT_PROCESS_CHANGE_UNDERLYING_MESH
   };
   int eventtype;
   XmedDataObject* objectdata;
-} PresentationEvent;
+} ProcessingEvent;
 
 class MEDModule;
 
-class MEDCALCGUI_EXPORT PresentationController : public QObject {
+class MEDCALCGUI_EXPORT ProcessingController : public QObject {
   Q_OBJECT
 
 public:
-  PresentationController(MEDModule* salomeModule);
-  ~PresentationController();
+  ProcessingController(MEDModule* salomeModule);
+  ~ProcessingController();
 
   void createActions();
 
-  MEDCALC::MEDPresentationViewMode getSelectedViewMode();
-  MEDCALC::MEDPresentationColorMap getSelectedColorMap();
-
-signals:
-  void presentationSignal(const PresentationEvent*);
+public slots:
+  // Callback connected to dialog box validation signals
+  void OnChangeUnderlyingMeshInputValidated();
+  void OnInterpolateFieldInputValidated();
 
 protected slots:
-  void OnVisualizeScalarMap();
-  void OnVisualizeContour();
-  void OnVisualizeVectorField();
-  void OnVisualizeSlices();
-  void OnVisualizeDeflectionShape();
-  void OnVisualizePointSprite();
-  void processWorkspaceEvent(const MEDCALC::MedEvent*);
+  void OnChangeUnderlyingMesh();
+  void OnInterpolateField();
 
-private:
-  void visualize(PresentationEvent::EventType);
-  void updateTreeViewWithNewPresentation(long, long);
-  std::string _getIconName(const std::string&);
+signals:
+  void processingSignal(const ProcessingEvent*);
 
 private:
   MEDModule* _salomeModule;
   SALOME_AppStudyEditor* _studyEditor; // borrowed to MEDModule
-  WidgetPresentationParameters* _widgetPresentationParameters;
+  DlgChangeUnderlyingMesh* _dlgChangeUnderlyingMesh;
+  DlgInterpolateField* _dlgInterpolateField;
 };
 
-#endif /* PRESENTATION_CONTROLLER_HXX */
+#endif /* PROCESSING_CONTROLLER_HXX */

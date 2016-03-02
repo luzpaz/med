@@ -611,6 +611,35 @@ void WorkspaceController::processPresentationEvent(const PresentationEvent* even
   }
 }
 
+void
+WorkspaceController::processProcessingEvent(const ProcessingEvent* event)
+{
+  XmedDataModel* dataModel = (XmedDataModel*)this->getDataModel();
+  if ( dataModel == NULL ) {
+    STDLOG("No data model associated to this tree view");
+    return;
+  }
+
+  // >>>
+  // __GBO__ To know what to do we should test the type, because the
+  // object could be a mesh, a timeseries or a single field. We test
+  // here the case of a single field. Moreover, there could have
+  // options such that "change the underlying mesh".
+  // <<<
+
+  XmedDataObject* dataObject = event->objectdata;
+
+  if ( event->eventtype == ProcessingEvent::EVENT_IMPORT_OBJECT ) {
+    std::cout << "IMPORT object in workspace: " << dataObject->toString() << std::endl;
+    STDLOG("IMPORT object in workspace:\n"<<dataObject->toString());
+    // _GBO_ QUESTION: tag automatically the object as a peristant object ??
+    // We first add the data object to the internal data model
+    dataModel->addDataObject(dataObject);
+    // Then we request the tree view to consider this new object
+    this->getDataTreeModel()->addData(dataObject);
+  }
+}
+
 void WorkspaceController::OnSaveWorkspace() {
 
   // Dialog to get the filename where the workspace must be saved into

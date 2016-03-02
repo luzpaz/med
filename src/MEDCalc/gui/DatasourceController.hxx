@@ -31,8 +31,6 @@
 #include <MEDPresentation.hxx>
 
 #include "XmedDataModel.hxx"
-#include "DlgChangeUnderlyingMesh.hxx"
-#include "DlgInterpolateField.hxx"
 #include "MEDCALCGUI.hxx"
 //
 // The DatasourceController defines data structures and classes to
@@ -88,9 +86,6 @@ public:
   void createActions();
 
 public slots:
-  // Callback connected to dialog box validation signals
-  void OnChangeUnderlyingMeshInputValidated();
-  void OnInterpolateFieldInputValidated();
   void processWorkspaceEvent(const MEDCALC::MedEvent* event);
 
 signals:
@@ -101,8 +96,6 @@ protected slots:
   void OnAddImagesource();
   void OnExpandField();
   void OnUseInWorkspace();
-  void OnChangeUnderlyingMesh();
-  void OnInterpolateField();
 
 private:
   void addDatasource(const char* filename);
@@ -111,10 +104,6 @@ private:
 private:
   MEDModule* _salomeModule;
   SALOME_AppStudyEditor* _studyEditor; // borrowed to MEDModule
-
-  DlgChangeUnderlyingMesh* _dlgChangeUnderlyingMesh;
-  DlgInterpolateField* _dlgInterpolateField;
-
 };
 
 #endif

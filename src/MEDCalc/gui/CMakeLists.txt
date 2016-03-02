@@ -31,7 +31,9 @@ SET(MEDCALCGUI_HEADERS
   MEDEventListener_i.hxx
   WorkspaceController.hxx
   DatasourceController.hxx
-  PresentationController.hxx)
+  PresentationController.hxx
+  ProcessingController.hxx
+  )
 QT_WRAP_MOC(MEDCALCGUI_HEADERS_MOC ${MEDCALCGUI_HEADERS})
 
 

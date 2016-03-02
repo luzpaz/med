@@ -27,6 +27,7 @@
 #include "XmedConsoleDriver.hxx"
 #include "DatasourceController.hxx"
 #include "PresentationController.hxx"
+#include "ProcessingController.hxx"
 #include "MEDCALCGUI.hxx"
 
 #include <SALOMEconfig.h>
@@ -60,6 +61,7 @@ public slots:
   void processMedEvent(const MEDCALC::MedEvent* event);
   void processDatasourceEvent(const DatasourceEvent* event);
   void processPresentationEvent(const PresentationEvent* event);
+  void processProcessingEvent(const ProcessingEvent* event);
   void OnSaveWorkspace();
   void OnCleanWorkspace();
 

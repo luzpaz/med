@@ -31,6 +31,7 @@
 #include "XmedDataModel.hxx"
 #include "DatasourceController.hxx"
 #include "PresentationController.hxx"
+#include "ProcessingController.hxx"
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MED_Gen)
@@ -94,6 +95,7 @@ private:
   WorkspaceController* _workspaceController;
   XmedDataModel* _xmedDataModel;
   PresentationController* _presentationController;
+  ProcessingController* _processingController;
   static MED_ORB::MED_Gen_var myEngine;
 };
 
