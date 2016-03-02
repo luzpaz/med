@@ -21,6 +21,7 @@
 #define PRESENTATION_CONTROLLER_HXX
 
 #include <QtGui>
+#include <QDockWidget>
 #include "MEDCALCGUI.hxx"
 
 #include "MEDEventListener_i.hxx"
@@ -59,6 +60,8 @@ public:
   MEDCALC::MEDPresentationViewMode getSelectedViewMode();
   MEDCALC::MEDPresentationColorMap getSelectedColorMap();
 
+  void showDockWidgets(bool isVisible);
+
 signals:
   void presentationSignal(const PresentationEvent*);
 
@@ -79,6 +82,7 @@ private:
 private:
   MEDModule* _salomeModule;
   SALOME_AppStudyEditor* _studyEditor; // borrowed to MEDModule
+  QDockWidget *_dockWidget;
   WidgetPresentationParameters* _widgetPresentationParameters;
 };
 

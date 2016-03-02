@@ -161,6 +161,7 @@ MEDModule::activateModule( SUIT_Study* theStudy )
 
   //this->createStudyComponent(theStudy);
   _workspaceController->showDockWidgets(true);
+  _presentationController->showDockWidgets(true);
   //this->setDockLayout(StandardApp_Module::DOCKLAYOUT_LEFT_VLARGE);
 
   // return the activation status
@@ -171,6 +172,7 @@ bool
 MEDModule::deactivateModule( SUIT_Study* theStudy )
 {
   _workspaceController->showDockWidgets(false);
+  _presentationController->showDockWidgets(false);
   //this->unsetDockLayout();
 
   // hide own menus

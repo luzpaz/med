@@ -36,7 +36,6 @@
 #include <SUIT_Session.h>
 #include <SUIT_ResourceMgr.h>
 #include <QMessageBox>
-#include <QDockWidget>
 
 PresentationController::PresentationController(MEDModule* salomeModule)
 {
@@ -47,15 +46,15 @@ PresentationController::PresentationController(MEDModule* salomeModule)
   _widgetPresentationParameters = new WidgetPresentationParameters();
 
   QMainWindow* parent = salomeModule->getApp()->desktop();
-  QDockWidget *dockWidget = new QDockWidget(parent);
-  dockWidget->setVisible(false);
-  dockWidget->setWindowTitle(tr("TITLE_PRESENTATION_PARAMETERS"));
-  dockWidget->setObjectName(tr("TITLE_PRESENTATION_PARAMETERS"));
-  dockWidget->setFeatures(QDockWidget::AllDockWidgetFeatures);
-  dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-  dockWidget->setWidget(_widgetPresentationParameters);
-  parent->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
-  dockWidget->show();
+  _dockWidget = new QDockWidget(parent);
+  _dockWidget->setVisible(false);
+  _dockWidget->setWindowTitle(tr("TITLE_PRESENTATION_PARAMETERS"));
+  _dockWidget->setObjectName(tr("TITLE_PRESENTATION_PARAMETERS"));
+  _dockWidget->setFeatures(QDockWidget::AllDockWidgetFeatures);
+  _dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  _dockWidget->setWidget(_widgetPresentationParameters);
+  parent->addDockWidget(Qt::LeftDockWidgetArea, _dockWidget);
+  //_dockWidget->show();
 }
 
 PresentationController::~PresentationController()
@@ -253,4 +252,11 @@ PresentationController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
   if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
     this->updateTreeViewWithNewPresentation(event->dataId, event->presentationId);
   }
+}
+
+void
+PresentationController::showDockWidgets(bool isVisible)
+{
+  STDLOG("Switching PresentationController visibility to: " << isVisible);
+  _dockWidget->setVisible(isVisible);
 }
