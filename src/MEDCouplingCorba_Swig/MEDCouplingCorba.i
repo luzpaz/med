@@ -399,10 +399,10 @@ def MEDCouplingDataArrayIntTupleIdiv(self,*args):
 def MEDCouplingDataArrayIntTupleImod(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayIntTuple____imod___(self, self, *args)
-def MEDCouplingDenseMatrixIadd(self,*args):
+def ParaMEDMEMDenseMatrixIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DenseMatrix____iadd___(self, self, *args)
-def MEDCouplingDenseMatrixIsub(self,*args):
+def ParaMEDMEMDenseMatrixIsub(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DenseMatrix____isub___(self, self, *args)
 def MEDCouplingUMeshnew(cls,*args):
