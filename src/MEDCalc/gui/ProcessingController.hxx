@@ -26,7 +26,7 @@
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MEDDataManager)
 
-#include <QtGui>
+#include <QObject>
 #include <SalomeApp_Module.h>
 #include <SALOME_AppStudyEditor.hxx>
 

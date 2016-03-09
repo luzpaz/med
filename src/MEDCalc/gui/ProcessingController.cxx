@@ -25,6 +25,7 @@
 #include "Basics_Utils.hxx"
 
 #include <SUIT_Desktop.h>
+#include <QMessageBox>
 
 ProcessingController::ProcessingController(MEDModule* salomeModule)
 {

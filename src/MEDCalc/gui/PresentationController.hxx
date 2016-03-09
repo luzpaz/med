@@ -20,8 +20,7 @@
 #ifndef PRESENTATION_CONTROLLER_HXX
 #define PRESENTATION_CONTROLLER_HXX
 
-#include <QtGui>
-#include <QDockWidget>
+#include <QObject>
 #include "MEDCALCGUI.hxx"
 
 #include "MEDEventListener_i.hxx"
@@ -47,6 +46,7 @@ typedef struct {
 } PresentationEvent;
 
 class MEDModule;
+class QDockWidget;
 
 class MEDCALCGUI_EXPORT PresentationController : public QObject {
   Q_OBJECT
