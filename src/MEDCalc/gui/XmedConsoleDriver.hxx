@@ -23,7 +23,7 @@
 
 #include "MEDCALCGUI.hxx"
 
-#include <PyConsole_Console.h>
+#include <SalomePyConsole_Console.h>
 
 #include <QStringList>
 
@@ -39,7 +39,7 @@ public:
 
 private:
   MEDModule* _salomeModule;
-  PyConsole_Console * _pyConsole;
+  SalomePyConsole_Console * _pyConsole;
   bool _importXmedDone;
 };
 
