@@ -1,7 +1,6 @@
 #ifndef _DlgChangeUnderlyingMesh_HXX
 #define _DlgChangeUnderlyingMesh_HXX
 
-#include <QtGui>
 #include "ui_DlgChangeUnderlyingMesh.h"
 #include "GenericDialog.hxx"
 

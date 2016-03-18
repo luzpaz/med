@@ -24,7 +24,6 @@
 // (gboulant - 12/10/2010)
 //
 #include <QApplication>
-#include <QtGui>
 
 #include "DlgAlias.hxx"
 

@@ -1,7 +1,6 @@
 #ifndef _GenericDialog_HXX
 #define _GenericDialog_HXX
 
-#include <QtGui>
 #include "ui_GenericDialog.h"
 
 class GenericDialog : public QDialog

@@ -1,7 +1,6 @@
 #ifndef DLGALIAS_H
 #define DLGALIAS_H
 
-#include <QtGui>
 #include "ui_DlgAlias.h"
 #include "MEDCALCGUIdialogs.hxx"
 

@@ -1,7 +1,6 @@
 #ifndef _DlgInterpolateField_HXX
 #define _DlgInterpolateField_HXX
 
-#include <QtGui>
 #include "ui_DlgInterpolateField.h"
 #include "GenericDialog.hxx"
 

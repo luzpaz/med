@@ -1,7 +1,6 @@
 #ifndef _DlgImageToMed_HXX
 #define _DlgImageToMed_HXX
 
-#include <QtGui>
 #include "ui_DlgImageToMed.h"
 #include "GenericDialog.hxx"
 

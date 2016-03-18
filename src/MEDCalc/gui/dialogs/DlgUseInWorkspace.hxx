@@ -1,7 +1,6 @@
 #ifndef _DlgUseInWorkspace_HXX
 #define _DlgUseInWorkspace_HXX
 
-#include <QtGui>
 #include "ui_DlgUseInWorkspace.h"
 #include "GenericDialog.hxx"
 

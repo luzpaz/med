@@ -3,7 +3,6 @@
 
 #include "MEDCALCGUIdialogs.hxx"
 
-#include <QtGui>
 #include "ui_WidgetPresentationParameters.h"
 
 #include <SALOMEconfig.h>
