@@ -1,4 +1,4 @@
-// Copyright (C) 2012-2015  CEA/DEN, EDF R&D
+// Copyright (C) 2012-2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,6 @@
 // (gboulant - 12/10/2010)
 //
 #include <QApplication>
-#include <QtGui>
 
 #include "DlgAlias.hxx"
 
