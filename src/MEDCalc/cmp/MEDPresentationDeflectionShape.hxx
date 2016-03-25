@@ -15,6 +15,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
 #ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_DEFLECTIONSHAPE_HXX_
 #define SRC_MEDCALC_CMP_MEDPRESENTATION_DEFLECTIONSHAPE_HXX_

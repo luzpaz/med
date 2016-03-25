@@ -1,4 +1,4 @@
-// Copyright (C) 2011-2015  CEA/DEN, EDF R&D
+// Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 
 #include "MEDCALCGUI.hxx"
 
-#include <SalomePyConsole_Console.h>
+#include <PyConsole_Console.h>
 
 #include <QStringList>
 
@@ -39,7 +39,7 @@ public:
 
 private:
   MEDModule* _salomeModule;
-  SalomePyConsole_Console * _pyConsole;
+  PyConsole_Console * _pyConsole;
   bool _importXmedDone;
 };
 
