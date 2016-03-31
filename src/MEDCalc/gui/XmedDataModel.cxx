@@ -19,6 +19,7 @@
 
 #include "XmedDataModel.hxx"
 #include <Basics_Utils.hxx>
+#include "MEDCalcConstants.hxx"
 
 //
 // =================================================================
@@ -47,8 +48,6 @@ MEDCALC::FieldHandler * XmedDataObject::getFieldHandler() {
   return &_fieldHandler;
 }
 
-const char * XmedDataObject::mapTypeOfFieldLabel[XmedDataObject::NB_TYPE_OF_FIELDS] =
-  {"ON_CELLS", "ON_NODES", "ON_GAUSS_PT", "ON_GAUSS_NE" };
 /*!
  * This function implements the convention for displaying a fieldname
  * characterized by its spatial discretisation type.
@@ -64,7 +63,7 @@ string XmedDataObject::_getTypedFieldLabel() {
   // 2 = ON_GAUSS_PT
   // 3 = ON_GAUSS_NE
   if ( _fieldHandler.type < 0 ||
-       _fieldHandler.type >= XmedDataObject::NB_TYPE_OF_FIELDS ) {
+       _fieldHandler.type >= NB_TYPE_OF_FIELDS ) {
     return string("UNKNOWN");
   }
   string label(_fieldHandler.fieldname);

@@ -18,7 +18,7 @@
 //
 
 #include "PresentationController.hxx"
-#include "DatasourceConstants.hxx"
+#include <MEDCalcConstants.hxx>
 #include "MEDModule.hxx"
 #include "Basics_Utils.hxx"
 #include "QtxActionGroup.h"

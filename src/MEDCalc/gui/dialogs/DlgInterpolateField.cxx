@@ -18,7 +18,7 @@
 //
 
 #include "DlgInterpolateField.hxx"
-#include "DatasourceConstants.hxx"
+#include <MEDCalcConstants.hxx>
 
 #include <QString>
 #include <QMessageBox>

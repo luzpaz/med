@@ -18,7 +18,7 @@
 //
 
 #include "ProcessingController.hxx"
-#include "DatasourceConstants.hxx"
+#include <MEDCalcConstants.hxx>
 
 #include "MEDFactoryClient.hxx"
 #include "MEDModule.hxx"

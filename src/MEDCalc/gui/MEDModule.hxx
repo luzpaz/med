@@ -37,6 +37,8 @@
 #include CORBA_CLIENT_HEADER(MED_Gen)
 #include CORBA_SERVER_HEADER(MEDPresentationManager)
 
+#include <QModelIndex>
+
 class SalomeApp_Application;
 
 /*!
@@ -83,6 +85,7 @@ public:
 public slots:
   virtual bool activateModule(SUIT_Study* theStudy);
   virtual bool deactivateModule(SUIT_Study* theStudy);
+  virtual void onDblClick(const QModelIndex& index);
 
 private:
   void createModuleWidgets();

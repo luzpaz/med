@@ -40,9 +40,6 @@ public:
   void setFieldHandler(MEDCALC::FieldHandler fieldHandler);
   MEDCALC::FieldHandler * getFieldHandler();
 
-  static const int NB_TYPE_OF_FIELDS = 4;
-  static const char *  mapTypeOfFieldLabel[NB_TYPE_OF_FIELDS];
-
 private:
   MEDCALC::FieldHandler _fieldHandler;
   string _getTypedFieldLabel();

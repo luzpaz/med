@@ -20,7 +20,7 @@
 // Author : Guillaume Boulant (EDF)
 
 #include "DatasourceController.hxx"
-#include "DatasourceConstants.hxx"
+#include <MEDCalcConstants.hxx>
 
 #include <SalomeApp_Application.h>
 #include <SalomeApp_Study.h>

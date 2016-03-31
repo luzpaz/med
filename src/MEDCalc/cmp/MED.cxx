@@ -18,14 +18,13 @@
 //
 
 #include "MED.hxx"
-
 #include "MEDFactoryClient.hxx"
+#include <MEDCalcConstants.hxx>
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(SALOMEDS_Attributes)
 
 #include <SALOMEDS_SObject.hxx>
-
 #include <Utils_ExceptHandlers.hxx>
 
 #include <string>
@@ -57,15 +56,6 @@ MED::~MED()
 {
   // nothing to do
 }
-
-// Duplicate gui/DatasourceConstants
-#define OBJECT_ID              "objectid"
-#define OBJECT_IS_IN_WORKSPACE "isInWorkspace"
-
-// Duplicate gui/XmedDataModel
-static const int NB_TYPE_OF_FIELDS = 4;
-static const char* mapTypeOfFieldLabel[NB_TYPE_OF_FIELDS] =
-  {"ON_CELLS", "ON_NODES", "ON_GAUSS_PT", "ON_GAUSS_NE" };
 
 MED_ORB::status
 MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
@@ -201,6 +191,13 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
 
   soPresentation->SetAttrString("AttributeName", name);
   soPresentation->SetAttrString("AttributePixMap", label);
+
+  SALOMEDS::GenericAttribute_var anAttr;
+  SALOMEDS::AttributeParameter_var aParam;
+  anAttr = studyBuilder->FindOrCreateAttribute(soPresentation, "AttributeParameter");
+  aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
+  aParam->SetInt(FIELD_ID, fieldId);
+  aParam->SetBool(IS_PRESENTATION, true);
 
   result = MED_ORB::OP_OK;
   return result;

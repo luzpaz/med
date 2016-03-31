@@ -21,6 +21,7 @@
 
 #include "MEDModule.hxx"
 #include "QtHelper.hxx"
+#include <MEDCalcConstants.hxx>
 
 #include "SALOME_LifeCycleCORBA.hxx"
 #include "QtxPopupMgr.h"
@@ -29,11 +30,21 @@
 #include <SUIT_Desktop.h>
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_Session.h>
+#include <SUIT_DataBrowser.h>
 #include <SalomeApp_Study.h>
+#include <SalomeApp_DataObject.h>
+#include <SalomeApp_DataModel.h>
+
+#include <SALOMEconfig.h>
+#include CORBA_CLIENT_HEADER(SALOMEDS_Attributes)
+#include <SALOMEDS_SObject.hxx>
+#include <SALOMEDS_Study.hxx>
 
 #ifndef DISABLE_PVVIEWER
 #include "PVViewer_ViewModel.h"
 #endif
+
+#include <sstream>
 
 //! The only instance of the reference to engine
 MED_ORB::MED_Gen_var MEDModule::myEngine;
@@ -84,6 +95,11 @@ MEDModule::initialize( CAM_Application* app )
 {
   // call the parent implementation
   SalomeApp_Module::initialize( app );
+
+  if (app && app->desktop()) {
+    connect((QObject*) (getApp()->objectBrowser()->treeView()), SIGNAL(doubleClicked(const QModelIndex&)),
+            this, SLOT(onDblClick(const QModelIndex&)));
+  }
 
   // The following initializes the GUI widget and associated actions
   this->createModuleWidgets();
@@ -286,4 +302,50 @@ MEDCALC::MEDPresentationColorMap
 MEDModule::getSelectedColorMap()
 {
   return _presentationController->getSelectedColorMap();
+}
+
+void
+MEDModule::onDblClick(const QModelIndex& index)
+{
+  DataObjectList dol = getApp()->objectBrowser()->getSelected();
+  if (dol.isEmpty())
+    return;
+  SalomeApp_DataObject* item = dynamic_cast<SalomeApp_DataObject*>(dol[0]);
+  if (!item)
+    return;
+  SalomeApp_DataModel *model = dynamic_cast<SalomeApp_DataModel*>(dataModel());
+  if (!model)
+    return;
+
+  if (item->componentDataType().toStdString() != "MED")
+    return;
+  _PTR(SObject) obj = item->object();
+  _PTR(GenericAttribute) anAttribute;
+
+  if (! obj->FindAttribute(anAttribute, "AttributeName"))
+    return;
+  _PTR(AttributeName) attrName(anAttribute);
+  std::string name = attrName->Value();
+
+  if (! obj->FindAttribute(anAttribute, "AttributeParameter"))
+    return;
+  _PTR(AttributeParameter) attrParam(anAttribute);
+  if (! attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN)
+      || ! attrParam->GetBool(IS_PRESENTATION)) { // Not a presentation
+    return;
+  }
+  if (!attrParam->IsSet(FIELD_ID, PT_INTEGER))
+    return;
+  int fieldId = attrParam->GetInt(FIELD_ID);
+
+  STDLOG("Presentation edition: NOT IMPLEMENTED YET");
+  STDLOG("  Presention infos:");
+  STDLOG("    - Component:         " + item->componentDataType().toStdString());
+  STDLOG("    - Item entry:        " + item->entry().toStdString());
+  STDLOG("    - Item name:         " + item->name().toStdString());
+  std::ostringstream oss;
+  oss << fieldId;
+  STDLOG("    - Field id:          " + oss.str());
+  STDLOG("    - Presentation name: " + name);
+
 }
