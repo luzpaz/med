@@ -18,6 +18,7 @@
 //
 
 #include "WidgetPresentationParameters.hxx"
+#include <Basics_Utils.hxx>
 
 WidgetPresentationParameters::WidgetPresentationParameters(QWidget* parent)
   : QWidget(parent)
@@ -40,6 +41,9 @@ WidgetPresentationParameters::getViewMode() {
   else if (viewMode == tr("LAB_VIEW_MODE_SPLIT_VIEW")) {
     return MEDCALC::VIEW_MODE_SPLIT_VIEW;
   }
+  // Should not happen
+  STDLOG("Strange!! No matching view mode found - returning VIEW_MODE_REPLACE.");
+  return MEDCALC::VIEW_MODE_REPLACE;
 }
 
 std::string
@@ -82,4 +86,7 @@ WidgetPresentationParameters::getColorMap()
   else if (colorMap == tr("LAB_COOL_TO_WARM")) {
     return MEDCALC::COLOR_MAP_COOL_TO_WARM;
   }
+  // Should not happen
+  STDLOG("Strange!! No matching color map found - returning blue to red.");
+  return MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW;
 }

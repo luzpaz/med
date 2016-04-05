@@ -27,10 +27,14 @@
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(MEDPresentationManager)
 
+#include <QObject>
+
 class WidgetPresentationParameters : public QWidget
 {
+  Q_OBJECT
 public:
   WidgetPresentationParameters(QWidget* parent = 0);
+  virtual ~WidgetPresentationParameters() {}
 
   MEDCALC::MEDPresentationViewMode getViewMode();
   std::string getField();

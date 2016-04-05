@@ -527,6 +527,7 @@ WorkspaceController::_getViewMode()
   case MEDCALC::VIEW_MODE_NEW_LAYOUT: return "MEDCALC.VIEW_MODE_NEW_LAYOUT";
   case MEDCALC::VIEW_MODE_SPLIT_VIEW: return "MEDCALC.VIEW_MODE_SPLIT_VIEW";
   }
+  return QString();
 }
 
 QString
@@ -537,6 +538,7 @@ WorkspaceController::_getColorMap()
   case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW: return "MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW";
   case MEDCALC::COLOR_MAP_COOL_TO_WARM: return "MEDCALC.COLOR_MAP_COOL_TO_WARM";
   }
+  return QString();
 }
 
 /**

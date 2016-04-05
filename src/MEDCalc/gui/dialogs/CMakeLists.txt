@@ -31,6 +31,7 @@ SET(MEDCALCGUI_dialogs_FILES
   DlgChangeUnderlyingMesh.hxx
   DlgInterpolateField.hxx
   DlgImageToMed.hxx
+  WidgetPresentationParameters.hxx
 )
 QT_WRAP_MOC(MEDCALCGUI_dialogs_HEADERS_MOC ${MEDCALCGUI_dialogs_FILES})
 
