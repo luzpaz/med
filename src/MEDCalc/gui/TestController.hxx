@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2016  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,34 +17,45 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef _MED_EVENTLISTENER_IDL_
-#define _MED_EVENTLISTENER_IDL_
+#ifndef SRC_MEDCALC_GUI_TESTCONTROLLER_HXX_
+#define SRC_MEDCALC_GUI_TESTCONTROLLER_HXX_
 
-#include "SALOME_GenericObj.idl"
+#include <QObject>
+#include <QString>
 
-module MEDCALC
-{
-  enum MedEventType {
-    EVENT_PUT_IN_WORKSPACE,
-    EVENT_REMOVE_FROM_WORKSPACE,
-    EVENT_UPDATE_FIELD,
-    EVENT_CLEAN_WORKSPACE,
-    EVENT_ADD_DATASOURCE,
-    EVENT_ADD_PRESENTATION,
-    EVENT_PLAY_TEST,
-    EVENT_UNKNOWN
-  };
-
-  struct MedEvent {
-    MedEventType  type;
-    long          dataId;
-    string        filename;
-    long          presentationId;
-  };
-
-  interface MEDEventListener: SALOME::GenericObj {
-    void processMedEvent(in MedEvent event);
-  };
+class pqTestUtility;
+class MEDModule;
+class SUIT_Desktop;
+class QAction;
+namespace MEDCALC {
+  class MedEvent;
 };
 
-#endif
+class TestController: public QObject {
+  Q_OBJECT
+
+public:
+  TestController(MEDModule* mod);
+  virtual ~TestController();
+
+  void createActions();
+
+public slots:
+  void processWorkspaceEvent(const MEDCALC::MedEvent* event);
+
+  void onRecordTest();
+  void onPlayTest();
+  void onPlayTestScenario();
+  void onLockViewSize();
+  void onTakeSnapshot();
+
+protected:
+  MEDModule* _salomeModule;
+  SUIT_Desktop * _desk;
+
+  pqTestUtility * _tester;
+  QAction * _lock_action;
+  QString _test_scenario;
+};
+
+#endif /* SRC_MEDCALC_GUI_TESTCONTROLLER_HXX_ */

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2016  CEA/DEN, EDF R&D
+# Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,16 +17,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(PYFILES_TO_INSTALL
-  __init__.py
-  fieldproxy.py
-  medconsole.py
-  medcorba.py
-  medevents.py
-  medimages.py
-  medio.py
-  medpresentation.py
-  medtest.py
-  )
-
-SALOME_INSTALL_SCRIPTS("${PYFILES_TO_INSTALL}" ${SALOME_INSTALL_PYTHON}/medcalc)
+def PlayQtTestingScenario(filename):
+  from medcalc.medevents import notifyGui_playQtTestingScenario
+  notifyGui_playQtTestingScenario(filename)

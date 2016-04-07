@@ -32,6 +32,7 @@
 #include "DatasourceController.hxx"
 #include "PresentationController.hxx"
 #include "ProcessingController.hxx"
+#include "TestController.hxx"
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MED_Gen)
@@ -86,10 +87,12 @@ public slots:
   virtual bool activateModule(SUIT_Study* theStudy);
   virtual bool deactivateModule(SUIT_Study* theStudy);
   virtual void onDblClick(const QModelIndex& index);
+  virtual void onPlayTest(const char * filename);
 
 private:
   void createModuleWidgets();
   void createModuleActions();
+
   static void init();
 
 private:
@@ -99,6 +102,9 @@ private:
   XmedDataModel* _xmedDataModel;
   PresentationController* _presentationController;
   ProcessingController* _processingController;
+#ifdef MED_HAS_QTTESTING
+  TestController * _testController;
+#endif
   static MED_ORB::MED_Gen_var myEngine;
 };
 

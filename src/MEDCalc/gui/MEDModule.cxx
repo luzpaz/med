@@ -222,6 +222,9 @@ MEDModule::createModuleWidgets() {
   _workspaceController->setDataModel(_xmedDataModel);
   _presentationController = new PresentationController(this);
   _processingController = new ProcessingController(this);
+#ifdef MED_HAS_QTTESTING
+  _testController = new TestController(this);
+#endif
 
   connect(_datasourceController, SIGNAL(datasourceSignal(const DatasourceEvent*)),
     _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent*)));
@@ -237,6 +240,11 @@ MEDModule::createModuleWidgets() {
 
   connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent*)),
     _presentationController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent*)));
+
+#ifdef MED_HAS_QTTESTING
+  connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent*)),
+    _testController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent*)));
+#endif
 }
 
 void
@@ -245,6 +253,9 @@ MEDModule::createModuleActions() {
   _workspaceController->createActions();
   _presentationController->createActions();
   _processingController->createActions();
+#ifdef MED_HAS_QTTESTING
+  _testController->createActions();
+#endif
 }
 
 int
@@ -262,9 +273,15 @@ MEDModule::createStandardAction(const QString& label,
   if ( effToolTip.isEmpty() )
     effToolTip = label;
 
+  QIcon ico;
+  if (iconName.isEmpty())
+    ico = QIcon();
+  else
+    ico = QIcon(resMgr->loadPixmap("MED", iconName));
+
   QAction* action = createAction(-1,
                                  label,
-                                 resMgr->loadPixmap("MED", iconName),
+                                 ico,
                                  label,
                                  effToolTip,
                                  0,
@@ -347,5 +364,11 @@ MEDModule::onDblClick(const QModelIndex& index)
   oss << fieldId;
   STDLOG("    - Field id:          " + oss.str());
   STDLOG("    - Presentation name: " + name);
+
+}
+
+void
+MEDModule::onPlayTest(const char * filename)
+{
 
 }

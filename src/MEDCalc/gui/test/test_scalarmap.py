@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2016  CEA/DEN, EDF R&D
+# Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,16 +17,21 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(PYFILES_TO_INSTALL
-  __init__.py
-  fieldproxy.py
-  medconsole.py
-  medcorba.py
-  medevents.py
-  medimages.py
-  medio.py
-  medpresentation.py
-  medtest.py
-  )
+""" Test of the scalarmap. 
 
-SALOME_INSTALL_SCRIPTS("${PYFILES_TO_INSTALL}" ${SALOME_INSTALL_PYTHON}/medcalc)
+This script is to be passed as an argument of the ./salome command and will be executed within the SALOME
+Python console.
+"""
+
+import os
+import SalomePyQt
+from medcalc_testutils import GetScenarioDir
+
+sgPyQt = SalomePyQt.SalomePyQt()
+sgPyQt.activateModule('MED')
+
+import medcalc  # After module activation !!
+medcalc.PlayQtTestingScenario(os.path.join(GetScenarioDir(), 'test_scalarmap.xml'))
+
+#medcalc.RequestTermination()
+#quit()

@@ -308,6 +308,9 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
   else if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
     emit workspaceSignal(event); // forward to DatasourceController
   }
+  else if ( event->type == MEDCALC::EVENT_PLAY_TEST ) {
+    emit workspaceSignal(event); // forward to TestController
+  }
 
 }
 

@@ -45,6 +45,7 @@
 #include <QStringList>
 #include <QString>
 #include <QMessageBox>
+#include <QFileDialog>
 
 #include "DlgAlias.hxx"
 
@@ -149,10 +150,15 @@ void DatasourceController::OnAddDatasource()
   if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
     anInitialPath = QDir::currentPath();
 
-  QStringList filenames = SUIT_FileDlg::getOpenFileNames( _salomeModule->getApp()->desktop(),
+//  QStringList filenames = SUIT_FileDlg::getOpenFileNames( _salomeModule->getApp()->desktop(),
+//                                                          anInitialPath,
+//                                                          filter,
+//                                                          tr("IMPORT_MED_FIELDS") );
+  // [ABN] the below to be compatible with QtTesting:
+  QStringList filenames = QFileDialog::getOpenFileNames( _salomeModule->getApp()->desktop(),
+                                                          tr("IMPORT_MED_FIELDS"),
                                                           anInitialPath,
-                                                          filter,
-                                                          tr("IMPORT_MED_FIELDS") );
+                                                          tr("FILE_FILTER_MED") );
 
   if ( filenames.count() <= 0 ) return;
   for ( QStringList::ConstIterator itFile = filenames.begin();

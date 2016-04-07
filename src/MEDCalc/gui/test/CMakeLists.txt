@@ -17,16 +17,23 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(PYFILES_TO_INSTALL
-  __init__.py
-  fieldproxy.py
-  medconsole.py
-  medcorba.py
-  medevents.py
-  medimages.py
-  medio.py
-  medpresentation.py
-  medtest.py
-  )
+SALOME_CONFIGURE_FILE(medcalc_testutils.py.in ${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py)
 
-SALOME_INSTALL_SCRIPTS("${PYFILES_TO_INSTALL}" ${SALOME_INSTALL_PYTHON}/medcalc)
+SET(_test_scripts
+    test_qttesting.py    # main entry point
+    test_scalarmap.py
+)
+
+SET(_test_scenarii
+   scenarios/test_scalarmap.xml
+)
+
+SET(_test_baselines
+    baselines/test_scalarmap.png
+)
+
+SALOME_INSTALL_SCRIPTS("${_test_scripts}" ${SALOME_INSTALL_PYTHON}/tests)
+SALOME_INSTALL_SCRIPTS(${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py ${SALOME_INSTALL_PYTHON})
+ 
+INSTALL(FILES ${_test_scenarii} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/scenarios)
+INSTALL(FILES ${_test_baselines} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/baselines)

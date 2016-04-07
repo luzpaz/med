@@ -32,6 +32,7 @@
 class WidgetPresentationParameters : public QWidget
 {
   Q_OBJECT
+
 public:
   WidgetPresentationParameters(QWidget* parent = 0);
   virtual ~WidgetPresentationParameters() {}

@@ -115,3 +115,5 @@ def notifyGui_addDatasource(filename):
 def notifyGui_addPresentation(fieldId, presId):
   __notifyGui(MEDCALC.EVENT_ADD_PRESENTATION, dataId=fieldId, presentationId=presId)
 #
+def notifyGui_playQtTestingScenario(filename):
+  __notifyGui(MEDCALC.EVENT_PLAY_TEST, filename=filename)

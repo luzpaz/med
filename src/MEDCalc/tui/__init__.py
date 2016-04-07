@@ -48,3 +48,7 @@ from medpresentation import MakePointSprite
 
 # Console commands
 import medconsole
+
+# Playing test scenarii
+from medtest import PlayQtTestingScenario
+
