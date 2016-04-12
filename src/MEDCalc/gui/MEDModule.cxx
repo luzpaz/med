@@ -368,7 +368,7 @@ MEDModule::onDblClick(const QModelIndex& index)
 }
 
 void
-MEDModule::onPlayTest(const char * filename)
+MEDModule::requestSALOMETermination() const
 {
-
+  SUIT_Session::session()->closeSession( SUIT_Session::DONT_SAVE, 1 );  // killServers = True
 }

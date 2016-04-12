@@ -32,6 +32,10 @@ SET(_test_baselines
     baselines/test_scalarmap.png
 )
 
+# Test rules - the test MEDCalcQtTesting must be run after install (since it starts SALOME) 
+ADD_TEST(MEDCalcQtTesting ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_qttesting.py)
+
+# Install rules
 SALOME_INSTALL_SCRIPTS("${_test_scripts}" ${SALOME_INSTALL_PYTHON}/tests)
 SALOME_INSTALL_SCRIPTS(${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py ${SALOME_INSTALL_PYTHON})
  

@@ -33,5 +33,4 @@ sgPyQt.activateModule('MED')
 import medcalc  # After module activation !!
 medcalc.PlayQtTestingScenario(os.path.join(GetScenarioDir(), 'test_scalarmap.xml'))
 
-#medcalc.RequestTermination()
-#quit()
+medcalc.RequestSALOMETermination()  # not equivalent to quit()! 

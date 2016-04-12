@@ -35,6 +35,8 @@
 #include <SUIT_Desktop.h>
 #include <SUIT_ResourceMgr.h>
 
+#include <QTimer>
+
 /*!
  * This class defines a DockWidget plugged in the SALOME application,
  * and containing a tree view for rendering a hierarchical data
@@ -311,7 +313,9 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
   else if ( event->type == MEDCALC::EVENT_PLAY_TEST ) {
     emit workspaceSignal(event); // forward to TestController
   }
-
+  else if ( event->type == MEDCALC::EVENT_QUIT_SALOME ) {
+    emit workspaceSignal(event); // forward to TestController
+  }
 }
 
 /*!

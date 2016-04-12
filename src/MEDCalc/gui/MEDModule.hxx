@@ -83,11 +83,12 @@ public:
 
   inline SALOME_AppStudyEditor* getStudyEditor() { return _studyEditor; }
 
+  void requestSALOMETermination() const;
+
 public slots:
   virtual bool activateModule(SUIT_Study* theStudy);
   virtual bool deactivateModule(SUIT_Study* theStudy);
   virtual void onDblClick(const QModelIndex& index);
-  virtual void onPlayTest(const char * filename);
 
 private:
   void createModuleWidgets();

@@ -48,6 +48,7 @@ public slots:
   void onPlayTestScenario();
   void onLockViewSize();
   void onTakeSnapshot();
+  void onRequestTermination();
 
 protected:
   MEDModule* _salomeModule;

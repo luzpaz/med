@@ -65,6 +65,8 @@ public slots:
   void OnSaveWorkspace();
   void OnCleanWorkspace();
 
+  void onRequestTermination();
+
 signals:
   void workspaceSignal(const MEDCALC::MedEvent* event);
 

@@ -51,4 +51,5 @@ import medconsole
 
 # Playing test scenarii
 from medtest import PlayQtTestingScenario
+from medtest import RequestSALOMETermination
 

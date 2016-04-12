@@ -117,3 +117,7 @@ def notifyGui_addPresentation(fieldId, presId):
 #
 def notifyGui_playQtTestingScenario(filename):
   __notifyGui(MEDCALC.EVENT_PLAY_TEST, filename=filename)
+#
+def notifyGui_termination():
+  __notifyGui(MEDCALC.EVENT_QUIT_SALOME)
+

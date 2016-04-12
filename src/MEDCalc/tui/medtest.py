@@ -20,3 +20,7 @@
 def PlayQtTestingScenario(filename):
   from medcalc.medevents import notifyGui_playQtTestingScenario
   notifyGui_playQtTestingScenario(filename)
+
+def RequestSALOMETermination():
+  from medcalc.medevents import notifyGui_termination
+  notifyGui_termination()

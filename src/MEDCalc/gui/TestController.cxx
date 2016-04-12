@@ -122,9 +122,9 @@ void TestController::onPlayTest()
 
 void TestController::onPlayTestScenario()
 {
-  STDLOG("@@@@ About to play test " << _test_scenario.toStdString());
+  STDLOG("About to play test " << _test_scenario.toStdString());
   _tester->playTests(_test_scenario);
-  STDLOG("@@@@ Done playing test " << _test_scenario.toStdString());
+  STDLOG("Done playing test " << _test_scenario.toStdString());
 }
 
 void TestController::onLockViewSize()
@@ -137,6 +137,21 @@ void TestController::onTakeSnapshot()
   pqSaveScreenshotReaction::saveScreenshot();
 }
 
+void TestController::onRequestTermination()
+{
+  // Check if test playing
+  if (_tester->playingTest())
+    {
+      STDLOG("Termination requested, but test still playing ...");
+      QTimer::singleShot(200, this, SLOT(onRequestTermination()));
+    }
+  else
+    {
+      _salomeModule->requestSALOMETermination();
+    }
+}
+
+
 void
 TestController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
 {
@@ -146,6 +161,11 @@ TestController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
        */
       _test_scenario = QString(event->filename);
       QTimer::singleShot(100, this, SLOT(onPlayTestScenario()));
+  }
+  else if ( event->type == MEDCALC::EVENT_QUIT_SALOME ) {
+      // [ABN] again: post as an event to give a chance to other events (piled up by test
+      // scenarios for example) to execute:
+      QTimer::singleShot(200, this, SLOT(onRequestTermination()));
   }
 }
 

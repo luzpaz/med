@@ -35,8 +35,8 @@ class MEDGUITest(unittest.TestCase):
   def tearDown(self):
     import shutil
     unittest.TestCase.tearDown(self)
-#    if self._removeDir:
-#      shutil.rmtree(self._tmpDir, False)
+    if self._removeDir:
+      shutil.rmtree(self._tmpDir, False)
     
   def getTestName(self):
     """ Return name of the test being currently executed. """
@@ -90,7 +90,8 @@ class MEDGUITest(unittest.TestCase):
     baseline = "test_scalarmap.png"
     self.launchSalomeWithScript("test_scalarmap.py", baseline)
     self.compareSnapshot(baseline)
-    
+
+
 if __name__ == "__main__":
   suite = unittest.TestSuite()
   suite.addTest(MEDGUITest('testScalarMap'))
