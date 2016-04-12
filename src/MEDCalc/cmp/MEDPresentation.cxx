@@ -70,10 +70,11 @@ void MEDPresentation::setProperty(const std::string& propName, const std::string
 }
 
 const std::string
-MEDPresentation::getProperty(const std::string& propName)
+MEDPresentation::getProperty(const std::string& propName) const
 {
-  if (_properties.find(propName) != _properties.end()) {
-    return _properties[propName];
+  std::map<std::string, std::string>::const_iterator it = _properties.find(propName);
+  if (it != _properties.end()) {
+    return (*it).second;
   }
   else {
     std::cerr << "getProperty(): no property named " << propName << std::endl;
@@ -81,7 +82,7 @@ MEDPresentation::getProperty(const std::string& propName)
   }
 }
 
-PyObject * MEDPresentation::getPythonObjectFromMain(const char * python_var)
+PyObject * MEDPresentation::getPythonObjectFromMain(const char * python_var) const
 {
   // TODO: improve to avoid getting dict at each call
 
@@ -91,7 +92,7 @@ PyObject * MEDPresentation::getPythonObjectFromMain(const char * python_var)
   return PyDict_GetItemString(global_dict, python_var);
 }
 
-std::string MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldType)
+std::string MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldType) const
 {
   switch(fieldType)
   {
@@ -106,7 +107,7 @@ std::string MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldTy
 }
 
 std::string
-MEDPresentation::getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode)
+MEDPresentation::getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode) const
 {
   std::string cmd = std::string("pvs._DisableFirstRenderCameraReset();");
   if (viewMode == MEDCALC::VIEW_MODE_OVERLAP) {
@@ -121,12 +122,18 @@ MEDPresentation::getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode)
   } else if (viewMode == MEDCALC::VIEW_MODE_SPLIT_VIEW) {
     cmd += std::string("__view1 = pvs.CreateView('RenderView');");
   }
-  cmd += std::string("__view1.ResetCamera();");
   return cmd;
 }
 
 std::string
-MEDPresentation::getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap)
+MEDPresentation::getResetCameraCommand() const
+{
+  return std::string("__view1.ResetCamera();");
+}
+
+
+std::string
+MEDPresentation::getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap) const
 {
   switch(colorMap) {
   case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW: return "Blue to Red Rainbow";

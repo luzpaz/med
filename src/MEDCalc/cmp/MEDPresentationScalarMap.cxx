@@ -36,6 +36,8 @@ MEDPresentationScalarMap::internalGeneratePipeline()
   cmd += std::string("__lut.ApplyPreset('")+getColorMapCommand(_params.colorMap)+std::string("',True);");
   cmd += std::string("pvs.Render();");
 
+  cmd += getResetCameraCommand();
+
   //std::cerr << "Python command:" << std::endl;
   //std::cerr << cmd << std::endl;
   PyRun_SimpleString(cmd.c_str());
