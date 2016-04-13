@@ -164,7 +164,7 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
   // to make a view of an object from the tui console).
   for (int i=0; i<listOfSObject->size(); i++) {
     SALOMEDS::SObject_var soField = listOfSObject->at(i);
-    int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
+    int fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);
     // If fieldId equals -1, then it means that it is not a field
     // managed by the MED module, and we stop this function process.
     if ( fieldId < 0 )
@@ -240,7 +240,7 @@ PresentationController::updateTreeViewWithNewPresentation(long fieldId, long pre
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
   _PTR(Study) studyDS = study->studyDS();
 
-  _salomeModule->engine()->registerPresentation(_CAST(Study, studyDS)->GetStudy(), fieldId, name.c_str(), label.c_str());
+  _salomeModule->engine()->registerPresentation(_CAST(Study, studyDS)->GetStudy(), fieldId, name.c_str(), label.c_str(), presentationId);
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);

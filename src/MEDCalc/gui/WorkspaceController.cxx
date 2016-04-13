@@ -504,12 +504,14 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent* event) {
   }
   else if ( event->eventtype == DatasourceEvent::EVENT_ADD_DATASOURCE ) {
     QStringList commands;
-    commands += QString("medcalc.LoadDataSource('%1')").arg(event->objectalias);
+    commands += QString("source_id = medcalc.LoadDataSource('%1')").arg(event->objectalias);
+    commands += QString("source_id");
     _consoleDriver->exec(commands);
   }
   else if ( event->eventtype == DatasourceEvent::EVENT_ADD_IMAGE_AS_DATASOURCE ) {
     QStringList commands;
-    commands += QString("medcalc.LoadImageAsDataSource('%1')").arg(event->objectalias);
+    commands += QString("source_id = medcalc.LoadImageAsDataSource('%1')").arg(event->objectalias);
+    commands += QString("source_id");
     _consoleDriver->exec(commands);
   }
   else {
@@ -570,42 +572,48 @@ void WorkspaceController::processPresentationEvent(const PresentationEvent* even
     QString colorMap = _getColorMap();
     MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
     QStringList commands;
-    commands += QString("medcalc.MakeScalarMap(accessField(%1), %2, colorMap=%3)").arg(fieldHandler->id).arg(viewMode).arg(colorMap);
+    commands += QString("presentation_id = medcalc.MakeScalarMap(accessField(%1), %2, colorMap=%3)").arg(fieldHandler->id).arg(viewMode).arg(colorMap);
+    commands += QString("presentation_id");
     _consoleDriver->exec(commands);
   }
   else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_CONTOUR ) {
     QString viewMode = _getViewMode();
     MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
     QStringList commands;
-    commands += QString("medcalc.MakeContour(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("presentation_id = medcalc.MakeContour(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("presentation_id");
     _consoleDriver->exec(commands);
   }
   else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_VECTOR_FIELD ) {
     QString viewMode = _getViewMode();
     MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
     QStringList commands;
-    commands += QString("medcalc.MakeVectorField(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("presentation_id = medcalc.MakeVectorField(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("presentation_id");
     _consoleDriver->exec(commands);
   }
   else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SLICES ) {
     QString viewMode = _getViewMode();
     MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
     QStringList commands;
-    commands += QString("medcalc.MakeSlices(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("presentation_id = medcalc.MakeSlices(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("presentation_id");
     _consoleDriver->exec(commands);
   }
   else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE ) {
     QString viewMode = _getViewMode();
     MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
     QStringList commands;
-    commands += QString("medcalc.MakeDeflectionShape(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("presentation_id = medcalc.MakeDeflectionShape(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("presentation_id");
     _consoleDriver->exec(commands);
   }
   else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_POINT_SPRITE ) {
     QString viewMode = _getViewMode();
     MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
     QStringList commands;
-    commands += QString("medcalc.MakePointSprite(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("presentation_id = medcalc.MakePointSprite(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+    commands += QString("presentation_id");
     _consoleDriver->exec(commands);
   }
   else {

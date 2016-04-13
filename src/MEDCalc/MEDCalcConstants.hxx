@@ -19,14 +19,15 @@
 
 // This constant strings are used to specify an attribute name for
 // AttributeParameter attributes associated to a SObject
-#define OBJECT_ID              "objectid"
-#define OBJECT_IS_IN_WORKSPACE "isInWorkspace"
+#define IS_IN_WORKSPACE  "isInWorkspace"
+#define SOURCE_ID        "sourceId"
+#define MESH_ID          "meshId"
+//#define FIELD_SERIES_ID  "fieldSeriesId"
+#define FIELD_ID         "fieldId"
+#define PRESENTATION_ID  "presentationId"
+#define IS_PRESENTATION  "isPresentation"
+
 
 static const int NB_TYPE_OF_FIELDS = 4;
 static const char* mapTypeOfFieldLabel[NB_TYPE_OF_FIELDS] =
   {"ON_CELLS", "ON_NODES", "ON_GAUSS_PT", "ON_GAUSS_NE" };
-
-
-// Used by presentations
-#define FIELD_ID "fieldid"
-#define IS_PRESENTATION "ispresentation"

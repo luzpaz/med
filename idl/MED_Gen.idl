@@ -44,7 +44,8 @@ module MED_ORB
     status registerPresentation(in SALOMEDS::Study study,
                                 in long fieldId,
                                 in string name,
-                                in string label)
+                                in string label,
+                                in long presentationId)
       raises (SALOME::SALOME_Exception);
   };
 };
