@@ -44,24 +44,25 @@ public:
   virtual ~MEDPresentation() {}
 
   void setProperty(const std::string& propName, const std::string& propValue);
-  const std::string getProperty(const std::string& propName);
+  const std::string getProperty(const std::string& propName) const;
 
 protected:
 
   MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::string name);
-  std::string getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode);
-  std::string getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap);
+  std::string getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode) const;
+  std::string getResetCameraCommand() const;
+  std::string getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap) const;
 
   virtual void internalGeneratePipeline() = 0;
-  PyObject * getPythonObjectFromMain(const char * var);
+  PyObject * getPythonObjectFromMain(const char * var) const;
   void pushInternal(PyObject * obj, PyObject * disp = NULL);
 
-  MEDPresentation::TypeID getID() { return _fieldHandlerId; }
+  MEDPresentation::TypeID getID() const { return _fieldHandlerId; }
 
 private:
 
   void generatePipeline(); // reserved to friend class MEDPresentationManager
-  std::string getFieldTypeString(MEDCoupling::TypeOfField fieldType);
+  std::string getFieldTypeString(MEDCoupling::TypeOfField fieldType) const;
 
 protected:
 

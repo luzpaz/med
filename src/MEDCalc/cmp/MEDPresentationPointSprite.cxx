@@ -35,6 +35,8 @@ MEDPresentationPointSprite::internalGeneratePipeline()
   cmd += std::string("__disp1.SetRepresentationType('Point Sprite');");
   cmd += std::string("pvs.Render();");
 
+  cmd += getResetCameraCommand();
+
   //std::cerr << "Python command:" << std::endl;
   //std::cerr << cmd << std::endl;
   PyRun_SimpleString(cmd.c_str());
