@@ -3,7 +3,7 @@
   <pqevent object="1STD_TabDesktop0/1QMenuBar0" command="activate" arguments="Fic&amp;hier" />
   <pqevent object="1QMenu0" command="activate" arguments="LAB_LOCK_TEST" />
   <pqevent object="1STD_TabDesktop0/DatasourceToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="Qt-subapplication-app" command="FilesOpen" arguments="/home/ab205030/agi_BKP.med" />
+  <pqevent object="Qt-subapplication-app" command="FilesOpen" arguments="/tmp/test_scalarmap.med" />
   <pqevent object="1STD_TabDesktop0/objectBrowserDock/objectBrowser/1QtxTreeView0" command="expand" arguments="0.0" />
   <pqevent object="1STD_TabDesktop0/objectBrowserDock/objectBrowser/1QtxTreeView0" command="expand" arguments="0.0.0.0" />
   <pqevent object="1STD_TabDesktop0/objectBrowserDock/objectBrowser/1QtxTreeView0" command="expand" arguments="0.0.0.0.0.0" />

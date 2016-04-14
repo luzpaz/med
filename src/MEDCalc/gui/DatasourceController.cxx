@@ -122,6 +122,11 @@ DatasourceController::addDatasource(const char* filename)
   event->eventtype = DatasourceEvent::EVENT_ADD_DATASOURCE;
   event->objectalias = filename;
   emit datasourceSignal(event);
+//#ifdef MED_WITH_QTTESTING
+//  _dirtyAddDataSource = true;
+//  while(_dirtyAddDataSource)
+//    QApplication::processEvents();
+//#endif
 }
 // After above data source creation, python console emits a signal, forwarded by workspace, to update the GUI
 void
@@ -138,6 +143,10 @@ DatasourceController::updateTreeViewWithNewDatasource(const MEDCALC::DatasourceH
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);
+
+//#ifdef MED_WITH_QTTESTING
+//  _dirtyAddDataSource = false;
+//#endif
 }
 
 void DatasourceController::OnAddDatasource()

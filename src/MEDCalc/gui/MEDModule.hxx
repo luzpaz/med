@@ -85,6 +85,8 @@ public:
 
   void requestSALOMETermination() const;
 
+//  bool hasMainEventLoopStarted() const;
+
 public slots:
   virtual bool activateModule(SUIT_Study* theStudy);
   virtual bool deactivateModule(SUIT_Study* theStudy);

@@ -45,11 +45,22 @@
 #include <QDir>
 #include <QIcon>
 #include <QTimer>
+#include <QEvent>
+
+class PlayTestEvent: public QEvent {
+public:
+  PlayTestEvent(QEvent::Type type, const std::string & filename): QEvent(type), _filename(filename) {}
+  virtual ~PlayTestEvent() {}
+  const std::string _filename;
+};
 
 TestController::TestController(MEDModule* mod):
   _salomeModule(mod),
   _desk(SUIT_Session::session()->activeApplication()->desktop()),
-  _tester(0), _lock_action(0)
+  _tester(0), _lock_action(0),
+  _quitEventType(QEvent::registerEventType()),
+  _playEventType(QEvent::registerEventType()),
+  _aboutToPlayTest(false)
 {
   STDLOG("Creating a TestController");
   _tester = new pqTestUtility(_desk);
@@ -120,19 +131,12 @@ void TestController::onPlayTest()
     _tester->playTests(fileName);
 }
 
-void TestController::onPlayTestScenario()
-{
-  STDLOG("About to play test " << _test_scenario.toStdString());
-  _tester->playTests(_test_scenario);
-  STDLOG("Done playing test " << _test_scenario.toStdString());
-}
-
-void TestController::onLockViewSize()
+void TestController::onLockViewSize() const
 {
   pqTestingReaction::lockViewSize(_lock_action->isChecked());
 }
 
-void TestController::onTakeSnapshot()
+void TestController::onTakeSnapshot() const
 {
   pqSaveScreenshotReaction::saveScreenshot();
 }
@@ -140,10 +144,10 @@ void TestController::onTakeSnapshot()
 void TestController::onRequestTermination()
 {
   // Check if test playing
-  if (_tester->playingTest())
+  if (_tester->playingTest() || _aboutToPlayTest)
     {
-      STDLOG("Termination requested, but test still playing ...");
-      QTimer::singleShot(200, this, SLOT(onRequestTermination()));
+      QEvent * e = new QEvent((QEvent::Type)_quitEventType);
+      QApplication::postEvent(this, e);
     }
   else
     {
@@ -151,6 +155,38 @@ void TestController::onRequestTermination()
     }
 }
 
+void
+TestController::customEvent(QEvent * event)
+{
+  if (event->type() == _quitEventType)
+    {
+      if(!_salomeModule->getApp()->isMainEventLoopStarted())
+          // Repost (=delay)
+          QApplication::postEvent(this, new QEvent((QEvent::Type)_quitEventType));
+      else
+          onRequestTermination();
+    }
+  else if (event->type() == _playEventType)
+    {
+      PlayTestEvent * e = dynamic_cast<PlayTestEvent *>(event);
+      if (e)
+        {
+//          // Wait for main event loop to start:
+          if(!_salomeModule->getApp()->isMainEventLoopStarted())
+              // Repost (=delay)
+              QApplication::postEvent(this, new PlayTestEvent((QEvent::Type)_playEventType, e->_filename));
+          else
+            {
+              STDLOG("About to play test " << e->_filename);
+              _tester->playTests(e->_filename.c_str());
+              _aboutToPlayTest = false;
+              STDLOG("Done playing test " << e->_filename);
+            }
+        }
+    }
+  else
+    { QObject::customEvent(event);  }
+}
 
 void
 TestController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
@@ -159,13 +195,15 @@ TestController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
       /* [ABN] Post an event. Indeed, calling the function directly would prevent the proper refresh of the
        * GUI which also needs to go through the MED event loop (WorkspaceController::processWorkspaceEvent)
        */
-      _test_scenario = QString(event->filename);
-      QTimer::singleShot(100, this, SLOT(onPlayTestScenario()));
+      _aboutToPlayTest = true; // to prevent an early quit!
+      PlayTestEvent * e  = new PlayTestEvent((QEvent::Type)_playEventType, std::string(event->filename));
+      QApplication::postEvent(this, e);
   }
   else if ( event->type == MEDCALC::EVENT_QUIT_SALOME ) {
       // [ABN] again: post as an event to give a chance to other events (piled up by test
       // scenarios for example) to execute:
-      QTimer::singleShot(200, this, SLOT(onRequestTermination()));
+      QEvent * e = new QEvent((QEvent::Type)_quitEventType);
+      QApplication::postEvent(this, e);
   }
 }
 

@@ -23,7 +23,7 @@ This script is to be passed as an argument of the ./salome command and will be e
 Python console.
 """
 
-import os
+import os, sys
 import SalomePyQt
 from medcalc_testutils import GetScenarioDir
 
@@ -31,6 +31,7 @@ sgPyQt = SalomePyQt.SalomePyQt()
 sgPyQt.activateModule('MED')
 
 import medcalc  # After module activation !!
-medcalc.PlayQtTestingScenario(os.path.join(GetScenarioDir(), 'test_scalarmap.xml'))
+localTestDir = sys.argv[1]
+medcalc.PlayQtTestingScenario(os.path.join(localTestDir, 'test_scalarmap.xml'))
 
-medcalc.RequestSALOMETermination()  # not equivalent to quit()! 
+#medcalc.RequestSALOMETermination()  # not equivalent to quit()! 

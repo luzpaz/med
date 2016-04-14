@@ -44,13 +44,16 @@
 #include "PVViewer_ViewModel.h"
 #endif
 
+#include <QTimer>
+
 #include <sstream>
 
 //! The only instance of the reference to engine
 MED_ORB::MED_Gen_var MEDModule::myEngine;
 
 MEDModule::MEDModule() :
-  SalomeApp_Module("MED"), _studyEditor(0), _datasourceController(0), _workspaceController(0), _presentationController(0), _processingController(0)
+  SalomeApp_Module("MED"), _studyEditor(0), _datasourceController(0), _workspaceController(0),
+  _presentationController(0), _processingController(0)
 {
   // Note also that we can't use the getApp() function here because
   // the initialize(...) function has not been called yet.
@@ -89,6 +92,15 @@ MEDModule::init()
     myEngine = MED_ORB::MED_Gen::_narrow( comp );
   }
 }
+
+//void MEDModule::onEventLoopStarted()
+//{
+//  if(!getApp()->isMainEventLoopStarted())
+//    {
+//      QTimer::singleShot(100, this, SLOT(onEventLoopStarted()));
+//      return;
+//    }
+//}
 
 void
 MEDModule::initialize( CAM_Application* app )
@@ -179,6 +191,10 @@ MEDModule::activateModule( SUIT_Study* theStudy )
   _workspaceController->showDockWidgets(true);
   _presentationController->showDockWidgets(true);
   //this->setDockLayout(StandardApp_Module::DOCKLAYOUT_LEFT_VLARGE);
+
+  // Mark the start of the main event loop - important for test playback:
+//  QObject::connect(getApp(), SIGNAL(activated(SUIT_Application *)), this, SLOT(onEventLoopStarted(SUIT_Application *)));
+//  QTimer::singleShot(0, this, SLOT(onEventLoopStarted()));
 
   // return the activation status
   return bOk;
@@ -370,5 +386,12 @@ MEDModule::onDblClick(const QModelIndex& index)
 void
 MEDModule::requestSALOMETermination() const
 {
+  STDLOG("Requesting SALOME termination!!");
   SUIT_Session::session()->closeSession( SUIT_Session::DONT_SAVE, 1 );  // killServers = True
 }
+
+
+//bool MEDModule::hasMainEventLoopStarted() const
+//{
+//  return _eventLoopStarted;
+//}

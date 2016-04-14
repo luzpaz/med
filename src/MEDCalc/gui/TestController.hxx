@@ -40,14 +40,19 @@ public:
 
   void createActions();
 
+
+
+protected:
+  virtual void customEvent(QEvent * event);
+
 public slots:
   void processWorkspaceEvent(const MEDCALC::MedEvent* event);
 
   void onRecordTest();
   void onPlayTest();
-  void onPlayTestScenario();
-  void onLockViewSize();
-  void onTakeSnapshot();
+//  void onPlayTestFile();
+  void onLockViewSize() const;
+  void onTakeSnapshot() const;
   void onRequestTermination();
 
 protected:
@@ -56,7 +61,12 @@ protected:
 
   pqTestUtility * _tester;
   QAction * _lock_action;
-  QString _test_scenario;
+
+private:
+  const int _playEventType;
+  const int _quitEventType;
+
+  bool _aboutToPlayTest;
 };
 
 #endif /* SRC_MEDCALC_GUI_TESTCONTROLLER_HXX_ */

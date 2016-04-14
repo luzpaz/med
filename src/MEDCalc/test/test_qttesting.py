@@ -18,7 +18,7 @@
 #
 # Author: A. Bruneton (CEA)
 
-import unittest, os
+import unittest, os, shutil
 from posixpath import basename
 
 class MEDGUITest(unittest.TestCase):
@@ -42,30 +42,22 @@ class MEDGUITest(unittest.TestCase):
     """ Return name of the test being currently executed. """
     return self.id().split(".")[-1]
 
-  def launchSalomeWithScript(self, scriptname, baseline):
+  def launchSalomeWithScript(self, scriptname):
     """ TODO: review this - what is the nicest way to launch SALOME GUI from a Python script? """
     import shutil, subprocess
     from medcalc_testutils import GetScriptDir
     # TODO: review this!
     salomeCommand = os.path.join(os.environ.get("KERNEL_ROOT_DIR", ""), "bin", "salome", "runSalome.py")
+    args = "args:%s" % self._tmpDir
     pth = os.path.join(GetScriptDir(), scriptname)
-    # Remove a potentially already present image file from the tmp directory:
-    gen_image = os.path.join("/tmp", baseline)
-    try:
-      shutil.rmtree(gen_image)
-    except OSError:
-      pass
     # Launch SALOME with the test script:
-    status = subprocess.call([salomeCommand, pth])
+    status = subprocess.call([salomeCommand, pth, args])
     if status:
       raise Exception("SALOME exited abnormally for this test!")
-    try:
-      # Move generated image to the temporary test directory - ideally test should produce image there directly ...
-      shutil.move(gen_image, self._tmpDir)
-    except IOError:
-      raise Exception("Test script didn't produce expected image '%s'!" % gen_image)
 
   def compareSnapshot(self, basename):
+    """ Compare the screenshot in the current temporary test directory with the reference baseline.
+    Assert if not matching. """
     import filecmp
     from medcalc_testutils import GetBaselineDir
     
@@ -82,13 +74,31 @@ class MEDGUITest(unittest.TestCase):
       self.assertTrue(ret, "[%s] -- Failed screenshot equality, or unable to open baseline file - directory is kept alive: %s" % (self.getTestName(), self._tmpDir))
     return ret
 
+  def prepareScenario(self, scenario, baseline, med_file):
+    """ Copy scenario to current temporary test dir and substitute paths inside """
+    from medcalc_testutils import GetScenarioDir, GetMEDFileDir
+    scen_path = os.path.join(GetScenarioDir(), scenario)
+    scen_pth2 = os.path.join(self._tmpDir, scenario)
+    try:
+      shutil.copy(scen_path, scen_pth2)
+    except IOError:
+      raise Exception("Could not copy test scenario '%s' to local test directory!" % scen_path)
+    with open(scen_pth2,'r') as f:
+      filedata = f.read()
+    filedata = filedata.replace("/tmp/%s" % baseline, "%s/%s" % (self._tmpDir, baseline))
+    filedata = filedata.replace("/tmp/%s" % med_file, os.path.join(GetMEDFileDir(), med_file))
+    with open(scen_pth2,'w') as f:
+      f.write(filedata)
+      
   ##
   ## Now the tests themselves
   ##
-  
   def testScalarMap(self):
     baseline = "test_scalarmap.png"
-    self.launchSalomeWithScript("test_scalarmap.py", baseline)
+    med_file = "test_scalarmap.med"  # will change
+    scenario = "test_scalarmap.xml"
+    self.prepareScenario(scenario, baseline, med_file)
+    self.launchSalomeWithScript("test_scalarmap.py")
     self.compareSnapshot(baseline)
 
 

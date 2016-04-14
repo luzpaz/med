@@ -34,3 +34,8 @@ def GetScenarioDir():
 def GetBaselineDir():
   relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/baselines"
   return os.path.join(__getRootDir(), relativeDir)
+ 
+def GetMEDFileDir():
+  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/medfiles"
+  return os.path.join(__getRootDir(), relativeDir)
+  
