@@ -31,6 +31,8 @@ public:
   {}
   virtual ~MEDPresentationContour() {}
 
+  void updatePipeline(const MEDCALC::ContourParameters& params);
+
 protected:
   virtual void internalGeneratePipeline();
 

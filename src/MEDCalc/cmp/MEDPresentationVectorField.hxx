@@ -31,6 +31,8 @@ public:
   {}
   virtual ~MEDPresentationVectorField() {}
 
+  void updatePipeline(const MEDCALC::VectorFieldParameters& params);
+
 protected:
   virtual void internalGeneratePipeline();
 

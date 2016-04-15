@@ -17,27 +17,14 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_POINTSPRITE_HXX_
-#define SRC_MEDCALC_CMP_MEDPRESENTATION_POINTSPRITE_HXX_
+#ifndef _MED_PRESENTATION_TXX_
+#define _MED_PRESENTATION_TXX_
 
-#include "MEDCALC.hxx"
-#include "MEDPresentation.hxx"
-
-class MEDCALC_EXPORT MEDPresentationPointSprite : public MEDPresentation
+template<typename PresentationType, typename PresentationParameters>
+void
+MEDPresentation::updatePipeline(PresentationParameters params)
 {
-public:
-  MEDPresentationPointSprite(const MEDCALC::PointSpriteParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationPointSprite"), _params(params)
-  {}
-  virtual ~MEDPresentationPointSprite() {}
+  static_cast<PresentationType*>(this)->updatePipeline(params);
+}
 
-  void updatePipeline(const MEDCALC::PointSpriteParameters& params);
-
-protected:
-  virtual void internalGeneratePipeline();
-
-private:
-  MEDCALC::PointSpriteParameters _params;
-};
-
-#endif
+#endif // _MED_PRESENTATION_TXX_

@@ -47,3 +47,9 @@ MEDPresentationContour::internalGeneratePipeline()
 
   PyGILState_Release(_gil_state);
 }
+
+void
+MEDPresentationContour::updatePipeline(const MEDCALC::ContourParameters& params)
+{
+  // :TODO:
+}

@@ -61,8 +61,13 @@ protected:
 
 private:
 
-  void generatePipeline(); // reserved to friend class MEDPresentationManager
   std::string getFieldTypeString(MEDCoupling::TypeOfField fieldType) const;
+
+  // The following functions are reserved to friend class MEDPresentationManager
+  void generatePipeline();
+
+  template<typename PresentationType, typename PresentationParameters>
+  void updatePipeline(PresentationParameters params);
 
 protected:
 
@@ -83,5 +88,7 @@ private:
   ///! Presentation properties <key,value>
   std::map<std::string, std::string> _properties;
 };
+
+#include "MEDPresentation.txx"
 
 #endif /* SRC_MEDCALC_CMP_MEDPRESENTATION_HXX_ */

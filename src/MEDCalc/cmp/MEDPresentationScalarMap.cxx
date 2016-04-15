@@ -48,3 +48,9 @@ MEDPresentationScalarMap::internalGeneratePipeline()
 
   PyGILState_Release(_gil_state);
 }
+
+void
+MEDPresentationScalarMap::updatePipeline(const MEDCALC::ScalarMapParameters& params)
+{
+  // :TODO:
+}

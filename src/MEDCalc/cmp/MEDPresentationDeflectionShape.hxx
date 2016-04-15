@@ -31,6 +31,8 @@ public:
   {}
   virtual ~MEDPresentationDeflectionShape() {}
 
+  void updatePipeline(const MEDCALC::DeflectionShapeParameters& params);
+
 protected:
   virtual void internalGeneratePipeline();
 

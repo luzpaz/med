@@ -132,6 +132,13 @@ module MEDCALC
     void setPresentationProperty(in long presId, in string propName, in string propValue);
     string getPresentationProperty(in long presId, in string propName);
 
+    void updateScalarMap(in long presId, in ScalarMapParameters params);
+    void updateContour(in long presId, in ContourParameters params);
+    void updateVectorField(in long presId, in VectorFieldParameters params);
+    void updateSlices(in long presId, in SlicesParameters params);
+    void updateDeflectionShape(in long presId, in DeflectionShapeParameters params);
+    void updatePointSprite(in long presId, in PointSpriteParameters params);
+
   };
 
 };

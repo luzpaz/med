@@ -47,3 +47,9 @@ MEDPresentationSlices::internalGeneratePipeline()
 
   PyGILState_Release(_gil_state);
 }
+
+void
+MEDPresentationSlices::updatePipeline(const MEDCALC::SlicesParameters& params)
+{
+  // :TODO:
+}

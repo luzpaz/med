@@ -31,6 +31,8 @@ public:
   {}
   virtual ~MEDPresentationSlices() {}
 
+  void updatePipeline(const MEDCALC::SlicesParameters& params);
+
 protected:
   virtual void internalGeneratePipeline();
 

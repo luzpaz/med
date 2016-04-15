@@ -40,4 +40,17 @@ MEDPresentationManager_i::_makePresentation(PresentationParameters params)
   return newID;
 }
 
+template<typename PresentationType, typename PresentationParameters>
+void
+MEDPresentationManager_i::_updatePresentation(MEDPresentation::TypeID presentationID, PresentationParameters params)
+{
+  MEDPresentation* presentation = _getPresentation(presentationID);
+  if (!presentation) {
+    std::cerr << "_updatePresentation(): presentation not found!!" << std::endl;
+    return;
+  }
+
+  presentation->updatePipeline<PresentationType>(params);
+}
+
 #endif // _MED_PRESENTATION_MANAGER_I_TXX_
