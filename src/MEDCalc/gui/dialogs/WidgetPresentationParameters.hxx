@@ -36,7 +36,6 @@ public:
   WidgetPresentationParameters(QWidget* parent = 0);
   virtual ~WidgetPresentationParameters() {}
 
-  MEDCALC::MEDPresentationViewMode getViewMode();
   std::string getField();
   std::string getScalarBarRange();
   double getScalarBarTimestep();

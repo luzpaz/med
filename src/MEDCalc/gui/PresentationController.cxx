@@ -37,6 +37,12 @@
 #include <SUIT_ResourceMgr.h>
 #include <QMessageBox>
 
+static const int OPTIONS_VIEW_MODE_ID = 943;
+static const int OPTIONS_VIEW_MODE_REPLACE_ID = 944;
+static const int OPTIONS_VIEW_MODE_OVERLAP_ID = 945;
+static const int OPTIONS_VIEW_MODE_NEW_LAYOUT_ID = 946;
+static const int OPTIONS_VIEW_MODE_SPLIT_VIEW_ID = 947;
+
 PresentationController::PresentationController(MEDModule* salomeModule)
 {
   STDLOG("Creating a PresentationController");
@@ -84,12 +90,44 @@ PresentationController::createActions()
 {
   STDLOG("Creating PresentationController actions");
 
+  // View Mode
+  int viewModeToolbarId = _salomeModule->createTool("View Mode", "ViewModeToolbar");
+  QtxActionGroup* ag = _salomeModule->createActionGroup(OPTIONS_VIEW_MODE_ID, true);
+  ag->setText("View mode");
+  ag->setUsesDropDown(true);
+  QString label   = tr("LAB_VIEW_MODE_REPLACE");
+  QString tooltip = tr("TIP_VIEW_MODE_REPLACE");
+  QAction* a = _salomeModule->createAction(OPTIONS_VIEW_MODE_REPLACE_ID,label,QIcon(),label,tooltip,0);
+  a->setCheckable(true);
+  a->setChecked(true);
+  ag->add(a);
+
+  label   = tr("LAB_VIEW_MODE_OVERLAP");
+  tooltip = tr("TIP_VIEW_MODE_OVERLAP");
+  a = _salomeModule->createAction(OPTIONS_VIEW_MODE_OVERLAP_ID,label,QIcon(),label,tooltip,0);
+  a->setCheckable(true);
+  ag->add(a);
+
+  label   = tr("LAB_VIEW_MODE_NEW_LAYOUT");
+  tooltip = tr("TIP_VIEW_MODE_NEW_LAYOUT");
+  a = _salomeModule->createAction(OPTIONS_VIEW_MODE_NEW_LAYOUT_ID,label,QIcon(),label,tooltip,0);
+  a->setCheckable(true);
+  ag->add(a);
+
+  label   = tr("LAB_VIEW_MODE_SPLIT_VIEW");
+  tooltip = tr("TIP_VIEW_MODE_SPLIT_VIEW");
+  a = _salomeModule->createAction(OPTIONS_VIEW_MODE_SPLIT_VIEW_ID,label,QIcon(),label,tooltip,0);
+  a->setCheckable(true);
+  ag->add(a);
+
+  _salomeModule->createTool(OPTIONS_VIEW_MODE_ID, viewModeToolbarId);
+
+  // Presentations
   int presentationToolbarId = _salomeModule->createTool("Presentations", "PresentationToolbar");
   int presentationMenuId = _salomeModule->createMenu(tr("MENU_PRESENTATIONS"), -1, 1);
 
-  // Presentations
-  QString label   = tr("LAB_PRESENTATION_SCALAR_MAP");
-  QString tooltip = tr("TIP_PRESENTATION_SCALAR_MAP");
+  label   = tr("LAB_PRESENTATION_SCALAR_MAP");
+  tooltip = tr("TIP_PRESENTATION_SCALAR_MAP");
   QString icon = tr(_getIconName("ICO_PRESENTATION_SCALAR_MAP").c_str());
   int actionId;
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnVisualizeScalarMap()),icon,tooltip);
@@ -141,7 +179,21 @@ PresentationController::createActions()
 MEDCALC::MEDPresentationViewMode
 PresentationController::getSelectedViewMode()
 {
-  return _widgetPresentationParameters->getViewMode();
+  if (_salomeModule->action(OPTIONS_VIEW_MODE_REPLACE_ID)->isChecked()) {
+    return MEDCALC::VIEW_MODE_REPLACE;
+  }
+  else if (_salomeModule->action(OPTIONS_VIEW_MODE_OVERLAP_ID)->isChecked()) {
+    return MEDCALC::VIEW_MODE_OVERLAP;
+  }
+  else if (_salomeModule->action(OPTIONS_VIEW_MODE_NEW_LAYOUT_ID)->isChecked()) {
+    return MEDCALC::VIEW_MODE_NEW_LAYOUT;
+  }
+  else if (_salomeModule->action(OPTIONS_VIEW_MODE_SPLIT_VIEW_ID)->isChecked()) {
+    return MEDCALC::VIEW_MODE_SPLIT_VIEW;
+  }
+  // Should not happen
+  STDLOG("Strange!! No matching view mode found - returning VIEW_MODE_REPLACE.");
+  return MEDCALC::VIEW_MODE_REPLACE;
 }
 
 MEDCALC::MEDPresentationColorMap

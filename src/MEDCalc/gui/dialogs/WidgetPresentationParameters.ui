@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>404</width>
-    <height>230</height>
+    <height>200</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -20,14 +20,14 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
+   <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>LAB_FIELD</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="0" column="1">
     <widget class="QComboBox" name="comboBoxField">
      <item>
       <property name="text">
@@ -36,7 +36,7 @@
      </item>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="labelTimeStep">
      <property name="enabled">
       <bool>false</bool>
@@ -49,14 +49,14 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="4" column="1">
     <widget class="QDoubleSpinBox" name="doubleSpinBoxTimeStep">
      <property name="enabled">
       <bool>false</bool>
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="5" column="0">
     <widget class="QLabel" name="labelMinVal">
      <property name="enabled">
       <bool>false</bool>
@@ -69,14 +69,14 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
+   <item row="5" column="1">
     <widget class="QDoubleSpinBox" name="doubleSpinBoxMinVal">
      <property name="enabled">
       <bool>false</bool>
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="labelMaxVal">
      <property name="enabled">
       <bool>false</bool>
@@ -89,21 +89,21 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
+   <item row="6" column="1">
     <widget class="QDoubleSpinBox" name="doubleSpinBoxMaxVal">
      <property name="enabled">
       <bool>false</bool>
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
+   <item row="7" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>LAB_COLOR_MAP</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="1">
+   <item row="7" column="1">
     <widget class="QComboBox" name="comboBoxColorMap">
      <item>
       <property name="text">
@@ -117,38 +117,7 @@
      </item>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>LAB_VIEW_MODE</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QComboBox" name="comboBoxViewMode">
-     <item>
-      <property name="text">
-       <string>LAB_VIEW_MODE_REPLACE</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>LAB_VIEW_MODE_OVERLAP</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>LAB_VIEW_MODE_NEW_LAYOUT</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>LAB_VIEW_MODE_SPLIT_VIEW</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="4" column="1">
+   <item row="3" column="1">
     <widget class="QComboBox" name="comboBoxScalarBarRange">
      <property name="enabled">
       <bool>true</bool>
@@ -170,14 +139,14 @@
      </item>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="1" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>LAB_SCALARBAR</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="label_5">
      <property name="enabled">
       <bool>true</bool>
