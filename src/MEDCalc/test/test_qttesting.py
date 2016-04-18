@@ -44,14 +44,15 @@ class MEDGUITest(unittest.TestCase):
 
   def launchSalomeWithScript(self, scriptname):
     """ TODO: review this - what is the nicest way to launch SALOME GUI from a Python script? """
-    import shutil, subprocess
+    from salome_instance import SalomeInstance
     from medcalc_testutils import GetScriptDir
-    # TODO: review this!
-    salomeCommand = os.path.join(os.environ.get("KERNEL_ROOT_DIR", ""), "bin", "salome", "runSalome.py")
     args = "args:%s" % self._tmpDir
     pth = os.path.join(GetScriptDir(), scriptname)
     # Launch SALOME with the test script:
-    status = subprocess.call([salomeCommand, pth, args])
+    inst = SalomeInstance.start(with_gui=True, args=[pth, args])
+    # And make sure SALOME is stopped before running next one:
+    inst.stop()
+    status = 0 # TODO review this
     if status:
       raise Exception("SALOME exited abnormally for this test!")
 
@@ -95,16 +96,24 @@ class MEDGUITest(unittest.TestCase):
   ##
   def testScalarMap(self):
     baseline = "test_scalarmap.png"
+    med_file = "test_scalarmap.med"  # will change with Cedric's files
+    scenario = "test_scalarmap.xml"
+    self.prepareScenario(scenario, baseline, med_file)
+    self.launchSalomeWithScript("test_scalarmap.py")
+    self.compareSnapshot(baseline)
+
+  def testScalarMap2(self):
+    baseline = "test_scalarmap.png"
     med_file = "test_scalarmap.med"  # will change
     scenario = "test_scalarmap.xml"
     self.prepareScenario(scenario, baseline, med_file)
     self.launchSalomeWithScript("test_scalarmap.py")
     self.compareSnapshot(baseline)
 
-
 if __name__ == "__main__":
   suite = unittest.TestSuite()
   suite.addTest(MEDGUITest('testScalarMap'))
+  suite.addTest(MEDGUITest('testScalarMap2'))
 #  suite.addTest(MEDGUITest('testIsoContour'))
   unittest.TextTestRunner().run(suite)
 

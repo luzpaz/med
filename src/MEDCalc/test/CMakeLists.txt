@@ -20,7 +20,6 @@
 SALOME_CONFIGURE_FILE(medcalc_testutils.py.in ${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py)
 
 SET(_test_scripts
-    test_qttesting.py    # main entry point
     test_scalarmap.py
 )
 
@@ -36,13 +35,14 @@ SET(_test_files
     medfiles/test_scalarmap.med
 )
 
-# Test rules - the test MEDCalcQtTesting must be run after install (since it starts SALOME) 
-ADD_TEST(MEDCalcQtTesting ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_qttesting.py)
-
 # Install rules
+SALOME_INSTALL_SCRIPTS(test_qttesting.py ${SALOME_MED_INSTALL_TEST}/MEDCalc)
+SALOME_INSTALL_SCRIPTS(${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py ${SALOME_MED_INSTALL_TEST}/MEDCalc)
+
 SALOME_INSTALL_SCRIPTS("${_test_scripts}" ${SALOME_INSTALL_PYTHON}/tests)
-SALOME_INSTALL_SCRIPTS(${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py ${SALOME_INSTALL_PYTHON})
  
 INSTALL(FILES ${_test_scenarii} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/scenarios)
 INSTALL(FILES ${_test_baselines} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/baselines)
 INSTALL(FILES ${_test_files} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/medfiles)
+
+INSTALL(FILES CTestTestfileInstall.cmake DESTINATION ${SALOME_MED_INSTALL_TEST}/MEDCalc RENAME CTestTestfile.cmake)
