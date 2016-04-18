@@ -160,8 +160,8 @@
   <context>
     <name>WidgetPresentationParameters</name>
     <message>
-      <source>LAB_FIELD</source>
-      <translation>Field:</translation>
+      <source>LAB_DISP_COMP</source>
+      <translation>Displayed component:</translation>
     </message>
     <message>
       <source>LAB_EUCLIDEAN_NORM</source>
