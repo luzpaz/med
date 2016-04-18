@@ -109,7 +109,7 @@ IF(SALOME_BUILD_GUI)
       FIND_PACKAGE(SalomeQt4 REQUIRED COMPONENTS QtCore QtGui)
     ELSE()
       FIND_PACKAGE(SalomeQt5 REQUIRED)
-    ENDIF()    
+    ENDIF()
 ENDIF(SALOME_BUILD_GUI)
 
 IF(SALOME_MED_ENABLE_PYTHON)
@@ -229,7 +229,7 @@ IF(SALOME_USE_MPI)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets paramedcouplingcorba paramedmemcompo)
 ENDIF()
 
-LIST(APPEND _${PROJECT_NAME}_exposed_targets 
+LIST(APPEND _${PROJECT_NAME}_exposed_targets
     medcouplingcorba medcouplingclient medcalculator MEDFactoryEngine)
 IF(SALOME_MED_ENABLE_PYTHON)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets medcalculatorspython)
@@ -274,11 +274,11 @@ SET(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/${INSTALL_INCLUDE_DIR}")
 
 # Build variables that will be expanded when configuring Salome<MODULE>Config.cmake:
 IF(NOT SALOME_GUI_BUILD_WITH_QT5)
-   SALOME_CONFIGURE_PREPARE(MEDCoupling Qt4 MPI omniORB CppUnit Graphviz Doxygen Sphinx  
-                         						PThread Python)
- ELSE()                     
-   SALOME_CONFIGURE_PREPARE(MEDCoupling Qt5 MPI omniORB CppUnit Graphviz Doxygen Sphinx  
-                         						PThread Python)
+   SALOME_CONFIGURE_PREPARE(MEDCoupling Qt4 MPI omniORB CppUnit Graphviz Doxygen Sphinx
+                                                                        PThread Python)
+ ELSE()
+   SALOME_CONFIGURE_PREPARE(MEDCoupling Qt5 MPI omniORB CppUnit Graphviz Doxygen Sphinx
+                                                                        PThread Python)
 ENDIF()
 
 CONFIGURE_PACKAGE_CONFIG_FILE(${PROJECT_NAME}Config.cmake.in
@@ -286,7 +286,7 @@ CONFIGURE_PACKAGE_CONFIG_FILE(${PROJECT_NAME}Config.cmake.in
     INSTALL_DESTINATION "${SALOME_INSTALL_CMAKE_LOCAL}"
     PATH_VARS CONF_INCLUDE_DIRS SALOME_INSTALL_CMAKE_LOCAL CMAKE_INSTALL_PREFIX
        KERNEL_ROOT_DIR GUI_ROOT_DIR MEDCOUPLING_ROOT_DIR QT_ROOT_DIR MPI_ROOT_DIR
-       OMNIORB_ROOT_DIR PTHREAD_ROOT_DIR SWIG_ROOT_DIR PYTHON_ROOT_DIR CPPUNIT_ROOT_DIR 
+       OMNIORB_ROOT_DIR PTHREAD_ROOT_DIR SWIG_ROOT_DIR PYTHON_ROOT_DIR CPPUNIT_ROOT_DIR
        GRAPHVIZ_ROOT_DIR DOXYGEN_ROOT_DIR SPHINX_ROOT_DIR)
 
 WRITE_BASIC_PACKAGE_VERSION_FILE(${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
@@ -302,3 +302,8 @@ INSTALL(FILES
 # Install the export set for use with the install-tree
 INSTALL(EXPORT ${PROJECT_NAME}TargetGroup DESTINATION "${SALOME_INSTALL_CMAKE_LOCAL}"
         FILE ${PROJECT_NAME}Targets.cmake)
+
+# Application tests
+INSTALL(FILES CTestTestfileInstall.cmake
+  DESTINATION ${SALOME_INSTALL_SCRIPT_SCRIPTS}/test
+  RENAME CTestTestfile.cmake)
