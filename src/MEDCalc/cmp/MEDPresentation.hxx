@@ -41,21 +41,21 @@ public:
 
   typedef ::CORBA::Long TypeID;
 
-  virtual ~MEDPresentation() {}
+  virtual ~MEDPresentation();
 
   void setProperty(const std::string& propName, const std::string& propValue);
   const std::string getProperty(const std::string& propName) const;
 
 protected:
 
-  MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::string name);
+  MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name);
   std::string getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode) const;
   std::string getResetCameraCommand() const;
   std::string getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap) const;
 
   virtual void internalGeneratePipeline() = 0;
-  PyObject * getPythonObjectFromMain(const char * var) const;
-  void pushInternal(PyObject * obj, PyObject * disp = NULL);
+  PyObject* getPythonObjectFromMain(const char* var) const;
+  void pushInternal(PyObject* obj, PyObject* disp = NULL);
 
   MEDPresentation::TypeID getID() const { return _fieldHandlerId; }
 
@@ -80,10 +80,10 @@ private:
   MEDPresentation::TypeID _fieldHandlerId;
 
   ///! Pipeline elements
-  std::vector< PyObject * > _pipeline;
+  std::vector<PyObject*> _pipeline;
 
   ///! Corresponding display object, if any:
-  std::vector< PyObject * > _display;
+  std::vector<PyObject*> _display;
 
   ///! Presentation properties <key,value>
   std::map<std::string, std::string> _properties;

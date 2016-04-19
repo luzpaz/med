@@ -139,6 +139,8 @@ module MEDCALC
     void updateDeflectionShape(in long presId, in DeflectionShapeParameters params);
     void updatePointSprite(in long presId, in PointSpriteParameters params);
 
+    boolean removePresentation(in long presId);
+
   };
 
 };

@@ -45,6 +45,7 @@ from medpresentation import MakeVectorField
 from medpresentation import MakeSlices
 from medpresentation import MakeDeflectionShape
 from medpresentation import MakePointSprite
+from medpresentation import RemovePresentation
 
 # Console commands
 import medconsole

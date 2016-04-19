@@ -306,7 +306,10 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
     emit workspaceSignal(event); // forward to DatasourceController
   }
   else if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
-    emit workspaceSignal(event); // forward to DatasourceController
+    emit workspaceSignal(event); // forward to PresentationController
+  }
+  else if ( event->type == MEDCALC::EVENT_REMOVE_PRESENTATION ) {
+    emit workspaceSignal(event); // forward to PresentationController
   }
 
 }

@@ -299,10 +299,30 @@ PresentationController::updateTreeViewWithNewPresentation(long fieldId, long pre
 }
 
 void
+PresentationController::updateTreeViewForPresentationRemoval(long presentationId)
+{
+  if (presentationId < 0) {
+    std::cerr << "Unknown presentation\n";
+    return;
+  }
+
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
+  _PTR(Study) studyDS = study->studyDS();
+
+  _salomeModule->engine()->unregisterPresentation(_CAST(Study, studyDS)->GetStudy(), presentationId);
+
+  // update Object browser
+  _salomeModule->getApp()->updateObjectBrowser(true);
+}
+
+void
 PresentationController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
 {
   if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
     this->updateTreeViewWithNewPresentation(event->dataId, event->presentationId);
+  }
+  else if ( event->type == MEDCALC::EVENT_REMOVE_PRESENTATION ) {
+    this->updateTreeViewForPresentationRemoval(event->presentationId);
   }
 }
 

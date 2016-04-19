@@ -56,6 +56,8 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   MEDCALC_EXPORT void updateDeflectionShape(MEDPresentation::TypeID presentationID, const MEDCALC::DeflectionShapeParameters&);
   MEDCALC_EXPORT void updatePointSprite(MEDPresentation::TypeID presentationID, const MEDCALC::PointSpriteParameters&);
 
+  MEDCALC_EXPORT CORBA::Boolean removePresentation(MEDPresentation::TypeID presentationID);
+
  private:
   MEDPresentationManager_i();
   virtual ~MEDPresentationManager_i();
@@ -71,6 +73,7 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   void _updatePresentation(MEDPresentation::TypeID presentationID, PresentationParameters params);
 
   MEDPresentation* _getPresentation(MEDPresentation::TypeID) const;
+  MEDPresentation::TypeID _getActivePresentationId() const;
 
  private :
 

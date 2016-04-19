@@ -47,6 +47,10 @@ module MED_ORB
                                 in string label,
                                 in long presentationId)
       raises (SALOME::SALOME_Exception);
+
+    status unregisterPresentation(in SALOMEDS::Study study,
+                                  in long presentationId)
+      raises (SALOME::SALOME_Exception);
   };
 };
 

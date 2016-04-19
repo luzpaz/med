@@ -115,3 +115,6 @@ def notifyGui_addDatasource(handlerId, filename):
 def notifyGui_addPresentation(fieldId, presId):
   __notifyGui(MEDCALC.EVENT_ADD_PRESENTATION, dataId=fieldId, presentationId=presId)
 #
+def notifyGui_removePresentation(presId):
+  __notifyGui(MEDCALC.EVENT_REMOVE_PRESENTATION, presentationId=presId)
+#

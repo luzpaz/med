@@ -61,6 +61,9 @@ public:
                                        const char* label,
                                        CORBA::Long presentationId);
 
+  MED_ORB::status unregisterPresentation(SALOMEDS::Study_ptr study,
+                                         CORBA::Long presentationId);
+
   /*! Dump the study as a Python file */
   virtual Engines::TMPFile* DumpPython(CORBA::Object_ptr theStudy,
                                        CORBA::Boolean isPublished,

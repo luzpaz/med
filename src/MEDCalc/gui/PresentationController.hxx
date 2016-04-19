@@ -77,6 +77,7 @@ protected slots:
 private:
   void visualize(PresentationEvent::EventType);
   void updateTreeViewWithNewPresentation(long, long);
+  void updateTreeViewForPresentationRemoval(long);
   std::string _getIconName(const std::string&);
 
 private:

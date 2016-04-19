@@ -205,6 +205,40 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
   return result;
 }
 
+MED_ORB::status
+MED::unregisterPresentation(SALOMEDS::Study_ptr study,
+                            CORBA::Long presentationId)
+{
+  // set exception handler to catch unexpected CORBA exceptions
+  Unexpect aCatch(SALOME_SalomeException);
+
+  // set result status to error initially
+  MED_ORB::status result = MED_ORB::OP_ERROR;
+
+  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+
+  SALOMEDS::GenericAttribute_var anAttribute;
+  SALOMEDS::SComponent_var father = study->FindComponent("MED");
+  SALOMEDS::ChildIterator_var it = study->NewChildIterator(father);
+  for (it->InitEx(true); it->More(); it->Next()) {
+    SALOMEDS::SObject_var child(it->Value());
+
+    if (child->FindAttribute(anAttribute, "AttributeParameter")) {
+      SALOMEDS::AttributeParameter_var attrParam = SALOMEDS::AttributeParameter::_narrow(anAttribute);
+      if (!attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN) || !attrParam->GetBool(IS_PRESENTATION) || !attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
+        continue;
+
+      if (presentationId == attrParam->GetInt(PRESENTATION_ID)) {
+        // remove object from study
+        studyBuilder->RemoveObjectWithChildren(child);
+        // remove object from use case tree
+        useCaseBuilder->Remove(child);
+      }
+    }
+  }
+}
+
 Engines::TMPFile*
 MED::DumpPython(CORBA::Object_ptr theStudy,
                 CORBA::Boolean isPublished,

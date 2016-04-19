@@ -19,7 +19,7 @@
 
 import medcalc
 import MEDCALC
-from medcalc.medevents import notifyGui_addPresentation
+from medcalc.medevents import notifyGui_addPresentation, notifyGui_removePresentation
 
 __manager = medcalc.medcorba.factory.getPresentationManager()
 
@@ -92,4 +92,10 @@ def MakePointSprite(proxy,
   presentation_id = __manager.makePointSprite(params)
   notifyGui_addPresentation(proxy.id, presentation_id)
   return presentation_id
+#
+
+def RemovePresentation(presentation_id):
+  ok = __manager.removePresentation(presentation_id)
+  if ok:
+    notifyGui_removePresentation(presentation_id)
 #

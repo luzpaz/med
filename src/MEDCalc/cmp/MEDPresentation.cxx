@@ -24,7 +24,7 @@
 #include "MEDCouplingRefCountObject.hxx"
 #include <iostream>
 
-MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::string name)
+MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name)
     : _fieldHandlerId(fieldHandlerId), _pipeline(0), _display(0), _properties()
 {
   MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
@@ -43,6 +43,12 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::st
   _fileName = _fileName.substr(7, _fileName.size());
 
   setProperty("name", name);
+}
+
+MEDPresentation::~MEDPresentation()
+{
+  std::cout << "###TODO#### ~MEDPresentation: clear pipeline\n";
+  std::cout << "###TODO#### ~MEDPresentation: clear display\n";
 }
 
 void

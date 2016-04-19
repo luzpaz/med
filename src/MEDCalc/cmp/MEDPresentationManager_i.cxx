@@ -166,3 +166,26 @@ MEDPresentationManager_i::updatePointSprite(MEDPresentation::TypeID presentation
 {
   return _updatePresentation<MEDPresentationPointSprite>(presentationID, params);
 }
+
+CORBA::Boolean
+MEDPresentationManager_i::removePresentation(MEDPresentation::TypeID presentationID)
+{
+  std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator citr = _presentations.find(presentationID);
+  if (citr == _presentations.end()) {
+    std::cerr << "removePresentation(): presentation not found!!" << std::endl;
+    return false;
+  }
+  MEDPresentation* presentation = (*citr).second;
+  if (presentation)
+    delete presentation;
+  _presentations.erase(presentationID);
+  return true;
+}
+
+MEDPresentation::TypeID
+MEDPresentationManager_i::_getActivePresentationId() const
+{
+  // :TODO:
+
+  return -1;
+}
