@@ -26,7 +26,8 @@
 
 #include <SALOMEDS_SObject.hxx>
 #include <Utils_ExceptHandlers.hxx>
-#include <SalomeApp_Application.h>
+#include <SALOME_LifeCycleCORBA.hxx>
+#include <SALOME_NamingService.hxx>
 
 #include <string>
 #include <sstream>
@@ -252,8 +253,8 @@ MED::hasObjectInfo()
 char*
 MED::getObjectInfo(CORBA::Long studyId, const char* entry)
 {
-  SALOME_NamingService* nameService = SalomeApp_Application::namingService();
-  CORBA::Object_var aSMObject = nameService->Resolve( "/myStudyManager" );
+  SALOME_LifeCycleCORBA lcc;
+  CORBA::Object_var aSMObject = lcc.namingService()->Resolve( "/myStudyManager" );
   SALOMEDS::StudyManager_var aStudyManager = SALOMEDS::StudyManager::_narrow( aSMObject );
   SALOMEDS::Study_var aStudy = aStudyManager->GetStudyByID( studyId );
   SALOMEDS::SObject_var aSObj = aStudy->FindObjectID( entry );
