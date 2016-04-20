@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2016  CEA/DEN, EDF R&D
+# Copyright (C) 2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ class MEDGUITest(unittest.TestCase):
     unittest.TestCase.__init__(self, methodName=methodName)
     self._tmpDir = ""
     self._removeDir = True
-    
+
   def setUp(self):
     import tempfile
     self._tmpDir = tempfile.mkdtemp(prefix="med_gui_tests_")
@@ -37,7 +37,7 @@ class MEDGUITest(unittest.TestCase):
     unittest.TestCase.tearDown(self)
     if self._removeDir:
       shutil.rmtree(self._tmpDir, False)
-    
+
   def getTestName(self):
     """ Return name of the test being currently executed. """
     return self.id().split(".")[-1]
@@ -61,13 +61,15 @@ class MEDGUITest(unittest.TestCase):
     Assert if not matching. """
     import filecmp
     from medcalc_testutils import GetBaselineDir
-    
+
     base_pth = os.path.join(GetBaselineDir(), basename)
     gen_path = os.path.join(self._tmpDir, basename)
     print base_pth, gen_path
     try:
       ret = filecmp.cmp(base_pth, gen_path, shallow=False)
     except OSError:
+      import traceback
+      traceback.print_exc()
       ret = False
     if not ret:
       # Keep file if comparison fails
@@ -90,7 +92,7 @@ class MEDGUITest(unittest.TestCase):
     filedata = filedata.replace("/tmp/%s" % med_file, os.path.join(GetMEDFileDir(), med_file))
     with open(scen_pth2,'w') as f:
       f.write(filedata)
-      
+
   ##
   ## Now the tests themselves
   ##

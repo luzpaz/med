@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2016  CEA/DEN, EDF R&D
+# Copyright (C) 2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,8 +17,15 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(COMPONENT_NAME MEDCALC)
-SET(TIMEOUT        180)   # the GUI needs to start - so let some time here!
+SET(TEST_NAMES
+  test_qttesting
+)
 
-ADD_TEST(MEDCalcQtTesting python test_qttesting.py)
-SET_TESTS_PROPERTIES(MEDCalcQtTesting PROPERTIES LABELS "${COMPONENT_NAME}")
+FOREACH(tfile ${TEST_NAMES})
+  SET(TEST_NAME ${COMPONENT_NAME}_${tfile})
+  ADD_TEST(${TEST_NAME} python ${tfile}.py)
+  SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES
+    LABELS "${COMPONENT_NAME}"
+    TIMEOUT ${TIMEOUT}
+    )
+ENDFOREACH()

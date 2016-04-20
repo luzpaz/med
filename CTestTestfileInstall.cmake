@@ -17,7 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(COMPONENT_NAME MEDCalc)
+SET(COMPONENT_NAME MEDCALC)
 SET(TIMEOUT        300)
 
 SUBDIRS(MEDCalculator)
+SUBDIRS(MEDCalc)
