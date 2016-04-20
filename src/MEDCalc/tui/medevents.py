@@ -109,15 +109,17 @@ def notifyGui_removeFromWorkspace(fieldId):
 def notifyGui_cleanWorkspace():
   __notifyGui(MEDCALC.EVENT_CLEAN_WORKSPACE)
 #
-def notifyGui_addDatasource(filename):
-  __notifyGui(MEDCALC.EVENT_ADD_DATASOURCE, filename=filename)
+def notifyGui_addDatasource(handlerId, filename):
+  __notifyGui(MEDCALC.EVENT_ADD_DATASOURCE, dataId=handlerId, filename=filename)
 #
 def notifyGui_addPresentation(fieldId, presId):
   __notifyGui(MEDCALC.EVENT_ADD_PRESENTATION, dataId=fieldId, presentationId=presId)
+#
+def notifyGui_removePresentation(presId):
+  __notifyGui(MEDCALC.EVENT_REMOVE_PRESENTATION, presentationId=presId)
 #
 def notifyGui_playQtTestingScenario(filename):
   __notifyGui(MEDCALC.EVENT_PLAY_TEST, filename=filename)
 #
 def notifyGui_termination():
   __notifyGui(MEDCALC.EVENT_QUIT_SALOME)
-

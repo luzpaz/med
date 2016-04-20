@@ -17,5 +17,15 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-ADD_TEST(TestMEDCalculator TestMEDCalculator)
-SET_TESTS_PROPERTIES(TestMEDCalculator PROPERTIES LABELS "${COMPONENT_NAME}")
+SET(TEST_NAMES
+  TestMEDCalculator
+)
+
+FOREACH(tfile ${TEST_NAMES})
+  SET(TEST_NAME ${COMPONENT_NAME}_${tfile})
+  ADD_TEST(${TEST_NAME} ${tfile})
+  SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES
+    LABELS "${COMPONENT_NAME}"
+    TIMEOUT ${TIMEOUT}
+    )
+ENDFOREACH()

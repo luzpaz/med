@@ -21,9 +21,10 @@ import medcalc
 
 def LoadDataSource(filename):
   dataManager = medcalc.medcorba.factory.getDataManager()
-  dataManager.loadDatasource(filename)
+  handler = dataManager.loadDatasource(filename)
   from medcalc.medevents import notifyGui_addDatasource
-  notifyGui_addDatasource(filename)
+  notifyGui_addDatasource(handler.id, filename)
+  return handler.id
 #
 
 def LoadImageAsDataSource(filename):
@@ -36,5 +37,5 @@ def LoadImageAsDataSource(filename):
   from medimages import FieldBuilder
   builder = FieldBuilder()
   builder.image2med(filename, medfilename)
-  LoadDataSource(medfilename)
+  return LoadDataSource(medfilename)
 #

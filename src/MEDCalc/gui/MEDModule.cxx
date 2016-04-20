@@ -381,6 +381,11 @@ MEDModule::onDblClick(const QModelIndex& index)
   STDLOG("    - Field id:          " + oss.str());
   STDLOG("    - Presentation name: " + name);
 
+  // :TODO:
+  // get edited values from a popup widget
+  // get presentation
+  // call presentation edit function
+
 }
 
 void

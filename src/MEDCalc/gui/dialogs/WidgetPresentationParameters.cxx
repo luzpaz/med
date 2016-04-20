@@ -26,26 +26,6 @@ WidgetPresentationParameters::WidgetPresentationParameters(QWidget* parent)
   ui.setupUi(this); // To be done first
 }
 
-MEDCALC::MEDPresentationViewMode
-WidgetPresentationParameters::getViewMode() {
-  QString viewMode = this->ui.comboBoxViewMode->currentText();
-  if (viewMode == tr("LAB_VIEW_MODE_REPLACE")) {
-    return MEDCALC::VIEW_MODE_REPLACE;
-  }
-  else if (viewMode == tr("LAB_VIEW_MODE_OVERLAP")) {
-    return MEDCALC::VIEW_MODE_OVERLAP;
-  }
-  else if (viewMode == tr("LAB_VIEW_MODE_NEW_LAYOUT")) {
-    return MEDCALC::VIEW_MODE_NEW_LAYOUT;
-  }
-  else if (viewMode == tr("LAB_VIEW_MODE_SPLIT_VIEW")) {
-    return MEDCALC::VIEW_MODE_SPLIT_VIEW;
-  }
-  // Should not happen
-  STDLOG("Strange!! No matching view mode found - returning VIEW_MODE_REPLACE.");
-  return MEDCALC::VIEW_MODE_REPLACE;
-}
-
 std::string
 WidgetPresentationParameters::getField()
 {

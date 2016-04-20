@@ -24,6 +24,13 @@ template<typename PresentationType, typename PresentationParameters>
 MEDPresentation::TypeID
 MEDPresentationManager_i::_makePresentation(PresentationParameters params)
 {
+  // Replace = Remove then add
+  if (params.viewMode == MEDCALC::VIEW_MODE_REPLACE) {
+    MEDPresentation::TypeID currentPresentationId = _getActivePresentationId();
+    if (currentPresentationId > -1)
+      removePresentation(currentPresentationId);
+  }
+
   // Create a new presentation instance
   PresentationType* presentation = NULL;
   try {
@@ -38,6 +45,19 @@ MEDPresentationManager_i::_makePresentation(PresentationParameters params)
   _presentations.insert( std::pair<MEDPresentation::TypeID, MEDPresentation *>(newID, presentation) );
   presentation->generatePipeline();
   return newID;
+}
+
+template<typename PresentationType, typename PresentationParameters>
+void
+MEDPresentationManager_i::_updatePresentation(MEDPresentation::TypeID presentationID, PresentationParameters params)
+{
+  MEDPresentation* presentation = _getPresentation(presentationID);
+  if (!presentation) {
+    std::cerr << "_updatePresentation(): presentation not found!!" << std::endl;
+    return;
+  }
+
+  presentation->updatePipeline<PresentationType>(params);
 }
 
 #endif // _MED_PRESENTATION_MANAGER_I_TXX_

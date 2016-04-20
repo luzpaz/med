@@ -46,8 +46,17 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   MEDCALC_EXPORT MEDPresentation::TypeID makeDeflectionShape(const MEDCALC::DeflectionShapeParameters&);
   MEDCALC_EXPORT MEDPresentation::TypeID makePointSprite(const MEDCALC::PointSpriteParameters&);
 
-  MEDCALC_EXPORT void setPresentationProperty(MEDPresentation::TypeID presentationID, const char * propName, const char * propValue);
+  MEDCALC_EXPORT void setPresentationProperty(MEDPresentation::TypeID presentationID, const char* propName, const char* propValue);
   MEDCALC_EXPORT char* getPresentationProperty(MEDPresentation::TypeID presentationID, const char* propName);
+
+  MEDCALC_EXPORT void updateScalarMap(MEDPresentation::TypeID presentationID, const MEDCALC::ScalarMapParameters&);
+  MEDCALC_EXPORT void updateContour(MEDPresentation::TypeID presentationID, const MEDCALC::ContourParameters&);
+  MEDCALC_EXPORT void updateVectorField(MEDPresentation::TypeID presentationID, const MEDCALC::VectorFieldParameters&);
+  MEDCALC_EXPORT void updateSlices(MEDPresentation::TypeID presentationID, const MEDCALC::SlicesParameters&);
+  MEDCALC_EXPORT void updateDeflectionShape(MEDPresentation::TypeID presentationID, const MEDCALC::DeflectionShapeParameters&);
+  MEDCALC_EXPORT void updatePointSprite(MEDPresentation::TypeID presentationID, const MEDCALC::PointSpriteParameters&);
+
+  MEDCALC_EXPORT CORBA::Boolean removePresentation(MEDPresentation::TypeID presentationID);
 
  private:
   MEDPresentationManager_i();
@@ -59,14 +68,21 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   template<typename PresentationType, typename PresentationParameters>
   MEDPresentation::TypeID _makePresentation(PresentationParameters params);
 
+  // Update presentation
+  template<typename PresentationType, typename PresentationParameters>
+  void _updatePresentation(MEDPresentation::TypeID presentationID, PresentationParameters params);
+
+  MEDPresentation* _getPresentation(MEDPresentation::TypeID) const;
+  MEDPresentation::TypeID _getActivePresentationId() const;
+
  private :
 
   // The MEDPresentationManager is a singleton, whose instance can be obtained
   // using the getInstance static method.
-  static MEDPresentationManager_i * _instance;
+  static MEDPresentationManager_i* _instance;
 
   // Owns a list of MEDPresentation objects
-  std::map< MEDPresentation::TypeID, MEDPresentation * > _presentations;
+  std::map<MEDPresentation::TypeID, MEDPresentation*> _presentations;
 
 };
 

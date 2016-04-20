@@ -58,13 +58,21 @@ public:
   MED_ORB::status registerPresentation(SALOMEDS::Study_ptr study,
                                        CORBA::Long fieldId,
                                        const char* name,
-                                       const char* label);
+                                       const char* label,
+                                       CORBA::Long presentationId);
+
+  MED_ORB::status unregisterPresentation(SALOMEDS::Study_ptr study,
+                                         CORBA::Long presentationId);
 
   /*! Dump the study as a Python file */
   virtual Engines::TMPFile* DumpPython(CORBA::Object_ptr theStudy,
                                        CORBA::Boolean isPublished,
                                        CORBA::Boolean isMultiFile,
                                        CORBA::Boolean& isValidScript);
+
+  // For tooltips
+  virtual CORBA::Boolean hasObjectInfo();
+  virtual char* getObjectInfo(CORBA::Long studyId, const char* entry);
 
  private:
   std::map<long, std::string> _fieldSeriesEntries;

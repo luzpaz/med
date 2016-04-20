@@ -26,8 +26,11 @@
 
 #include <SALOMEDS_SObject.hxx>
 #include <Utils_ExceptHandlers.hxx>
+#include <SALOME_LifeCycleCORBA.hxx>
+#include <SALOME_NamingService.hxx>
 
 #include <string>
+#include <sstream>
 
 /*!
   \brief Constructor
@@ -103,7 +106,7 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
       soDatasource->SetAttrString("AttributePixMap", "ICO_DATASOURCE");
       anAttr = studyBuilder->FindOrCreateAttribute(soDatasource, "AttributeParameter");
       aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-      aParam->SetInt(OBJECT_ID, datasourceHandler.id);
+      aParam->SetInt(SOURCE_ID, datasourceHandler.id);
       useCaseBuilder->AppendTo(soDatasource->GetFather(), soDatasource);
 
       // We can add the meshes as children of the datasource
@@ -117,10 +120,8 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
         soMesh->SetAttrString("AttributePixMap", "ICO_DATASOURCE_MESH");
         anAttr = studyBuilder->FindOrCreateAttribute(soMesh, "AttributeParameter");
         aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-        aParam->SetInt(OBJECT_ID, meshHandler.id);
-        anAttr = studyBuilder->FindOrCreateAttribute(soMesh, "AttributeParameter");
-        aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-        aParam->SetBool(OBJECT_IS_IN_WORKSPACE, false);
+        aParam->SetInt(MESH_ID, meshHandler.id);
+        aParam->SetBool(IS_IN_WORKSPACE, false);
         useCaseBuilder->AppendTo(soMesh->GetFather(), soMesh);
 
         // We add the field timeseries defined on this mesh, as children of the mesh SObject
@@ -138,10 +139,9 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
           soFieldseries->SetAttrString("AttributePixMap", "ICO_DATASOURCE_FIELD");
           anAttr = studyBuilder->FindOrCreateAttribute(soFieldseries, "AttributeParameter");
           aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-          aParam->SetInt(OBJECT_ID, fieldseriesHandler.id);
-          anAttr = studyBuilder->FindOrCreateAttribute(soFieldseries, "AttributeParameter");
-          aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-          aParam->SetBool(OBJECT_IS_IN_WORKSPACE, false);
+          //aParam->SetInt(FIELD_SERIES_ID, fieldseriesHandler.id);
+          aParam->SetInt(FIELD_ID, fieldseriesHandler.id);
+          aParam->SetBool(IS_IN_WORKSPACE, false);
 
           useCaseBuilder->AppendTo(soFieldseries->GetFather(), soFieldseries);
           soFieldseries->UnRegister();
@@ -163,7 +163,8 @@ MED_ORB::status
 MED::registerPresentation(SALOMEDS::Study_ptr study,
                           CORBA::Long fieldId,
                           const char* name,
-                          const char* label)
+                          const char* label,
+                          CORBA::Long presentationId)
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
@@ -198,9 +199,44 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
   aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
   aParam->SetInt(FIELD_ID, fieldId);
   aParam->SetBool(IS_PRESENTATION, true);
+  aParam->SetInt(PRESENTATION_ID, presentationId);
 
   result = MED_ORB::OP_OK;
   return result;
+}
+
+MED_ORB::status
+MED::unregisterPresentation(SALOMEDS::Study_ptr study,
+                            CORBA::Long presentationId)
+{
+  // set exception handler to catch unexpected CORBA exceptions
+  Unexpect aCatch(SALOME_SalomeException);
+
+  // set result status to error initially
+  MED_ORB::status result = MED_ORB::OP_ERROR;
+
+  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+
+  SALOMEDS::GenericAttribute_var anAttribute;
+  SALOMEDS::SComponent_var father = study->FindComponent("MED");
+  SALOMEDS::ChildIterator_var it = study->NewChildIterator(father);
+  for (it->InitEx(true); it->More(); it->Next()) {
+    SALOMEDS::SObject_var child(it->Value());
+
+    if (child->FindAttribute(anAttribute, "AttributeParameter")) {
+      SALOMEDS::AttributeParameter_var attrParam = SALOMEDS::AttributeParameter::_narrow(anAttribute);
+      if (!attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN) || !attrParam->GetBool(IS_PRESENTATION) || !attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
+        continue;
+
+      if (presentationId == attrParam->GetInt(PRESENTATION_ID)) {
+        // remove object from study
+        studyBuilder->RemoveObjectWithChildren(child);
+        // remove object from use case tree
+        useCaseBuilder->Remove(child);
+      }
+    }
+  }
 }
 
 Engines::TMPFile*
@@ -240,6 +276,80 @@ MED::DumpPython(CORBA::Object_ptr theStudy,
 
   isValidScript = true;
   return aStreamFile._retn();
+}
+
+CORBA::Boolean
+MED::hasObjectInfo()
+{
+  return true;
+}
+
+char*
+MED::getObjectInfo(CORBA::Long studyId, const char* entry)
+{
+  SALOME_LifeCycleCORBA lcc;
+  CORBA::Object_var aSMObject = lcc.namingService()->Resolve( "/myStudyManager" );
+  SALOMEDS::StudyManager_var aStudyManager = SALOMEDS::StudyManager::_narrow( aSMObject );
+  SALOMEDS::Study_var aStudy = aStudyManager->GetStudyByID( studyId );
+  SALOMEDS::SObject_var aSObj = aStudy->FindObjectID( entry );
+  SALOMEDS::SObject_var aResultSObj;
+  if (aSObj->ReferencedObject(aResultSObj))
+    aSObj = aResultSObj;
+
+  if (aSObj->_is_nil())
+    return CORBA::string_dup("unknown");
+
+  SALOMEDS::GenericAttribute_var anAttribute;
+
+  std::string name("unknown");
+  if (aSObj->FindAttribute(anAttribute, "AttributeName")) {
+    SALOMEDS::AttributeName_var attrName = SALOMEDS::AttributeName::_narrow(anAttribute);
+    name = std::string(attrName->Value());
+  }
+
+  bool isInWorkspace = false;
+  //bool isPresentation = false;
+  int sourceId = -1;
+  int meshId = -1;
+  //int fieldSeriesId = -1;
+  int fieldId = -1;
+  int presentationId = -1;
+  if (aSObj->FindAttribute(anAttribute, "AttributeParameter")) {
+    SALOMEDS::AttributeParameter_var attrParam = SALOMEDS::AttributeParameter::_narrow(anAttribute);
+    if (attrParam->IsSet(IS_IN_WORKSPACE, PT_BOOLEAN))
+      isInWorkspace = attrParam->GetBool(IS_IN_WORKSPACE);
+    //if (attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN))
+    //  isPresentation = attrParam->GetBool(IS_PRESENTATION);
+    if (attrParam->IsSet(SOURCE_ID, PT_INTEGER))
+      sourceId = attrParam->GetInt(SOURCE_ID);
+    if (attrParam->IsSet(MESH_ID, PT_INTEGER))
+      meshId = attrParam->GetInt(MESH_ID);
+    //if (attrParam->IsSet(FIELD_SERIES_ID, PT_INTEGER))
+    //  fieldSeriesId = attrParam->GetInt(FIELD_SERIES_ID);
+    if (attrParam->IsSet(FIELD_ID, PT_INTEGER))
+      fieldId = attrParam->GetInt(FIELD_ID);
+    if (attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
+      presentationId = attrParam->GetInt(PRESENTATION_ID);
+  }
+
+  if (!aSObj->_is_nil() )
+    aSObj->UnRegister();
+
+  std::ostringstream oss;
+  if (sourceId > -1)
+    oss << "Source id: " << sourceId << std::endl;
+  if (meshId > -1)
+    oss << "Mesh id: " << meshId << std::endl;
+  //if (fieldSeriesId > -1)
+  //  oss << "Field series id: " << fieldSeriesId << std::endl;
+  if (fieldId > -1)
+    oss << "Field id: " << fieldId << std::endl;
+  //oss << "Is presentation: " << isPresentation << std::endl;
+  if (presentationId > -1)
+    oss << "Presentation id: " << presentationId << std::endl;
+  oss << "Is in workspace: " << isInWorkspace << std::endl;
+
+  return CORBA::string_dup(oss.str().c_str());
 }
 
 extern "C"

@@ -19,7 +19,7 @@
 
 import medcalc
 import MEDCALC
-from medcalc.medevents import notifyGui_addPresentation
+from medcalc.medevents import notifyGui_addPresentation, notifyGui_removePresentation
 
 __manager = medcalc.medcorba.factory.getPresentationManager()
 
@@ -35,6 +35,7 @@ def MakeScalarMap(proxy,
   params = MEDCALC.ScalarMapParameters(proxy.id, viewMode, displayedInfo, scalarBarRange, colorMap)
   presentation_id = __manager.makeScalarMap(params)
   notifyGui_addPresentation(proxy.id, presentation_id)
+  return presentation_id
 #
 
 def MakeContour(proxy,
@@ -48,6 +49,7 @@ def MakeContour(proxy,
   params = MEDCALC.ContourParameters(proxy.id, viewMode, displayedInfo, scalarBarRange, colorMap, nbContours)
   presentation_id = __manager.makeContour(params)
   notifyGui_addPresentation(proxy.id, presentation_id)
+  return presentation_id
 #
 
 def MakeVectorField(proxy,
@@ -56,6 +58,7 @@ def MakeVectorField(proxy,
   params = MEDCALC.VectorFieldParameters(proxy.id, viewMode)
   presentation_id = __manager.makeVectorField(params)
   notifyGui_addPresentation(proxy.id, presentation_id)
+  return presentation_id
 #
 
 def MakeSlices(proxy,
@@ -66,6 +69,7 @@ def MakeSlices(proxy,
   params = MEDCALC.SlicesParameters(proxy.id, viewMode, orientation, nbSlices)
   presentation_id = __manager.makeSlices(params)
   notifyGui_addPresentation(proxy.id, presentation_id)
+  return presentation_id
 #
 
 def MakeDeflectionShape(proxy,
@@ -74,6 +78,7 @@ def MakeDeflectionShape(proxy,
   params = MEDCALC.DeflectionShapeParameters(proxy.id, viewMode)
   presentation_id = __manager.makeDeflectionShape(params)
   notifyGui_addPresentation(proxy.id, presentation_id)
+  return presentation_id
 #
 
 def MakePointSprite(proxy,
@@ -86,4 +91,11 @@ def MakePointSprite(proxy,
   params = MEDCALC.PointSpriteParameters(proxy.id, viewMode, displayedInfo, scalarBarRange, colorMap)
   presentation_id = __manager.makePointSprite(params)
   notifyGui_addPresentation(proxy.id, presentation_id)
+  return presentation_id
+#
+
+def RemovePresentation(presentation_id):
+  ok = __manager.removePresentation(presentation_id)
+  if ok:
+    notifyGui_removePresentation(presentation_id)
 #

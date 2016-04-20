@@ -230,7 +230,8 @@ void DatasourceController::OnExpandField()
     SALOMEDS::SObject_var soFieldseries = listOfSObject->at(i);
 
     // First retrieve the fieldseries id associated to this study object
-    long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,OBJECT_ID);
+    //long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,FIELD_SERIES_ID);
+    long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,FIELD_ID);
     STDLOG("Expand the field timeseries "<<fieldseriesId);
 
     // If fieldseriesId equals -1, then it means that it is not a
@@ -251,8 +252,8 @@ void DatasourceController::OnExpandField()
       SALOMEDS::SObject_var soField = _studyEditor->newObject(soFieldseries);
       std::string label("it="); label += ToString(fieldHandler.iteration);
       _studyEditor->setName(soField,label.c_str());
-      _studyEditor->setParameterInt(soField, OBJECT_ID, fieldHandler.id);
-      _studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,false);
+      _studyEditor->setParameterInt(soField, FIELD_ID, fieldHandler.id);
+      _studyEditor->setParameterBool(soField,IS_IN_WORKSPACE,false);
     }
   }
   _salomeModule->updateObjBrowser(true);
@@ -277,7 +278,7 @@ void DatasourceController::OnUseInWorkspace() {
 
     SALOMEDS::SObject_var soField = listOfSObject->at(0);
 
-    bool isInWorkspace = _studyEditor->getParameterBool(soField,OBJECT_IS_IN_WORKSPACE);
+    bool isInWorkspace = _studyEditor->getParameterBool(soField,IS_IN_WORKSPACE);
     if ( isInWorkspace ) {
       QMessageBox::warning(_salomeModule->getApp()->desktop(),
          tr("Operation not allowed"),
@@ -285,7 +286,7 @@ void DatasourceController::OnUseInWorkspace() {
       return;
     }
 
-    int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
+    int fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);
 
     // If fieldId equals -1, then it means that it is not a field
     // managed by the MED module, and we stop this function process.
@@ -324,7 +325,7 @@ void DatasourceController::OnUseInWorkspace() {
     event->objectalias = alias;
     emit datasourceSignal(event);
     // Tag the item to prevent double import
-    //    _studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
+    //    _studyEditor->setParameterBool(soField,IS_IN_WORKSPACE,true);
     // Tag the field as persistent on the server. It means that a
     // saving of the workspace will save at least this field (maybe it
     // should be an option?)
@@ -336,9 +337,9 @@ void DatasourceController::OnUseInWorkspace() {
     for (int i=0; i<listOfSObject->size(); i++) {
       SALOMEDS::SObject_var soField = listOfSObject->at(i);
 
-      bool isInWorkspace = _studyEditor->getParameterBool(soField,OBJECT_IS_IN_WORKSPACE);
+      bool isInWorkspace = _studyEditor->getParameterBool(soField,IS_IN_WORKSPACE);
       if ( !isInWorkspace ) {
-        int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
+        int fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);
         MEDCALC::FieldHandler* fieldHandler =
           MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
         DatasourceEvent* event = new DatasourceEvent();
@@ -350,7 +351,7 @@ void DatasourceController::OnUseInWorkspace() {
         // Note that this signal is processed by the WorkspaceController
 
         // Tag the item to prevent double import
-        //        _studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
+        //        _studyEditor->setParameterBool(soField,IS_IN_WORKSPACE,true);
         // Tag the field as persistent on the server. It means that a
         // saving of the workspace will save at least this field (maybe it
         // should be an option?)

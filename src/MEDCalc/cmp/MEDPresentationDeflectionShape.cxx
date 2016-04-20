@@ -47,3 +47,9 @@ MEDPresentationDeflectionShape::internalGeneratePipeline()
 
   PyGILState_Release(_gil_state);
 }
+
+void
+MEDPresentationDeflectionShape::updatePipeline(const MEDCALC::DeflectionShapeParameters& params)
+{
+  // :TODO:
+}

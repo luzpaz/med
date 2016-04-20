@@ -24,7 +24,7 @@
 #include "MEDCouplingRefCountObject.hxx"
 #include <iostream>
 
-MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::string name)
+MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name)
     : _fieldHandlerId(fieldHandlerId), _pipeline(0), _display(0), _properties()
 {
   MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
@@ -45,20 +45,29 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, std::st
   setProperty("name", name);
 }
 
-void MEDPresentation::generatePipeline()
+MEDPresentation::~MEDPresentation()
+{
+  std::cout << "###TODO#### ~MEDPresentation: clear pipeline\n";
+  std::cout << "###TODO#### ~MEDPresentation: clear display\n";
+}
+
+void
+MEDPresentation::generatePipeline()
 {
   // Might be more complicated in the future:
 
   this->internalGeneratePipeline();
 }
 
-void MEDPresentation::pushInternal(PyObject * obj, PyObject * disp)
+void
+MEDPresentation::pushInternal(PyObject* obj, PyObject* disp)
 {
   _pipeline.push_back(obj);
   _display.push_back(disp);
 }
 
-void MEDPresentation::setProperty(const std::string& propName, const std::string& propValue)
+void
+MEDPresentation::setProperty(const std::string& propName, const std::string& propValue)
 {
   // LIMITED!!! For now switch the first display element to Wireframe
   /*
@@ -82,7 +91,8 @@ MEDPresentation::getProperty(const std::string& propName) const
   }
 }
 
-PyObject * MEDPresentation::getPythonObjectFromMain(const char * python_var) const
+PyObject*
+MEDPresentation::getPythonObjectFromMain(const char* python_var) const
 {
   // TODO: improve to avoid getting dict at each call
 
@@ -92,7 +102,8 @@ PyObject * MEDPresentation::getPythonObjectFromMain(const char * python_var) con
   return PyDict_GetItemString(global_dict, python_var);
 }
 
-std::string MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldType) const
+std::string
+MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldType) const
 {
   switch(fieldType)
   {
@@ -135,7 +146,7 @@ MEDPresentation::getResetCameraCommand() const
 std::string
 MEDPresentation::getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap) const
 {
-  switch(colorMap) {
+  switch (colorMap) {
   case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW: return "Blue to Red Rainbow";
   case MEDCALC::COLOR_MAP_COOL_TO_WARM: return "Cool to Warm";
   }

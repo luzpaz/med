@@ -47,3 +47,9 @@ MEDPresentationPointSprite::internalGeneratePipeline()
 
   PyGILState_Release(_gil_state);
 }
+
+void
+MEDPresentationPointSprite::updatePipeline(const MEDCALC::PointSpriteParameters& params)
+{
+  // :TODO:
+}

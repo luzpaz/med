@@ -47,3 +47,9 @@ MEDPresentationVectorField::internalGeneratePipeline()
 
   PyGILState_Release(_gil_state);
 }
+
+void
+MEDPresentationVectorField::updatePipeline(const MEDCALC::VectorFieldParameters& params)
+{
+  // :TODO:
+}

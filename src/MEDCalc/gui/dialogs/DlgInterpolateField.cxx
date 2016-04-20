@@ -115,7 +115,7 @@ void DlgInterpolateField::OnSelectMesh() {
     SALOMEDS::SObject_var soMesh = listOfSObject->at(0);
     // _GBO_ TODO: we should test here if it is a mesh (attribute in
     // the sobject)
-    _meshId = _studyEditor->getParameterInt(soMesh,OBJECT_ID);
+    _meshId = _studyEditor->getParameterInt(soMesh,MESH_ID);
     const char * meshname = _studyEditor->getName(soMesh);
     this->ui.txtMesh->setText(QString(meshname));
   }

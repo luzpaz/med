@@ -86,7 +86,8 @@ ProcessingController::OnChangeUnderlyingMesh()
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() > 0 ) {
     SALOMEDS::SObject_var soField = listOfSObject->at(0);
-    int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
+    //int fieldId = _studyEditor->getParameterInt(soField,FIELD_SERIES_ID);
+    int fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);
     // _GBO_ : the dialog should not be modal, so that we can choose a
     // mesh in the browser. Then we have to emit a signal from the
     // dialog.accept, connected to a slot of the DatasourceControler
@@ -141,7 +142,7 @@ ProcessingController::OnInterpolateField()
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() > 0 ) {
     SALOMEDS::SObject_var soField = listOfSObject->at(0);
-    int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
+    int fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);
     // _GBO_ : the dialog should not be modal, so that we can choose a
     // mesh in the browser. Then we have to emit a signal from the
     // dialog.accept, connected to a slot of the DatasourceControler

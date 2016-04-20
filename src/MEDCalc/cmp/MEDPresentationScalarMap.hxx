@@ -31,6 +31,8 @@ public:
   {}
   virtual ~MEDPresentationScalarMap() {}
 
+  void updatePipeline(const MEDCALC::ScalarMapParameters& params);
+
 protected:
   virtual void internalGeneratePipeline();
 

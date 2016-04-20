@@ -63,25 +63,30 @@ MEDPresentationManager_i::GenerateID()
   return START_ID;
 }
 
-void
-MEDPresentationManager_i::setPresentationProperty(MEDPresentation::TypeID presentationID, const char * propName, const char * propValue)
+MEDPresentation*
+MEDPresentationManager_i::_getPresentation(MEDPresentation::TypeID presentationID) const
 {
-  if (_presentations.find(presentationID) != _presentations.end())
-    {
-      MEDPresentation * pres(_presentations[presentationID]);
-      pres->setProperty(propName, propValue);
-    }
+  std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator citr = _presentations.find(presentationID);
+  if (citr == _presentations.end())
+    return NULL;
+  return (*citr).second;
+}
+
+void
+MEDPresentationManager_i::setPresentationProperty(MEDPresentation::TypeID presentationID, const char* propName, const char* propValue)
+{
+  MEDPresentation* pres = _getPresentation(presentationID);
+  if (pres)
+    pres->setProperty(propName, propValue);
   else
-    {
-      std::cerr << "setPresentationProperty(): presentation not found!!" << std::endl;
-    }
+    std::cerr << "setPresentationProperty(): presentation not found!!" << std::endl;
 }
 
 char*
 MEDPresentationManager_i::getPresentationProperty(MEDPresentation::TypeID presentationID, const char* propName)
 {
-  if (_presentations.find(presentationID) != _presentations.end()) {
-    MEDPresentation* pres = _presentations[presentationID];
+  MEDPresentation* pres = _getPresentation(presentationID);
+  if (pres) {
     return (char*) pres->getProperty(propName).c_str();
   }
   else {
@@ -124,4 +129,63 @@ MEDPresentation::TypeID
 MEDPresentationManager_i::makePointSprite(const MEDCALC::PointSpriteParameters& params)
 {
   return _makePresentation<MEDPresentationPointSprite>(params);
+}
+
+void
+MEDPresentationManager_i::updateScalarMap(MEDPresentation::TypeID presentationID, const MEDCALC::ScalarMapParameters& params)
+{
+  return _updatePresentation<MEDPresentationScalarMap>(presentationID, params);
+}
+
+void
+MEDPresentationManager_i::updateContour(MEDPresentation::TypeID presentationID, const MEDCALC::ContourParameters& params)
+{
+  return _updatePresentation<MEDPresentationContour>(presentationID, params);
+}
+
+void
+MEDPresentationManager_i::updateVectorField(MEDPresentation::TypeID presentationID, const MEDCALC::VectorFieldParameters& params)
+{
+  return _updatePresentation<MEDPresentationVectorField>(presentationID, params);
+}
+
+void
+MEDPresentationManager_i::updateSlices(MEDPresentation::TypeID presentationID, const MEDCALC::SlicesParameters& params)
+{
+  return _updatePresentation<MEDPresentationSlices>(presentationID, params);
+}
+
+void
+MEDPresentationManager_i::updateDeflectionShape(MEDPresentation::TypeID presentationID, const MEDCALC::DeflectionShapeParameters& params)
+{
+  return _updatePresentation<MEDPresentationDeflectionShape>(presentationID, params);
+}
+
+void
+MEDPresentationManager_i::updatePointSprite(MEDPresentation::TypeID presentationID, const MEDCALC::PointSpriteParameters& params)
+{
+  return _updatePresentation<MEDPresentationPointSprite>(presentationID, params);
+}
+
+CORBA::Boolean
+MEDPresentationManager_i::removePresentation(MEDPresentation::TypeID presentationID)
+{
+  std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator citr = _presentations.find(presentationID);
+  if (citr == _presentations.end()) {
+    std::cerr << "removePresentation(): presentation not found!!" << std::endl;
+    return false;
+  }
+  MEDPresentation* presentation = (*citr).second;
+  if (presentation)
+    delete presentation;
+  _presentations.erase(presentationID);
+  return true;
+}
+
+MEDPresentation::TypeID
+MEDPresentationManager_i::_getActivePresentationId() const
+{
+  // :TODO:
+
+  return -1;
 }
