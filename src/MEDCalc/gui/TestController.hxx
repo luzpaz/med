@@ -42,6 +42,8 @@ public:
 
   bool isMainEventLoopStarted() const { return _myEventLoopStarted; }
 
+  bool eventFilter(QObject *obj, QEvent *event);
+  
 protected:
   virtual void customEvent(QEvent * event);
 

@@ -68,7 +68,8 @@ TestController::TestController(MEDModule* mod):
   _tester->addEventObserver("xml", new pqXMLEventObserver(_desk));
   _tester->addEventSource("xml", new pqXMLEventSource(_desk));
 
-  QTimer::singleShot(0, this, SLOT(onMainEventLoopStarting()));
+  QApplication::instance()->installEventFilter(this);
+  //QTimer::singleShot(0, this, SLOT(onMainEventLoopStarting()));
 }
 
 TestController::~TestController()
@@ -213,4 +214,12 @@ TestController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
 void TestController::onMainEventLoopStarting()
 {
   _myEventLoopStarted = true;
+  QApplication::instance()->removeEventFilter(this);
+}
+
+bool TestController::eventFilter(QObject *obj, QEvent *event)
+{
+  if ( obj == QApplication::instance() && event->type() == 9999 )
+    onMainEventLoopStarting();
+  return QObject::eventFilter(obj, event);
 }
