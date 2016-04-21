@@ -40,7 +40,7 @@ public:
 
   void createActions();
 
-
+  bool isMainEventLoopStarted() const { return _myEventLoopStarted; }
 
 protected:
   virtual void customEvent(QEvent * event);
@@ -62,11 +62,16 @@ protected:
   pqTestUtility * _tester;
   QAction * _lock_action;
 
+private slots:
+  void onMainEventLoopStarting();
+
 private:
   const int _playEventType;
   const int _quitEventType;
 
   bool _aboutToPlayTest;
+
+  bool _myEventLoopStarted;
 };
 
 #endif /* SRC_MEDCALC_GUI_TESTCONTROLLER_HXX_ */
