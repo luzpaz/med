@@ -29,7 +29,7 @@
 
 #include <QObject>
 
-class WidgetPresentationParameters : public QWidget
+class MEDCALCGUI_DIALOGS_EXPORT WidgetPresentationParameters : public QWidget
 {
   Q_OBJECT
 public:
