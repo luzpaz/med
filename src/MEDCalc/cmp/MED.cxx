@@ -67,9 +67,6 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
 
-  // set result status to error initially
-  MED_ORB::status result = MED_ORB::OP_ERROR;
-
   // check if reference to study is valid
   if (!CORBA::is_nil(study)) {
     // get full object path
@@ -155,8 +152,7 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
     }
   }
 
-  result = MED_ORB::OP_OK;
-  return result;
+  return MED_ORB::OP_OK;
 }
 
 MED_ORB::status
@@ -169,9 +165,6 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
 
-  // set result status to error initially
-  MED_ORB::status result = MED_ORB::OP_ERROR;
-
   if (_fieldSeriesEntries.find(fieldId) == _fieldSeriesEntries.end()) {
     std::cerr << "Field not found\n";
     return MED_ORB::OP_ERROR ;
@@ -182,7 +175,7 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
 
   if (soFieldseries->IsNull()) {
     std::cerr << "Entry not found\n";
-    return  MED_ORB::OP_ERROR;
+    return MED_ORB::OP_ERROR;
   }
 
   SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
@@ -201,8 +194,7 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
   aParam->SetBool(IS_PRESENTATION, true);
   aParam->SetInt(PRESENTATION_ID, presentationId);
 
-  result = MED_ORB::OP_OK;
-  return result;
+  return MED_ORB::OP_OK;
 }
 
 MED_ORB::status
@@ -211,9 +203,6 @@ MED::unregisterPresentation(SALOMEDS::Study_ptr study,
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
-
-  // set result status to error initially
-  MED_ORB::status result = MED_ORB::OP_ERROR;
 
   SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
   SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
@@ -237,6 +226,8 @@ MED::unregisterPresentation(SALOMEDS::Study_ptr study,
       }
     }
   }
+
+  return MED_ORB::OP_OK;
 }
 
 Engines::TMPFile*
