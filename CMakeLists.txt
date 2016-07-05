@@ -36,6 +36,16 @@ SET(${PROJECT_NAME_UC}_VERSION
   ${${PROJECT_NAME_UC}_MAJOR_VERSION}.${${PROJECT_NAME_UC}_MINOR_VERSION}.${${PROJECT_NAME_UC}_PATCH_VERSION})
 SET(${PROJECT_NAME_UC}_VERSION_DEV 1)
 
+# Common CMake macros
+# ===================
+SET(CONFIGURATION_ROOT_DIR $ENV{CONFIGURATION_ROOT_DIR} CACHE PATH "Path to the Salome CMake configuration files")
+IF(EXISTS ${CONFIGURATION_ROOT_DIR})
+  LIST(APPEND CMAKE_MODULE_PATH "${CONFIGURATION_ROOT_DIR}/cmake")
+  INCLUDE(SalomeMacros)
+ELSE()
+  MESSAGE(FATAL_ERROR "We absolutely need the Salome CMake configuration files, please define CONFIGURATION_ROOT_DIR !")
+ENDIF()
+
 #
 # Kernel detection comes before user options to be
 # able to take previous values of global options ...
@@ -44,7 +54,6 @@ SET(_default_MPI OFF)
 SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL")
 IF(EXISTS ${KERNEL_ROOT_DIR})
   LIST(APPEND CMAKE_MODULE_PATH "${KERNEL_ROOT_DIR}/salome_adm/cmake_files")
-  INCLUDE(SalomeMacros)
   FIND_PACKAGE(SalomeKERNEL REQUIRED)
   KERNEL_WITH_CORBA() #check whether KERNEL builded with CORBA
   ADD_DEFINITIONS(${KERNEL_DEFINITIONS})
