@@ -427,6 +427,7 @@ MEDModule::onClick(const QModelIndex & index)
     return;
 
   STDLOG("Presentation selection (activate view)");
+  STDLOG("  Presention infos:");
   std::ostringstream oss;
   oss << fieldId << " / " << presId;
   STDLOG("    - Field id / pres id:   " + oss.str());

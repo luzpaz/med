@@ -95,8 +95,6 @@ public slots:
   virtual void onDblClick(const QModelIndex& index);
   virtual void onClick(const QModelIndex& index);
 
-
-
 private:
   void createModuleWidgets();
   void createModuleActions();
