@@ -39,7 +39,8 @@ typedef struct {
     EVENT_VIEW_OBJECT_POINT_SPRITE,
     EVENT_VIEW_OBJECT_SCALAR_MAP,
     EVENT_VIEW_OBJECT_SLICES,
-    EVENT_VIEW_OBJECT_VECTOR_FIELD
+    EVENT_VIEW_OBJECT_VECTOR_FIELD,
+    EVENT_DELETE_PRESENTATION
   };
   int eventtype;
   XmedDataObject* objectdata;
@@ -72,6 +73,9 @@ protected slots:
   void OnVisualizeSlices();
   void OnVisualizeDeflectionShape();
   void OnVisualizePointSprite();
+
+  void OnDeletePresentation();
+
   void processWorkspaceEvent(const MEDCALC::MedEvent*);
 
 private:
@@ -83,6 +87,7 @@ private:
 private:
   MEDModule* _salomeModule;
   SALOME_AppStudyEditor* _studyEditor; // borrowed to MEDModule
+
   QDockWidget *_dockWidget;
   WidgetPresentationParameters* _widgetPresentationParameters;
 };

@@ -27,7 +27,7 @@
 // =================================================================
 //
 
-XmedDataObject::XmedDataObject() : DataObject() {
+XmedDataObject::XmedDataObject() : DataObject(), _presId(-1) {
 }
 
 /*! This function specified the localization of the object in the
@@ -47,6 +47,13 @@ void XmedDataObject::setFieldHandler(MEDCALC::FieldHandler fieldHandler) {
 MEDCALC::FieldHandler * XmedDataObject::getFieldHandler() {
   return &_fieldHandler;
 }
+
+void XmedDataObject::setPresentationId(int presId) {
+  _presId = presId;
+}
+
+int XmedDataObject::getPresentationId() const { return _presId; }
+
 
 /*!
  * This function implements the convention for displaying a fieldname

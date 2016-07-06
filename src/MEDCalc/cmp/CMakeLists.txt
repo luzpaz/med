@@ -29,6 +29,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/..
   ${PROJECT_BINARY_DIR}/idl
+  ${GUI_INCLUDE_DIRS}  # For PyLockWrapper 
 )
 
 SET(COMMON_SOURCES
@@ -68,6 +69,7 @@ SET(COMMON_LIBS
   ${OMNIORB_LIBRARIES}
   ${PYTHON_LIBRARIES}
   ${MEDCoupling_medcoupling} ${MEDCoupling_medloader} ${MEDCoupling_medcouplingremapper}
+  ${GUI_PyInterp}
 )
 
 # This undefines the macros MIN and MAX which are specified in the windows headers

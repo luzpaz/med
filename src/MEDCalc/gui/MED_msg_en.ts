@@ -56,6 +56,14 @@
       <translation>Point sprite</translation>
     </message>
     <message>
+      <source>LAB_DELETE_PRESENTATION</source>
+      <translation>Delete presentation</translation>
+    </message>
+    <message>
+      <source>TIP_DELETE_PRESENTATION</source>
+      <translation>Delete selected presentation</translation>
+    </message> 
+    <message>
       <source>MENU_PRESENTATIONS</source>
       <translation>Presentations</translation>
     </message>

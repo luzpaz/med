@@ -106,6 +106,8 @@ MEDModule::initialize( CAM_Application* app )
   if (app && app->desktop()) {
     connect((QObject*) (getApp()->objectBrowser()->treeView()), SIGNAL(doubleClicked(const QModelIndex&)),
             this, SLOT(onDblClick(const QModelIndex&)));
+    connect((QObject*) (getApp()->objectBrowser()->treeView()), SIGNAL(clicked(const QModelIndex&)),
+                this, SLOT(onClick(const QModelIndex&)));
   }
 
   // The following initializes the GUI widget and associated actions
@@ -308,7 +310,7 @@ void
 MEDModule::addActionInPopupMenu(int actionId,const QString& menus,const QString& rule)
 {
   // _GBO_ for a fine customization of the rule (for example with a
-  // test on the type of the selected object), see the LIGTH module:
+  // test on the type of the selected object), see the LIGHT module:
   // implement "LightApp_Selection*    createSelection() const;"
   int parentId = -1;
   QtxPopupMgr* mgr = this->popupMgr();
@@ -332,45 +334,77 @@ MEDModule::getSelectedColorMap()
   return _presentationController->getSelectedColorMap();
 }
 
-void
-MEDModule::onDblClick(const QModelIndex& index)
+bool
+MEDModule::itemClickGeneric(const QModelIndex & index, std::string & name, int & fieldId, int & presId) const
 {
   DataObjectList dol = getApp()->objectBrowser()->getSelected();
   if (dol.isEmpty())
-    return;
+    return false;
   SalomeApp_DataObject* item = dynamic_cast<SalomeApp_DataObject*>(dol[0]);
   if (!item)
-    return;
+    return false;
   SalomeApp_DataModel *model = dynamic_cast<SalomeApp_DataModel*>(dataModel());
   if (!model)
-    return;
+    return false;
 
   if (item->componentDataType().toStdString() != "MED")
-    return;
+    return false;
   _PTR(SObject) obj = item->object();
   _PTR(GenericAttribute) anAttribute;
 
   if (! obj->FindAttribute(anAttribute, "AttributeName"))
-    return;
+    return false;
   _PTR(AttributeName) attrName(anAttribute);
-  std::string name = attrName->Value();
+  name = attrName->Value();
 
   if (! obj->FindAttribute(anAttribute, "AttributeParameter"))
-    return;
+    return false;
   _PTR(AttributeParameter) attrParam(anAttribute);
   if (! attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN)
       || ! attrParam->GetBool(IS_PRESENTATION)) { // Not a presentation
-    return;
+      return false;
   }
   if (!attrParam->IsSet(FIELD_ID, PT_INTEGER))
+    return false;
+  fieldId = attrParam->GetInt(FIELD_ID);
+  if (!attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
+      return false;
+  presId = attrParam->GetInt(PRESENTATION_ID);
+  return true;
+}
+
+void
+MEDModule::onClick(const QModelIndex & index)
+{
+  int fieldId, presId;
+  std::string name;
+  if (!itemClickGeneric(index, name, fieldId, presId))
     return;
-  int fieldId = attrParam->GetInt(FIELD_ID);
+
+  STDLOG("Presentation selection (should activate view): NOT IMPLEMENTED YET");
+  STDLOG("  Presention infos:");
+  std::ostringstream oss;
+  oss << fieldId << " / " << presId;
+  STDLOG("    - Field id / pres id:   " + oss.str());
+  STDLOG("    - Presentation name: " + name);
+
+  // TODO: activate corresponding view
+
+}
+
+void
+MEDModule::onDblClick(const QModelIndex& index)
+{
+  int fieldId, presId;
+  std::string name;
+  if (!itemClickGeneric(index, name, fieldId, presId))
+    return;
 
   STDLOG("Presentation edition: NOT IMPLEMENTED YET");
   STDLOG("  Presention infos:");
-  STDLOG("    - Component:         " + item->componentDataType().toStdString());
-  STDLOG("    - Item entry:        " + item->entry().toStdString());
-  STDLOG("    - Item name:         " + item->name().toStdString());
+//  STDLOG("    - Component:         " + item->componentDataType().toStdString());
+//  STDLOG("    - Item entry:        " + item->entry().toStdString());
+//  STDLOG("    - Item name:         " + item->name().toStdString());
   std::ostringstream oss;
   oss << fieldId;
   STDLOG("    - Field id:          " + oss.str());

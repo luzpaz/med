@@ -43,11 +43,11 @@ static const int OPTIONS_VIEW_MODE_OVERLAP_ID = 945;
 static const int OPTIONS_VIEW_MODE_NEW_LAYOUT_ID = 946;
 static const int OPTIONS_VIEW_MODE_SPLIT_VIEW_ID = 947;
 
-PresentationController::PresentationController(MEDModule* salomeModule)
+PresentationController::PresentationController(MEDModule* salomeModule) :
+    _salomeModule(salomeModule),
+    _studyEditor(salomeModule->getStudyEditor())
 {
   STDLOG("Creating a PresentationController");
-  _salomeModule = salomeModule;
-  _studyEditor = _salomeModule->getStudyEditor();
 
   _widgetPresentationParameters = new WidgetPresentationParameters();
 
@@ -174,6 +174,15 @@ PresentationController::createActions()
   _salomeModule->createTool(actionId, presentationToolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
   _salomeModule->createMenu(actionId, presentationMenuId);
+
+  label   = tr("LAB_DELETE_PRESENTATION");
+  tooltip = tr("TIP_DELETE_PRESENTATION");
+  icon    = tr(_getIconName("ICO_DELETE_PRESENTATION").c_str());
+  actionId = _salomeModule->createStandardAction(label,this, SLOT(OnDeletePresentation()),icon,tooltip);
+//  _salomeModule->createTool(actionId, presentationToolbarId);
+//  _salomeModule->action(actionId)->setIconVisibleInMenu(true);
+  _salomeModule->createMenu(actionId, presentationMenuId);
+
 }
 
 MEDCALC::MEDPresentationViewMode
@@ -289,6 +298,38 @@ void
 PresentationController::OnVisualizePointSprite()
 {
   this->visualize(PresentationEvent::EVENT_VIEW_OBJECT_POINT_SPRITE);
+}
+
+void
+PresentationController::OnDeletePresentation()
+{
+  // We need a _studyEditor updated on the active study
+  _studyEditor->updateActiveStudy();
+
+  // Get the selected objects in the study (SObject)
+  SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
+
+  // For each object, emit a signal to the workspace to request pres deletion
+  for (int i=0; i<listOfSObject->size(); i++) {
+    SALOMEDS::SObject_var soPres = listOfSObject->at(i);
+    int presId = _studyEditor->getParameterInt(soPres,PRESENTATION_ID);
+    // If fieldId equals -1, then it means that it is not a field
+    // managed by the MED module, and we stop this function process.
+    if ( presId < 0 )
+      continue;
+
+    STDLOG("Requesting deletion of presentation: ")
+    std::ostringstream oss;
+    oss << presId;
+    STDLOG("    - Pres id:          " + oss.str());
+
+    PresentationEvent* event = new PresentationEvent();
+    event->eventtype = PresentationEvent::EVENT_DELETE_PRESENTATION;
+    XmedDataObject* dataObject = new XmedDataObject();
+    dataObject->setPresentationId(presId);
+    event->objectdata = dataObject;
+    emit presentationSignal(event); // --> WorkspaceController::processPresentationEvent
+  }
 }
 
 void

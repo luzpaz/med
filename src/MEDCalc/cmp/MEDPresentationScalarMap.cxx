@@ -18,35 +18,47 @@
 //
 
 #include "MEDPresentationScalarMap.hxx"
+#include "PyInterp_Utils.h"
+
+#include <sstream>
 
 void
 MEDPresentationScalarMap::internalGeneratePipeline()
 {
-  PyGILState_STATE _gil_state = PyGILState_Ensure();
+  PyLockWrapper lock;
 
-  std::string cmd = std::string("import pvsimple as pvs;");
-  cmd += getRenderViewCommand(_params.viewMode); // define __view1
+  int disp_id(GeneratePythonId());
+  int obj_id(disp_id);
+  std::ostringstream oss_o, oss_d, oss, oss_v;
+  oss_o << "__obj" << obj_id;      std::string obj(oss_o.str());
+  oss_d << "__disp" << disp_id;    std::string disp(oss_d.str());
 
-  cmd += std::string("__obj1 = pvs.MEDReader(FileName='") + _fileName + std::string("');");
-  cmd += std::string("__disp1 = pvs.Show(__obj1, __view1);");
-  cmd += std::string("pvs.ColorBy(__disp1, ('") + _fieldType + std::string("', '") + _fieldName + std::string("'));");
-  cmd += std::string("__disp1.SetScalarBarVisibility(__view1, True);");
-  cmd += std::string("__disp1.RescaleTransferFunctionToDataRangeOverTime();");
-  cmd += std::string("__lut = pvs.GetColorTransferFunction('")+_fieldName+std::string("');");
-  cmd += std::string("__lut.ApplyPreset('")+getColorMapCommand(_params.colorMap)+std::string("',True);");
-  cmd += std::string("pvs.Render();");
+  pushAndExecPyLine( "import pvsimple as pvs;");
+  pushAndExecPyLine( getRenderViewCommand(_params.viewMode) ); // define __viewXXX
 
-  cmd += getResetCameraCommand();
+  oss_v << "__view" << _renderViewPyId;    std::string view(oss_v.str());
 
-  //std::cerr << "Python command:" << std::endl;
-  //std::cerr << cmd << std::endl;
-  PyRun_SimpleString(cmd.c_str());
+  oss << obj << " = pvs.MEDReader(FileName='" << _fileName << "');";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << disp << " = pvs.Show(" << obj << ", " << view << ");";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << "pvs.ColorBy(" << disp << ", ('" << _fieldType << "', '" << _fieldName << "'));";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << disp <<  ".SetScalarBarVisibility(" << view << ", True);";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << disp <<  ".RescaleTransferFunctionToDataRangeOverTime();";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << "__lut = pvs.GetColorTransferFunction('" << _fieldName << "');";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << "__lut.ApplyPreset('" << getColorMapCommand(_params.colorMap) << "',True);";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  pushAndExecPyLine(getResetCameraCommand());
+  pushAndExecPyLine("pvs.Render();");
+
   // Retrieve Python object for internal storage:
-  PyObject* obj = getPythonObjectFromMain("__obj1");
-  PyObject* disp = getPythonObjectFromMain("__disp1");
-  pushInternal(obj, disp);
-
-  PyGILState_Release(_gil_state);
+  PyObject* p_obj = getPythonObjectFromMain(obj.c_str());
+  PyObject* p_disp = getPythonObjectFromMain(disp.c_str());
+  pushPyObjects(std::make_pair(obj_id, p_obj), std::make_pair(disp_id, p_disp));
 }
 
 void

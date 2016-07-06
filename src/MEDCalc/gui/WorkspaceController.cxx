@@ -619,6 +619,11 @@ void WorkspaceController::processPresentationEvent(const PresentationEvent* even
     commands += QString("presentation_id");
     _consoleDriver->exec(commands);
   }
+  else if ( event->eventtype == PresentationEvent::EVENT_DELETE_PRESENTATION ) {
+      QStringList commands;
+      commands += QString("medcalc.RemovePresentation(%1)").arg(dataObject->getPresentationId());
+      _consoleDriver->exec(commands);
+  }
   else {
     STDLOG("The event "<<event->eventtype<<" is not implemented yet");
   }

@@ -47,6 +47,7 @@ public:
   const std::string getProperty(const std::string& propName) const;
 
 protected:
+  typedef std::pair<int, PyObject *> PyObjectId;
 
   MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name);
   std::string getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode) const;
@@ -55,9 +56,12 @@ protected:
 
   virtual void internalGeneratePipeline() = 0;
   PyObject* getPythonObjectFromMain(const char* var) const;
-  void pushInternal(PyObject* obj, PyObject* disp = NULL);
+  void pushPyObjects(PyObjectId obj, PyObjectId disp);
+  void pushAndExecPyLine(const std::string & lin);
 
   MEDPresentation::TypeID getID() const { return _fieldHandlerId; }
+
+  static int GeneratePythonId();
 
 private:
 
@@ -70,20 +74,21 @@ private:
   void updatePipeline(PresentationParameters params);
 
 protected:
-
   std::string _fileName;
   std::string _fieldName;
   std::string _fieldType;
 
-private:
+  ///! Identifier (in the Python dump) of the render view
+  int _renderViewPyId;
 
+private:
   MEDPresentation::TypeID _fieldHandlerId;
 
   ///! Pipeline elements
-  std::vector<PyObject*> _pipeline;
+  std::vector<PyObjectId> _pipeline;
 
   ///! Corresponding display object, if any:
-  std::vector<PyObject*> _display;
+  std::vector<PyObjectId> _display;
 
   ///! Presentation properties <key,value>
   std::map<std::string, std::string> _properties;

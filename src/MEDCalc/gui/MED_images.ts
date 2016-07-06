@@ -213,5 +213,9 @@
       <source>ICO_MEDPresentationPointSprite_CLASSIC</source>
       <translation>visu_points16.png</translation>
     </message>
+    <message>
+      <source>ICO_DELETE_PRESENTATION</source>
+      <translation>close.png</translation>
+    </message>
   </context>
 </TS>

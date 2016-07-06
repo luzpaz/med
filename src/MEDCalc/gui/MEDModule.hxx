@@ -87,6 +87,7 @@ public slots:
   virtual bool activateModule(SUIT_Study* theStudy);
   virtual bool deactivateModule(SUIT_Study* theStudy);
   virtual void onDblClick(const QModelIndex& index);
+  virtual void onClick(const QModelIndex& index);
 
 
 
@@ -94,6 +95,8 @@ private:
   void createModuleWidgets();
   void createModuleActions();
   void initToolbars();
+  bool itemClickGeneric(const QModelIndex & index, std::string & name, int & fieldId, int & presId) const;
+
   static void init();
 
 private:

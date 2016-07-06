@@ -40,8 +40,12 @@ public:
   void setFieldHandler(MEDCALC::FieldHandler fieldHandler);
   MEDCALC::FieldHandler * getFieldHandler();
 
+  void setPresentationId(int presId);
+  int getPresentationId() const;
+
 private:
   MEDCALC::FieldHandler _fieldHandler;
+  int _presId;
   string _getTypedFieldLabel();
 };
 

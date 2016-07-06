@@ -22,10 +22,14 @@
 #include "MEDPresentation.hxx"
 #include "MEDPresentationException.hxx"
 #include "MEDCouplingRefCountObject.hxx"
-#include <iostream>
+#include "Basics_Utils.hxx"
+#include "PyInterp_Utils.h"
+
+#include <sstream>
 
 MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name)
-    : _fieldHandlerId(fieldHandlerId), _pipeline(0), _display(0), _properties()
+    : _fieldHandlerId(fieldHandlerId), _pipeline(0), _display(0), _properties(),
+      _renderViewPyId(GeneratePythonId())
 {
   MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
   MEDCALC::FieldHandler* fieldHandler = dataManager->getFieldHandler(fieldHandlerId);
@@ -47,8 +51,19 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const s
 
 MEDPresentation::~MEDPresentation()
 {
-  std::cout << "###TODO#### ~MEDPresentation: clear pipeline\n";
-  std::cout << "###TODO#### ~MEDPresentation: clear display\n";
+  STDLOG("~MEDPresentation(): clear display");
+  {
+    PyLockWrapper lock;
+    std::ostringstream oss_o, oss_v, oss;
+    // Get top level object and display:
+    oss_o << "__obj" << _pipeline.front().first;
+    oss_v << "__view" << _renderViewPyId;
+    oss << "pvs.Hide(" << oss_o.str() <<  ", view=" << oss_v.str() << ");";
+    oss << "pvs.Render();";
+
+//    std::cerr << oss.str() << std::endl;
+    PyRun_SimpleString(oss.str().c_str());
+  }
 }
 
 void
@@ -60,10 +75,19 @@ MEDPresentation::generatePipeline()
 }
 
 void
-MEDPresentation::pushInternal(PyObject* obj, PyObject* disp)
+MEDPresentation::pushPyObjects(PyObjectId obj, PyObjectId disp)
 {
   _pipeline.push_back(obj);
   _display.push_back(disp);
+}
+
+void
+MEDPresentation::pushAndExecPyLine(const std::string & lin)
+{
+  // TODO: store internally for low level dump
+  PyLockWrapper lock;
+//  std::cerr << lin << std::endl;
+  PyRun_SimpleString(lin.c_str());
 }
 
 void
@@ -86,7 +110,7 @@ MEDPresentation::getProperty(const std::string& propName) const
     return (*it).second;
   }
   else {
-    std::cerr << "getProperty(): no property named " << propName << std::endl;
+    STDLOG("MEDPresentation::getProperty(): no property named " + propName);
     return std::string();
   }
 }
@@ -112,7 +136,7 @@ MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldType) const
     case MEDCoupling::ON_NODES:
       return "POINTS";
     default:
-      std::cerr << "MEDPresentation::getFieldTypeString() -- Not implemented ! Gauss points?";
+      STDLOG("MEDPresentation::getFieldTypeString() -- Not implemented ! Gauss points?");
       return "";
   }
 }
@@ -120,28 +144,32 @@ MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldType) const
 std::string
 MEDPresentation::getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode) const
 {
-  std::string cmd = std::string("pvs._DisableFirstRenderCameraReset();");
+  std::ostringstream oss, oss2;
+  oss << "__view" << _renderViewPyId;
+  std::string view(oss.str());
+  oss2 << "pvs._DisableFirstRenderCameraReset();";
   if (viewMode == MEDCALC::VIEW_MODE_OVERLAP) {
-    cmd += std::string("__view1 = pvs.GetActiveViewOrCreate('RenderView');");
+      oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');";
   } else if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
-    cmd += std::string("__view1 = pvs.GetActiveViewOrCreate('RenderView');");
-    cmd += std::string("pvs.active_objects.source and pvs.Hide(view=__view1);");
-    cmd += std::string("pvs.Render();");
+      oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');";
+      oss2 << "pvs.active_objects.source and pvs.Hide(view=" << view << ");";
+      oss2 << "pvs.Render();";
   } else if (viewMode == MEDCALC::VIEW_MODE_NEW_LAYOUT) {
-    cmd += std::string("__layout1 = pvs.servermanager.misc.ViewLayout(registrationGroup='layouts');");
-    cmd += std::string("__view1 = pvs.CreateView('RenderView');");
+      oss2 <<  "__layout1 = pvs.servermanager.misc.ViewLayout(registrationGroup='layouts');";
+      oss2 << view << " = pvs.CreateView('RenderView');";
   } else if (viewMode == MEDCALC::VIEW_MODE_SPLIT_VIEW) {
-    cmd += std::string("__view1 = pvs.CreateView('RenderView');");
+      oss2 << view << " = pvs.CreateView('RenderView');";
   }
-  return cmd;
+  return oss2.str();
 }
 
 std::string
 MEDPresentation::getResetCameraCommand() const
 {
-  return std::string("__view1.ResetCamera();");
+  std::ostringstream oss;
+  oss << "__view" << _renderViewPyId << ".ResetCamera();";
+  return oss.str();
 }
-
 
 std::string
 MEDPresentation::getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap) const
@@ -150,4 +178,11 @@ MEDPresentation::getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap) c
   case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW: return "Blue to Red Rainbow";
   case MEDCALC::COLOR_MAP_COOL_TO_WARM: return "Cool to Warm";
   }
+}
+
+int
+MEDPresentation::GeneratePythonId()
+{
+  static int INIT_ID = 0;
+  return INIT_ID++;
 }
