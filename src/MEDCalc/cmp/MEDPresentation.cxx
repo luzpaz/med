@@ -186,3 +186,13 @@ MEDPresentation::GeneratePythonId()
   static int INIT_ID = 0;
   return INIT_ID++;
 }
+
+void
+MEDPresentation::activateView() const
+{
+  PyLockWrapper lock;
+  std::ostringstream oss;
+  oss << "pvs.SetActiveView(__view" << _renderViewPyId << ");";
+  std::cerr << oss.str() << std::endl;
+  PyRun_SimpleString(oss.str().c_str());
+}

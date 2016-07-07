@@ -45,6 +45,9 @@
 #include "PVViewer_GUIElements.h"
 #endif
 
+#include "MEDFactoryClient.hxx"
+#include "MEDPresentationManager_i.hxx"
+
 #include <sstream>
 
 #include <pqAnimationManager.h>
@@ -52,7 +55,9 @@
 
 
 //! The only instance of the reference to engine
-MED_ORB::MED_Gen_var MEDModule::myEngine;
+MED_ORB::MED_Gen_var MEDModule::_MED_engine;
+//! The only instance of the MEDPresentationManager
+MEDCALC::MEDPresentationManager_ptr MEDModule::_presManager;
 
 MEDModule::MEDModule() :
   SalomeApp_Module("MED"), _studyEditor(0),
@@ -83,18 +88,23 @@ MED_ORB::MED_Gen_var
 MEDModule::engine()
 {
   init(); // initialize engine, if necessary
-  return myEngine;
+  return _MED_engine;
 }
 
 void
 MEDModule::init()
 {
   // initialize MED module engine (load, if necessary)
-  if ( CORBA::is_nil( myEngine ) ) {
+  if ( CORBA::is_nil( _MED_engine ) ) {
     Engines::EngineComponent_var comp =
       SalomeApp_Application::lcc()->FindOrLoad_Component( "FactoryServer", "MED" );
-    myEngine = MED_ORB::MED_Gen::_narrow( comp );
+    _MED_engine = MED_ORB::MED_Gen::_narrow( comp );
   }
+
+  // Retrieve MEDFactory to get MEDPresentationManager (sometimes
+  if ( ! _presManager ) {
+      _presManager = MEDFactoryClient::getFactory()->getPresentationManager();
+    }
 }
 
 void
@@ -119,7 +129,7 @@ QString
 MEDModule::engineIOR() const
 {
   init(); // initialize engine, if necessary
-  CORBA::String_var anIOR = getApp()->orb()->object_to_string( myEngine.in() );
+  CORBA::String_var anIOR = getApp()->orb()->object_to_string( _MED_engine.in() );
   return QString( anIOR.in() );
 }
 
@@ -171,7 +181,7 @@ MEDModule::createPreferences()
 bool
 MEDModule::activateModule( SUIT_Study* theStudy )
 {
-  if ( CORBA::is_nil( myEngine ) )
+  if ( CORBA::is_nil( _MED_engine ) )
     return false;
 
   // call parent implementation
@@ -381,15 +391,13 @@ MEDModule::onClick(const QModelIndex & index)
   if (!itemClickGeneric(index, name, fieldId, presId))
     return;
 
-  STDLOG("Presentation selection (should activate view): NOT IMPLEMENTED YET");
-  STDLOG("  Presention infos:");
+  STDLOG("Presentation selection (activate view)");
   std::ostringstream oss;
   oss << fieldId << " / " << presId;
   STDLOG("    - Field id / pres id:   " + oss.str());
   STDLOG("    - Presentation name: " + name);
 
-  // TODO: activate corresponding view
-
+  _presManager->activateView(presId);
 }
 
 void

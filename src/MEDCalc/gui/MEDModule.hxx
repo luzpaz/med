@@ -41,6 +41,7 @@
 
 class SalomeApp_Application;
 class PVViewer_GUIElements;
+class MEDPresentationManager_i;
 
 /*!
  * This class defines the gui of the MED module.
@@ -106,8 +107,12 @@ private:
   XmedDataModel* _xmedDataModel;
   PresentationController* _presentationController;
   ProcessingController* _processingController;
-  static MED_ORB::MED_Gen_var myEngine;
   PVViewer_GUIElements*   _pvGuiElements;
+
+  static MED_ORB::MED_Gen_var _MED_engine;
+
+  // GUI needs to talk directly to the pres manager to activate a view, get some params, etc ...:
+  static MEDCALC::MEDPresentationManager_ptr _presManager;
 };
 
 #endif

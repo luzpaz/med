@@ -46,6 +46,8 @@ public:
   void setProperty(const std::string& propName, const std::string& propValue);
   const std::string getProperty(const std::string& propName) const;
 
+  void activateView() const;
+
 protected:
   typedef std::pair<int, PyObject *> PyObjectId;
 
@@ -60,6 +62,7 @@ protected:
   void pushAndExecPyLine(const std::string & lin);
 
   MEDPresentation::TypeID getID() const { return _fieldHandlerId; }
+  long getPyViewID() const { return _renderViewPyId; }
 
   static int GeneratePythonId();
 

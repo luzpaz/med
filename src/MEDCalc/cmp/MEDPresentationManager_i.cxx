@@ -182,6 +182,20 @@ MEDPresentationManager_i::removePresentation(MEDPresentation::TypeID presentatio
   return true;
 }
 
+CORBA::Boolean
+MEDPresentationManager_i::activateView(MEDPresentation::TypeID presentationID)
+{
+  std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator citr = _presentations.find(presentationID);
+  if (citr == _presentations.end()) {
+    std::cerr << "getPresentationPyViewId(): presentation not found!!" << std::endl;
+    return false;
+  }
+  MEDPresentation* presentation = (*citr).second;
+
+  presentation->activateView();
+  return true;
+}
+
 MEDPresentation::TypeID
 MEDPresentationManager_i::_getActivePresentationId() const
 {

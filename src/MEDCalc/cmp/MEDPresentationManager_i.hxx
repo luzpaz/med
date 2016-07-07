@@ -58,6 +58,8 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
 
   MEDCALC_EXPORT CORBA::Boolean removePresentation(MEDPresentation::TypeID presentationID);
 
+  MEDCALC_EXPORT CORBA::Boolean activateView(MEDPresentation::TypeID presentationID);
+
  private:
   MEDPresentationManager_i();
   virtual ~MEDPresentationManager_i();
