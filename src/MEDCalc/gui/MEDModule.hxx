@@ -121,6 +121,7 @@ private:
 #ifdef MED_HAS_QTTESTING
   TestController * _testController;
 #endif
+
 };
 
 #endif

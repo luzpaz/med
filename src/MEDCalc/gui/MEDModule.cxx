@@ -45,7 +45,6 @@
 #include "PVViewer_GUIElements.h"
 #endif
 
-
 #include "MEDFactoryClient.hxx"
 #include "MEDPresentationManager_i.hxx"
 #include <QTimer>
@@ -427,7 +426,6 @@ MEDModule::onClick(const QModelIndex & index)
     return;
 
   STDLOG("Presentation selection (activate view)");
-  STDLOG("  Presention infos:");
   std::ostringstream oss;
   oss << fieldId << " / " << presId;
   STDLOG("    - Field id / pres id:   " + oss.str());

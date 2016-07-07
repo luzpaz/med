@@ -194,7 +194,7 @@ MEDPresentationManager_i::activateView(MEDPresentation::TypeID presentationID)
 {
   std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator citr = _presentations.find(presentationID);
   if (citr == _presentations.end()) {
-    std::cerr << "getPresentationPyViewId(): presentation not found!!" << std::endl;
+    std::cerr << "activateView(): presentation not found!!" << std::endl;
     return false;
   }
   MEDPresentation* presentation = (*citr).second;
