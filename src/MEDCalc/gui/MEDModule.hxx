@@ -40,6 +40,7 @@
 #include <QModelIndex>
 
 class SalomeApp_Application;
+class PVViewer_GUIElements;
 
 /*!
  * This class defines the gui of the MED module.
@@ -87,9 +88,12 @@ public slots:
   virtual bool deactivateModule(SUIT_Study* theStudy);
   virtual void onDblClick(const QModelIndex& index);
 
+
+
 private:
   void createModuleWidgets();
   void createModuleActions();
+  void initToolbars();
   static void init();
 
 private:
@@ -100,6 +104,7 @@ private:
   PresentationController* _presentationController;
   ProcessingController* _processingController;
   static MED_ORB::MED_Gen_var myEngine;
+  PVViewer_GUIElements*   _pvGuiElements;
 };
 
 #endif

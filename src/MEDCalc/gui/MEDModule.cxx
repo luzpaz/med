@@ -42,15 +42,22 @@
 
 #ifndef DISABLE_PVVIEWER
 #include "PVViewer_ViewModel.h"
+#include "PVViewer_GUIElements.h"
 #endif
 
 #include <sstream>
+
+#include <pqAnimationManager.h>
+#include <pqPVApplicationCore.h>
+
 
 //! The only instance of the reference to engine
 MED_ORB::MED_Gen_var MEDModule::myEngine;
 
 MEDModule::MEDModule() :
-  SalomeApp_Module("MED"), _studyEditor(0), _datasourceController(0), _workspaceController(0), _presentationController(0), _processingController(0)
+  SalomeApp_Module("MED"), _studyEditor(0),
+  _datasourceController(0), _workspaceController(0), _presentationController(0),
+  _processingController(0), _pvGuiElements(0)
 {
   // Note also that we can't use the getApp() function here because
   // the initialize(...) function has not been called yet.
@@ -237,6 +244,27 @@ MEDModule::createModuleWidgets() {
 
   connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent*)),
     _presentationController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent*)));
+
+  // Now that the workspace controller is created, ParaView core application has normally been started,
+  // and hidden GUI elements have been created.  We can fire the VCR toolbar activation:
+  initToolbars();
+}
+
+void
+MEDModule::initToolbars()
+{
+  // VCR and Time toolbars:
+  SUIT_Desktop* dsk = getApp()->desktop();
+  _pvGuiElements = PVViewer_GUIElements::GetInstance(dsk);
+
+  _pvGuiElements->getVCRToolbar();  // make sure VCR toolbar is built
+  _pvGuiElements->setToolBarVisible(false);
+  _pvGuiElements->setVCRTimeToolBarVisible(true);
+
+  // Emit signal in order to make sure that animation scene is set - same trick as in PARAVIS module activation
+  QMetaObject::invokeMethod( pqPVApplicationCore::instance()->animationManager(),
+                             "activeSceneChanged",
+                             Q_ARG( pqAnimationScene*, pqPVApplicationCore::instance()->animationManager()->getActiveScene() ) );
 }
 
 void
