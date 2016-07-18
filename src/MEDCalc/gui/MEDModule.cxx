@@ -113,6 +113,8 @@ MEDModule::initialize( CAM_Application* app )
   // call the parent implementation
   SalomeApp_Module::initialize( app );
 
+  getApp()->objectBrowser()->setAutoOpenLevel(5);
+
   if (app && app->desktop()) {
     connect((QObject*) (getApp()->objectBrowser()->treeView()), SIGNAL(doubleClicked(const QModelIndex&)),
             this, SLOT(onDblClick(const QModelIndex&)));
