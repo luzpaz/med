@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2016  CEA/DEN, EDF R&D
+# Copyright (C) 2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,25 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-import os
-
-def __getRootDir():  
-  rootDir = os.environ.get("MED_ROOT_DIR", "")
-  return rootDir 
-
-def GetScriptDir():
-  relativeDir = "@SALOME_INSTALL_PYTHON@/tests"
-  return os.path.join(__getRootDir(), relativeDir)
-
-def GetScenarioDir():
-  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/scenarios"
-  return os.path.join(__getRootDir(), relativeDir)
-
-def GetBaselineDir():
-  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/baselines"
-  return os.path.join(__getRootDir(), relativeDir)
- 
-def GetMEDFileDir():
-  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/medfiles"
-  return os.path.join(__getRootDir(), relativeDir)
-  
+SET(TEST_INSTALL_DIRECTORY ${SALOME_MED_INSTALL_TEST}/MEDCalc/tui)
+INSTALL(FILES CTestTestfileInstall.cmake
+  DESTINATION ${TEST_INSTALL_DIRECTORY}
+  RENAME CTestTestfile.cmake)

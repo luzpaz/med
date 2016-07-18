@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2016  CEA/DEN, EDF R&D
+# Copyright (C) 2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,18 +17,15 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-ADD_SUBDIRECTORY(cmp)
-ADD_SUBDIRECTORY(res)
+SET(TEST_NAMES
+  test_qttesting
+)
 
-IF(SALOME_BUILD_GUI)
-  ADD_SUBDIRECTORY(gui)
-ENDIF()
-
-ADD_SUBDIRECTORY(test)
-
-IF(SALOME_MED_ENABLE_PYTHON)
-  ADD_SUBDIRECTORY(tui)
-  ADD_SUBDIRECTORY(exe)
-ENDIF()
-
-INSTALL(FILES MEDCalcConstants.hxx DESTINATION ${SALOME_INSTALL_HEADERS})
+FOREACH(tfile ${TEST_NAMES})
+  SET(TEST_NAME ${COMPONENT_NAME}_${tfile})
+  ADD_TEST(${TEST_NAME} python ${tfile}.py)
+  SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES
+    LABELS "${COMPONENT_NAME}"
+    TIMEOUT ${TIMEOUT}
+    )
+ENDFOREACH()

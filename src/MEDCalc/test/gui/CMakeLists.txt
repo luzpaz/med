@@ -17,17 +17,36 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-IF(SALOME_BUILD_GUI)
-  IF(SALOME_MED_WITH_QTTESTING)
-    ADD_SUBDIRECTORY(gui)
-  ENDIF()
-ENDIF()
+SALOME_CONFIGURE_FILE(medcalc_testutils.py.in ${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py)
 
-IF(SALOME_MED_ENABLE_PYTHON)
-  ADD_SUBDIRECTORY(tui)
-ENDIF()
+SET(_test_scripts
+    test_scalarmap.py
+)
 
-SET(TEST_INSTALL_DIRECTORY ${SALOME_MED_INSTALL_TEST}/MEDCalc)
+SET(_test_scenarii
+   scenarios/test_scalarmap.xml
+)
+
+SET(_test_baselines
+    baselines/test_scalarmap.png
+)
+
+SET(_test_files
+    medfiles/test_scalarmap.med
+)
+
+# Install rules
+SET(TEST_INSTALL_DIRECTORY ${SALOME_MED_INSTALL_TEST}/MEDCalc/gui)
+
+SALOME_INSTALL_SCRIPTS(test_qttesting.py ${TEST_INSTALL_DIRECTORY})
+SALOME_INSTALL_SCRIPTS(${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py ${TEST_INSTALL_DIRECTORY})
+
+SALOME_INSTALL_SCRIPTS("${_test_scripts}" ${SALOME_INSTALL_PYTHON}/tests)
+
+INSTALL(FILES ${_test_scenarii} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/gui/scenarios)
+INSTALL(FILES ${_test_baselines} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/gui/baselines)
+INSTALL(FILES ${_test_files} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/gui/medfiles)
+
 INSTALL(FILES CTestTestfileInstall.cmake
   DESTINATION ${TEST_INSTALL_DIRECTORY}
   RENAME CTestTestfile.cmake)
