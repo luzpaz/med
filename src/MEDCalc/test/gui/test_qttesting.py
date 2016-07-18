@@ -18,7 +18,7 @@
 #
 # Author: A. Bruneton (CEA)
 
-import unittest, os, shutil
+import unittest, os, shutil, sys
 from posixpath import basename
 
 class MEDGUITest(unittest.TestCase):
@@ -117,5 +117,7 @@ if __name__ == "__main__":
   suite.addTest(MEDGUITest('testScalarMap'))
   suite.addTest(MEDGUITest('testScalarMap2'))
 #  suite.addTest(MEDGUITest('testIsoContour'))
-  unittest.TextTestRunner().run(suite)
 
+  runner = unittest.TextTestRunner()
+  ret = not runner.run(suite).wasSuccessful()
+  sys.exit(ret)

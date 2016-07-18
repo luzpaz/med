@@ -24,7 +24,7 @@ def __getRootDir():
   return rootDir
 
 def GetScriptDir():
-  relativeDir = "@SALOME_INSTALL_PYTHON@/tests"
+  relativeDir = "@SALOME_INSTALL_PYTHON@/tests/gui"
   return os.path.join(__getRootDir(), relativeDir)
 
 def GetScenarioDir():
