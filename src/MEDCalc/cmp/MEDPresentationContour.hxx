@@ -32,6 +32,7 @@ public:
   virtual ~MEDPresentationContour() {}
 
   void updatePipeline(const MEDCALC::ContourParameters& params);
+  MEDCALC::MEDPresentationViewMode getViewMode() { return _params.viewMode; }
 
 protected:
   virtual void internalGeneratePipeline();

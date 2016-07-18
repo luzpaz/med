@@ -140,9 +140,11 @@ module MEDCALC
     void updatePointSprite(in long presId, in PointSpriteParameters params);
 
     boolean removePresentation(in long presId);
-    
+
     // Helper functions to keep GUI sync
     boolean activateView(in long presentationId);
+
+    MEDPresentationViewMode getPresentationViewMode(in long presId);
   };
 
 };

@@ -66,6 +66,8 @@ protected:
 
   static int GeneratePythonId();
 
+  virtual MEDCALC::MEDPresentationViewMode getViewMode() = 0;
+
 private:
 
   std::string getFieldTypeString(MEDCoupling::TypeOfField fieldType) const;

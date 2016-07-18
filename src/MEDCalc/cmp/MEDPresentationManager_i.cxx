@@ -19,6 +19,7 @@
 
 #include "MEDPresentationManager_i.hxx"
 #include "MEDFactoryClient.hxx"
+#include "Basics_Utils.hxx"
 
 // presentations
 #include "MEDPresentationScalarMap.hxx"
@@ -29,6 +30,7 @@
 #include "MEDPresentationPointSprite.hxx"
 
 #include <iostream>
+#include <sstream>
 
 MEDPresentationManager_i* MEDPresentationManager_i::_instance = NULL;
 
@@ -179,6 +181,11 @@ MEDPresentationManager_i::removePresentation(MEDPresentation::TypeID presentatio
   if (presentation)
     delete presentation;
   _presentations.erase(presentationID);
+
+  std::stringstream sstm;
+  sstm << "Presentation " << presentationID << " has been removed.\n";
+  STDLOG(sstm.str());
+
   return true;
 }
 
@@ -196,10 +203,14 @@ MEDPresentationManager_i::activateView(MEDPresentation::TypeID presentationID)
   return true;
 }
 
-MEDPresentation::TypeID
-MEDPresentationManager_i::_getActivePresentationId() const
+MEDCALC::MEDPresentationViewMode
+MEDPresentationManager_i::getPresentationViewMode(MEDPresentation::TypeID presentationID)
 {
-  // :TODO:
-
-  return -1;
+  MEDPresentation* pres = _getPresentation(presentationID);
+  if (pres) {
+    return pres->getViewMode();
+  } else {
+    std::cerr << "setPresentationProperty(): presentation not found!!" << std::endl;
+    return MEDCALC::VIEW_MODE_DEFAULT;
+  }
 }

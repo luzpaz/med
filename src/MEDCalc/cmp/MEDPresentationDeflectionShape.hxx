@@ -32,6 +32,7 @@ public:
   virtual ~MEDPresentationDeflectionShape() {}
 
   void updatePipeline(const MEDCALC::DeflectionShapeParameters& params);
+  MEDCALC::MEDPresentationViewMode getViewMode() { return _params.viewMode; }
 
 protected:
   virtual void internalGeneratePipeline();

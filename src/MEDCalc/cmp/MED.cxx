@@ -230,6 +230,54 @@ MED::unregisterPresentation(SALOMEDS::Study_ptr study,
   return MED_ORB::OP_OK;
 }
 
+MED_ORB::PresentationsList*
+MED::getSiblingPresentations(SALOMEDS::Study_ptr study, CORBA::Long presentationId)
+{
+  // set exception handler to catch unexpected CORBA exceptions
+  Unexpect aCatch(SALOME_SalomeException);
+
+  MED_ORB::PresentationsList* presList = new MED_ORB::PresentationsList;
+
+  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+
+  SALOMEDS::GenericAttribute_var anAttribute;
+  SALOMEDS::SComponent_var father = study->FindComponent("MED");
+  SALOMEDS::ChildIterator_var it = study->NewChildIterator(father);
+  for (it->InitEx(true); it->More(); it->Next()) {
+    SALOMEDS::SObject_var child(it->Value());
+
+    if (child->FindAttribute(anAttribute, "AttributeParameter")) {
+      SALOMEDS::AttributeParameter_var attrParam = SALOMEDS::AttributeParameter::_narrow(anAttribute);
+      if (!attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN) || !attrParam->GetBool(IS_PRESENTATION) || !attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
+        continue;
+
+      if (presentationId == attrParam->GetInt(PRESENTATION_ID)) {
+        // get siblings
+        SALOMEDS::ChildIterator_var siblItr = study->NewChildIterator(child->GetFather());
+        for (siblItr->InitEx(true); siblItr->More(); siblItr->Next()) {
+          SALOMEDS::SObject_var sibl(siblItr->Value());
+
+          if (sibl->FindAttribute(anAttribute, "AttributeParameter")) {
+            SALOMEDS::AttributeParameter_var attrParam = SALOMEDS::AttributeParameter::_narrow(anAttribute);
+            if (!attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN) || !attrParam->GetBool(IS_PRESENTATION) || !attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
+              continue;
+
+            if (attrParam->GetInt(PRESENTATION_ID) != presentationId) {
+              CORBA::ULong size = presList->length();
+              presList->length(size+1);
+              (*presList)[size] = attrParam->GetInt(PRESENTATION_ID);
+            }
+          }
+        }
+        return presList;
+      }
+    }
+  }
+
+  return presList;
+}
+
 Engines::TMPFile*
 MED::DumpPython(CORBA::Object_ptr theStudy,
                 CORBA::Boolean isPublished,

@@ -64,6 +64,10 @@ public:
   MED_ORB::status unregisterPresentation(SALOMEDS::Study_ptr study,
                                          CORBA::Long presentationId);
 
+  // Caller owns the returned list, and is responsible for the list deletion.
+  MED_ORB::PresentationsList* getSiblingPresentations(SALOMEDS::Study_ptr study,
+                                                      CORBA::Long presentationId);
+
   /*! Dump the study as a Python file */
   virtual Engines::TMPFile* DumpPython(CORBA::Object_ptr theStudy,
                                        CORBA::Boolean isPublished,

@@ -24,6 +24,7 @@
 #include "QtxActionGroup.h"
 #include "QtxActionToolMgr.h"
 #include "MEDFactoryClient.hxx"
+#include "MEDPresentationManager_i.hxx"
 
 #include <SalomeApp_Application.h>
 #include <SalomeApp_Study.h>
@@ -36,6 +37,7 @@
 #include <SUIT_Session.h>
 #include <SUIT_ResourceMgr.h>
 #include <QMessageBox>
+#include <sstream>
 
 static const int OPTIONS_VIEW_MODE_ID = 943;
 static const int OPTIONS_VIEW_MODE_REPLACE_ID = 944;
@@ -350,6 +352,32 @@ PresentationController::updateTreeViewWithNewPresentation(long fieldId, long pre
   _PTR(Study) studyDS = study->studyDS();
 
   _salomeModule->engine()->registerPresentation(_CAST(Study, studyDS)->GetStudy(), fieldId, name.c_str(), label.c_str(), presentationId);
+
+
+  MEDCALC::MEDPresentationViewMode viewMode = MEDFactoryClient::getPresentationManager()->getPresentationViewMode(presentationId);
+
+  // Remove sibling presentations if view mode is set to REPLACE
+  if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
+    MED_ORB::PresentationsList* presList = _salomeModule->engine()->getSiblingPresentations(_CAST(Study, studyDS)->GetStudy(), presentationId);
+    CORBA::ULong size = presList->length();
+
+    std::stringstream sstm;
+    sstm << "Removing sibling presentation(s): ";
+    for (int i = 0; i < size; ++i)
+      sstm << (*presList)[i] << "  ";
+    STDLOG(sstm.str());
+
+    for (int i = 0; i < size; ++i) {
+      PresentationEvent* event = new PresentationEvent();
+      event->eventtype = PresentationEvent::EVENT_DELETE_PRESENTATION;
+      XmedDataObject* dataObject = new XmedDataObject();
+      dataObject->setPresentationId((*presList)[i]);
+      event->objectdata = dataObject;
+      emit presentationSignal(event); // --> WorkspaceController::processPresentationEvent
+    }
+
+    delete presList;
+  }
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);

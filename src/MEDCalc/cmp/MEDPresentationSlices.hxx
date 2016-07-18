@@ -32,6 +32,7 @@ public:
   virtual ~MEDPresentationSlices() {}
 
   void updatePipeline(const MEDCALC::SlicesParameters& params);
+  MEDCALC::MEDPresentationViewMode getViewMode() { return _params.viewMode; }
 
 protected:
   virtual void internalGeneratePipeline();

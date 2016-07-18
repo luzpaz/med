@@ -24,13 +24,6 @@ template<typename PresentationType, typename PresentationParameters>
 MEDPresentation::TypeID
 MEDPresentationManager_i::_makePresentation(PresentationParameters params)
 {
-  // Replace = Remove then add
-  if (params.viewMode == MEDCALC::VIEW_MODE_REPLACE) {
-    MEDPresentation::TypeID currentPresentationId = _getActivePresentationId();
-    if (currentPresentationId > -1)
-      removePresentation(currentPresentationId);
-  }
-
   // Create a new presentation instance
   PresentationType* presentation = NULL;
   try {

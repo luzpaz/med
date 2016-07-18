@@ -34,6 +34,8 @@ module MED_ORB
     OP_ERROR                 //!< ERROR: other problems
   };
 
+  typedef sequence<long> PresentationsList;
+
   interface
   MED_Gen : Engines::EngineComponent
   {
@@ -51,6 +53,11 @@ module MED_ORB
     status unregisterPresentation(in SALOMEDS::Study study,
                                   in long presentationId)
       raises (SALOME::SALOME_Exception);
+
+    PresentationsList getSiblingPresentations(in SALOMEDS::Study study,
+                                              in long presentationId)
+      raises (SALOME::SALOME_Exception);
+
   };
 };
 
