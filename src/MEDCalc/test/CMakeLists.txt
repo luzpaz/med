@@ -17,6 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+SALOME_CONFIGURE_FILE(medcalc_testutils.py.in ${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py)
+
 IF(SALOME_BUILD_GUI)
   IF(SALOME_MED_WITH_QTTESTING)
     ADD_SUBDIRECTORY(gui)
@@ -28,6 +30,7 @@ IF(SALOME_MED_ENABLE_PYTHON)
 ENDIF()
 
 SET(TEST_INSTALL_DIRECTORY ${SALOME_MED_INSTALL_TEST}/MEDCalc)
+SALOME_INSTALL_SCRIPTS(${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py ${SALOME_INSTALL_SCRIPT_SCRIPTS})
 INSTALL(FILES CTestTestfileInstall.cmake
   DESTINATION ${TEST_INSTALL_DIRECTORY}
   RENAME CTestTestfile.cmake)

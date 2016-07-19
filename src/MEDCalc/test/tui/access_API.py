@@ -17,23 +17,11 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(tests.set)
+import medcalc
+medcalc.medconsole.setConsoleGlobals(globals())
+import MEDCALC
 
-SET(_test_files
-    medfiles/smooth_surface_and_field.med
-)
-
-SET(TEST_INSTALL_DIRECTORY ${SALOME_MED_INSTALL_TEST}/MEDCalc/tui)
-
-FOREACH(tfile ${TEST_NAMES})
-  INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
-          DESTINATION ${TEST_INSTALL_DIRECTORY})
-ENDFOREACH()
-
-INSTALL(FILES CTestTestfileInstall.cmake
-  DESTINATION ${TEST_INSTALL_DIRECTORY}
-  RENAME CTestTestfile.cmake)
-
-INSTALL(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
-
-INSTALL(FILES ${_test_files} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/tui/medfiles)
+from medcalc.medconsole import saveWorkspace, cleanWorkspace
+from medcalc.medconsole import putInWorkspace, removeFromWorkspace
+from medcalc.medconsole import accessField
+from medcalc.medconsole import getEnvironment, ls, la

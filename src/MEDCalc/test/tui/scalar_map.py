@@ -17,23 +17,22 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(tests.set)
+import medcalc
+medcalc.medconsole.setConsoleGlobals(globals())
+import MEDCALC
 
-SET(_test_files
-    medfiles/smooth_surface_and_field.med
-)
+from medcalc.medconsole import saveWorkspace, cleanWorkspace
+from medcalc.medconsole import putInWorkspace, removeFromWorkspace
+from medcalc.medconsole import accessField
+from medcalc.medconsole import getEnvironment, ls, la
 
-SET(TEST_INSTALL_DIRECTORY ${SALOME_MED_INSTALL_TEST}/MEDCalc/tui)
+import os
 
-FOREACH(tfile ${TEST_NAMES})
-  INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
-          DESTINATION ${TEST_INSTALL_DIRECTORY})
-ENDFOREACH()
+from medcalc_testutils import GetMEDFileDirTUI
 
-INSTALL(FILES CTestTestfileInstall.cmake
-  DESTINATION ${TEST_INSTALL_DIRECTORY}
-  RENAME CTestTestfile.cmake)
+datafile = os.path.join(GetMEDFileDirTUI(), "smooth_surface_and_field.med")
+source_id = medcalc.LoadDataSource(datafile)
 
-INSTALL(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
+presentation_id = medcalc.MakeScalarMap(accessField(source_id), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
 
-INSTALL(FILES ${_test_files} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/tui/medfiles)
+medcalc.RemovePresentation(presentation_id)

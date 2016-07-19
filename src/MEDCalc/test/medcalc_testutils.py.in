@@ -17,22 +17,32 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-""" Test of the scalarmap.
+import os
 
-This script is to be passed as an argument of the ./salome command and will be executed within the SALOME
-Python console.
-"""
+def __getRootDir():
+  rootDir = os.environ.get("MED_ROOT_DIR", "")
+  return rootDir
 
-import os, sys
-import SalomePyQt
+# === GUI ===
 
-from medcalc_testutils import GetScenarioDirGUI
+def GetScriptDirGUI():
+  relativeDir = "@SALOME_INSTALL_PYTHON@/tests/gui"
+  return os.path.join(__getRootDir(), relativeDir)
 
-sgPyQt = SalomePyQt.SalomePyQt()
-sgPyQt.activateModule('MED')
+def GetScenarioDirGUI():
+  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/gui/scenarios"
+  return os.path.join(__getRootDir(), relativeDir)
 
-import medcalc  # After module activation !!
-localTestDir = sys.argv[1]
-medcalc.PlayQtTestingScenario(os.path.join(localTestDir, 'test_scalarmap.xml'))
+def GetBaselineDirGUI():
+  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/gui/baselines"
+  return os.path.join(__getRootDir(), relativeDir)
 
-medcalc.RequestSALOMETermination()  # not equivalent to quit()!
+def GetMEDFileDirGUI():
+  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/gui/medfiles"
+  return os.path.join(__getRootDir(), relativeDir)
+
+# === TUI ===
+
+def GetMEDFileDirTUI():
+  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/tui/medfiles"
+  return os.path.join(__getRootDir(), relativeDir)

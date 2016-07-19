@@ -17,23 +17,4 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(tests.set)
-
-SET(_test_files
-    medfiles/smooth_surface_and_field.med
-)
-
-SET(TEST_INSTALL_DIRECTORY ${SALOME_MED_INSTALL_TEST}/MEDCalc/tui)
-
-FOREACH(tfile ${TEST_NAMES})
-  INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
-          DESTINATION ${TEST_INSTALL_DIRECTORY})
-ENDFOREACH()
-
-INSTALL(FILES CTestTestfileInstall.cmake
-  DESTINATION ${TEST_INSTALL_DIRECTORY}
-  RENAME CTestTestfile.cmake)
-
-INSTALL(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
-
-INSTALL(FILES ${_test_files} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/tui/medfiles)
+import pvsimple as pvs

@@ -17,8 +17,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SALOME_CONFIGURE_FILE(medcalc_testutils.py.in ${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py)
-
 SET(_test_scripts
     test_scalarmap.py
 )
@@ -39,7 +37,6 @@ SET(_test_files
 SET(TEST_INSTALL_DIRECTORY ${SALOME_MED_INSTALL_TEST}/MEDCalc/gui)
 
 SALOME_INSTALL_SCRIPTS(test_qttesting.py ${TEST_INSTALL_DIRECTORY})
-SALOME_INSTALL_SCRIPTS(${CMAKE_CURRENT_BINARY_DIR}/medcalc_testutils.py ${TEST_INSTALL_DIRECTORY})
 
 SALOME_INSTALL_SCRIPTS("${_test_scripts}" ${SALOME_INSTALL_PYTHON}/tests/gui)
 

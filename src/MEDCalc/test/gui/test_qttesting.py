@@ -45,9 +45,9 @@ class MEDGUITest(unittest.TestCase):
   def launchSalomeWithScript(self, scriptname):
     """ TODO: review this - what is the nicest way to launch SALOME GUI from a Python script? """
     from salome_instance import SalomeInstance
-    from medcalc_testutils import GetScriptDir
+    from medcalc_testutils import GetScriptDirGUI
     args = "args:%s" % self._tmpDir
-    pth = os.path.join(GetScriptDir(), scriptname)
+    pth = os.path.join(GetScriptDirGUI(), scriptname)
     # Launch SALOME with the test script:
     inst = SalomeInstance.start(with_gui=True, args=[pth, args])
     # And make sure SALOME is stopped before running next one:
@@ -60,9 +60,9 @@ class MEDGUITest(unittest.TestCase):
     """ Compare the screenshot in the current temporary test directory with the reference baseline.
     Assert if not matching. """
     import filecmp
-    from medcalc_testutils import GetBaselineDir
+    from medcalc_testutils import GetBaselineDirGUI
 
-    base_pth = os.path.join(GetBaselineDir(), basename)
+    base_pth = os.path.join(GetBaselineDirGUI(), basename)
     gen_path = os.path.join(self._tmpDir, basename)
     print base_pth, gen_path
     try:
@@ -79,8 +79,8 @@ class MEDGUITest(unittest.TestCase):
 
   def prepareScenario(self, scenario, baseline, med_file):
     """ Copy scenario to current temporary test dir and substitute paths inside """
-    from medcalc_testutils import GetScenarioDir, GetMEDFileDir
-    scen_path = os.path.join(GetScenarioDir(), scenario)
+    from medcalc_testutils import GetScenarioDirGUI, GetMEDFileDirGUI
+    scen_path = os.path.join(GetScenarioDirGUI(), scenario)
     scen_pth2 = os.path.join(self._tmpDir, scenario)
     try:
       shutil.copy(scen_path, scen_pth2)
@@ -89,7 +89,7 @@ class MEDGUITest(unittest.TestCase):
     with open(scen_pth2,'r') as f:
       filedata = f.read()
     filedata = filedata.replace("/tmp/%s" % baseline, "%s/%s" % (self._tmpDir, baseline))
-    filedata = filedata.replace("/tmp/%s" % med_file, os.path.join(GetMEDFileDir(), med_file))
+    filedata = filedata.replace("/tmp/%s" % med_file, os.path.join(GetMEDFileDirGUI(), med_file))
     with open(scen_pth2,'w') as f:
       f.write(filedata)
 
