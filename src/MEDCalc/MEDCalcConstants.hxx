@@ -22,7 +22,7 @@
 #define IS_IN_WORKSPACE  "isInWorkspace"
 #define SOURCE_ID        "sourceId"
 #define MESH_ID          "meshId"
-//#define FIELD_SERIES_ID  "fieldSeriesId"
+#define FIELD_SERIES_ID  "fieldSeriesId"
 #define FIELD_ID         "fieldId"
 #define PRESENTATION_ID  "presentationId"
 #define IS_PRESENTATION  "isPresentation"

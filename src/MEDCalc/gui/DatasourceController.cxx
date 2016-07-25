@@ -215,8 +215,8 @@ void DatasourceController::OnExpandField()
     SALOMEDS::SObject_var soFieldseries = listOfSObject->at(i);
 
     // First retrieve the fieldseries id associated to this study object
-    //long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,FIELD_SERIES_ID);
-    long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,FIELD_ID);
+    long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,FIELD_SERIES_ID);
+    //long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,FIELD_ID);
     STDLOG("Expand the field timeseries "<<fieldseriesId);
 
     // If fieldseriesId equals -1, then it means that it is not a

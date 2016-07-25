@@ -216,11 +216,27 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
   // to make a view of an object from the tui console).
   for (int i=0; i<listOfSObject->size(); i++) {
     SALOMEDS::SObject_var soField = listOfSObject->at(i);
-    int fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);
-    // If fieldId equals -1, then it means that it is not a field
-    // managed by the MED module, and we stop this function process.
-    if ( fieldId < 0 )
-      continue;
+    int fieldId = -1;
+    try {
+        fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);    }
+    catch(...)    { }
+    if (fieldId < 0)  // is it a field serie ?
+      {
+        int fieldSeriesId = -1;
+        try {
+            fieldSeriesId = _studyEditor->getParameterInt(soField,FIELD_SERIES_ID);      }
+        catch(...)  { }
+        // If fieldId and fieldSeriesId equals -1, then it means that it is not a field
+        // managed by the MED module, and we stop this function process.
+        if ( fieldSeriesId < 0)
+          continue;
+        MEDCALC::FieldHandlerList* fieldHandlerList = MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldSeriesId);
+        if (fieldHandlerList->length() < 0)
+          continue;
+        // For a field series, get the first real field entry:
+        MEDCALC::FieldHandler fieldHandler = (*fieldHandlerList)[0];
+        fieldId = fieldHandler.id;
+      }
 
     MEDCALC::FieldHandler* fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
     if (! fieldHandler) {

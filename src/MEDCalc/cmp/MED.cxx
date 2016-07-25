@@ -136,8 +136,8 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
           soFieldseries->SetAttrString("AttributePixMap", "ICO_DATASOURCE_FIELD");
           anAttr = studyBuilder->FindOrCreateAttribute(soFieldseries, "AttributeParameter");
           aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-          //aParam->SetInt(FIELD_SERIES_ID, fieldseriesHandler.id);
-          aParam->SetInt(FIELD_ID, fieldseriesHandler.id);
+          aParam->SetInt(FIELD_SERIES_ID, fieldseriesHandler.id);
+          //aParam->SetInt(FIELD_ID, fieldseriesHandler.id);
           aParam->SetBool(IS_IN_WORKSPACE, false);
 
           useCaseBuilder->AppendTo(soFieldseries->GetFather(), soFieldseries);
@@ -302,7 +302,7 @@ MED::getObjectInfo(CORBA::Long studyId, const char* entry)
   //bool isPresentation = false;
   int sourceId = -1;
   int meshId = -1;
-  //int fieldSeriesId = -1;
+  int fieldSeriesId = -1;
   int fieldId = -1;
   int presentationId = -1;
   if (aSObj->FindAttribute(anAttribute, "AttributeParameter")) {
@@ -315,8 +315,8 @@ MED::getObjectInfo(CORBA::Long studyId, const char* entry)
       sourceId = attrParam->GetInt(SOURCE_ID);
     if (attrParam->IsSet(MESH_ID, PT_INTEGER))
       meshId = attrParam->GetInt(MESH_ID);
-    //if (attrParam->IsSet(FIELD_SERIES_ID, PT_INTEGER))
-    //  fieldSeriesId = attrParam->GetInt(FIELD_SERIES_ID);
+    if (attrParam->IsSet(FIELD_SERIES_ID, PT_INTEGER))
+      fieldSeriesId = attrParam->GetInt(FIELD_SERIES_ID);
     if (attrParam->IsSet(FIELD_ID, PT_INTEGER))
       fieldId = attrParam->GetInt(FIELD_ID);
     if (attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
@@ -331,8 +331,8 @@ MED::getObjectInfo(CORBA::Long studyId, const char* entry)
     oss << "Source id: " << sourceId << std::endl;
   if (meshId > -1)
     oss << "Mesh id: " << meshId << std::endl;
-  //if (fieldSeriesId > -1)
-  //  oss << "Field series id: " << fieldSeriesId << std::endl;
+  if (fieldSeriesId > -1)
+    oss << "Field series id: " << fieldSeriesId << std::endl;
   if (fieldId > -1)
     oss << "Field id: " << fieldId << std::endl;
   //oss << "Is presentation: " << isPresentation << std::endl;
