@@ -1,4 +1,4 @@
-# Copyright (C) 2016  CEA/DEN, EDF R&D
+# Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,8 +17,10 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(COMPONENT_NAME MEDCALC)
-SET(TIMEOUT        300)
+def PlayQtTestingScenario(filename):
+  from medcalc.medevents import notifyGui_playQtTestingScenario
+  notifyGui_playQtTestingScenario(filename)
 
-SUBDIRS(MEDCalculator)
-SUBDIRS(MEDCalc)
+def RequestSALOMETermination():
+  from medcalc.medevents import notifyGui_termination
+  notifyGui_termination()

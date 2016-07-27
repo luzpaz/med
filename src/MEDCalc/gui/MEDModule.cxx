@@ -45,8 +45,10 @@
 #include "PVViewer_GUIElements.h"
 #endif
 
+
 #include "MEDFactoryClient.hxx"
 #include "MEDPresentationManager_i.hxx"
+#include <QTimer>
 
 #include <sstream>
 
@@ -106,6 +108,15 @@ MEDModule::init()
       _presManager = MEDFactoryClient::getFactory()->getPresentationManager();
     }
 }
+
+//void MEDModule::onEventLoopStarted()
+//{
+//  if(!getApp()->isMainEventLoopStarted())
+//    {
+//      QTimer::singleShot(100, this, SLOT(onEventLoopStarted()));
+//      return;
+//    }
+//}
 
 void
 MEDModule::initialize( CAM_Application* app )
@@ -201,6 +212,10 @@ MEDModule::activateModule( SUIT_Study* theStudy )
   _presentationController->showDockWidgets(true);
   //this->setDockLayout(StandardApp_Module::DOCKLAYOUT_LEFT_VLARGE);
 
+  // Mark the start of the main event loop - important for test playback:
+//  QObject::connect(getApp(), SIGNAL(activated(SUIT_Application *)), this, SLOT(onEventLoopStarted(SUIT_Application *)));
+//  QTimer::singleShot(0, this, SLOT(onEventLoopStarted()));
+
   // return the activation status
   return bOk;
 }
@@ -243,6 +258,9 @@ MEDModule::createModuleWidgets() {
   _workspaceController->setDataModel(_xmedDataModel);
   _presentationController = new PresentationController(this);
   _processingController = new ProcessingController(this);
+#ifdef MED_HAS_QTTESTING
+  _testController = new TestController(this);
+#endif
 
   connect(_datasourceController, SIGNAL(datasourceSignal(const DatasourceEvent*)),
     _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent*)));
@@ -258,6 +276,7 @@ MEDModule::createModuleWidgets() {
 
   connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent*)),
     _presentationController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent*)));
+
 
   // Now that the workspace controller is created, ParaView core application has normally been started,
   // and hidden GUI elements have been created.  We can fire the VCR toolbar activation:
@@ -279,6 +298,11 @@ MEDModule::initToolbars()
   QMetaObject::invokeMethod( pqPVApplicationCore::instance()->animationManager(),
                              "activeSceneChanged",
                              Q_ARG( pqAnimationScene*, pqPVApplicationCore::instance()->animationManager()->getActiveScene() ) );
+
+#ifdef MED_HAS_QTTESTING
+  connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent*)),
+    _testController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent*)));
+#endif
 }
 
 void
@@ -287,6 +311,9 @@ MEDModule::createModuleActions() {
   _workspaceController->createActions();
   _presentationController->createActions();
   _processingController->createActions();
+#ifdef MED_HAS_QTTESTING
+  _testController->createActions();
+#endif
 }
 
 int
@@ -304,9 +331,15 @@ MEDModule::createStandardAction(const QString& label,
   if ( effToolTip.isEmpty() )
     effToolTip = label;
 
+  QIcon ico;
+  if (iconName.isEmpty())
+    ico = QIcon();
+  else
+    ico = QIcon(resMgr->loadPixmap("MED", iconName));
+
   QAction* action = createAction(-1,
                                  label,
-                                 resMgr->loadPixmap("MED", iconName),
+                                 ico,
                                  label,
                                  effToolTip,
                                  0,
@@ -426,3 +459,16 @@ MEDModule::onDblClick(const QModelIndex& index)
   // call presentation edit function
 
 }
+
+void
+MEDModule::requestSALOMETermination() const
+{
+  STDLOG("Requesting SALOME termination!!");
+  SUIT_Session::session()->closeSession( SUIT_Session::DONT_SAVE, 1 );  // killServers = True
+}
+
+
+//bool MEDModule::hasMainEventLoopStarted() const
+//{
+//  return _eventLoopStarted;
+//}

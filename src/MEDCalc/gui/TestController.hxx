@@ -17,36 +17,56 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef WIDGET_PRESENTATION_PARAMETERS_HXX
-#define WIDGET_PRESENTATION_PARAMETERS_HXX
-
-#include "MEDCALCGUIdialogs.hxx"
-
-#include "ui_WidgetPresentationParameters.h"
-
-#include <SALOMEconfig.h>
-#include CORBA_SERVER_HEADER(MEDPresentationManager)
+#ifndef SRC_MEDCALC_GUI_TESTCONTROLLER_HXX_
+#define SRC_MEDCALC_GUI_TESTCONTROLLER_HXX_
 
 #include <QObject>
+#include <QString>
 
-class MEDCALCGUI_DIALOGS_EXPORT WidgetPresentationParameters : public QWidget
-{
+class pqTestUtility;
+class MEDModule;
+class SUIT_Desktop;
+class QAction;
+namespace MEDCALC {
+  class MedEvent;
+};
+
+class TestController: public QObject {
   Q_OBJECT
 
 public:
-  WidgetPresentationParameters(QWidget* parent = 0);
-  virtual ~WidgetPresentationParameters() {}
+  TestController(MEDModule* mod);
+  virtual ~TestController();
 
-  std::string getField();
-  std::string getScalarBarRange();
-  double getScalarBarTimestep();
-  double getScalarBarMinVal();
-  double getScalarBarMaxVal();
-  MEDCALC::MEDPresentationColorMap getColorMap();
+  void createActions();
 
- private:
-  Ui_WidgetPresentationParameters ui; // instance of the class defined in ui_WidgetPresentationParameters.h
+
+
+protected:
+  virtual void customEvent(QEvent * event);
+
+public slots:
+  void processWorkspaceEvent(const MEDCALC::MedEvent* event);
+
+  void onRecordTest();
+  void onPlayTest();
+//  void onPlayTestFile();
+  void onLockViewSize() const;
+  void onTakeSnapshot() const;
+  void onRequestTermination();
+
+protected:
+  MEDModule* _salomeModule;
+  SUIT_Desktop * _desk;
+
+  pqTestUtility * _tester;
+  QAction * _lock_action;
+
+private:
+  const int _playEventType;
+  const int _quitEventType;
+
+  bool _aboutToPlayTest;
 };
 
-
-#endif
+#endif /* SRC_MEDCALC_GUI_TESTCONTROLLER_HXX_ */

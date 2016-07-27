@@ -26,6 +26,7 @@ SET(PYFILES_TO_INSTALL
   medimages.py
   medio.py
   medpresentation.py
+  medtest.py
   )
 
 SALOME_INSTALL_SCRIPTS("${PYFILES_TO_INSTALL}" ${SALOME_INSTALL_PYTHON}/medcalc)

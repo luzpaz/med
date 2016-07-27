@@ -17,8 +17,15 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(COMPONENT_NAME MEDCALC)
-SET(TIMEOUT        300)
+SET(TEST_NAMES
+  test_qttesting
+)
 
-SUBDIRS(MEDCalculator)
-SUBDIRS(MEDCalc)
+FOREACH(tfile ${TEST_NAMES})
+  SET(TEST_NAME ${COMPONENT_NAME}_${tfile})
+  ADD_TEST(${TEST_NAME} python ${tfile}.py)
+  SET_TESTS_PROPERTIES(${TEST_NAME} PROPERTIES
+    LABELS "${COMPONENT_NAME}"
+    TIMEOUT ${TIMEOUT}
+    )
+ENDFOREACH()

@@ -49,3 +49,8 @@ from medpresentation import RemovePresentation
 
 # Console commands
 import medconsole
+
+# Playing test scenarii
+from medtest import PlayQtTestingScenario
+from medtest import RequestSALOMETermination
+

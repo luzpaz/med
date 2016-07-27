@@ -32,6 +32,7 @@
 #include "DatasourceController.hxx"
 #include "PresentationController.hxx"
 #include "ProcessingController.hxx"
+#include "TestController.hxx"
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MED_Gen)
@@ -84,6 +85,10 @@ public:
 
   inline SALOME_AppStudyEditor* getStudyEditor() { return _studyEditor; }
 
+  void requestSALOMETermination() const;
+
+//  bool hasMainEventLoopStarted() const;
+
 public slots:
   virtual bool activateModule(SUIT_Study* theStudy);
   virtual bool deactivateModule(SUIT_Study* theStudy);
@@ -107,12 +112,17 @@ private:
   XmedDataModel* _xmedDataModel;
   PresentationController* _presentationController;
   ProcessingController* _processingController;
+
   PVViewer_GUIElements*   _pvGuiElements;
 
   static MED_ORB::MED_Gen_var _MED_engine;
 
   // GUI needs to talk directly to the pres manager to activate a view, get some params, etc ...:
   static MEDCALC::MEDPresentationManager_ptr _presManager;
+
+#ifdef MED_HAS_QTTESTING
+  TestController * _testController;
+#endif
 };
 
 #endif

@@ -1,4 +1,4 @@
-# Copyright (C) 2016  CEA/DEN, EDF R&D
+# Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,8 +17,21 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(COMPONENT_NAME MEDCALC)
-SET(TIMEOUT        300)
+""" Test of the scalarmap. 
 
-SUBDIRS(MEDCalculator)
-SUBDIRS(MEDCalc)
+This script is to be passed as an argument of the ./salome command and will be executed within the SALOME
+Python console.
+"""
+
+import os, sys
+import SalomePyQt
+from medcalc_testutils import GetScenarioDir
+
+sgPyQt = SalomePyQt.SalomePyQt()
+sgPyQt.activateModule('MED')
+
+import medcalc  # After module activation !!
+localTestDir = sys.argv[1]
+medcalc.PlayQtTestingScenario(os.path.join(localTestDir, 'test_scalarmap.xml'))
+
+medcalc.RequestSALOMETermination()  # not equivalent to quit()! 

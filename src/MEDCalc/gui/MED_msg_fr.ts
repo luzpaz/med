@@ -205,7 +205,7 @@
     </message>
     <message>
       <source>LAB_BLUE_TO_RED</source>
-      <translation>Arc-en-ciel blue vers rouge</translation>
+      <translation>Arc-en-ciel bleu vers rouge</translation>
     </message>
     <message>
       <source>LAB_COOL_TO_WARM</source>
