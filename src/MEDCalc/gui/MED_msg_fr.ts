@@ -180,8 +180,8 @@
       <translation>Tous les pas de temps</translation>
     </message>
     <message>
-      <source>LAB_ONE_TIMESTEP</source>
-      <translation>Pas de temps sélectionné</translation>
+      <source>LAB_CURRENT_TIMESTEP</source>
+      <translation>Pas de temps courant</translation>
     </message>
     <message>
       <source>LAB_USER_RANGE</source>

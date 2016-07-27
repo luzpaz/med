@@ -48,7 +48,7 @@ def _typeOfFieldLabel(typeOfField):
   try:
     return __mapTypeOfFieldLabel[typeOfField]
   except IndexError, e:
-    return "UNCKNOWN"
+    return "UNKNOWN"
 #
 
 def newFieldProxy(fieldHandlerId):

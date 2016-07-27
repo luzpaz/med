@@ -23,11 +23,13 @@
 
 // presentations
 #include "MEDPresentationScalarMap.hxx"
-#include "MEDPresentationContour.hxx"
-#include "MEDPresentationVectorField.hxx"
-#include "MEDPresentationSlices.hxx"
-#include "MEDPresentationDeflectionShape.hxx"
-#include "MEDPresentationPointSprite.hxx"
+//#include "MEDPresentationContour.hxx"
+//#include "MEDPresentationVectorField.hxx"
+//#include "MEDPresentationSlices.hxx"
+//#include "MEDPresentationDeflectionShape.hxx"
+//#include "MEDPresentationPointSprite.hxx"
+
+#include <SALOME_KernelServices.hxx>
 
 #include <iostream>
 #include <sstream>
@@ -75,62 +77,92 @@ MEDPresentationManager_i::_getPresentation(MEDPresentation::TypeID presentationI
 }
 
 void
-MEDPresentationManager_i::setPresentationProperty(MEDPresentation::TypeID presentationID, const char* propName, const char* propValue)
+MEDPresentationManager_i::setPresentationStringProperty(MEDPresentation::TypeID presentationID, const char* propName, const char* propValue)
 {
   MEDPresentation* pres = _getPresentation(presentationID);
   if (pres)
-    pres->setProperty(propName, propValue);
+    pres->setStringProperty(propName, propValue);
   else
-    std::cerr << "setPresentationProperty(): presentation not found!!" << std::endl;
+    throw KERNEL::createSalomeException("setPresentationStringProperty(): presentation not found!!");
 }
 
 char*
-MEDPresentationManager_i::getPresentationProperty(MEDPresentation::TypeID presentationID, const char* propName)
+MEDPresentationManager_i::getPresentationStringProperty(MEDPresentation::TypeID presentationID, const char* propName)
 {
   MEDPresentation* pres = _getPresentation(presentationID);
   if (pres) {
-    return (char*) pres->getProperty(propName).c_str();
+    return (char*) pres->getStringProperty(propName).c_str();
   }
-  else {
-    std::cerr << "getPresentationProperty(): presentation not found!!" << std::endl;
-    return (char*) "";
+  else
+    throw KERNEL::createSalomeException("getPresentationStringProperty(): presentation not found!!");
+}
+
+void
+MEDPresentationManager_i::setPresentationIntProperty(MEDPresentation::TypeID presentationID, const char* propName,
+                                                     const CORBA::Long propValue)
+{
+  MEDPresentation* pres = _getPresentation(presentationID);
+  if (pres)
+    pres->setIntProperty(propName, propValue);
+  else
+    throw KERNEL::createSalomeException("setPresentationIntProperty(): presentation not found!!");
+}
+
+CORBA::Long
+MEDPresentationManager_i::getPresentationIntProperty(MEDPresentation::TypeID presentationID, const char* propName)
+{
+  MEDPresentation* pres = _getPresentation(presentationID);
+  if (pres) {
+    return (CORBA::Long) pres->getIntProperty(propName);
   }
+  else
+    throw KERNEL::createSalomeException("getPresentationIntProperty(): presentation not found!!");
+
 }
 
 MEDPresentation::TypeID
-MEDPresentationManager_i::makeScalarMap(const MEDCALC::ScalarMapParameters& params)
+MEDPresentationManager_i::makeScalarMap(const MEDCALC::ScalarMapParameters& params, const MEDCALC::MEDPresentationViewMode viewMode)
 {
-  return _makePresentation<MEDPresentationScalarMap>(params);
+  return _makePresentation<MEDPresentationScalarMap>(params, viewMode);
 }
 
-MEDPresentation::TypeID
-MEDPresentationManager_i::makeContour(const MEDCALC::ContourParameters& params)
-{
-  return _makePresentation<MEDPresentationContour>(params);
-}
+//MEDPresentation::TypeID
+//MEDPresentationManager_i::makeContour(const MEDCALC::ContourParameters& params)
+//{
+//  return _makePresentation<MEDPresentationContour>(params);
+//}
+//
+//MEDPresentation::TypeID
+//MEDPresentationManager_i::makeVectorField(const MEDCALC::VectorFieldParameters& params)
+//{
+//  return _makePresentation<MEDPresentationVectorField>(params);
+//}
+//
+//MEDPresentation::TypeID
+//MEDPresentationManager_i::makeSlices(const MEDCALC::SlicesParameters& params)
+//{
+//  return _makePresentation<MEDPresentationSlices>(params);
+//}
+//
+//MEDPresentation::TypeID
+//MEDPresentationManager_i::makeDeflectionShape(const MEDCALC::DeflectionShapeParameters& params)
+//{
+//  return _makePresentation<MEDPresentationDeflectionShape>(params);
+//}
+//
+//MEDPresentation::TypeID
+//MEDPresentationManager_i::makePointSprite(const MEDCALC::PointSpriteParameters& params)
+//{
+//  return _makePresentation<MEDPresentationPointSprite>(params);
+//}
 
-MEDPresentation::TypeID
-MEDPresentationManager_i::makeVectorField(const MEDCALC::VectorFieldParameters& params)
+MEDCALC::ScalarMapParameters*
+MEDPresentationManager_i::getScalarMapParameters(MEDPresentation::TypeID presentationID)
 {
-  return _makePresentation<MEDPresentationVectorField>(params);
-}
-
-MEDPresentation::TypeID
-MEDPresentationManager_i::makeSlices(const MEDCALC::SlicesParameters& params)
-{
-  return _makePresentation<MEDPresentationSlices>(params);
-}
-
-MEDPresentation::TypeID
-MEDPresentationManager_i::makeDeflectionShape(const MEDCALC::DeflectionShapeParameters& params)
-{
-  return _makePresentation<MEDPresentationDeflectionShape>(params);
-}
-
-MEDPresentation::TypeID
-MEDPresentationManager_i::makePointSprite(const MEDCALC::PointSpriteParameters& params)
-{
-  return _makePresentation<MEDPresentationPointSprite>(params);
+  MEDCALC::ScalarMapParameters* p = new MEDCALC::ScalarMapParameters();
+  _getParameters<MEDPresentationScalarMap>(presentationID, *p);
+  MEDCALC::ScalarMapParameters_var tmp(p);
+  return tmp._retn();
 }
 
 void
@@ -139,35 +171,35 @@ MEDPresentationManager_i::updateScalarMap(MEDPresentation::TypeID presentationID
   return _updatePresentation<MEDPresentationScalarMap>(presentationID, params);
 }
 
-void
-MEDPresentationManager_i::updateContour(MEDPresentation::TypeID presentationID, const MEDCALC::ContourParameters& params)
-{
-  return _updatePresentation<MEDPresentationContour>(presentationID, params);
-}
-
-void
-MEDPresentationManager_i::updateVectorField(MEDPresentation::TypeID presentationID, const MEDCALC::VectorFieldParameters& params)
-{
-  return _updatePresentation<MEDPresentationVectorField>(presentationID, params);
-}
-
-void
-MEDPresentationManager_i::updateSlices(MEDPresentation::TypeID presentationID, const MEDCALC::SlicesParameters& params)
-{
-  return _updatePresentation<MEDPresentationSlices>(presentationID, params);
-}
-
-void
-MEDPresentationManager_i::updateDeflectionShape(MEDPresentation::TypeID presentationID, const MEDCALC::DeflectionShapeParameters& params)
-{
-  return _updatePresentation<MEDPresentationDeflectionShape>(presentationID, params);
-}
-
-void
-MEDPresentationManager_i::updatePointSprite(MEDPresentation::TypeID presentationID, const MEDCALC::PointSpriteParameters& params)
-{
-  return _updatePresentation<MEDPresentationPointSprite>(presentationID, params);
-}
+//void
+//MEDPresentationManager_i::updateContour(MEDPresentation::TypeID presentationID, const MEDCALC::ContourParameters& params)
+//{
+//  return _updatePresentation<MEDPresentationContour>(presentationID, params);
+//}
+//
+//void
+//MEDPresentationManager_i::updateVectorField(MEDPresentation::TypeID presentationID, const MEDCALC::VectorFieldParameters& params)
+//{
+//  return _updatePresentation<MEDPresentationVectorField>(presentationID, params);
+//}
+//
+//void
+//MEDPresentationManager_i::updateSlices(MEDPresentation::TypeID presentationID, const MEDCALC::SlicesParameters& params)
+//{
+//  return _updatePresentation<MEDPresentationSlices>(presentationID, params);
+//}
+//
+//void
+//MEDPresentationManager_i::updateDeflectionShape(MEDPresentation::TypeID presentationID, const MEDCALC::DeflectionShapeParameters& params)
+//{
+//  return _updatePresentation<MEDPresentationDeflectionShape>(presentationID, params);
+//}
+//
+//void
+//MEDPresentationManager_i::updatePointSprite(MEDPresentation::TypeID presentationID, const MEDCALC::PointSpriteParameters& params)
+//{
+//  return _updatePresentation<MEDPresentationPointSprite>(presentationID, params);
+//}
 
 CORBA::Boolean
 MEDPresentationManager_i::removePresentation(MEDPresentation::TypeID presentationID)
@@ -214,3 +246,15 @@ MEDPresentationManager_i::getPresentationViewMode(MEDPresentation::TypeID presen
     return MEDCALC::VIEW_MODE_DEFAULT;
   }
 }
+
+char*
+MEDPresentationManager_i::getParavisDump(MEDPresentation::TypeID presentationID)
+{
+  MEDPresentation* pres = _getPresentation(presentationID);
+  if (pres) {
+    return (char*) pres->paravisDump().c_str();
+  }
+  else
+    throw KERNEL::createSalomeException("getParavisDump(): presentation not found!!");
+}
+

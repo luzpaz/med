@@ -52,6 +52,7 @@ public:
   ~WorkspaceController();
 
   void createActions();
+  XmedConsoleDriver* getConsoleDriver() { return _consoleDriver; }
 
 public slots:
   // Slots overiding TreeGuiManager
@@ -60,12 +61,9 @@ public slots:
   // Internal slots
   void processMedEvent(const MEDCALC::MedEvent* event);
   void processDatasourceEvent(const DatasourceEvent* event);
-  void processPresentationEvent(const PresentationEvent* event);
   void processProcessingEvent(const ProcessingEvent* event);
   void OnSaveWorkspace();
   void OnCleanWorkspace();
-
-  void onRequestTermination();
 
 signals:
   void workspaceSignal(const MEDCALC::MedEvent* event);
@@ -81,15 +79,13 @@ private:
   void _saveItemList(QStringList itemNameIdList);
   void _removeItemList(QStringList itemNameIdList);
   void _viewItemList(QStringList itemNameIdList);
-  QString _getViewMode();
-  QString _getColorMap();
 
 private:
   XmedConsoleDriver* _consoleDriver;
   MEDModule* _salomeModule;
   MEDEventListener_i* _medEventListener;
 
-  // This structure is intended to memorized in a bundle the whole set
+  // This structure is intended to memorize in a bundle the whole set
   // of integers identifying the actions of the popup menu associated
   // to the TreeView embedded in this TreeGuiManager
   typedef struct {

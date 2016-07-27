@@ -105,6 +105,7 @@ void DatasourceController::createActions() {
   icon  = tr("ICO_DATASOURCE_USE");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnUseInWorkspace()),icon);
   _salomeModule->addActionInPopupMenu(actionId);
+
 }
 
 /**
@@ -121,13 +122,14 @@ DatasourceController::addDatasource(const char* filename)
   DatasourceEvent* event = new DatasourceEvent();
   event->eventtype = DatasourceEvent::EVENT_ADD_DATASOURCE;
   event->objectalias = filename;
-  emit datasourceSignal(event);
+  emit datasourceSignal(event);  // --> WorkspaceController::processDatasourceEvent()
 //#ifdef MED_WITH_QTTESTING
 //  _dirtyAddDataSource = true;
 //  while(_dirtyAddDataSource)
 //    QApplication::processEvents();
 //#endif
 }
+
 // After above data source creation, python console emits a signal, forwarded by workspace, to update the GUI
 void
 DatasourceController::updateTreeViewWithNewDatasource(const MEDCALC::DatasourceHandler* datasourceHandler)
@@ -216,7 +218,7 @@ void DatasourceController::OnAddImagesource()
   DatasourceEvent* event = new DatasourceEvent();
   event->eventtype = DatasourceEvent::EVENT_ADD_IMAGE_AS_DATASOURCE;
   event->objectalias = imageFilename;
-  emit datasourceSignal(event);
+  emit datasourceSignal(event); // --> WorkspaceController::processDatasourceEvent()
 }
 
 void DatasourceController::OnExpandField()
@@ -323,7 +325,7 @@ void DatasourceController::OnUseInWorkspace() {
     dataObject->setFieldHandler(*fieldHandler);
     event->objectdata  = dataObject;
     event->objectalias = alias;
-    emit datasourceSignal(event);
+    emit datasourceSignal(event);  // --> WorkspaceController::processDatasourceEvent()
     // Tag the item to prevent double import
     //    _studyEditor->setParameterBool(soField,IS_IN_WORKSPACE,true);
     // Tag the field as persistent on the server. It means that a
@@ -347,7 +349,7 @@ void DatasourceController::OnUseInWorkspace() {
         XmedDataObject* dataObject = new XmedDataObject();
         dataObject->setFieldHandler(*fieldHandler);
         event->objectdata  = dataObject;
-        emit datasourceSignal(event);
+        emit datasourceSignal(event); // --> WorkspaceController::processDatasourceEvent()
         // Note that this signal is processed by the WorkspaceController
 
         // Tag the item to prevent double import

@@ -37,6 +37,8 @@ SET(MEDCALCGUI_SOURCES
     WorkspaceController.cxx
     XmedConsoleDriver.cxx
     XmedDataModel.cxx
+    MEDWidgetHelper.cxx
+    MEDWidgetHelperScalarMap.cxx
 )
 
 IF(SALOME_MED_WITH_QTTESTING)
@@ -50,6 +52,8 @@ SET(MEDCALCGUI_HEADERS
   DatasourceController.hxx
   PresentationController.hxx
   ProcessingController.hxx
+  MEDWidgetHelper.hxx
+  MEDWidgetHelperScalarMap.hxx
   )
  
 IF(SALOME_MED_WITH_QTTESTING)

@@ -58,7 +58,8 @@ public:
   MED_ORB::status registerPresentation(SALOMEDS::Study_ptr study,
                                        CORBA::Long fieldId,
                                        const char* name,
-                                       const char* label,
+                                       const char* type,
+                                       const char* ico,
                                        CORBA::Long presentationId);
 
   MED_ORB::status unregisterPresentation(SALOMEDS::Study_ptr study,

@@ -28,6 +28,8 @@
 #include CORBA_SERVER_HEADER(MEDPresentationManager)
 
 #include <QObject>
+#include <vector>
+#include <string>
 
 class MEDCALCGUI_DIALOGS_EXPORT WidgetPresentationParameters : public QWidget
 {
@@ -37,15 +39,37 @@ public:
   WidgetPresentationParameters(QWidget* parent = 0);
   virtual ~WidgetPresentationParameters() {}
 
-  std::string getField();
-  std::string getScalarBarRange();
-  double getScalarBarTimestep();
-  double getScalarBarMinVal();
-  double getScalarBarMaxVal();
-  MEDCALC::MEDPresentationColorMap getColorMap();
+  std::string getComponent() const;
+  void setComponents(std::vector<std::string> compos, int selecIndex);
 
- private:
-  Ui_WidgetPresentationParameters ui; // instance of the class defined in ui_WidgetPresentationParameters.h
+  MEDCALC::MEDPresentationScalarBarRange getScalarBarRange() const;
+  void setScalarBarRange(MEDCALC::MEDPresentationScalarBarRange);
+
+//  double getScalarBarTimestep() const;
+//  double getScalarBarMinVal() const;
+//  double getScalarBarMaxVal() const;
+  MEDCALC::MEDPresentationColorMap getColorMap() const;
+  void setColorMap(MEDCALC::MEDPresentationColorMap);
+
+  void setPresName(const std::string& name);
+
+  void toggleWidget(bool show);
+  bool isShown() const;
+  QComboBox * getComboBoxCompo();
+
+signals:
+  void comboScalarBarRangeIndexChanged(int);
+  void comboColorMapIndexChanged(int);
+  void comboCompoIndexChanged(int);
+
+private slots:
+  void onComboScalarBarRangeIndexChanged(int);
+  void onComboColorMapIndexChanged(int);
+  void onComboCompoIndexChanged(int);
+
+private:
+  Ui_WidgetPresentationParameters _ui; // instance of the class defined in ui_WidgetPresentationParameters.h
+  bool _blockSig;
 };
 
 

@@ -41,11 +41,11 @@ SET(COMMON_SOURCES
   MEDPresentation.cxx
   # presentations
   MEDPresentationScalarMap.cxx
-  MEDPresentationContour.cxx
-  MEDPresentationVectorField.cxx
-  MEDPresentationSlices.cxx
-  MEDPresentationDeflectionShape.cxx
-  MEDPresentationPointSprite.cxx
+#  MEDPresentationContour.cxx
+#  MEDPresentationVectorField.cxx
+#  MEDPresentationSlices.cxx
+#  MEDPresentationDeflectionShape.cxx
+#  MEDPresentationPointSprite.cxx
 )
 
 SET(MEDFactoryEngine_SOURCES

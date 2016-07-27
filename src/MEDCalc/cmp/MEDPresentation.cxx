@@ -22,14 +22,31 @@
 #include "MEDPresentation.hxx"
 #include "MEDPresentationException.hxx"
 #include "MEDCouplingRefCountObject.hxx"
-#include "Basics_Utils.hxx"
-#include "PyInterp_Utils.h"
+#include <SALOME_KernelServices.hxx>
+#undef LOG
+#include <Basics_Utils.hxx>
+#include <PyInterp_Utils.h>
 
 #include <sstream>
 
-MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name)
-    : _fieldHandlerId(fieldHandlerId), _pipeline(0), _display(0), _properties(),
-      _renderViewPyId(GeneratePythonId())
+const std::string MEDPresentation::PROP_NAME  = "name";
+const std::string MEDPresentation::PROP_NB_COMPONENTS = "nbComponents";
+const std::string MEDPresentation::PROP_SELECTED_COMPONENT = "selectedComponent";
+const std::string MEDPresentation::PROP_COMPONENT = "component_";
+const std::string MEDPresentation::PROP_COLOR_MAP = "colorMap";
+const std::string MEDPresentation::PROP_SCALAR_BAR_RANGE = "scalarBarRange";
+
+MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name,
+                                 const MEDCALC::MEDPresentationViewMode viewMode,
+                                 const MEDCALC::MEDPresentationColorMap colorMap)
+    : _fieldHandlerId(fieldHandlerId), _propertiesStr(),
+      //_pipeline(0), _display(0)
+      _selectedComponentIndex(-1),
+      _viewMode(viewMode),
+      _colorMap(colorMap),
+      _renderViewPyId(GeneratePythonId()),
+      _objId(_renderViewPyId), _dispId(_renderViewPyId), _lutId(_renderViewPyId),
+      _globalDict(0)
 {
   MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
   MEDCALC::FieldHandler* fieldHandler = dataManager->getFieldHandler(fieldHandlerId);
@@ -46,7 +63,13 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const s
   }
   _fileName = _fileName.substr(7, _fileName.size());
 
-  setProperty("name", name);
+  setStringProperty(MEDPresentation::PROP_NAME, name);
+
+  setIntProperty(MEDPresentation::PROP_NB_COMPONENTS, 0);
+  setIntProperty(MEDPresentation::PROP_SELECTED_COMPONENT, 0);
+
+  setIntProperty(MEDPresentation::PROP_COLOR_MAP, static_cast<int>(MEDCALC::COLOR_MAP_DEFAULT));
+  setIntProperty(MEDPresentation::PROP_SCALAR_BAR_RANGE, static_cast<int>(MEDCALC::SCALAR_BAR_RANGE_DEFAULT));
 }
 
 MEDPresentation::~MEDPresentation()
@@ -55,13 +78,11 @@ MEDPresentation::~MEDPresentation()
   {
     PyLockWrapper lock;
     std::ostringstream oss_o, oss_v, oss;
-    // Get top level object and display:
-    oss_o << "__obj" << _pipeline.front().first;
+    oss_o << "__obj" << _objId;
     oss_v << "__view" << _renderViewPyId;
     oss << "pvs.Hide(" << oss_o.str() <<  ", view=" << oss_v.str() << ");";
     oss << "pvs.Render();";
 
-//    std::cerr << oss.str() << std::endl;
     PyRun_SimpleString(oss.str().c_str());
   }
 }
@@ -74,56 +95,102 @@ MEDPresentation::generatePipeline()
   this->internalGeneratePipeline();
 }
 
-void
-MEDPresentation::pushPyObjects(PyObjectId obj, PyObjectId disp)
-{
-  _pipeline.push_back(obj);
-  _display.push_back(disp);
-}
+//void
+//MEDPresentation::pushPyObjects(PyObjectId obj, PyObjectId disp)
+//{
+//  _pipeline.push_back(obj);
+//  _display.push_back(disp);
+//}
 
 void
 MEDPresentation::pushAndExecPyLine(const std::string & lin)
 {
-  // TODO: store internally for low level dump
   PyLockWrapper lock;
 //  std::cerr << lin << std::endl;
-  PyRun_SimpleString(lin.c_str());
+  if(PyRun_SimpleString(lin.c_str()))
+    {
+      std::ostringstream oss;
+      oss << "MEDPresentation::pushAndExecPyLine(): following Python command failed!\n";
+      oss << ">> " << lin;
+      STDLOG(oss.str());
+      throw KERNEL::createSalomeException(oss.str().c_str());
+    }
+  _pythonCmds.push_back(lin);
 }
 
 void
-MEDPresentation::setProperty(const std::string& propName, const std::string& propValue)
+MEDPresentation::setStringProperty(const std::string& propName, const std::string& propValue)
 {
-  // LIMITED!!! For now switch the first display element to Wireframe
-  /*
-  PyLockWrapper lock;
-  PyObject_CallMethod(_display[0], (char*)"SetRepresentationType", (char*)"(s)", "Wireframe");
-  */
-
-  _properties[propName] = propValue;
+  _propertiesStr[propName] = propValue;
 }
 
 const std::string
-MEDPresentation::getProperty(const std::string& propName) const
+MEDPresentation::getStringProperty(const std::string& propName) const
 {
-  std::map<std::string, std::string>::const_iterator it = _properties.find(propName);
-  if (it != _properties.end()) {
-    return (*it).second;
+  std::map<std::string, std::string>::const_iterator it = _propertiesStr.find(propName);
+  if (it != _propertiesStr.end()) {
+      return (*it).second;
   }
   else {
-    STDLOG("MEDPresentation::getProperty(): no property named " + propName);
-    return std::string();
+      throw MEDPresentationException("MEDPresentation::getStringProperty(): no property named " + propName);
   }
 }
+
+void
+MEDPresentation::setIntProperty(const std::string& propName, const int propValue)
+{
+  _propertiesInt[propName] = propValue;
+}
+
+int
+MEDPresentation::getIntProperty(const std::string& propName) const
+{
+  std::map<std::string, int>::const_iterator it = _propertiesInt.find(propName);
+  if (it != _propertiesInt.end()) {
+      return (*it).second;
+  }
+  else {
+      throw MEDPresentationException("MEDPresentation::getIntProperty(): no property named " + propName);
+  }
+}
+
+ void
+ MEDPresentation::dumpIntProperties() const
+ {
+   std::map<std::string, int>::const_iterator it = _propertiesInt.begin();
+   STDLOG("@@@ Dumping INT properties");
+   for(; it != _propertiesInt.end(); ++it)
+     {
+       std::ostringstream oss;
+       oss << (*it).first << "  ->   " << (*it).second;
+       STDLOG(oss.str());
+     }
+ }
+
+ void
+ MEDPresentation::dumpStringProperties() const
+ {
+   std::map<std::string, std::string>::const_iterator it = _propertiesStr.begin();
+   STDLOG("@@@ Dumping STR properties");
+   for(; it != _propertiesStr.end(); ++it)
+     {
+       std::ostringstream oss;
+       oss << (*it).first << "  ->   " << (*it).second;
+       STDLOG(oss.str());
+     }
+ }
+
 
 PyObject*
 MEDPresentation::getPythonObjectFromMain(const char* python_var) const
 {
-  // TODO: improve to avoid getting dict at each call
-
-  // All the calls below returns *borrowed* references
-  PyObject* main_module = PyImport_AddModule((char*)"__main__");
-  PyObject* global_dict = PyModule_GetDict(main_module);
-  return PyDict_GetItemString(global_dict, python_var);
+  if (! _globalDict)
+    {
+      // All the calls below returns *borrowed* references
+      PyObject* main_module = PyImport_AddModule((char*)"__main__");
+      _globalDict = PyModule_GetDict(main_module);
+    }
+  return PyDict_GetItemString(_globalDict, python_var);
 }
 
 std::string
@@ -142,23 +209,23 @@ MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldType) const
 }
 
 std::string
-MEDPresentation::getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode) const
+MEDPresentation::getRenderViewCommand() const
 {
   std::ostringstream oss, oss2;
   oss << "__view" << _renderViewPyId;
   std::string view(oss.str());
-  oss2 << "pvs._DisableFirstRenderCameraReset();";
-  if (viewMode == MEDCALC::VIEW_MODE_OVERLAP) {
-      oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');";
-  } else if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
-      oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');";
-      oss2 << "pvs.active_objects.source and pvs.Hide(view=" << view << ");";
-      oss2 << "pvs.Render();";
-  } else if (viewMode == MEDCALC::VIEW_MODE_NEW_LAYOUT) {
-      oss2 <<  "__layout1 = pvs.servermanager.misc.ViewLayout(registrationGroup='layouts');";
-      oss2 << view << " = pvs.CreateView('RenderView');";
-  } else if (viewMode == MEDCALC::VIEW_MODE_SPLIT_VIEW) {
-      oss2 << view << " = pvs.CreateView('RenderView');";
+  oss2 << "pvs._DisableFirstRenderCameraReset();" << std::endl;
+  if (_viewMode == MEDCALC::VIEW_MODE_OVERLAP) {
+      oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');" << std::endl;
+  } else if (_viewMode == MEDCALC::VIEW_MODE_REPLACE) {
+      oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');" << std::endl;
+      oss2 << "pvs.active_objects.source and pvs.Hide(view=" << view << ");" << std::endl;
+      oss2 << "pvs.Render();" << std::endl;
+  } else if (_viewMode == MEDCALC::VIEW_MODE_NEW_LAYOUT) {
+      oss2 <<  "__layout1 = pvs.servermanager.misc.ViewLayout(registrationGroup='layouts');" << std::endl;
+      oss2 << view << " = pvs.CreateView('RenderView');" << std::endl;
+  } else if (_viewMode == MEDCALC::VIEW_MODE_SPLIT_VIEW) {
+      oss2 << view << " = pvs.CreateView('RenderView');" << std::endl;
   }
   return oss2.str();
 }
@@ -172,12 +239,57 @@ MEDPresentation::getResetCameraCommand() const
 }
 
 std::string
-MEDPresentation::getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap) const
+MEDPresentation::getComponentSelectionCommand() const
 {
-  switch (colorMap) {
-  case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW: return "Blue to Red Rainbow";
-  case MEDCALC::COLOR_MAP_COOL_TO_WARM: return "Cool to Warm";
+  std::ostringstream oss, oss_l;
+  oss_l << "__lut" << _lutId;    std::string lut(oss_l.str());
+
+  if (_selectedComponentIndex != -1)
+    {
+      oss << lut << ".VectorMode = 'Component';\n";
+      oss << lut << ".VectorComponent = " << _selectedComponentIndex << ";";
+    }
+  else  // Euclidean norm
+    {
+      oss << lut << ".VectorMode = 'Magnitude';";
+    }
+  return oss.str();
+}
+
+std::string
+MEDPresentation::getColorMapCommand() const
+{
+  std::ostringstream oss, oss_l;
+  oss_l << "__lut" << _lutId;    std::string lut(oss_l.str());
+  switch (_colorMap) {
+  case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW:
+    oss << lut << ".ApplyPreset('Blue to Red Rainbow',True);";
+    break;
+  case MEDCALC::COLOR_MAP_COOL_TO_WARM:
+    oss << lut << ".ApplyPreset('Cool to Warm',True);";
+    break;
+  default:
+    throw KERNEL::createSalomeException("MEDPresentation::getColorMapCommand(): invalid colormap!");
   }
+  return oss.str();
+}
+std::string
+MEDPresentation::getRescaleCommand() const
+{
+  std::ostringstream oss, oss_d;
+  oss_d << "__disp" << _dispId;    std::string disp(oss_d.str());
+  switch(_sbRange)
+  {
+    case MEDCALC::SCALAR_BAR_ALL_TIMESTEPS:
+      oss << disp <<  ".RescaleTransferFunctionToDataRangeOverTime();";
+      break;
+    case MEDCALC::SCALAR_BAR_CURRENT_TIMESTEP:
+      oss << disp <<  ".RescaleTransferFunctionToDataRange(False);";
+      break;
+    default:
+      throw KERNEL::createSalomeException("MEDPresentation::getRescaleCommand(): invalid range!");
+  }
+  return oss.str();
 }
 
 int
@@ -188,11 +300,81 @@ MEDPresentation::GeneratePythonId()
 }
 
 void
-MEDPresentation::activateView() const
+MEDPresentation::activateView()
 {
   PyLockWrapper lock;
+
   std::ostringstream oss;
   oss << "pvs.SetActiveView(__view" << _renderViewPyId << ");";
-  std::cerr << oss.str() << std::endl;
-  PyRun_SimpleString(oss.str().c_str());
+  pushAndExecPyLine(oss.str());
 }
+
+
+std::string
+MEDPresentation::paravisDump() const
+{
+  using namespace std;
+  ostringstream oss;
+  for (vector<string>::const_iterator it=_pythonCmds.begin(); it != _pythonCmds.end(); ++it)
+    {
+      oss << (*it);
+      oss << "\n";
+    }
+  return oss.str();
+}
+
+/**
+ * Query all available component names for the field associated with this presentation.
+ * Fills in all the corresponding string properties:
+ *  - PROP_COMPONENT1
+ *  - PROP_COMPONENT2
+ *    etc...
+ *  and the number of components.
+ */
+void
+MEDPresentation::fillAvailableFieldComponents()
+{
+  PyLockWrapper lock;  // GIL!
+
+  std::ostringstream oss_o;
+  oss_o << "__obj" << _objId;      std::string obj(oss_o.str());
+  std::string typ;
+
+  if(_fieldType == "CELLS") {
+      typ = "CellData";
+  }
+  else if (_fieldType == "POINTS") {
+      typ = "PointData";
+  }
+  else {
+      std::string msg("Unsupported spatial discretisation: " + _fieldType);
+      throw KERNEL::createSalomeException(msg.c_str());
+  }
+
+  std::ostringstream oss;
+  oss << "__nbCompo = " << obj << "." << typ << ".GetArray('" <<  _fieldName << "').GetNumberOfComponents();";
+  PyRun_SimpleString(oss.str().c_str());
+  PyObject* p_obj = getPythonObjectFromMain("__nbCompo");
+  long nbCompo;
+  if (p_obj && PyInt_Check(p_obj))
+    nbCompo = PyInt_AS_LONG(p_obj);
+  else
+    throw KERNEL::createSalomeException("Unexpected Python error");
+  setIntProperty(MEDPresentation::PROP_NB_COMPONENTS, nbCompo);
+  for (long i = 0; i<nbCompo; i++)
+    {
+      std::ostringstream oss2;
+      oss2 << "__compo = " << obj << "." << typ << ".GetArray('" <<  _fieldName << "').GetComponentName(" << i << ");";
+      PyRun_SimpleString(oss2.str().c_str());
+      PyObject* p_obj = getPythonObjectFromMain("__compo");
+      std::string compo;
+      if (p_obj && PyString_Check(p_obj))
+        compo = std::string(PyString_AsString(p_obj));  // pointing to internal Python memory, so make a copy!!
+      else
+        throw KERNEL::createSalomeException("Unexpected Python error");
+      std::ostringstream oss_p;
+      oss_p << MEDPresentation::PROP_COMPONENT << i;
+      setStringProperty(oss_p.str(), compo);
+    }
+}
+

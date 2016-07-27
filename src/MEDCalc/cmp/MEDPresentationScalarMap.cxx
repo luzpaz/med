@@ -18,51 +18,77 @@
 //
 
 #include "MEDPresentationScalarMap.hxx"
-#include "PyInterp_Utils.h"
+#include "MEDPresentationException.hxx"
+
+#include <PyInterp_Utils.h>
+#include <SALOME_KernelServices.hxx>
+#undef LOG  // should be fixed in KERNEL - double definition
+#include <Basics_Utils.hxx>
 
 #include <sstream>
+
+const std::string MEDPresentationScalarMap::TYPE_NAME = "MEDPresentationScalarMap";
+
+MEDPresentationScalarMap::MEDPresentationScalarMap(const MEDCALC::ScalarMapParameters& params,
+                                                   const MEDCALC::MEDPresentationViewMode viewMode) :
+    MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, params.colorMap), _params(params)
+{
+}
 
 void
 MEDPresentationScalarMap::internalGeneratePipeline()
 {
   PyLockWrapper lock;
 
-  int disp_id(GeneratePythonId());
-  int obj_id(disp_id);
-  std::ostringstream oss_o, oss_d, oss, oss_v;
-  oss_o << "__obj" << obj_id;      std::string obj(oss_o.str());
-  oss_d << "__disp" << disp_id;    std::string disp(oss_d.str());
+  std::ostringstream oss_o, oss_d,oss_l, oss, oss_v;
+  oss_o << "__obj" << _objId;      std::string obj(oss_o.str());
+  oss_d << "__disp" << _dispId;    std::string disp(oss_d.str());
+  oss_l << "__lut" << _lutId;    std::string lut(oss_l.str());
 
   pushAndExecPyLine( "import pvsimple as pvs;");
-  pushAndExecPyLine( getRenderViewCommand(_params.viewMode) ); // define __viewXXX
+  pushAndExecPyLine( getRenderViewCommand() ); // define __viewXXX
 
   oss_v << "__view" << _renderViewPyId;    std::string view(oss_v.str());
 
   oss << obj << " = pvs.MEDReader(FileName='" << _fileName << "');";
   pushAndExecPyLine(oss.str()); oss.str("");
+
+  // Populate internal array of available components:
+  fillAvailableFieldComponents();
+//  dumpIntProperties();
+//  dumpStringProperties();
+
   oss << disp << " = pvs.Show(" << obj << ", " << view << ");";
   pushAndExecPyLine(oss.str()); oss.str("");
   oss << "pvs.ColorBy(" << disp << ", ('" << _fieldType << "', '" << _fieldName << "'));";
   pushAndExecPyLine(oss.str()); oss.str("");
   oss << disp <<  ".SetScalarBarVisibility(" << view << ", True);";
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << disp <<  ".RescaleTransferFunctionToDataRangeOverTime();";
+  oss << getRescaleCommand();
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << "__lut = pvs.GetColorTransferFunction('" << _fieldName << "');";
+  oss << lut << " = pvs.GetColorTransferFunction('" << _fieldName << "');";
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << "__lut.ApplyPreset('" << getColorMapCommand(_params.colorMap) << "',True);";
-  pushAndExecPyLine(oss.str()); oss.str("");
+  pushAndExecPyLine(getColorMapCommand()); oss.str("");
   pushAndExecPyLine(getResetCameraCommand());
   pushAndExecPyLine("pvs.Render();");
 
   // Retrieve Python object for internal storage:
-  PyObject* p_obj = getPythonObjectFromMain(obj.c_str());
-  PyObject* p_disp = getPythonObjectFromMain(disp.c_str());
-  pushPyObjects(std::make_pair(obj_id, p_obj), std::make_pair(disp_id, p_disp));
+//  PyObject* p_obj = getPythonObjectFromMain(obj.c_str());
+//  PyObject* p_disp = getPythonObjectFromMain(disp.c_str());
+//  pushPyObjects(std::make_pair(_objId, p_obj), std::make_pair(disp_id, p_disp));
 }
 
 void
 MEDPresentationScalarMap::updatePipeline(const MEDCALC::ScalarMapParameters& params)
 {
-  // :TODO:
+  if (params.fieldHandlerId != _params.fieldHandlerId)
+    throw KERNEL::createSalomeException("Unexpected updatePipeline error! Mismatching fieldHandlerId!");
+
+  if (params.displayedComponent != _params.displayedComponent)
+    updateComponent<MEDPresentationScalarMap, MEDCALC::ScalarMapParameters>(std::string(params.displayedComponent));
+  if (params.scalarBarRange != _params.scalarBarRange)
+    updateScalarBarRange<MEDPresentationScalarMap, MEDCALC::ScalarMapParameters>(params.scalarBarRange);
+  if (params.colorMap != _params.colorMap)
+    updateColorMap<MEDPresentationScalarMap, MEDCALC::ScalarMapParameters>(params.colorMap);
 }
+

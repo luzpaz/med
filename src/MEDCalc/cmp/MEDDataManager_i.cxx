@@ -182,6 +182,7 @@ MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepa
     fieldHandler->meshid = meshHandler->id;
     fieldHandler->fieldseriesId = fieldseriesHandler->id;
     _fieldHandlerMap[fieldHandler->id] = fieldHandler;
+//    LOG("=== Storing " << fieldName << " (" << fieldHandler->id << ")");
   }
       }
     }

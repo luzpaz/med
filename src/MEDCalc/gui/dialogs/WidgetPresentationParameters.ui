@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>404</width>
-    <height>200</height>
+    <width>439</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,145 +19,161 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="labelPresName">
      <property name="text">
-      <string>LAB_DISP_COMP</string>
+      <string>LAB_PRES_NAME</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QComboBox" name="comboBoxField">
-     <item>
-      <property name="text">
-       <string>LAB_EUCLIDEAN_NORM</string>
-      </property>
-     </item>
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="1">
+       <widget class="QComboBox" name="comboBoxScalarBarRange">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <item>
+         <property name="text">
+          <string>LAB_ALL_TIMESTEPS</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_CURRENT_TIMESTEP</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>LAB_COLOR_MAP</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="comboBoxColorMap">
+        <item>
+         <property name="text">
+          <string>LAB_BLUE_TO_RED</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_COOL_TO_WARM</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>LAB_RANGE</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="labelTimeStep">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>LAB_TIMESTEP</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBoxTimeStep">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="labelMinVal">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>LAB_MIN_VALUE</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBoxMinVal">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="labelMaxVal">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>LAB_MAX_VALUE</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBoxMaxVal">
-     <property name="enabled">
-      <bool>false</bool>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>LAB_COLOR_MAP</string>
-     </property>
+   <item>
+    <widget class="QWidget" name="widgetDynamic" native="true">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelCompo">
+        <property name="text">
+         <string>LAB_DISP_COMP</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="QComboBox" name="comboBoxCompo">
+        <item>
+         <property name="text">
+          <string>LAB_EUCLIDEAN_NORM</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelSpinBox">
+        <property name="text">
+         <string>LAB_SPIN_BOX</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="spinBox"/>
+      </item>
+      <item row="1" column="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>235</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelSliceOrient">
+        <property name="text">
+         <string>LAB_SLICE_ORIENT</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2">
+       <widget class="QComboBox" name="comboBoxSliceOrient">
+        <item>
+         <property name="text">
+          <string>LAB_SLICE_NORMAL_TO_X</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_SLICE_NORMAL_TO_Y</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_SLICE_NORMAL_TO_Z</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="QComboBox" name="comboBoxColorMap">
-     <item>
-      <property name="text">
-       <string>LAB_BLUE_TO_RED</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>LAB_COOL_TO_WARM</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QComboBox" name="comboBoxScalarBarRange">
-     <property name="enabled">
-      <bool>true</bool>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <item>
-      <property name="text">
-       <string>LAB_ALL_TIMESTEPS</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>LAB_ONE_TIMESTEP</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>LAB_USER_RANGE</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>LAB_SCALARBAR</string>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>167</height>
+      </size>
      </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>LAB_RANGE</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
+    </spacer>
    </item>
   </layout>
  </widget>

@@ -36,6 +36,12 @@ public:
     this->_msg = oss.str();
   }
 
+  MEDPresentationException(const std::string& msg) {
+      std::ostringstream oss;
+      oss << "Error: " << msg;
+      this->_msg = oss.str();
+    }
+
   virtual ~MEDPresentationException() throw() {}
 
   virtual const char* what() const throw() {

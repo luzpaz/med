@@ -38,65 +38,117 @@ class MEDCALC_EXPORT MEDPresentation
   friend class MEDPresentationManager_i;
 
 public:
-
   typedef ::CORBA::Long TypeID;
 
   virtual ~MEDPresentation();
 
-  void setProperty(const std::string& propName, const std::string& propValue);
-  const std::string getProperty(const std::string& propName) const;
+  static const std::string PROP_NAME;                 // name of the presentation
+  static const std::string PROP_NB_COMPONENTS;        // number of field components
+  static const std::string PROP_SELECTED_COMPONENT;   // index of the selected component - 0 means Euclidean norm
+  static const std::string PROP_COMPONENT;            // string prefix for all properties storing component names
 
-  void activateView() const;
+  static const std::string PROP_COLOR_MAP;            // color map - TODO: arch fix - should be in params only
+  static const std::string PROP_SCALAR_BAR_RANGE;     // scalar bar range - TODO: arch fix - should be in params only
+
+  virtual void setStringProperty(const std::string& propName, const std::string& propValue);
+  const std::string getStringProperty(const std::string& propName) const;
+
+  virtual void setIntProperty(const std::string& propName, const int propValue);
+  int getIntProperty(const std::string& propName) const;
+
+  void activateView();  // non const because generates a Python trace
+
+  void dumpIntProperties() const;
+  void dumpStringProperties() const;
+
+  std::string paravisDump() const;
 
 protected:
   typedef std::pair<int, PyObject *> PyObjectId;
+  static int GeneratePythonId();
 
-  MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name);
-  std::string getRenderViewCommand(MEDCALC::MEDPresentationViewMode viewMode) const;
+  MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name,
+                  const MEDCALC::MEDPresentationViewMode viewMode,
+                  const MEDCALC::MEDPresentationColorMap colorMap);
+  std::string getRenderViewCommand() const;
   std::string getResetCameraCommand() const;
-  std::string getColorMapCommand(MEDCALC::MEDPresentationColorMap colorMap) const;
+
+  std::string getComponentSelectionCommand() const;
+  std::string getColorMapCommand() const;
+  std::string getRescaleCommand() const;
 
   virtual void internalGeneratePipeline() = 0;
   PyObject* getPythonObjectFromMain(const char* var) const;
-  void pushPyObjects(PyObjectId obj, PyObjectId disp);
+//  void pushPyObjects(PyObjectId obj, PyObjectId disp);
   void pushAndExecPyLine(const std::string & lin);
 
   MEDPresentation::TypeID getID() const { return _fieldHandlerId; }
   long getPyViewID() const { return _renderViewPyId; }
 
-  static int GeneratePythonId();
+  void fillAvailableFieldComponents();
 
+  // TODO: follow the pattern of the others methods: template!
   virtual MEDCALC::MEDPresentationViewMode getViewMode() = 0;
 
-private:
+  template<typename PresentationType, typename PresentationParameters>
+  void updateComponent(const std::string& newCompo);
 
+  template<typename PresentationType, typename PresentationParameters>
+  void updateColorMap(MEDCALC::MEDPresentationColorMap colorMap);
+
+  template<typename PresentationType, typename PresentationParameters>
+  void updateScalarBarRange(MEDCALC::MEDPresentationScalarBarRange sbRange);
+
+  template<typename PresentationType, typename PresentationParameters>
+  void getParameters(PresentationParameters& params) const;
+
+  template<typename PresentationType, typename PresentationParameters>
+  void setParameters(const PresentationParameters& params);
+
+private:
   std::string getFieldTypeString(MEDCoupling::TypeOfField fieldType) const;
 
   // The following functions are reserved to friend class MEDPresentationManager
   void generatePipeline();
 
   template<typename PresentationType, typename PresentationParameters>
-  void updatePipeline(PresentationParameters params);
+  void updatePipeline(const PresentationParameters& params);
 
 protected:
   std::string _fileName;
   std::string _fieldName;
   std::string _fieldType;
 
-  ///! Identifier (in the Python dump) of the render view
-  int _renderViewPyId;
-
-private:
   MEDPresentation::TypeID _fieldHandlerId;
 
+  int _selectedComponentIndex;
+  MEDCALC::MEDPresentationViewMode _viewMode;
+  MEDCALC::MEDPresentationColorMap _colorMap;
+  MEDCALC::MEDPresentationScalarBarRange _sbRange;
+
+  ///! Identifier (in the Python dump) of the render view
+  int _renderViewPyId;
+  ///! ParaView object ID in the Python scripting commands
+  int _objId;
+  ///! ParaView display ID in the Python scripting commands
+  int _dispId;
+  ///! ParaView LUT ID in the Python scripting commands
+  int _lutId;
+
+private:
   ///! Pipeline elements
-  std::vector<PyObjectId> _pipeline;
+//  std::vector<PyObjectId> _pipeline;
 
   ///! Corresponding display object, if any:
-  std::vector<PyObjectId> _display;
+//  std::vector<PyObjectId> _display;
 
   ///! Presentation properties <key,value>
-  std::map<std::string, std::string> _properties;
+  std::map<std::string, std::string> _propertiesStr;
+  std::map<std::string, int> _propertiesInt;
+
+  std::vector<std::string> _pythonCmds;
+
+  mutable PyObject* _globalDict;
 };
 
 #include "MEDPresentation.txx"

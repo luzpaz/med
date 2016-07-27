@@ -28,6 +28,7 @@
 #include <Utils_ExceptHandlers.hxx>
 #include <SALOME_LifeCycleCORBA.hxx>
 #include <SALOME_NamingService.hxx>
+#include <SALOME_KernelServices.hxx>
 
 #include <string>
 #include <sstream>
@@ -159,22 +160,30 @@ MED_ORB::status
 MED::registerPresentation(SALOMEDS::Study_ptr study,
                           CORBA::Long fieldId,
                           const char* name,
-                          const char* label,
+                          const char* type,
+                          const char* ico,
                           CORBA::Long presentationId)
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
 
-  if (_fieldSeriesEntries.find(fieldId) == _fieldSeriesEntries.end()) {
-    std::cerr << "Field not found\n";
+  MEDCALC::FieldHandler_var fldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
+  int fieldSeriesId = fldHandler->fieldseriesId;
+  if (fieldSeriesId < 0){
+      std::cerr << "MED::registerPresentation(): Error getting field handler\n";
+      return MED_ORB::OP_ERROR ;
+    }
+
+  if (_fieldSeriesEntries.find(fieldSeriesId) == _fieldSeriesEntries.end()) {
+    std::cerr << "MED::registerPresentation(): Field series not found\n";
     return MED_ORB::OP_ERROR ;
   }
-  std::string entry = _fieldSeriesEntries[fieldId];
+  std::string entry = _fieldSeriesEntries[fieldSeriesId];
   SALOMEDS::SObject_var sobject = study->FindObjectID(entry.c_str());
   SALOMEDS::SObject_ptr soFieldseries = sobject._retn();
 
   if (soFieldseries->IsNull()) {
-    std::cerr << "Entry not found\n";
+    std::cerr << "MED::registerPresentation(): Entry not found\n";
     return MED_ORB::OP_ERROR;
   }
 
@@ -184,7 +193,7 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
   useCaseBuilder->AppendTo(soPresentation->GetFather(), soPresentation);
 
   soPresentation->SetAttrString("AttributeName", name);
-  soPresentation->SetAttrString("AttributePixMap", label);
+  soPresentation->SetAttrString("AttributePixMap", ico);
 
   SALOMEDS::GenericAttribute_var anAttr;
   SALOMEDS::AttributeParameter_var aParam;
@@ -193,6 +202,7 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
   aParam->SetInt(FIELD_ID, fieldId);
   aParam->SetBool(IS_PRESENTATION, true);
   aParam->SetInt(PRESENTATION_ID, presentationId);
+  aParam->SetString(PRESENTATION_TYPE, type);
 
   return MED_ORB::OP_OK;
 }

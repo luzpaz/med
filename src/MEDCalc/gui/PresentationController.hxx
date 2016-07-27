@@ -32,22 +32,12 @@
 #include <SALOME_AppStudyEditor.hxx>
 #include "WidgetPresentationParameters.hxx"
 
-typedef struct {
-  enum EventType {
-    EVENT_VIEW_OBJECT_CONTOUR,
-    EVENT_VIEW_OBJECT_DEFLECTION_SHAPE,
-    EVENT_VIEW_OBJECT_POINT_SPRITE,
-    EVENT_VIEW_OBJECT_SCALAR_MAP,
-    EVENT_VIEW_OBJECT_SLICES,
-    EVENT_VIEW_OBJECT_VECTOR_FIELD,
-    EVENT_DELETE_PRESENTATION
-  };
-  int eventtype;
-  XmedDataObject* objectdata;
-} PresentationEvent;
+#include "PresentationEvent.hxx"
 
 class MEDModule;
 class QDockWidget;
+class MEDWidgetHelper;
+class XmedConsoleDriver;
 
 class MEDCALCGUI_EXPORT PresentationController : public QObject {
   Q_OBJECT
@@ -58,38 +48,64 @@ public:
 
   void createActions();
 
-  MEDCALC::MEDPresentationViewMode getSelectedViewMode();
-  MEDCALC::MEDPresentationColorMap getSelectedColorMap();
+  MEDCALC::MEDPresentationViewMode getSelectedViewMode() const;
+  MEDCALC::MEDPresentationColorMap getSelectedColorMap() const;
+  MEDCALC::MEDPresentationScalarBarRange getSelectedScalarBarRange() const;
 
   void showDockWidgets(bool isVisible);
+
+  std::string getPresTypeFromWidgetHelper(int presId) const;
+
+  void setConsoleDriver(XmedConsoleDriver* driver) { _consoleDriver = driver; };
 
 signals:
   void presentationSignal(const PresentationEvent*);
 
 protected slots:
-  void OnVisualizeScalarMap();
-  void OnVisualizeContour();
-  void OnVisualizeVectorField();
-  void OnVisualizeSlices();
-  void OnVisualizeDeflectionShape();
-  void OnVisualizePointSprite();
+  void onVisualizeScalarMap();
+  void onVisualizeContour();
+  void onVisualizeVectorField();
+  void onVisualizeSlices();
+  void onVisualizeDeflectionShape();
+  void onVisualizePointSprite();
 
-  void OnDeletePresentation();
+  void onDeletePresentation();
+  void onParavisDump();
+
+  void onPresentationSelected(int presId, const QString& presType, const QString& presName);
 
   void processWorkspaceEvent(const MEDCALC::MedEvent*);
+  void processPresentationEvent(const PresentationEvent* event);
 
 private:
   void visualize(PresentationEvent::EventType);
   void updateTreeViewWithNewPresentation(long, long);
   void updateTreeViewForPresentationRemoval(long);
   std::string _getIconName(const std::string&);
+  MEDWidgetHelper * findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager_ptr presManager,
+                                             int presId, const std::string& type, const std::string& name);
+
+  int getIntParamFromStudyEditor(SALOMEDS::SObject_var obj, const char * name);
+
+  QString getViewModePython() const;
+  QString getColorMapPython() const;
+  QString getScalarBarRangePython() const;
 
 private:
   MEDModule* _salomeModule;
+  XmedConsoleDriver* _consoleDriver;   // the same as in WorkspaceController
   SALOME_AppStudyEditor* _studyEditor; // borrowed to MEDModule
 
   QDockWidget *_dockWidget;
   WidgetPresentationParameters* _widgetPresentationParameters;
+
+  // GUI needs to talk directly to the pres manager to activate a view, get some params, print low level py dump, etc ...:
+  static MEDCALC::MEDPresentationManager_ptr _presManager;
+
+  // Key: presentation ID, value MEDPresentationHelper *
+  std::map<int, MEDWidgetHelper *> _presHelperMap;
+
+  MEDWidgetHelper * _currentWidgetHelper;
 };
 
 #endif /* PRESENTATION_CONTROLLER_HXX */

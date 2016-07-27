@@ -41,24 +41,21 @@
 #include <SALOMEDS_Study.hxx>
 
 #ifndef DISABLE_PVVIEWER
-#include "PVViewer_ViewModel.h"
-#include "PVViewer_GUIElements.h"
+#include <PVViewer_ViewModel.h>
+#include <PVViewer_GUIElements.h>
 #endif
 
 #include "MEDFactoryClient.hxx"
 #include "MEDPresentationManager_i.hxx"
-#include <QTimer>
 
+#include <QTimer>
 #include <sstream>
 
 #include <pqAnimationManager.h>
 #include <pqPVApplicationCore.h>
 
-
 //! The only instance of the reference to engine
 MED_ORB::MED_Gen_var MEDModule::_MED_engine;
-//! The only instance of the MEDPresentationManager
-MEDCALC::MEDPresentationManager_ptr MEDModule::_presManager;
 
 MEDModule::MEDModule() :
   SalomeApp_Module("MED"), _studyEditor(0),
@@ -101,11 +98,6 @@ MEDModule::init()
       SalomeApp_Application::lcc()->FindOrLoad_Component( "FactoryServer", "MED" );
     _MED_engine = MED_ORB::MED_Gen::_narrow( comp );
   }
-
-  // Retrieve MEDFactory to get MEDPresentationManager (sometimes
-  if ( ! _presManager ) {
-      _presManager = MEDFactoryClient::getFactory()->getPresentationManager();
-    }
 }
 
 //void MEDModule::onEventLoopStarted()
@@ -256,6 +248,8 @@ MEDModule::createModuleWidgets() {
   _xmedDataModel  = new XmedDataModel();
   _workspaceController->setDataModel(_xmedDataModel);
   _presentationController = new PresentationController(this);
+  // ABN: ultimately console driver should be owned by module: everyone needs it, not only WorkspaceController
+  _presentationController->setConsoleDriver(_workspaceController->getConsoleDriver());
   _processingController = new ProcessingController(this);
 #ifdef MED_HAS_QTTESTING
   _testController = new TestController(this);
@@ -265,7 +259,7 @@ MEDModule::createModuleWidgets() {
     _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent*)));
 
   connect(_presentationController, SIGNAL(presentationSignal(const PresentationEvent*)),
-    _workspaceController, SLOT(processPresentationEvent(const PresentationEvent*)));
+    _presentationController, SLOT(processPresentationEvent(const PresentationEvent*)));
 
   connect(_processingController, SIGNAL(processingSignal(const ProcessingEvent*)),
     _workspaceController, SLOT(processProcessingEvent(const ProcessingEvent*)));
@@ -366,20 +360,27 @@ MEDModule::addActionInPopupMenu(int actionId,const QString& menus,const QString&
   mgr->setRule( this->action( actionId ), rule, QtxPopupMgr::VisibleRule );
 }
 
-MEDCALC::MEDPresentationViewMode
-MEDModule::getSelectedViewMode()
-{
-  return _presentationController->getSelectedViewMode();
-}
+//MEDCALC::MEDPresentationViewMode
+//MEDModule::getSelectedViewMode() const
+//{
+//  return _presentationController->getSelectedViewMode();
+//}
+//
+//MEDCALC::MEDPresentationColorMap
+//MEDModule::getSelectedColorMap() const
+//{
+//  return _presentationController->getSelectedColorMap();
+//}
+//
+//MEDCALC::MEDPresentationScalarBarRange
+//MEDModule::getSelectedScalarBarRange() const
+//{
+//  return _presentationController->getSelectedScalarBarRange();
+//}
 
-MEDCALC::MEDPresentationColorMap
-MEDModule::getSelectedColorMap()
-{
-  return _presentationController->getSelectedColorMap();
-}
 
 bool
-MEDModule::itemClickGeneric(const QModelIndex & index, std::string & name, int & fieldId, int & presId) const
+MEDModule::itemClickGeneric(const QModelIndex & index, std::string & name, std::string & type, int & fieldId, int & presId) const
 {
   DataObjectList dol = getApp()->objectBrowser()->getSelected();
   if (dol.isEmpty())
@@ -414,6 +415,9 @@ MEDModule::itemClickGeneric(const QModelIndex & index, std::string & name, int &
   if (!attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
       return false;
   presId = attrParam->GetInt(PRESENTATION_ID);
+  if (!attrParam->IsSet(PRESENTATION_TYPE, PT_STRING))
+    return false;
+  type = attrParam->GetString(PRESENTATION_TYPE);
   return true;
 }
 
@@ -421,29 +425,34 @@ void
 MEDModule::onClick(const QModelIndex & index)
 {
   int fieldId, presId;
-  std::string name;
-  if (!itemClickGeneric(index, name, fieldId, presId))
-    return;
+  std::string name, type;
+  if (!itemClickGeneric(index, name, type, fieldId, presId))
+    {
+      // Not a presentation - clear widget:
+      emit presentationSelected(-1, QString(""), QString(""));
+      return;
+    }
 
-  STDLOG("Presentation selection (activate view)");
-  std::ostringstream oss;
-  oss << fieldId << " / " << presId;
-  STDLOG("    - Field id / pres id:   " + oss.str());
-  STDLOG("    - Presentation name: " + name);
+//  STDLOG("Presentation selection");
+//  std::ostringstream oss;
+//  oss << fieldId << " / " << presId;
+//  STDLOG("    - Field id / pres id:   " + oss.str());
+//  STDLOG("    - Presentation type: " + type);
+//  STDLOG("    - Presentation name: " + name);
 
-  _presManager->activateView(presId);
+  emit presentationSelected(presId, QString::fromStdString(type), QString::fromStdString(name) );  // caught by PresentationController
 }
 
 void
 MEDModule::onDblClick(const QModelIndex& index)
 {
   int fieldId, presId;
-  std::string name;
-  if (!itemClickGeneric(index, name, fieldId, presId))
+  std::string name, type;
+  if (!itemClickGeneric(index, name, type, fieldId, presId))
     return;
 
   STDLOG("Presentation edition: NOT IMPLEMENTED YET");
-  STDLOG("  Presention infos:");
+  STDLOG("  Presentation infos:");
 //  STDLOG("    - Component:         " + item->componentDataType().toStdString());
 //  STDLOG("    - Item entry:        " + item->entry().toStdString());
 //  STDLOG("    - Item name:         " + item->name().toStdString());

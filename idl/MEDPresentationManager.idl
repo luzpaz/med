@@ -39,16 +39,23 @@ module MEDCALC
     COLOR_MAP_COOL_TO_WARM
   };
 
-  struct ScalarBarRange {
-    // (valMin,valMax) defines the scalar bar range from:
-    //      (-1,timetep): the field values at the chosen timestep
-    //      (-1,-1):      the field values across all timesteps
-    //      (start,end):  a user-input range of values
-    long valMin;
-    long valMax;
+  enum MEDPresentationScalarBarRange {
+    SCALAR_BAR_ALL_TIMESTEPS,
+    SCALAR_BAR_CURRENT_TIMESTEP
   };
 
-  const string DISPLAY_EUCLIDEAN_NORM = "Euclidean norm";
+
+//  struct ScalarBarRange {
+//    // (valMin,valMax) defines the scalar bar range from:
+//    //      (-1,timestep): the field values at the chosen timestep
+//    //      (-1,-1):      the field values across all timesteps
+//    //      (-2,-2):      the field values at current timestep
+//    //      (start,end):  a user-input range of values
+//    long valMin;
+//    long valMax;
+//  };
+
+  const string DISPLAY_EUCLIDEAN_NORM = "";  // Void string to avoid clash with a real component name -- never used actually?
 
   enum SliceOrientation {
     SLICE_NORMAL_TO_X,
@@ -64,6 +71,7 @@ module MEDCALC
 
   const MEDPresentationViewMode VIEW_MODE_DEFAULT = VIEW_MODE_REPLACE;
   const MEDPresentationColorMap COLOR_MAP_DEFAULT = COLOR_MAP_BLUE_TO_RED_RAINBOW;
+  const MEDPresentationScalarBarRange SCALAR_BAR_RANGE_DEFAULT = SCALAR_BAR_ALL_TIMESTEPS;
   //const ScalarBarRange SCALAR_BAR_RANGE_DEFAULT = ;
   const long SCALAR_BAR_RANGE_VAL_MIN_DEFAULT = -1;
   const long SCALAR_BAR_RANGE_VAL_MAX_DEFAULT = -1;
@@ -76,77 +84,76 @@ module MEDCALC
 
   struct ScalarMapParameters {
     long fieldHandlerId;
-    MEDPresentationViewMode viewMode;
-    string displayedInfo; // DISPLAY_EUCLIDEAN_NORM or any field name
-    ScalarBarRange sbRange;
+    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
+    MEDPresentationScalarBarRange scalarBarRange;
     MEDPresentationColorMap colorMap;
   };
 
   // A contour is an isoline in 2D and an isosurface in 3D
-  struct ContourParameters {
-    long fieldHandlerId;
-    MEDPresentationViewMode viewMode;
-    string displayedInfo; // DISPLAY_EUCLIDEAN_NORM or any field name
-    ScalarBarRange sbRange;
-    MEDPresentationColorMap colorMap;
-    long nbContours;
-  };
-
-  struct VectorFieldParameters {
-    long fieldHandlerId;
-    MEDPresentationViewMode viewMode;
-  };
-
-  struct SlicesParameters {
-    long fieldHandlerId;
-    MEDPresentationViewMode viewMode;
-    SliceOrientation orientation;
-    long nbSlices;
-  };
-
-  struct DeflectionShapeParameters {
-    long fieldHandlerId;
-    MEDPresentationViewMode viewMode;
-  };
-
-  struct PointSpriteParameters {
-    long fieldHandlerId;
-    MEDPresentationViewMode viewMode;
-    string displayedInfo; // DISPLAY_EUCLIDEAN_NORM or any field name
-    ScalarBarRange sbRange;
-    MEDPresentationColorMap colorMap;
-  };
+//  struct ContourParameters {
+//    long fieldHandlerId;
+//    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
+//    ScalarBarRange scalarBarRange;
+//    MEDPresentationColorMap colorMap;
+//    long nbContours;
+//  };
+//
+//  struct VectorFieldParameters {
+//    long fieldHandlerId;
+//  };
+//
+//  struct SlicesParameters {
+//    long fieldHandlerId;
+//    SliceOrientation orientation;
+//    long nbSlices;
+//  };
+//
+//  struct DeflectionShapeParameters {
+//    long fieldHandlerId;
+//  };
+//
+//  struct PointSpriteParameters {
+//    long fieldHandlerId;
+//    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
+//    ScalarBarRange scalarBarRange;
+//    MEDPresentationColorMap colorMap;
+//  };
 
   /* Functions */
 
   interface MEDPresentationManager : SALOME::GenericObj
   {
+    long makeScalarMap(in ScalarMapParameters params, in MEDPresentationViewMode viewMode);
+//    long makeContour(in ContourParameters params, in MEDPresentationViewMode viewMode);
+//    long makeVectorField(in VectorFieldParameters params, in MEDPresentationViewMode viewMode);
+//    long makeSlices(in SlicesParameters params, in MEDPresentationViewMode viewMode);
+//    long makeDeflectionShape(in DeflectionShapeParameters params, in MEDPresentationViewMode viewMode);
+//    long makePointSprite(in PointSpriteParameters params, in MEDPresentationViewMode viewMode);
 
-    long makeScalarMap(in ScalarMapParameters params);
-    long makeContour(in ContourParameters params);
-    long makeVectorField(in VectorFieldParameters params);
-    long makeSlices(in SlicesParameters params);
-    long makeDeflectionShape(in DeflectionShapeParameters params);
-    long makePointSprite(in PointSpriteParameters params);
+    void setPresentationStringProperty(in long presId, in string propName, in string propValue);
+    string getPresentationStringProperty(in long presId, in string propName);
+    void setPresentationIntProperty(in long presId, in string propName, in long propValue);
+    long getPresentationIntProperty(in long presId, in string propName);
 
-    void setPresentationProperty(in long presId, in string propName, in string propValue);
-    string getPresentationProperty(in long presId, in string propName);
+    ScalarMapParameters getScalarMapParameters(in long presId);
 
     void updateScalarMap(in long presId, in ScalarMapParameters params);
-    void updateContour(in long presId, in ContourParameters params);
-    void updateVectorField(in long presId, in VectorFieldParameters params);
-    void updateSlices(in long presId, in SlicesParameters params);
-    void updateDeflectionShape(in long presId, in DeflectionShapeParameters params);
-    void updatePointSprite(in long presId, in PointSpriteParameters params);
+//    void updateContour(in long presId, in ContourParameters params);
+//    void updateVectorField(in long presId, in VectorFieldParameters params);
+//    void updateSlices(in long presId, in SlicesParameters params);
+//    void updateDeflectionShape(in long presId, in DeflectionShapeParameters params);
+//    void updatePointSprite(in long presId, in PointSpriteParameters params);
 
     boolean removePresentation(in long presId);
 
-    // Helper functions to keep GUI sync
+    // Helper function to keep GUI sync
     boolean activateView(in long presentationId);
 
+    // Low level ParaVis dump
+    string getParavisDump(in long presId);
+    
     MEDPresentationViewMode getPresentationViewMode(in long presId);
   };
-
 };
 
 #endif

@@ -188,8 +188,8 @@
       <translation>All timesteps</translation>
     </message>
     <message>
-      <source>LAB_ONE_TIMESTEP</source>
-      <translation>Selected timestep</translation>
+      <source>LAB_CURRENT_TIMESTEP</source>
+      <translation>Current timestep</translation>
     </message>
     <message>
       <source>LAB_USER_RANGE</source>

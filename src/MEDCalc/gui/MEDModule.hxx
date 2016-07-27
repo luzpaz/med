@@ -80,14 +80,15 @@ public:
                             const QString& menus="",
                             const QString& rule="client='ObjectBrowser'");
 
-  MEDCALC::MEDPresentationViewMode getSelectedViewMode();
-  MEDCALC::MEDPresentationColorMap getSelectedColorMap();
+//  MEDCALC::MEDPresentationViewMode getSelectedViewMode() const;
+//  MEDCALC::MEDPresentationColorMap getSelectedColorMap() const;
+//  MEDCALC::MEDPresentationScalarBarRange getSelectedScalarBarRange() const;
 
   inline SALOME_AppStudyEditor* getStudyEditor() { return _studyEditor; }
-
   void requestSALOMETermination() const;
 
-//  bool hasMainEventLoopStarted() const;
+signals:
+  void presentationSelected(int presId, const QString& presType, const QString& presName);
 
 public slots:
   virtual bool activateModule(SUIT_Study* theStudy);
@@ -99,7 +100,9 @@ private:
   void createModuleWidgets();
   void createModuleActions();
   void initToolbars();
-  bool itemClickGeneric(const QModelIndex & index, std::string & name, int & fieldId, int & presId) const;
+
+  bool itemClickGeneric(const QModelIndex & index, std::string & name,
+                        std::string & type, int & fieldId, int & presId) const;
 
   static void init();
 
@@ -121,7 +124,6 @@ private:
 #ifdef MED_HAS_QTTESTING
   TestController * _testController;
 #endif
-
 };
 
 #endif

@@ -22,12 +22,19 @@
 
 template<typename PresentationType, typename PresentationParameters>
 MEDPresentation::TypeID
-MEDPresentationManager_i::_makePresentation(PresentationParameters params)
+MEDPresentationManager_i::_makePresentation(const PresentationParameters params, const MEDCALC::MEDPresentationViewMode viewMode)
 {
+  // Replace = Remove then add
+  if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
+    MEDPresentation::TypeID currentPresentationId = _getActivePresentationId();
+    if (currentPresentationId > -1)
+      removePresentation(currentPresentationId);
+  }
+
   // Create a new presentation instance
   PresentationType* presentation = NULL;
   try {
-    presentation = new PresentationType(params);  // on stack or on heap?? stack for now
+    presentation = new PresentationType(params, viewMode);  // on stack or on heap?? heap for now
   }
   catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
@@ -42,7 +49,7 @@ MEDPresentationManager_i::_makePresentation(PresentationParameters params)
 
 template<typename PresentationType, typename PresentationParameters>
 void
-MEDPresentationManager_i::_updatePresentation(MEDPresentation::TypeID presentationID, PresentationParameters params)
+MEDPresentationManager_i::_updatePresentation(MEDPresentation::TypeID presentationID, const PresentationParameters params)
 {
   MEDPresentation* presentation = _getPresentation(presentationID);
   if (!presentation) {
@@ -52,5 +59,19 @@ MEDPresentationManager_i::_updatePresentation(MEDPresentation::TypeID presentati
 
   presentation->updatePipeline<PresentationType>(params);
 }
+
+template<typename PresentationType, typename PresentationParameters>
+void
+MEDPresentationManager_i::_getParameters(MEDPresentation::TypeID presentationID, PresentationParameters & params) const
+{
+  MEDPresentation* presentation = _getPresentation(presentationID);
+  if (!presentation) {
+    std::cerr << "_getParameters(): presentation not found!!" << std::endl;
+    return;
+  }
+
+  presentation->getParameters<PresentationType>(params);
+}
+
 
 #endif // _MED_PRESENTATION_MANAGER_I_TXX_

@@ -22,17 +22,21 @@
 
 #include "MEDCALC.hxx"
 #include "MEDPresentation.hxx"
+#include <string>
 
 class MEDCALC_EXPORT MEDPresentationScalarMap : public MEDPresentation
 {
 public:
-  MEDPresentationScalarMap(const MEDCALC::ScalarMapParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationScalarMap"), _params(params)
-  {}
+  static const std::string TYPE_NAME;
+
+  MEDPresentationScalarMap(const MEDCALC::ScalarMapParameters& params, const MEDCALC::MEDPresentationViewMode viewMode);
   virtual ~MEDPresentationScalarMap() {}
 
   void updatePipeline(const MEDCALC::ScalarMapParameters& params);
   MEDCALC::MEDPresentationViewMode getViewMode() { return _params.viewMode; }
+
+  void getParameters(MEDCALC::ScalarMapParameters & params) const { params = _params; } ;
+  void setParameters(const MEDCALC::ScalarMapParameters & params) { _params = params; } ;
 
 protected:
   virtual void internalGeneratePipeline();

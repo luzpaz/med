@@ -19,6 +19,8 @@
 
 #include "MEDPresentationContour.hxx"
 
+const std::string MEDPresentationContour::PROP_NB_CONTOUR = "nbContour";
+
 void
 MEDPresentationContour::internalGeneratePipeline()
 {
