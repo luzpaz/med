@@ -60,12 +60,16 @@ TestController::TestController(MEDModule* mod):
   _tester(0), _lock_action(0),
   _quitEventType(QEvent::registerEventType()),
   _playEventType(QEvent::registerEventType()),
-  _aboutToPlayTest(false)
+  _aboutToPlayTest(false),
+  _myEventLoopStarted(false)
 {
   STDLOG("Creating a TestController");
   _tester = new pqTestUtility(_desk);
   _tester->addEventObserver("xml", new pqXMLEventObserver(_desk));
   _tester->addEventSource("xml", new pqXMLEventSource(_desk));
+
+  QApplication::instance()->installEventFilter(this);
+  //QTimer::singleShot(0, this, SLOT(onMainEventLoopStarting()));
 }
 
 TestController::~TestController()
@@ -160,7 +164,7 @@ TestController::customEvent(QEvent * event)
 {
   if (event->type() == _quitEventType)
     {
-      if(!_salomeModule->getApp()->isMainEventLoopStarted())
+      if(!isMainEventLoopStarted())
           // Repost (=delay)
           QApplication::postEvent(this, new QEvent((QEvent::Type)_quitEventType));
       else
@@ -172,7 +176,7 @@ TestController::customEvent(QEvent * event)
       if (e)
         {
 //          // Wait for main event loop to start:
-          if(!_salomeModule->getApp()->isMainEventLoopStarted())
+          if(!isMainEventLoopStarted())
               // Repost (=delay)
               QApplication::postEvent(this, new PlayTestEvent((QEvent::Type)_playEventType, e->_filename));
           else
@@ -207,3 +211,15 @@ TestController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
   }
 }
 
+void TestController::onMainEventLoopStarting()
+{
+  _myEventLoopStarted = true;
+  QApplication::instance()->removeEventFilter(this);
+}
+
+bool TestController::eventFilter(QObject *obj, QEvent *event)
+{
+  if ( obj == QApplication::instance() && event->type() == 9999 )
+    onMainEventLoopStarting();
+  return QObject::eventFilter(obj, event);
+}
