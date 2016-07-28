@@ -17,10 +17,11 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#include "MEDPyLockWrapper.hxx"
+
 #include "MEDPresentationScalarMap.hxx"
 #include "MEDPresentationException.hxx"
 
-#include <PyInterp_Utils.h>
 #include <SALOME_KernelServices.hxx>
 #undef LOG  // should be fixed in KERNEL - double definition
 #include <Basics_Utils.hxx>
@@ -40,7 +41,7 @@ MEDPresentationScalarMap::internalGeneratePipeline()
 {
   MEDPresentation::internalGeneratePipeline();
 
-  PyLockWrapper lock;
+  MEDPyLockWrapper lock;
 
   std::ostringstream oss_o, oss_d,oss_l, oss, oss_v;
   oss_o << "__obj" << _objId;      std::string obj(oss_o.str());

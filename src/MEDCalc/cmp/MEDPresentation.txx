@@ -20,9 +20,9 @@
 #ifndef _MED_PRESENTATION_TXX_
 #define _MED_PRESENTATION_TXX_
 
+#include "MEDPyLockWrapper.hxx"
 #include <sstream>
 #include <SALOME_KernelServices.hxx>
-#include <PyInterp_Utils.h>
 
 template<typename PresentationType, typename PresentationParameters>
 void
@@ -89,7 +89,7 @@ MEDPresentation::updateComponent(const std::string& newCompo)
 
   // Update ParaView pipeline:
   {
-    PyLockWrapper lock;
+    MEDPyLockWrapper lock;
 
     std::ostringstream oss;
     std::string cmd = getComponentSelectionCommand();
@@ -117,7 +117,7 @@ MEDPresentation::updateColorMap(MEDCALC::MEDPresentationColorMap colorMap)
 
   // Update the pipeline:
   {
-    PyLockWrapper lock;
+    MEDPyLockWrapper lock;
     std::string cmd = getColorMapCommand();
     pushAndExecPyLine(cmd);
     pushAndExecPyLine("pvs.Render();");
@@ -142,7 +142,7 @@ MEDPresentation::updateScalarBarRange(MEDCALC::MEDPresentationScalarBarRange sbR
 
   // Update the pipeline:
   {
-    PyLockWrapper lock;
+    MEDPyLockWrapper lock;
     std::string cmd = getRescaleCommand();
     pushAndExecPyLine(cmd);
     pushAndExecPyLine("pvs.Render();");

@@ -18,6 +18,7 @@
 //
 // Authors: A Bruneton (CEA), C Aguerre (EdF)
 
+#include "MEDPyLockWrapper.hxx"
 #include "MEDFactoryClient.hxx"
 #include "MEDPresentation.hxx"
 #include "MEDPresentationException.hxx"
@@ -25,7 +26,6 @@
 #include <SALOME_KernelServices.hxx>
 #undef LOG
 #include <Basics_Utils.hxx>
-#include <PyInterp_Utils.h>
 
 #include <sstream>
 
@@ -80,7 +80,7 @@ MEDPresentation::~MEDPresentation()
 {
   STDLOG("~MEDPresentation(): clear display");
   {
-    PyLockWrapper lock;
+    MEDPyLockWrapper lock;
     std::ostringstream oss_o, oss_v, oss;
     oss_o << "__obj" << _objId;
     oss_v << "__view" << _renderViewPyId;
@@ -116,7 +116,7 @@ MEDPresentation::pushAndExecPyLine(const std::string & lin)
 void
 MEDPresentation::execPyLine(const std::string & lin)
 {
-  PyLockWrapper lock;
+  MEDPyLockWrapper lock;
 //  STDLOG("@@@@ MEDPresentation::execPyLine() about to exec >> " << lin);
   if(PyRun_SimpleString(lin.c_str()))
     {
@@ -196,7 +196,7 @@ MEDPresentation::getIntProperty(const std::string& propName) const
  void
  MEDPresentation::internalGeneratePipeline()
  {
-   PyLockWrapper lock;
+   MEDPyLockWrapper lock;
    pushAndExecPyLine( "import pvsimple as pvs;");
  }
 
@@ -328,7 +328,7 @@ MEDPresentation::GeneratePythonId()
 void
 MEDPresentation::activateView()
 {
-  PyLockWrapper lock;
+  MEDPyLockWrapper lock;
 
   std::ostringstream oss;
   oss << "pvs.SetActiveView(__view" << _renderViewPyId << ");";
@@ -360,7 +360,7 @@ MEDPresentation::paravisDump() const
 void
 MEDPresentation::fillAvailableFieldComponents()
 {
-  PyLockWrapper lock;  // GIL!
+  MEDPyLockWrapper lock;  // GIL!
 
   std::ostringstream oss_o;
   oss_o << "__obj" << _objId;      std::string obj(oss_o.str());

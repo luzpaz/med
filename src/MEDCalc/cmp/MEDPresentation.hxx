@@ -21,8 +21,8 @@
 #ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_HXX_
 #define SRC_MEDCALC_CMP_MEDPRESENTATION_HXX_
 
-#include "MEDCouplingRefCountObject.hxx"
 #include <Python.h>
+#include "MEDCouplingRefCountObject.hxx"
 #include "MEDCALC.hxx"
 
 #include <SALOMEconfig.h>
