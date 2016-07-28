@@ -20,30 +20,52 @@
 #ifndef _MED_PRESENTATION_MANAGER_I_TXX_
 #define _MED_PRESENTATION_MANAGER_I_TXX_
 
+#include <Basics_Utils.hxx>
+
 template<typename PresentationType, typename PresentationParameters>
 MEDPresentation::TypeID
 MEDPresentationManager_i::_makePresentation(const PresentationParameters params, const MEDCALC::MEDPresentationViewMode viewMode)
 {
+  int activeViewId = getActiveViewPythonId();
+
   // Replace = Remove then add
-  if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
-    MEDPresentation::TypeID currentPresentationId = _getActivePresentationId();
-    if (currentPresentationId > -1)
-      removePresentation(currentPresentationId);
+  if (viewMode == MEDCALC::VIEW_MODE_REPLACE)
+    {
+      // Remove all presentations from this view:
+      std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator it;
+      std::vector<int> to_del;
+      for (it = _presentations.begin(); it != _presentations.end(); ++it)
+        {
+          int viewId2 = (*it).second->getPyViewID();
+          if (viewId2 == activeViewId)
+            to_del.push_back((*it).first);
+        }
+      for (std::vector<int>::const_iterator it2 = to_del.begin(); it2 != to_del.end(); ++it2)
+        removePresentation(*it2);
   }
 
   // Create a new presentation instance
   PresentationType* presentation = NULL;
+  MEDPresentation::TypeID newID = MEDPresentationManager_i::GenerateID();
+  STDLOG("Generated presentation ID: " << newID);
   try {
     presentation = new PresentationType(params, viewMode);  // on stack or on heap?? heap for now
+    // In replace or overlap mode we force the display in the active view:
+    if(activeViewId != -1 && (viewMode == MEDCALC::VIEW_MODE_REPLACE || viewMode == MEDCALC::VIEW_MODE_OVERLAP))
+      presentation->setPyViewID(activeViewId);
+    else
+      presentation->setPyViewID(newID);  // ensures a new ID for the view
   }
   catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
+    STDLOG("Error: " << e.what());
     return -1;
   }
 
-  MEDPresentation::TypeID newID = MEDPresentationManager_i::GenerateID();
   _presentations.insert( std::pair<MEDPresentation::TypeID, MEDPresentation *>(newID, presentation) );
   presentation->generatePipeline();
+  // Make the view holding the newly created presentation the active one:
+  activateView(newID);
   return newID;
 }
 

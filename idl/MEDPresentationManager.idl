@@ -152,7 +152,7 @@ module MEDCALC
     // Low level ParaVis dump
     string getParavisDump(in long presId);
     
-    MEDPresentationViewMode getPresentationViewMode(in long presId);
+//    MEDPresentationViewMode getPresentationViewMode(in long presId);
   };
 };
 

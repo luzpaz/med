@@ -599,7 +599,7 @@ PresentationController::updateTreeViewWithNewPresentation(long fieldId, long pre
     return;
   }
 
-  std::string name(MEDFactoryClient::getPresentationManager()->getPresentationStringProperty(presentationId, MEDPresentation::PROP_NAME.c_str()));
+  std::string name(_presManager->getPresentationStringProperty(presentationId, MEDPresentation::PROP_NAME.c_str()));
   std::string type = name;
   std::string icon = std::string("ICO_") + type;
   icon = _getIconName(icon);
@@ -617,30 +617,30 @@ PresentationController::updateTreeViewWithNewPresentation(long fieldId, long pre
       oss.str().c_str(), type.c_str(),ico.c_str(), presentationId);
 
 
-  MEDCALC::MEDPresentationViewMode viewMode = MEDFactoryClient::getPresentationManager()->getPresentationViewMode(presentationId);
-
-  // Remove sibling presentations if view mode is set to REPLACE
-  if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
-    MED_ORB::PresentationsList* presList = _salomeModule->engine()->getSiblingPresentations(_CAST(Study, studyDS)->GetStudy(), presentationId);
-    CORBA::ULong size = presList->length();
-
-    std::stringstream sstm;
-    sstm << "Removing sibling presentation(s): ";
-    for (int i = 0; i < size; ++i)
-      sstm << (*presList)[i] << "  ";
-    STDLOG(sstm.str());
-
-    for (int i = 0; i < size; ++i) {
-      PresentationEvent* event = new PresentationEvent();
-      event->eventtype = PresentationEvent::EVENT_DELETE_PRESENTATION;
-      XmedDataObject* dataObject = new XmedDataObject();
-      dataObject->setPresentationId((*presList)[i]);
-      event->objectdata = dataObject;
-      emit presentationSignal(event); // --> WorkspaceController::processPresentationEvent
-    }
-
-    delete presList;
-  }
+//  MEDCALC::MEDPresentationViewMode viewMode = MEDFactoryClient::getPresentationManager()->getPresentationViewMode(presentationId);
+//
+//  // Remove sibling presentations if view mode is set to REPLACE
+//  if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
+//    MED_ORB::PresentationsList* presList = _salomeModule->engine()->getSiblingPresentations(_CAST(Study, studyDS)->GetStudy(), presentationId);
+//    CORBA::ULong size = presList->length();
+//
+//    std::stringstream sstm;
+//    sstm << "Removing sibling presentation(s): ";
+//    for (int i = 0; i < size; ++i)
+//      sstm << (*presList)[i] << "  ";
+//    STDLOG(sstm.str());
+//
+//    for (int i = 0; i < size; ++i) {
+//      PresentationEvent* event = new PresentationEvent();
+//      event->eventtype = PresentationEvent::EVENT_DELETE_PRESENTATION;
+//      XmedDataObject* dataObject = new XmedDataObject();
+//      dataObject->setPresentationId((*presList)[i]);
+//      event->objectdata = dataObject;
+//      emit presentationSignal(event); // --> WorkspaceController::processPresentationEvent
+//    }
+//
+//    delete presList;
+//  }
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);
@@ -667,10 +667,31 @@ void
 PresentationController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
 {
   if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
-    this->updateTreeViewWithNewPresentation(event->dataId, event->presentationId);
+    updateTreeViewWithNewPresentation(event->dataId, event->presentationId);
+    // Deal with replace mode: presentations with invalid IDs have to be removed:
+    std::map<int, MEDWidgetHelper *>::iterator it;
+    std::vector<int> to_del;
+    for (it = _presHelperMap.begin(); it != _presHelperMap.end(); ++it)
+      {
+        try {
+            // TODO: not the best way to test for presentation existence at the engine level?
+            _presManager->getPresentationStringProperty((*it).first, MEDPresentation::PROP_NAME.c_str());
+        }
+        catch(...){
+           to_del.push_back((*it).first);
+           delete((*it).second);
+           (*it).second = 0;
+        }
+      }
+    std::vector<int>::const_iterator it2;
+    for (it2 = to_del.begin(); it2 != to_del.end(); ++it2)
+      {
+        updateTreeViewForPresentationRemoval(*it2);
+        _presHelperMap.erase(*it2);
+      }
   }
   else if ( event->type == MEDCALC::EVENT_REMOVE_PRESENTATION ) {
-    this->updateTreeViewForPresentationRemoval(event->presentationId);
+    updateTreeViewForPresentationRemoval(event->presentationId);
   }
 }
 

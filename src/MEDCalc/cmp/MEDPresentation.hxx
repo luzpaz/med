@@ -63,13 +63,17 @@ public:
 
   std::string paravisDump() const;
 
+  long getPyViewID() const { return _renderViewPyId; }
+  void setPyViewID(long id) { _renderViewPyId = id; }
+
 protected:
   typedef std::pair<int, PyObject *> PyObjectId;
   static int GeneratePythonId();
 
   MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name,
                   const MEDCALC::MEDPresentationViewMode viewMode,
-                  const MEDCALC::MEDPresentationColorMap colorMap);
+                  const MEDCALC::MEDPresentationColorMap colorMap,
+                  const MEDCALC::MEDPresentationScalarBarRange sbRange);
   std::string getRenderViewCommand() const;
   std::string getResetCameraCommand() const;
 
@@ -77,18 +81,17 @@ protected:
   std::string getColorMapCommand() const;
   std::string getRescaleCommand() const;
 
-  virtual void internalGeneratePipeline() = 0;
+  virtual void internalGeneratePipeline();
   PyObject* getPythonObjectFromMain(const char* var) const;
 //  void pushPyObjects(PyObjectId obj, PyObjectId disp);
+  void execPyLine(const std::string & lin);
   void pushAndExecPyLine(const std::string & lin);
 
   MEDPresentation::TypeID getID() const { return _fieldHandlerId; }
-  long getPyViewID() const { return _renderViewPyId; }
 
   void fillAvailableFieldComponents();
 
-  // TODO: follow the pattern of the others methods: template!
-  virtual MEDCALC::MEDPresentationViewMode getViewMode() = 0;
+//  virtual MEDCALC::MEDPresentationViewMode getViewMode() = 0;
 
   template<typename PresentationType, typename PresentationParameters>
   void updateComponent(const std::string& newCompo);

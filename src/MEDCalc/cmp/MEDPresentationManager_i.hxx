@@ -63,7 +63,8 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
 
   MEDCALC_EXPORT CORBA::Boolean removePresentation(MEDPresentation::TypeID);
   MEDCALC_EXPORT CORBA::Boolean activateView(MEDPresentation::TypeID);
-  MEDCALC_EXPORT MEDCALC::MEDPresentationViewMode getPresentationViewMode(MEDPresentation::TypeID);
+  MEDCALC_EXPORT CORBA::Long getActiveViewPythonId();
+//  MEDCALC_EXPORT MEDCALC::MEDPresentationViewMode getPresentationViewMode(MEDPresentation::TypeID);
   MEDCALC_EXPORT char* getParavisDump(MEDPresentation::TypeID presentationID);
 
  private:
@@ -95,6 +96,7 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   // Owns a list of MEDPresentation objects
   std::map<MEDPresentation::TypeID, MEDPresentation*> _presentations;
 
+  long _activeViewPythonId;
 };
 
 #include "MEDPresentationManager_i.txx"

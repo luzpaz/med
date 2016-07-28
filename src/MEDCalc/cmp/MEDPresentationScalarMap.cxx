@@ -31,24 +31,24 @@ const std::string MEDPresentationScalarMap::TYPE_NAME = "MEDPresentationScalarMa
 
 MEDPresentationScalarMap::MEDPresentationScalarMap(const MEDCALC::ScalarMapParameters& params,
                                                    const MEDCALC::MEDPresentationViewMode viewMode) :
-    MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, params.colorMap), _params(params)
+    MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, params.colorMap, params.scalarBarRange), _params(params)
 {
 }
 
 void
 MEDPresentationScalarMap::internalGeneratePipeline()
 {
+  MEDPresentation::internalGeneratePipeline();
+
   PyLockWrapper lock;
 
   std::ostringstream oss_o, oss_d,oss_l, oss, oss_v;
   oss_o << "__obj" << _objId;      std::string obj(oss_o.str());
   oss_d << "__disp" << _dispId;    std::string disp(oss_d.str());
   oss_l << "__lut" << _lutId;    std::string lut(oss_l.str());
-
-  pushAndExecPyLine( "import pvsimple as pvs;");
-  pushAndExecPyLine( getRenderViewCommand() ); // define __viewXXX
-
   oss_v << "__view" << _renderViewPyId;    std::string view(oss_v.str());
+
+  pushAndExecPyLine( getRenderViewCommand() ); // instanciate __viewXXX
 
   oss << obj << " = pvs.MEDReader(FileName='" << _fileName << "');";
   pushAndExecPyLine(oss.str()); oss.str("");

@@ -38,14 +38,17 @@ const std::string MEDPresentation::PROP_SCALAR_BAR_RANGE = "scalarBarRange";
 
 MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name,
                                  const MEDCALC::MEDPresentationViewMode viewMode,
-                                 const MEDCALC::MEDPresentationColorMap colorMap)
+                                 const MEDCALC::MEDPresentationColorMap colorMap,
+                                 const MEDCALC::MEDPresentationScalarBarRange sbRange)
     : _fieldHandlerId(fieldHandlerId), _propertiesStr(),
       //_pipeline(0), _display(0)
       _selectedComponentIndex(-1),
       _viewMode(viewMode),
       _colorMap(colorMap),
-      _renderViewPyId(GeneratePythonId()),
-      _objId(_renderViewPyId), _dispId(_renderViewPyId), _lutId(_renderViewPyId),
+      _sbRange(sbRange),
+      _renderViewPyId(-1),  // will be set by getRenderViewCommand()
+      _objId(GeneratePythonId()),
+      _dispId(_objId), _lutId(_objId),
       _globalDict(0)
 {
   MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
@@ -58,7 +61,8 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const s
   _fieldType = getFieldTypeString((MEDCoupling::TypeOfField) fieldHandler->type);
 
   if (_fileName.substr(0, 7) != std::string("file://")) {
-    const char* msg = "Data source is not a file! Can not proceed.";
+    const char* msg = "MEDPresentation(): Data source is not a file! Can not proceed.";
+    STDLOG(msg);
     throw MEDPresentationException(msg);
   }
   _fileName = _fileName.substr(7, _fileName.size());
@@ -105,17 +109,24 @@ MEDPresentation::generatePipeline()
 void
 MEDPresentation::pushAndExecPyLine(const std::string & lin)
 {
+  execPyLine(lin);
+  _pythonCmds.push_back(lin);
+}
+
+void
+MEDPresentation::execPyLine(const std::string & lin)
+{
   PyLockWrapper lock;
-//  std::cerr << lin << std::endl;
+//  STDLOG("@@@@ MEDPresentation::execPyLine() about to exec >> " << lin);
   if(PyRun_SimpleString(lin.c_str()))
     {
       std::ostringstream oss;
-      oss << "MEDPresentation::pushAndExecPyLine(): following Python command failed!\n";
+      oss << "MEDPresentation::execPyLine(): following Python command failed!\n";
       oss << ">> " << lin;
       STDLOG(oss.str());
       throw KERNEL::createSalomeException(oss.str().c_str());
     }
-  _pythonCmds.push_back(lin);
+
 }
 
 void
@@ -132,6 +143,7 @@ MEDPresentation::getStringProperty(const std::string& propName) const
       return (*it).second;
   }
   else {
+      STDLOG("MEDPresentation::getStringProperty(): no property named " + propName);
       throw MEDPresentationException("MEDPresentation::getStringProperty(): no property named " + propName);
   }
 }
@@ -150,6 +162,7 @@ MEDPresentation::getIntProperty(const std::string& propName) const
       return (*it).second;
   }
   else {
+      STDLOG("MEDPresentation::getIntProperty(): no property named " + propName);
       throw MEDPresentationException("MEDPresentation::getIntProperty(): no property named " + propName);
   }
 }
@@ -178,6 +191,13 @@ MEDPresentation::getIntProperty(const std::string& propName) const
        oss << (*it).first << "  ->   " << (*it).second;
        STDLOG(oss.str());
      }
+ }
+
+ void
+ MEDPresentation::internalGeneratePipeline()
+ {
+   PyLockWrapper lock;
+   pushAndExecPyLine( "import pvsimple as pvs;");
  }
 
 
@@ -212,12 +232,16 @@ std::string
 MEDPresentation::getRenderViewCommand() const
 {
   std::ostringstream oss, oss2;
+
   oss << "__view" << _renderViewPyId;
   std::string view(oss.str());
   oss2 << "pvs._DisableFirstRenderCameraReset();" << std::endl;
   if (_viewMode == MEDCALC::VIEW_MODE_OVERLAP) {
+      // this might potentially re-assign to an existing view variable, but this is OK, we
+      // normally reassign exaclty the same RenderView object.
       oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');" << std::endl;
   } else if (_viewMode == MEDCALC::VIEW_MODE_REPLACE) {
+      // same as above
       oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');" << std::endl;
       oss2 << "pvs.active_objects.source and pvs.Hide(view=" << view << ");" << std::endl;
       oss2 << "pvs.Render();" << std::endl;
@@ -269,6 +293,7 @@ MEDPresentation::getColorMapCommand() const
     oss << lut << ".ApplyPreset('Cool to Warm',True);";
     break;
   default:
+    STDLOG("MEDPresentation::getColorMapCommand(): invalid colormap!");
     throw KERNEL::createSalomeException("MEDPresentation::getColorMapCommand(): invalid colormap!");
   }
   return oss.str();
@@ -287,6 +312,7 @@ MEDPresentation::getRescaleCommand() const
       oss << disp <<  ".RescaleTransferFunctionToDataRange(False);";
       break;
     default:
+      STDLOG("MEDPresentation::getRescaleCommand(): invalid range!");
       throw KERNEL::createSalomeException("MEDPresentation::getRescaleCommand(): invalid range!");
   }
   return oss.str();
@@ -348,30 +374,37 @@ MEDPresentation::fillAvailableFieldComponents()
   }
   else {
       std::string msg("Unsupported spatial discretisation: " + _fieldType);
+      STDLOG(msg);
       throw KERNEL::createSalomeException(msg.c_str());
   }
 
   std::ostringstream oss;
   oss << "__nbCompo = " << obj << "." << typ << ".GetArray('" <<  _fieldName << "').GetNumberOfComponents();";
-  PyRun_SimpleString(oss.str().c_str());
+  execPyLine(oss.str());
   PyObject* p_obj = getPythonObjectFromMain("__nbCompo");
   long nbCompo;
   if (p_obj && PyInt_Check(p_obj))
     nbCompo = PyInt_AS_LONG(p_obj);
   else
-    throw KERNEL::createSalomeException("Unexpected Python error");
+    {
+      STDLOG("Unexpected Python error");
+      throw KERNEL::createSalomeException("Unexpected Python error");
+    }
   setIntProperty(MEDPresentation::PROP_NB_COMPONENTS, nbCompo);
   for (long i = 0; i<nbCompo; i++)
     {
       std::ostringstream oss2;
       oss2 << "__compo = " << obj << "." << typ << ".GetArray('" <<  _fieldName << "').GetComponentName(" << i << ");";
-      PyRun_SimpleString(oss2.str().c_str());
+      execPyLine(oss2.str());
       PyObject* p_obj = getPythonObjectFromMain("__compo");
       std::string compo;
       if (p_obj && PyString_Check(p_obj))
         compo = std::string(PyString_AsString(p_obj));  // pointing to internal Python memory, so make a copy!!
       else
-        throw KERNEL::createSalomeException("Unexpected Python error");
+        {
+          STDLOG("Unexpected Python error");
+          throw KERNEL::createSalomeException("Unexpected Python error");
+        }
       std::ostringstream oss_p;
       oss_p << MEDPresentation::PROP_COMPONENT << i;
       setStringProperty(oss_p.str(), compo);

@@ -43,7 +43,9 @@ MEDPresentationManager_i::getInstance() {
   return _instance;
 }
 
-MEDPresentationManager_i::MEDPresentationManager_i()
+MEDPresentationManager_i::MEDPresentationManager_i() :
+    _presentations(),
+    _activeViewPythonId(-1)
 {
 }
 
@@ -214,10 +216,7 @@ MEDPresentationManager_i::removePresentation(MEDPresentation::TypeID presentatio
     delete presentation;
   _presentations.erase(presentationID);
 
-  std::stringstream sstm;
-  sstm << "Presentation " << presentationID << " has been removed.\n";
-  STDLOG(sstm.str());
-
+  STDLOG("Presentation " << presentationID << " has been removed.");
   return true;
 }
 
@@ -232,20 +231,32 @@ MEDPresentationManager_i::activateView(MEDPresentation::TypeID presentationID)
   MEDPresentation* presentation = (*citr).second;
 
   presentation->activateView();
+  _activeViewPythonId = presentation->getPyViewID();
   return true;
 }
 
-MEDCALC::MEDPresentationViewMode
-MEDPresentationManager_i::getPresentationViewMode(MEDPresentation::TypeID presentationID)
+CORBA::Long
+MEDPresentationManager_i::getActiveViewPythonId()
 {
-  MEDPresentation* pres = _getPresentation(presentationID);
-  if (pres) {
-    return pres->getViewMode();
-  } else {
-    std::cerr << "setPresentationProperty(): presentation not found!!" << std::endl;
-    return MEDCALC::VIEW_MODE_DEFAULT;
-  }
+  //TODO: should be more elaborate to re-identify the active ParaView view when another
+  //mechanism than MED module has activated another view.
+  // Idea: 1/ call Python to current active view
+  //       2/ compare with all id(__viewX) from currently existing presentations
+  return _activeViewPythonId;
 }
+
+
+//MEDCALC::MEDPresentationViewMode
+//MEDPresentationManager_i::getPresentationViewMode(MEDPresentation::TypeID presentationID)
+//{
+//  MEDPresentation* pres = _getPresentation(presentationID);
+//  if (pres) {
+//    return pres->getViewMode();
+//  } else {
+//    std::cerr << "setPresentationProperty(): presentation not found!!" << std::endl;
+//    return MEDCALC::VIEW_MODE_DEFAULT;
+//  }
+//}
 
 char*
 MEDPresentationManager_i::getParavisDump(MEDPresentation::TypeID presentationID)

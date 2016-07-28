@@ -337,7 +337,7 @@ MEDCALC::FieldHandlerList * MEDDataManager_i::getFieldHandlerList() {
  * This returns a copy of the fieldHandler associated to the specified id.
  */
 MEDCALC::FieldHandler * MEDDataManager_i::getFieldHandler(CORBA::Long fieldHandlerId) {
-  LOG("getFieldHandler: START")
+//  LOG("getFieldHandler: START")
 
   FieldHandlerMapIterator fieldIt = _fieldHandlerMap.find(fieldHandlerId);
   if ( fieldIt != _fieldHandlerMap.end() ) {
