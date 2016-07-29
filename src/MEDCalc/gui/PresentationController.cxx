@@ -669,25 +669,22 @@ PresentationController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
   if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
     updateTreeViewWithNewPresentation(event->dataId, event->presentationId);
     // Deal with replace mode: presentations with invalid IDs have to be removed:
-    std::map<int, MEDWidgetHelper *>::iterator it;
-    std::vector<int> to_del;
-    for (it = _presHelperMap.begin(); it != _presHelperMap.end(); ++it)
+    SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
+    _PTR(Study) studyDS = study->studyDS();
+
+    MEDCALC::PresentationsList * lstManager = _presManager->getAllPresentations();
+    MED_ORB::PresentationsList * lstModule = _salomeModule->engine()->getStudyPresentations(_CAST(Study, studyDS)->GetStudy());
+    // The IDs not in the intersection needs deletion:
+    CORBA::Long * last = lstManager->get_buffer() + lstManager->length();
+    for (unsigned i = 0; i < lstModule->length(); i++)
       {
-        try {
-            // TODO: not the best way to test for presentation existence at the engine level?
-            _presManager->getPresentationStringProperty((*it).first, MEDPresentation::PROP_NAME.c_str());
-        }
-        catch(...){
-           to_del.push_back((*it).first);
-           delete((*it).second);
-           (*it).second = 0;
-        }
-      }
-    std::vector<int>::const_iterator it2;
-    for (it2 = to_del.begin(); it2 != to_del.end(); ++it2)
-      {
-        updateTreeViewForPresentationRemoval(*it2);
-        _presHelperMap.erase(*it2);
+        CORBA::Long * ptr = std::find(lstManager->get_buffer(), last, (*lstModule)[i]);
+        if (ptr == last)
+          {
+            STDLOG("Removing pres " << (*lstModule)[i] << " from OB.");
+          // Presentation in module but not in manager anymore: to be deleted from OB:
+          updateTreeViewForPresentationRemoval((*lstModule)[i]);
+          }
       }
   }
   else if ( event->type == MEDCALC::EVENT_REMOVE_PRESENTATION ) {

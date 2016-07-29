@@ -59,6 +59,9 @@ module MED_ORB
                                               in long presentationId)
       raises (SALOME::SALOME_Exception);
 
+    // Get all presentations in study:
+    PresentationsList getStudyPresentations(in SALOMEDS::Study study)
+      raises (SALOME::SALOME_Exception);
   };
 };
 

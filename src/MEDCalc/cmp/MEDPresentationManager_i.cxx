@@ -269,3 +269,14 @@ MEDPresentationManager_i::getParavisDump(MEDPresentation::TypeID presentationID)
     throw KERNEL::createSalomeException("getParavisDump(): presentation not found!!");
 }
 
+MEDCALC::PresentationsList*
+MEDPresentationManager_i::getAllPresentations()
+{
+  MEDCALC::PresentationsList* presList = new MEDCALC::PresentationsList;
+  presList->length(_presentations.size());
+  std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator it;
+  int i;
+  for (i = 0, it = _presentations.begin(); it != _presentations.end(); ++it, ++i)
+    (*presList)[i] = it->first;
+  return presList;
+}

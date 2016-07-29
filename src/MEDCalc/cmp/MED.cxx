@@ -241,6 +241,38 @@ MED::unregisterPresentation(SALOMEDS::Study_ptr study,
 }
 
 MED_ORB::PresentationsList*
+MED::getStudyPresentations(SALOMEDS::Study_ptr study)
+{
+  // set exception handler to catch unexpected CORBA exceptions
+  Unexpect aCatch(SALOME_SalomeException);
+
+  MED_ORB::PresentationsList* presList = new MED_ORB::PresentationsList;
+
+  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+
+  SALOMEDS::GenericAttribute_var anAttribute;
+  SALOMEDS::SComponent_var father = study->FindComponent("MED");
+  SALOMEDS::ChildIterator_var it = study->NewChildIterator(father);
+  for (it->InitEx(true); it->More(); it->Next())
+    {
+      SALOMEDS::SObject_var child(it->Value());
+      if (child->FindAttribute(anAttribute, "AttributeParameter"))
+        {
+          SALOMEDS::AttributeParameter_var attrParam = SALOMEDS::AttributeParameter::_narrow(anAttribute);
+          if (!attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN) || !attrParam->GetBool(IS_PRESENTATION) || !attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
+            continue;
+
+          CORBA::ULong size = presList->length();
+          presList->length(size+1);
+          (*presList)[size] = attrParam->GetInt(PRESENTATION_ID);
+        }
+    }
+  return presList;
+}
+
+
+MED_ORB::PresentationsList*
 MED::getSiblingPresentations(SALOMEDS::Study_ptr study, CORBA::Long presentationId)
 {
   // set exception handler to catch unexpected CORBA exceptions

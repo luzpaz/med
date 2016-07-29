@@ -69,6 +69,9 @@ public:
   MED_ORB::PresentationsList* getSiblingPresentations(SALOMEDS::Study_ptr study,
                                                       CORBA::Long presentationId);
 
+  // Get all presentations registered in the study
+  MED_ORB::PresentationsList* getStudyPresentations(SALOMEDS::Study_ptr study);
+
   /*! Dump the study as a Python file */
   virtual Engines::TMPFile* DumpPython(CORBA::Object_ptr theStudy,
                                        CORBA::Boolean isPublished,
