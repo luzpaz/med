@@ -83,8 +83,8 @@ connectEventListener()
 # that they could be used in another context than the FieldProxy instances
 import MEDCALC
 
-def __notifyGui(eventType, dataId=-1, filename="", presentationId=-1):
-  medEvent = MEDCALC.MedEvent(eventType, dataId, filename, presentationId)
+def __notifyGui(eventType, dataId=-1, filename="", presentationId=-1, msg=""):
+  medEvent = MEDCALC.MedEvent(eventType, dataId, filename, presentationId, msg)
   if not eventListenerIsRunning(): return
 
   # Notify the GUI of the update event
@@ -123,3 +123,6 @@ def notifyGui_playQtTestingScenario(filename):
 #
 def notifyGui_termination():
   __notifyGui(MEDCALC.EVENT_QUIT_SALOME)
+  
+def notifyGui_error(msg):
+  __notifyGui(MEDCALC.EVENT_ERROR, msg=msg)

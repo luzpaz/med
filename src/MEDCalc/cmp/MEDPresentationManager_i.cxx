@@ -23,9 +23,9 @@
 
 // presentations
 #include "MEDPresentationScalarMap.hxx"
-//#include "MEDPresentationContour.hxx"
-//#include "MEDPresentationVectorField.hxx"
+#include "MEDPresentationContour.hxx"
 //#include "MEDPresentationSlices.hxx"
+//#include "MEDPresentationVectorField.hxx"
 //#include "MEDPresentationDeflectionShape.hxx"
 //#include "MEDPresentationPointSprite.hxx"
 
@@ -128,12 +128,12 @@ MEDPresentationManager_i::makeScalarMap(const MEDCALC::ScalarMapParameters& para
   return _makePresentation<MEDPresentationScalarMap>(params, viewMode);
 }
 
-//MEDPresentation::TypeID
-//MEDPresentationManager_i::makeContour(const MEDCALC::ContourParameters& params)
-//{
-//  return _makePresentation<MEDPresentationContour>(params);
-//}
-//
+MEDPresentation::TypeID
+MEDPresentationManager_i::makeContour(const MEDCALC::ContourParameters& params, const MEDCALC::MEDPresentationViewMode viewMode)
+{
+  return _makePresentation<MEDPresentationContour>(params, viewMode);
+}
+
 //MEDPresentation::TypeID
 //MEDPresentationManager_i::makeVectorField(const MEDCALC::VectorFieldParameters& params)
 //{
@@ -167,18 +167,26 @@ MEDPresentationManager_i::getScalarMapParameters(MEDPresentation::TypeID present
   return tmp._retn();
 }
 
+MEDCALC::ContourParameters
+MEDPresentationManager_i::getContourParameters(MEDPresentation::TypeID presentationID)
+{
+  MEDCALC::ContourParameters p;
+  _getParameters<MEDPresentationContour>(presentationID, p);
+  return p;
+}
+
 void
 MEDPresentationManager_i::updateScalarMap(MEDPresentation::TypeID presentationID, const MEDCALC::ScalarMapParameters& params)
 {
   return _updatePresentation<MEDPresentationScalarMap>(presentationID, params);
 }
 
-//void
-//MEDPresentationManager_i::updateContour(MEDPresentation::TypeID presentationID, const MEDCALC::ContourParameters& params)
-//{
-//  return _updatePresentation<MEDPresentationContour>(presentationID, params);
-//}
-//
+void
+MEDPresentationManager_i::updateContour(MEDPresentation::TypeID presentationID, const MEDCALC::ContourParameters& params)
+{
+  return _updatePresentation<MEDPresentationContour>(presentationID, params);
+}
+
 //void
 //MEDPresentationManager_i::updateVectorField(MEDPresentation::TypeID presentationID, const MEDCALC::VectorFieldParameters& params)
 //{
@@ -232,6 +240,7 @@ MEDPresentationManager_i::activateView(MEDPresentation::TypeID presentationID)
 
   presentation->activateView();
   _activeViewPythonId = presentation->getPyViewID();
+  STDLOG("Activated view " << _activeViewPythonId);
   return true;
 }
 

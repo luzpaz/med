@@ -18,8 +18,8 @@
 #
 
 import medcalc
-import MEDCALC
-from medcalc.medevents import notifyGui_addPresentation, notifyGui_removePresentation
+import MEDCALC, SALOME
+from medcalc.medevents import notifyGui_addPresentation, notifyGui_removePresentation, notifyGui_error
 
 __manager = medcalc.medcorba.factory.getPresentationManager()
 
@@ -32,22 +32,30 @@ def MakeScalarMap(proxy,
   # Create the presentation instance in CORBA engine
   # The engine in turn creates the ParaView pipeline elements
   params = MEDCALC.ScalarMapParameters(proxy.id, displayedComponent, scalarBarRange, colorMap)
-  presentation_id = __manager.makeScalarMap(params, viewMode)
-  notifyGui_addPresentation(proxy.id, presentation_id)
-  return presentation_id
-#
+  try:
+    presentation_id = __manager.makeScalarMap(params, viewMode)
+    notifyGui_addPresentation(proxy.id, presentation_id)
+    return presentation_id
+  except SALOME.SALOME_Exception as e:
+    notifyGui_error("An error occured while creating the scalar map:\n" + e.details.text)
+    raise Exception(e.details.text)
 
-#def MakeContour(proxy,
-#                viewMode=MEDCALC.VIEW_MODE_DEFAULT,
-#                displayedComponent=MEDCALC.DISPLAY_DEFAULT,
-#                scalarBarRange=MEDCALC.SCALAR_BAR_RANGE_DEFAULT,
-#                colorMap=MEDCALC.COLOR_MAP_DEFAULT,
-#                nbContours=MEDCALC.NB_CONTOURS_DEFAULT
-#                ):
-#  params = MEDCALC.ContourParameters(proxy.id, viewMode, displayedComponent, scalarBarRange, colorMap, nbContours)
-#  presentation_id = __manager.makeContour(params)
-#  notifyGui_addPresentation(proxy.id, presentation_id)
-#  return presentation_id
+def MakeContour(proxy,
+                viewMode=MEDCALC.VIEW_MODE_DEFAULT,
+                displayedComponent=MEDCALC.DISPLAY_DEFAULT,
+                scalarBarRange=MEDCALC.SCALAR_BAR_RANGE_DEFAULT,
+                colorMap=MEDCALC.COLOR_MAP_DEFAULT,
+                nbContours=MEDCALC.NB_CONTOURS_DEFAULT
+                ):
+  params = MEDCALC.ContourParameters(proxy.id, scalarBarRange, colorMap, nbContours)
+  try:
+    presentation_id = __manager.makeContour(params, viewMode)
+    notifyGui_addPresentation(proxy.id, presentation_id)
+    return presentation_id
+  except SALOME.SALOME_Exception as e:
+    notifyGui_error("An error occured while creating the contour:\n" + e.details.text)
+    raise Exception(e.details.text)
+
 ##
 #
 #def MakeVectorField(proxy,
@@ -102,5 +110,14 @@ def GetScalarMapParameters(presentation_id):
   params = __manager.getScalarMapParameters(presentation_id)
   return params
 
+def GetContourParameters(presentation_id):
+  # TODO: check that pres id is really a ScalarMap ...
+  params = __manager.getContourParameters(presentation_id)
+  return params
+
 def UpdateScalarMap(presentation_id, params):
   __manager.updateScalarMap(presentation_id, params)
+
+def UpdateContour(presentation_id, params):
+  __manager.updateContour(presentation_id, params)
+

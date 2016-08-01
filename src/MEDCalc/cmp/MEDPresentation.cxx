@@ -47,8 +47,6 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const s
       _colorMap(colorMap),
       _sbRange(sbRange),
       _renderViewPyId(-1),  // will be set by getRenderViewCommand()
-      _objId(GeneratePythonId()),
-      _dispId(_objId), _lutId(_objId),
       _globalDict(0)
 {
   MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
@@ -72,8 +70,20 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const s
   setIntProperty(MEDPresentation::PROP_NB_COMPONENTS, 0);
   setIntProperty(MEDPresentation::PROP_SELECTED_COMPONENT, 0);
 
-  setIntProperty(MEDPresentation::PROP_COLOR_MAP, static_cast<int>(MEDCALC::COLOR_MAP_DEFAULT));
-  setIntProperty(MEDPresentation::PROP_SCALAR_BAR_RANGE, static_cast<int>(MEDCALC::SCALAR_BAR_RANGE_DEFAULT));
+  setIntProperty(MEDPresentation::PROP_COLOR_MAP, static_cast<int>(colorMap));
+  setIntProperty(MEDPresentation::PROP_SCALAR_BAR_RANGE, static_cast<int>(sbRange));
+
+  // Python variables:
+  int id = GeneratePythonId();
+  std::ostringstream oss_o, oss_d, oss_l, oss_s;
+  oss_o << "__obj" << id;
+  oss_s << "__srcObj" << id;
+  oss_d << "__disp" << id;
+  oss_l << "__lut" << id;
+  _objVar = oss_o.str();
+  _srcObjVar = oss_s.str();
+  _dispVar = oss_d.str();
+  _lutVar = oss_l.str();
 }
 
 MEDPresentation::~MEDPresentation()
@@ -81,10 +91,9 @@ MEDPresentation::~MEDPresentation()
   STDLOG("~MEDPresentation(): clear display");
   {
     MEDPyLockWrapper lock;
-    std::ostringstream oss_o, oss_v, oss;
-    oss_o << "__obj" << _objId;
+    std::ostringstream oss_v, oss;
     oss_v << "__view" << _renderViewPyId;
-    oss << "pvs.Hide(" << oss_o.str() <<  ", view=" << oss_v.str() << ");";
+    oss << "pvs.Hide(" << _objVar <<  ", view=" << oss_v.str() << ");";
     oss << "pvs.Render();";
 
     PyRun_SimpleString(oss.str().c_str());
@@ -117,7 +126,7 @@ void
 MEDPresentation::execPyLine(const std::string & lin)
 {
   MEDPyLockWrapper lock;
-//  STDLOG("@@@@ MEDPresentation::execPyLine() about to exec >> " << lin);
+  STDLOG("@@@@ MEDPresentation::execPyLine() about to exec >> " << lin);
   if(PyRun_SimpleString(lin.c_str()))
     {
       std::ostringstream oss;
@@ -126,7 +135,6 @@ MEDPresentation::execPyLine(const std::string & lin)
       STDLOG(oss.str());
       throw KERNEL::createSalomeException(oss.str().c_str());
     }
-
 }
 
 void
@@ -229,12 +237,19 @@ MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldType) const
 }
 
 std::string
+MEDPresentation::getRenderViewVar() const
+{
+  std::ostringstream oss;
+  oss << "__view" << _renderViewPyId;
+  return oss.str();
+}
+
+std::string
 MEDPresentation::getRenderViewCommand() const
 {
   std::ostringstream oss, oss2;
 
-  oss << "__view" << _renderViewPyId;
-  std::string view(oss.str());
+  std::string view(getRenderViewVar());
   oss2 << "pvs._DisableFirstRenderCameraReset();" << std::endl;
   if (_viewMode == MEDCALC::VIEW_MODE_OVERLAP) {
       // this might potentially re-assign to an existing view variable, but this is OK, we
@@ -257,25 +272,23 @@ MEDPresentation::getRenderViewCommand() const
 std::string
 MEDPresentation::getResetCameraCommand() const
 {
-  std::ostringstream oss;
-  oss << "__view" << _renderViewPyId << ".ResetCamera();";
-  return oss.str();
+  return getRenderViewVar() + ".ResetCamera();";
 }
 
 std::string
 MEDPresentation::getComponentSelectionCommand() const
 {
   std::ostringstream oss, oss_l;
-  oss_l << "__lut" << _lutId;    std::string lut(oss_l.str());
+  std::string ret;
 
   if (_selectedComponentIndex != -1)
     {
-      oss << lut << ".VectorMode = 'Component';\n";
-      oss << lut << ".VectorComponent = " << _selectedComponentIndex << ";";
+      oss << _lutVar << ".VectorMode = 'Component';\n";
+      oss << _lutVar << ".VectorComponent = " << _selectedComponentIndex << ";";
     }
   else  // Euclidean norm
     {
-      oss << lut << ".VectorMode = 'Magnitude';";
+      oss << _lutVar << ".VectorMode = 'Magnitude';";
     }
   return oss.str();
 }
@@ -283,39 +296,37 @@ MEDPresentation::getComponentSelectionCommand() const
 std::string
 MEDPresentation::getColorMapCommand() const
 {
-  std::ostringstream oss, oss_l;
-  oss_l << "__lut" << _lutId;    std::string lut(oss_l.str());
+  std::string ret;
   switch (_colorMap) {
   case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW:
-    oss << lut << ".ApplyPreset('Blue to Red Rainbow',True);";
+    ret = _lutVar + ".ApplyPreset('Blue to Red Rainbow',True);";
     break;
   case MEDCALC::COLOR_MAP_COOL_TO_WARM:
-    oss << lut << ".ApplyPreset('Cool to Warm',True);";
+    ret = _lutVar + ".ApplyPreset('Cool to Warm',True);";
     break;
   default:
     STDLOG("MEDPresentation::getColorMapCommand(): invalid colormap!");
     throw KERNEL::createSalomeException("MEDPresentation::getColorMapCommand(): invalid colormap!");
   }
-  return oss.str();
+  return ret;
 }
 std::string
 MEDPresentation::getRescaleCommand() const
 {
-  std::ostringstream oss, oss_d;
-  oss_d << "__disp" << _dispId;    std::string disp(oss_d.str());
+  std::string ret;
   switch(_sbRange)
   {
     case MEDCALC::SCALAR_BAR_ALL_TIMESTEPS:
-      oss << disp <<  ".RescaleTransferFunctionToDataRangeOverTime();";
+      ret = _dispVar + ".RescaleTransferFunctionToDataRangeOverTime();";
       break;
     case MEDCALC::SCALAR_BAR_CURRENT_TIMESTEP:
-      oss << disp <<  ".RescaleTransferFunctionToDataRange(False);";
+      ret = _dispVar + ".RescaleTransferFunctionToDataRange(False);";
       break;
     default:
       STDLOG("MEDPresentation::getRescaleCommand(): invalid range!");
       throw KERNEL::createSalomeException("MEDPresentation::getRescaleCommand(): invalid range!");
   }
-  return oss.str();
+  return ret;
 }
 
 int
@@ -329,10 +340,7 @@ void
 MEDPresentation::activateView()
 {
   MEDPyLockWrapper lock;
-
-  std::ostringstream oss;
-  oss << "pvs.SetActiveView(__view" << _renderViewPyId << ");";
-  pushAndExecPyLine(oss.str());
+  pushAndExecPyLine("pvs.SetActiveView(" + getRenderViewVar() + ");");
 }
 
 
@@ -361,9 +369,6 @@ void
 MEDPresentation::fillAvailableFieldComponents()
 {
   MEDPyLockWrapper lock;  // GIL!
-
-  std::ostringstream oss_o;
-  oss_o << "__obj" << _objId;      std::string obj(oss_o.str());
   std::string typ;
 
   if(_fieldType == "CELLS") {
@@ -379,7 +384,7 @@ MEDPresentation::fillAvailableFieldComponents()
   }
 
   std::ostringstream oss;
-  oss << "__nbCompo = " << obj << "." << typ << ".GetArray('" <<  _fieldName << "').GetNumberOfComponents();";
+  oss << "__nbCompo = " << _srcObjVar << "." << typ << ".GetArray('" <<  _fieldName << "').GetNumberOfComponents();";
   execPyLine(oss.str());
   PyObject* p_obj = getPythonObjectFromMain("__nbCompo");
   long nbCompo;
@@ -394,7 +399,7 @@ MEDPresentation::fillAvailableFieldComponents()
   for (long i = 0; i<nbCompo; i++)
     {
       std::ostringstream oss2;
-      oss2 << "__compo = " << obj << "." << typ << ".GetArray('" <<  _fieldName << "').GetComponentName(" << i << ");";
+      oss2 << "__compo = " << _srcObjVar << "." << typ << ".GetArray('" <<  _fieldName << "').GetComponentName(" << i << ");";
       execPyLine(oss2.str());
       PyObject* p_obj = getPythonObjectFromMain("__compo");
       std::string compo;

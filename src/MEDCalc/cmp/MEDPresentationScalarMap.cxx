@@ -43,15 +43,12 @@ MEDPresentationScalarMap::internalGeneratePipeline()
 
   MEDPyLockWrapper lock;
 
-  std::ostringstream oss_o, oss_d,oss_l, oss, oss_v;
-  oss_o << "__obj" << _objId;      std::string obj(oss_o.str());
-  oss_d << "__disp" << _dispId;    std::string disp(oss_d.str());
-  oss_l << "__lut" << _lutId;    std::string lut(oss_l.str());
-  oss_v << "__view" << _renderViewPyId;    std::string view(oss_v.str());
+  std::ostringstream oss;
+  std::string view(getRenderViewVar());
 
   pushAndExecPyLine( getRenderViewCommand() ); // instanciate __viewXXX
 
-  oss << obj << " = pvs.MEDReader(FileName='" << _fileName << "');";
+  oss << _srcObjVar << " = pvs.MEDReader(FileName='" << _fileName << "');";
   pushAndExecPyLine(oss.str()); oss.str("");
 
   // Populate internal array of available components:
@@ -59,15 +56,17 @@ MEDPresentationScalarMap::internalGeneratePipeline()
 //  dumpIntProperties();
 //  dumpStringProperties();
 
-  oss << disp << " = pvs.Show(" << obj << ", " << view << ");";
+  pushAndExecPyLine(_objVar + " = " + _srcObjVar);
+
+  oss << _dispVar << " = pvs.Show(" << _objVar << ", " << view << ");";
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << "pvs.ColorBy(" << disp << ", ('" << _fieldType << "', '" << _fieldName << "'));";
+  oss << "pvs.ColorBy(" << _dispVar << ", ('" << _fieldType << "', '" << _fieldName << "'));";
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << disp <<  ".SetScalarBarVisibility(" << view << ", True);";
+  oss << _dispVar <<  ".SetScalarBarVisibility(" << view << ", True);";
   pushAndExecPyLine(oss.str()); oss.str("");
   oss << getRescaleCommand();
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << lut << " = pvs.GetColorTransferFunction('" << _fieldName << "');";
+  oss << _lutVar << " = pvs.GetColorTransferFunction('" << _fieldName << "');";
   pushAndExecPyLine(oss.str()); oss.str("");
   pushAndExecPyLine(getColorMapCommand()); oss.str("");
   pushAndExecPyLine(getResetCameraCommand());
@@ -85,8 +84,13 @@ MEDPresentationScalarMap::updatePipeline(const MEDCALC::ScalarMapParameters& par
   if (params.fieldHandlerId != _params.fieldHandlerId)
     throw KERNEL::createSalomeException("Unexpected updatePipeline error! Mismatching fieldHandlerId!");
 
-  if (params.displayedComponent != _params.displayedComponent)
-    updateComponent<MEDPresentationScalarMap, MEDCALC::ScalarMapParameters>(std::string(params.displayedComponent));
+  if (std::string(params.displayedComponent) != std::string(_params.displayedComponent))
+    {
+      STDLOG("about to updateCompo in scalar map");
+      STDLOG("from param " << params.displayedComponent);
+      STDLOG("from intern " << _params.displayedComponent);
+      updateComponent<MEDPresentationScalarMap, MEDCALC::ScalarMapParameters>(std::string(params.displayedComponent));
+    }
   if (params.scalarBarRange != _params.scalarBarRange)
     updateScalarBarRange<MEDPresentationScalarMap, MEDCALC::ScalarMapParameters>(params.scalarBarRange);
   if (params.colorMap != _params.colorMap)

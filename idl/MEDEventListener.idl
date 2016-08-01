@@ -37,6 +37,7 @@ module MEDCALC
     EVENT_REMOVE_PRESENTATION,
     EVENT_PLAY_TEST,
     EVENT_QUIT_SALOME,
+    EVENT_ERROR,
     EVENT_UNKNOWN
   };
 
@@ -45,6 +46,7 @@ module MEDCALC
     long          dataId;
     string        filename;
     long          presentationId;
+    string        msg;
   };
 
   interface MEDEventListener: SALOME::GenericObj {

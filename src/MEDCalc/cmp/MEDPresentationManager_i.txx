@@ -29,19 +29,18 @@ MEDPresentationManager_i::_makePresentation(const PresentationParameters params,
   int activeViewId = getActiveViewPythonId();
 
   // Replace = Remove then add
+  std::vector<int> to_del;
   if (viewMode == MEDCALC::VIEW_MODE_REPLACE)
     {
       // Remove all presentations from this view:
+      STDLOG("About to remove all presentations from view " << activeViewId);
       std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator it;
-      std::vector<int> to_del;
       for (it = _presentations.begin(); it != _presentations.end(); ++it)
         {
           int viewId2 = (*it).second->getPyViewID();
           if (viewId2 == activeViewId)
             to_del.push_back((*it).first);
         }
-      for (std::vector<int>::const_iterator it2 = to_del.begin(); it2 != to_del.end(); ++it2)
-        removePresentation(*it2);
   }
 
   // Create a new presentation instance
@@ -64,6 +63,11 @@ MEDPresentationManager_i::_makePresentation(const PresentationParameters params,
 
   _presentations.insert( std::pair<MEDPresentation::TypeID, MEDPresentation *>(newID, presentation) );
   presentation->generatePipeline();
+
+  // If generatePipeline didn't throw, we can actually remove presentations to be deleted:
+  for (std::vector<int>::const_iterator it2 = to_del.begin(); it2 != to_del.end(); ++it2)
+    removePresentation(*it2);
+
   // Make the view holding the newly created presentation the active one:
   activateView(newID);
   return newID;

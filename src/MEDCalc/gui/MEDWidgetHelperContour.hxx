@@ -17,27 +17,36 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef SRC_MEDCALC_GUI_MEDWIDGETHELPERSCALARMAP_HXX_
-#define SRC_MEDCALC_GUI_MEDWIDGETHELPERSCALARMAP_HXX_
+#ifndef SRC_MEDCALC_GUI_MEDWIDGETHELPERCONTOUR_HXX_
+#define SRC_MEDCALC_GUI_MEDWIDGETHELPERCONTOUR_HXX_
 
 #include "MEDWidgetHelper.hxx"
 
 class PresentationController;
 
-class MEDWidgetHelperScalarMap: public MEDWidgetHelper
+class MEDWidgetHelperContour: public MEDWidgetHelper
 {
   Q_OBJECT
 
 public:
-  MEDWidgetHelperScalarMap(const PresentationController* presController,
+  MEDWidgetHelperContour(const PresentationController* presController,
                            MEDCALC::MEDPresentationManager_ptr presManager, int presId, const std::string & presName,
                            WidgetPresentationParameters * paramW);
-  virtual ~MEDWidgetHelperScalarMap();
+  virtual ~MEDWidgetHelperContour();
 
   virtual void udpateWidget();
   virtual void releaseWidget();
 
-  virtual std::string getPythonTag() const { return "ScalarMap"; }
+  virtual std::string getPythonTag() const { return "Contour"; }
+
+protected slots:
+  void onNbContourChanged(int nbContour);
+
+protected:
+  virtual void loadParametersFromEngine();
+
+private:
+  int _nbContours;
 };
 
-#endif /* SRC_MEDCALC_GUI_MEDWIDGETHELPERSCALARMAP_HXX_ */
+#endif /* SRC_MEDCALC_GUI_MEDWIDGETHELPERCONTOUR_HXX_ */

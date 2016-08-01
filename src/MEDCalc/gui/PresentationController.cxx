@@ -27,8 +27,11 @@
 #include "MEDPresentationManager_i.hxx"
 #include "XmedConsoleDriver.hxx"
 
-#include "MEDWidgetHelperScalarMap.hxx"
 #include "MEDPresentationScalarMap.hxx"
+#include "MEDPresentationContour.hxx"
+
+#include "MEDWidgetHelperScalarMap.hxx"
+#include "MEDWidgetHelperContour.hxx"
 
 #include <SalomeApp_Application.h>
 #include <SalomeApp_Study.h>
@@ -55,11 +58,11 @@ static const int OPTIONS_VIEW_MODE_SPLIT_VIEW_ID = 947;
 MEDCALC::MEDPresentationManager_ptr PresentationController::_presManager;
 
 PresentationController::PresentationController(MEDModule* salomeModule) :
-    _salomeModule(salomeModule),
-    _consoleDriver(0),
-    _studyEditor(salomeModule->getStudyEditor()),
-    _presHelperMap(),
-    _currentWidgetHelper(0)
+        _salomeModule(salomeModule),
+        _consoleDriver(0),
+        _studyEditor(salomeModule->getStudyEditor()),
+        _presHelperMap(),
+        _currentWidgetHelper(0)
 {
   STDLOG("Creating a PresentationController");
 
@@ -79,11 +82,11 @@ PresentationController::PresentationController(MEDModule* salomeModule) :
   // Retrieve MEDFactory to get MEDPresentationManager (sometimes GUI needs to talk to the engine directly)
   if ( ! _presManager ) {
       _presManager = MEDFactoryClient::getFactory()->getPresentationManager();
-    }
+  }
 
   // Connect to the click in the object browser
   connect(salomeModule, SIGNAL( presentationSelected(int , const QString&, const QString&) ),
-             this, SLOT(onPresentationSelected(int , const QString&, const QString&) )     );
+          this, SLOT(onPresentationSelected(int , const QString&, const QString&) )     );
 }
 
 PresentationController::~PresentationController()
@@ -119,9 +122,9 @@ PresentationController::_getIconName(const std::string& name)
   // Read value from preferences and suffix name to select icon theme
   int theme = mgr->integerValue("MEDCalc", "icons");
   if (theme == 0) {
-    return name + "_MODERN";
+      return name + "_MODERN";
   } else if (theme == 1) {
-    return name + "_CLASSIC";
+      return name + "_CLASSIC";
   }
   return name + "_DEFAULT";
 }
@@ -223,8 +226,8 @@ PresentationController::createActions()
   tooltip = tr("TIP_DELETE_PRESENTATION");
   icon    = tr(_getIconName("ICO_DELETE_PRESENTATION").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(onDeletePresentation()),icon,tooltip);
-//  _salomeModule->createTool(actionId, presentationToolbarId);
-//  _salomeModule->action(actionId)->setIconVisibleInMenu(true);
+  //  _salomeModule->createTool(actionId, presentationToolbarId);
+  //  _salomeModule->action(actionId)->setIconVisibleInMenu(true);
   _salomeModule->createMenu(actionId, presentationMenuId);
 
   //
@@ -243,16 +246,16 @@ MEDCALC::MEDPresentationViewMode
 PresentationController::getSelectedViewMode() const
 {
   if (_salomeModule->action(OPTIONS_VIEW_MODE_REPLACE_ID)->isChecked()) {
-    return MEDCALC::VIEW_MODE_REPLACE;
+      return MEDCALC::VIEW_MODE_REPLACE;
   }
   else if (_salomeModule->action(OPTIONS_VIEW_MODE_OVERLAP_ID)->isChecked()) {
-    return MEDCALC::VIEW_MODE_OVERLAP;
+      return MEDCALC::VIEW_MODE_OVERLAP;
   }
   else if (_salomeModule->action(OPTIONS_VIEW_MODE_NEW_LAYOUT_ID)->isChecked()) {
-    return MEDCALC::VIEW_MODE_NEW_LAYOUT;
+      return MEDCALC::VIEW_MODE_NEW_LAYOUT;
   }
   else if (_salomeModule->action(OPTIONS_VIEW_MODE_SPLIT_VIEW_ID)->isChecked()) {
-    return MEDCALC::VIEW_MODE_SPLIT_VIEW;
+      return MEDCALC::VIEW_MODE_SPLIT_VIEW;
   }
   // Should not happen
   STDLOG("Strange!! No matching view mode found - returning VIEW_MODE_REPLACE.");
@@ -284,35 +287,35 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
   // visualisation using the tui command (so that the user can see how
   // to make a view of an object from the tui console).
   for (int i=0; i<listOfSObject->size(); i++) {
-    SALOMEDS::SObject_var soField = listOfSObject->at(i);
-    int fieldId = getIntParamFromStudyEditor(soField, FIELD_ID);
-    if (fieldId < 0)  // is it a field serie ?
-      {
-        int fieldSeriesId = getIntParamFromStudyEditor(soField, FIELD_SERIES_ID);
-        // If fieldId and fieldSeriesId equals -1, then it means that it is not a field
-        // managed by the MED module, and we stop this function process.
-        if ( fieldSeriesId < 0)
-          continue;
-        MEDCALC::FieldHandlerList* fieldHandlerList = MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldSeriesId);
-        if (fieldHandlerList->length() < 0)
-          continue;
-        // For a field series, get the first real field entry:
-        MEDCALC::FieldHandler fieldHandler = (*fieldHandlerList)[0];
-        fieldId = fieldHandler.id;
+      SALOMEDS::SObject_var soField = listOfSObject->at(i);
+      int fieldId = getIntParamFromStudyEditor(soField, FIELD_ID);
+      if (fieldId < 0)  // is it a field serie ?
+        {
+          int fieldSeriesId = getIntParamFromStudyEditor(soField, FIELD_SERIES_ID);
+          // If fieldId and fieldSeriesId equals -1, then it means that it is not a field
+          // managed by the MED module, and we stop this function process.
+          if ( fieldSeriesId < 0)
+            continue;
+          MEDCALC::FieldHandlerList* fieldHandlerList = MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldSeriesId);
+          if (fieldHandlerList->length() < 0)
+            continue;
+          // For a field series, get the first real field entry:
+          MEDCALC::FieldHandler fieldHandler = (*fieldHandlerList)[0];
+          fieldId = fieldHandler.id;
+        }
+
+      MEDCALC::FieldHandler* fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
+      if (! fieldHandler) {
+          QMessageBox::warning(_salomeModule->getApp()->desktop(),
+                               tr("Operation not allowed"),
+                               tr("No field is defined"));
+          return;
       }
 
-    MEDCALC::FieldHandler* fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
-    if (! fieldHandler) {
-      QMessageBox::warning(_salomeModule->getApp()->desktop(),
-         tr("Operation not allowed"),
-         tr("No field is defined"));
-      return;
-    }
-
-    PresentationEvent* event = new PresentationEvent();
-    event->eventtype = eventType;
-    event->fieldHandler = fieldHandler;
-    emit presentationSignal(event); // --> processPresentationEvent()
+      PresentationEvent* event = new PresentationEvent();
+      event->eventtype = eventType;
+      event->fieldHandler = fieldHandler;
+      emit presentationSignal(event); // --> processPresentationEvent()
   }
 }
 
@@ -363,17 +366,17 @@ PresentationController::onDeletePresentation()
 
   // For each object, emit a signal to the workspace to request pres deletion
   for (int i=0; i<listOfSObject->size(); i++) {
-    SALOMEDS::SObject_var soPres = listOfSObject->at(i);
-    int presId = getIntParamFromStudyEditor(soPres,PRESENTATION_ID);
-    // If fieldId equals -1, then it means that it is not a field
-    // managed by the MED module, and we stop this function process.
-    if ( presId < 0 )
-      continue;
+      SALOMEDS::SObject_var soPres = listOfSObject->at(i);
+      int presId = getIntParamFromStudyEditor(soPres,PRESENTATION_ID);
+      // If fieldId equals -1, then it means that it is not a field
+      // managed by the MED module, and we stop this function process.
+      if ( presId < 0 )
+        continue;
 
-    PresentationEvent* event = new PresentationEvent();
-    event->eventtype = PresentationEvent::EVENT_DELETE_PRESENTATION;
-    event->presentationId = presId;
-    emit presentationSignal(event); // --> processPresentationEvent()
+      PresentationEvent* event = new PresentationEvent();
+      event->eventtype = PresentationEvent::EVENT_DELETE_PRESENTATION;
+      event->presentationId = presId;
+      emit presentationSignal(event); // --> processPresentationEvent()
   }
 }
 
@@ -382,10 +385,10 @@ PresentationController::getViewModePython() const
 {
   MEDCALC::MEDPresentationViewMode viewMode = getSelectedViewMode();
   switch(viewMode) {
-  case MEDCALC::VIEW_MODE_REPLACE: return "MEDCALC.VIEW_MODE_REPLACE";
-  case MEDCALC::VIEW_MODE_OVERLAP: return "MEDCALC.VIEW_MODE_OVERLAP";
-  case MEDCALC::VIEW_MODE_NEW_LAYOUT: return "MEDCALC.VIEW_MODE_NEW_LAYOUT";
-  case MEDCALC::VIEW_MODE_SPLIT_VIEW: return "MEDCALC.VIEW_MODE_SPLIT_VIEW";
+    case MEDCALC::VIEW_MODE_REPLACE: return "MEDCALC.VIEW_MODE_REPLACE";
+    case MEDCALC::VIEW_MODE_OVERLAP: return "MEDCALC.VIEW_MODE_OVERLAP";
+    case MEDCALC::VIEW_MODE_NEW_LAYOUT: return "MEDCALC.VIEW_MODE_NEW_LAYOUT";
+    case MEDCALC::VIEW_MODE_SPLIT_VIEW: return "MEDCALC.VIEW_MODE_SPLIT_VIEW";
   }
   return QString();
 }
@@ -395,8 +398,8 @@ PresentationController::getColorMapPython() const
 {
   MEDCALC::MEDPresentationColorMap colorMap = getSelectedColorMap();
   switch(colorMap) {
-  case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW: return "MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW";
-  case MEDCALC::COLOR_MAP_COOL_TO_WARM: return "MEDCALC.COLOR_MAP_COOL_TO_WARM";
+    case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW: return "MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW";
+    case MEDCALC::COLOR_MAP_COOL_TO_WARM: return "MEDCALC.COLOR_MAP_COOL_TO_WARM";
   }
   return QString();
 }
@@ -405,11 +408,11 @@ QString
 PresentationController::getScalarBarRangePython() const
 {
   MEDCALC::MEDPresentationScalarBarRange colorMap = getSelectedScalarBarRange();
-   switch(colorMap) {
-   case MEDCALC::SCALAR_BAR_ALL_TIMESTEPS: return "MEDCALC.SCALAR_BAR_ALL_TIMESTEPS";
-   case MEDCALC::SCALAR_BAR_CURRENT_TIMESTEP: return "MEDCALC.SCALAR_BAR_CURRENT_TIMESTEP";
-   }
-   return QString();
+  switch(colorMap) {
+    case MEDCALC::SCALAR_BAR_ALL_TIMESTEPS: return "MEDCALC.SCALAR_BAR_ALL_TIMESTEPS";
+    case MEDCALC::SCALAR_BAR_CURRENT_TIMESTEP: return "MEDCALC.SCALAR_BAR_CURRENT_TIMESTEP";
+  }
+  return QString();
 }
 
 std::string
@@ -417,99 +420,78 @@ PresentationController::getPresTypeFromWidgetHelper(int presId) const
 {
   std::map<int, MEDWidgetHelper *>::const_iterator it =_presHelperMap.find(presId);
   if (it != _presHelperMap.end())
-      return (*it).second->getPythonTag();
+    return (*it).second->getPythonTag();
   return "UNKNOWN";
 }
 
 void
 PresentationController::processPresentationEvent(const PresentationEvent* event) {
   // --> Send commands to SALOME Python console
+  QString viewMode = getViewModePython();
+  QString colorMap = getColorMapPython();
+  QString scalarBarRange = getScalarBarRangePython();
+  MEDCALC::FieldHandler* fieldHandler = event->fieldHandler;
+  QStringList commands;
   if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SCALAR_MAP ) {
-    QString viewMode = getViewModePython();
-    //QString displayedComponent = ; // from PresentationController combobox
-    //QString scalarBarRange = ; // from PresentationController spinbox
-    QString colorMap = getColorMapPython();
-    MEDCALC::FieldHandler* fieldHandler = event->fieldHandler;
-    QStringList commands;
-    commands += QString("presentation_id = medcalc.MakeScalarMap(accessField(%1), %2, colorMap=%3)").arg(fieldHandler->id).arg(viewMode).arg(colorMap);
-    commands += QString("presentation_id");
-    _consoleDriver->exec(commands);
+      commands += QString("presentation_id = medcalc.MakeScalarMap(accessField(%1), viewMode=%2, scalarBarRange=%3, colorMap=%4)")
+          .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
+      commands += QString("presentation_id");
   }
-//  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_CONTOUR ) {
-//    QString viewMode = getViewModePython();
-//    MEDCALC::FieldHandler* fieldHandler = event->_fieldHandler;
-//    QStringList commands;
-//    commands += QString("presentation_id = medcalc.MakeContour(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-//    commands += QString("presentation_id");
-//    _consoleDriver->exec(commands);
-//  }
-//  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_VECTOR_FIELD ) {
-//    QString viewMode = getViewModePython();
-//    MEDCALC::FieldHandler* fieldHandler = event->_fieldHandler;
-//    QStringList commands;
-//    commands += QString("presentation_id = medcalc.MakeVectorField(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-//    commands += QString("presentation_id");
-//    _consoleDriver->exec(commands);
-//  }
-//  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SLICES ) {
-//    QString viewMode = getViewModePython();
-//    MEDCALC::FieldHandler* fieldHandler = event->_fieldHandler;
-//    QStringList commands;
-//    commands += QString("presentation_id = medcalc.MakeSlices(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-//    commands += QString("presentation_id");
-//    _consoleDriver->exec(commands);
-//  }
-//  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE ) {
-//    QString viewMode = getViewModePython();
-//    MEDCALC::FieldHandler* fieldHandler = event->_fieldHandler;
-//    QStringList commands;
-//    commands += QString("presentation_id = medcalc.MakeDeflectionShape(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-//    commands += QString("presentation_id");
-//    _consoleDriver->exec(commands);
-//  }
-//  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_POINT_SPRITE ) {
-//    QString viewMode = getViewModePython();
-//    MEDCALC::FieldHandler* fieldHandler = event->_fieldHandler;
-//    QStringList commands;
-//    commands += QString("presentation_id = medcalc.MakePointSprite(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-//    commands += QString("presentation_id");
-//    _consoleDriver->exec(commands);
-//  }
+  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_CONTOUR ) {
+      commands += QString("presentation_id = medcalc.MakeContour(accessField(%1), viewMode=%2, scalarBarRange=%3, colorMap=%4)")
+        .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
+      commands += QString("presentation_id");
+  }
+  //  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_VECTOR_FIELD ) {
+  //    commands += QString("presentation_id = medcalc.MakeVectorField(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+  //    commands += QString("presentation_id");
+  //  }
+  //  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SLICES ) {
+  //    commands += QString("presentation_id = medcalc.MakeSlices(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+  //    commands += QString("presentation_id");
+  //  }
+  //  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE ) {
+  //    commands += QString("presentation_id = medcalc.MakeDeflectionShape(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+  //    commands += QString("presentation_id");
+  //  }
+  //  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_POINT_SPRITE ) {
+  //    commands += QString("presentation_id = medcalc.MakePointSprite(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
+  //    commands += QString("presentation_id");
+  //  }
 
   // [ABN] using event mechanism for this is awkward? TODO: direct implementation in each
   // dedicated widget helper class?
   else if ( event->eventtype == PresentationEvent::EVENT_CHANGE_COMPONENT ) {
       std::string typ = getPresTypeFromWidgetHelper(event->presentationId);
-      QStringList commands;
       commands += QString("params = medcalc.Get%1Parameters(%2)").arg(QString::fromStdString(typ)).arg(event->presentationId);
       commands += QString("params.displayedComponent = '%1'").arg(QString::fromStdString(event->aString));
       commands += QString("medcalc.Update%1(%2, params)").arg(QString::fromStdString(typ)).arg(event->presentationId);
-      _consoleDriver->exec(commands);
   }
   else if ( event->eventtype == PresentationEvent::EVENT_CHANGE_COLORMAP ) {
       std::string typ = getPresTypeFromWidgetHelper(event->presentationId);
-      QStringList commands;
       commands += QString("params = medcalc.Get%1Parameters(%2)").arg(QString::fromStdString(typ)).arg(event->presentationId);
       commands += QString("params.colorMap = %1").arg(getColorMapPython());
       commands += QString("medcalc.Update%1(%2, params)").arg(QString::fromStdString(typ)).arg(event->presentationId);
-      _consoleDriver->exec(commands);
-    }
+  }
   else if ( event->eventtype == PresentationEvent::EVENT_CHANGE_TIME_RANGE ) {
       std::string typ = getPresTypeFromWidgetHelper(event->presentationId);
-      QStringList commands;
       commands += QString("params = medcalc.Get%1Parameters(%2)").arg(QString::fromStdString(typ)).arg(event->presentationId);
       commands += QString("params.scalarBarRange = %1").arg(getScalarBarRangePython());
       commands += QString("medcalc.Update%1(%2, params)").arg(QString::fromStdString(typ)).arg(event->presentationId);
-      _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == PresentationEvent::EVENT_CHANGE_NB_CONTOUR ) {
+      std::string typ = getPresTypeFromWidgetHelper(event->presentationId);
+      commands += QString("params = medcalc.GetContourParameters(%2)").arg(event->presentationId);
+      commands += QString("params.nbContours = %1").arg(event->anInteger);
+      commands += QString("medcalc.UpdateContour(%1, params)").arg(event->presentationId);
   }
   else if ( event->eventtype == PresentationEvent::EVENT_DELETE_PRESENTATION ) {
-      QStringList commands;
       commands += QString("medcalc.RemovePresentation(%1)").arg(event->presentationId);
-      _consoleDriver->exec(commands);
   }
   else {
-    STDLOG("The event "<<event->eventtype<<" is not implemented yet");
+      STDLOG("The event "<<event->eventtype<<" is not implemented yet");
   }
+  _consoleDriver->exec(commands);
 }
 
 MEDWidgetHelper *
@@ -522,22 +504,24 @@ PresentationController::findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager
   MEDWidgetHelper * wh;
   if (type == MEDPresentationScalarMap::TYPE_NAME)
     wh = new MEDWidgetHelperScalarMap(this, _presManager, presId, name, _widgetPresentationParameters);
+  else if (type == MEDPresentationContour::TYPE_NAME)
+    wh = new MEDWidgetHelperContour(this, _presManager, presId, name, _widgetPresentationParameters);
   else
     {
-//    case PRES_CONTOUR:
-//// break;
-//    case PRES_DEFLECTION:
-////          break;
-//    case PRES_VECTOR_FIELD:
-//  //        break;
-//    case PRES_POINT_SPRITE:
-//    //      break;
-//    case PRES_POINT_SPRITE:
-//      //    break;
-//    default:
+      //    case PRES_CONTOUR:
+      //// break;
+      //    case PRES_DEFLECTION:
+      ////          break;
+      //    case PRES_VECTOR_FIELD:
+      //  //        break;
+      //    case PRES_POINT_SPRITE:
+      //    //      break;
+      //    case PRES_POINT_SPRITE:
+      //      //    break;
+      //    default:
       STDLOG("findOrCreateWidgetHelper(): NOT IMPLEMENTED !!!");
 
-  }
+    }
   _presHelperMap[presId] = wh;
   return wh;
 }
@@ -575,19 +559,19 @@ PresentationController::onParavisDump()
 
   // For the first object only, request the dump
   for (int i=0; i<listOfSObject->size(); i++) {
-    SALOMEDS::SObject_var soPres = listOfSObject->at(i);
-    int presId = getIntParamFromStudyEditor(soPres,PRESENTATION_ID);
-    // If fieldId equals -1, then it means that it is not a field
-    // managed by the MED module, and we stop this function process.
-    if ( presId < 0 )
-      continue;
+      SALOMEDS::SObject_var soPres = listOfSObject->at(i);
+      int presId = getIntParamFromStudyEditor(soPres,PRESENTATION_ID);
+      // If fieldId equals -1, then it means that it is not a field
+      // managed by the MED module, and we stop this function process.
+      if ( presId < 0 )
+        continue;
 
-    std::string dump(_presManager->getParavisDump(presId));
-    std::cerr << "#====== ParaVis dump =============== " << std::endl;
-    std::cerr << dump;
-    std::cerr << "#====== End of ParaVis dump ======== " << std::endl;
+      std::string dump(_presManager->getParavisDump(presId));
+      std::cerr << "#====== ParaVis dump =============== " << std::endl;
+      std::cerr << dump;
+      std::cerr << "#====== End of ParaVis dump ======== " << std::endl;
 
-    break; // stop at the first one
+      break; // stop at the first one
   }
 }
 
@@ -595,8 +579,8 @@ void
 PresentationController::updateTreeViewWithNewPresentation(long fieldId, long presentationId)
 {
   if (presentationId < 0) {
-    std::cerr << "Unknown presentation\n";
-    return;
+      std::cerr << "Unknown presentation\n";
+      return;
   }
 
   std::string name(_presManager->getPresentationStringProperty(presentationId, MEDPresentation::PROP_NAME.c_str()));
@@ -617,30 +601,30 @@ PresentationController::updateTreeViewWithNewPresentation(long fieldId, long pre
       oss.str().c_str(), type.c_str(),ico.c_str(), presentationId);
 
 
-//  MEDCALC::MEDPresentationViewMode viewMode = MEDFactoryClient::getPresentationManager()->getPresentationViewMode(presentationId);
-//
-//  // Remove sibling presentations if view mode is set to REPLACE
-//  if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
-//    MED_ORB::PresentationsList* presList = _salomeModule->engine()->getSiblingPresentations(_CAST(Study, studyDS)->GetStudy(), presentationId);
-//    CORBA::ULong size = presList->length();
-//
-//    std::stringstream sstm;
-//    sstm << "Removing sibling presentation(s): ";
-//    for (int i = 0; i < size; ++i)
-//      sstm << (*presList)[i] << "  ";
-//    STDLOG(sstm.str());
-//
-//    for (int i = 0; i < size; ++i) {
-//      PresentationEvent* event = new PresentationEvent();
-//      event->eventtype = PresentationEvent::EVENT_DELETE_PRESENTATION;
-//      XmedDataObject* dataObject = new XmedDataObject();
-//      dataObject->setPresentationId((*presList)[i]);
-//      event->objectdata = dataObject;
-//      emit presentationSignal(event); // --> WorkspaceController::processPresentationEvent
-//    }
-//
-//    delete presList;
-//  }
+  //  MEDCALC::MEDPresentationViewMode viewMode = MEDFactoryClient::getPresentationManager()->getPresentationViewMode(presentationId);
+  //
+  //  // Remove sibling presentations if view mode is set to REPLACE
+  //  if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
+  //    MED_ORB::PresentationsList* presList = _salomeModule->engine()->getSiblingPresentations(_CAST(Study, studyDS)->GetStudy(), presentationId);
+  //    CORBA::ULong size = presList->length();
+  //
+  //    std::stringstream sstm;
+  //    sstm << "Removing sibling presentation(s): ";
+  //    for (int i = 0; i < size; ++i)
+  //      sstm << (*presList)[i] << "  ";
+  //    STDLOG(sstm.str());
+  //
+  //    for (int i = 0; i < size; ++i) {
+  //      PresentationEvent* event = new PresentationEvent();
+  //      event->eventtype = PresentationEvent::EVENT_DELETE_PRESENTATION;
+  //      XmedDataObject* dataObject = new XmedDataObject();
+  //      dataObject->setPresentationId((*presList)[i]);
+  //      event->objectdata = dataObject;
+  //      emit presentationSignal(event); // --> WorkspaceController::processPresentationEvent
+  //    }
+  //
+  //    delete presList;
+  //  }
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);
@@ -650,8 +634,8 @@ void
 PresentationController::updateTreeViewForPresentationRemoval(long presentationId)
 {
   if (presentationId < 0) {
-    std::cerr << "Unknown presentation\n";
-    return;
+      std::cerr << "Unknown presentation\n";
+      return;
   }
 
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
@@ -688,7 +672,7 @@ PresentationController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
       }
   }
   else if ( event->type == MEDCALC::EVENT_REMOVE_PRESENTATION ) {
-    updateTreeViewForPresentationRemoval(event->presentationId);
+      updateTreeViewForPresentationRemoval(event->presentationId);
   }
 }
 

@@ -15,7 +15,9 @@ typedef struct {
 
     EVENT_CHANGE_COMPONENT,
     EVENT_CHANGE_COLORMAP,
-    EVENT_CHANGE_TIME_RANGE
+    EVENT_CHANGE_TIME_RANGE,
+
+    EVENT_CHANGE_NB_CONTOUR
   };
 
   EventType eventtype;

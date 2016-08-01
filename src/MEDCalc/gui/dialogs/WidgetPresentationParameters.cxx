@@ -34,6 +34,8 @@ WidgetPresentationParameters::WidgetPresentationParameters(QWidget* parent)
                    this,                       SLOT(onComboScalarBarRangeIndexChanged(int)) );
   QObject::connect(_ui.comboBoxColorMap,       SIGNAL(currentIndexChanged(int)),
                    this,                       SLOT(onComboColorMapIndexChanged(int)) );
+  QObject::connect(_ui.spinBox,                SIGNAL(valueChanged(int)),
+                     this,                     SLOT(onSpinBoxValueChanged(int)) );
 }
 
 void
@@ -54,6 +56,11 @@ WidgetPresentationParameters::onComboScalarBarRangeIndexChanged(int idx)
   if (!_blockSig) emit comboScalarBarRangeIndexChanged(idx);
 }
 
+void
+WidgetPresentationParameters::onSpinBoxValueChanged(int val)
+{
+  if (!_blockSig) emit spinBoxValueChanged(val);
+}
 
 void
 WidgetPresentationParameters::toggleWidget(bool show)
@@ -110,6 +117,30 @@ WidgetPresentationParameters::setComponents(vector<string> compos, int selecInde
     _ui.comboBoxCompo->addItem(QString::fromStdString(*it));
   _ui.comboBoxCompo->setCurrentIndex(selecIndex);
   _blockSig = false;
+}
+
+void
+WidgetPresentationParameters::setNbContour(int nbContour)
+{
+  if (nbContour <= 0)
+    {
+      //TODO throw?
+      STDLOG("WidgetPresentationParameters::setNbContour(): invalid number of contours!");
+    }
+
+  // Show the widget:
+  _ui.labelSpinBox->setText(tr("LAB_NB_CONTOUR"));
+  _ui.labelSpinBox->show();
+  _ui.spinBox->show();
+
+  _blockSig = true;
+  _ui.spinBox->setValue(nbContour);
+  _blockSig = false;
+}
+
+int WidgetPresentationParameters::getNbContour() const
+{
+  return _ui.spinBox->value();
 }
 
 void

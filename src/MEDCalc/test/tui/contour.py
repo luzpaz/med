@@ -27,10 +27,19 @@ from medcalc.medconsole import accessField
 
 from medcalc_testutils import GetMEDFileDirTUI
 
-datafile = os.path.join(GetMEDFileDirTUI(), "smooth_surface_and_field.med")
+datafile = os.path.join(GetMEDFileDirTUI(), "agitateur.med")
 source_id = medcalc.LoadDataSource(datafile)
 
-presentation_id = medcalc.MakeScalarMap(accessField(0), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
+# Field 0 = CONCENTRATION_ELEM_DOM (ON_CELLS) -> scalar
+presentation_id = medcalc.MakeContour(accessField(0), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
 sleep(2)
 medcalc.RemovePresentation(presentation_id)
+sleep(2)
+
+# Field 55 = VITESSE_ELEM_DOM (ON_CELLS) -> vector field, contour should fail.
+try:
+  presentation_id = medcalc.MakeContour(accessField(55), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
+  sys.exit(-1);
+except:
+  print "Contour failed as expected."
 sleep(2)

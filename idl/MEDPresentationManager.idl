@@ -72,7 +72,6 @@ module MEDCALC
   const MEDPresentationViewMode VIEW_MODE_DEFAULT = VIEW_MODE_REPLACE;
   const MEDPresentationColorMap COLOR_MAP_DEFAULT = COLOR_MAP_BLUE_TO_RED_RAINBOW;
   const MEDPresentationScalarBarRange SCALAR_BAR_RANGE_DEFAULT = SCALAR_BAR_ALL_TIMESTEPS;
-  //const ScalarBarRange SCALAR_BAR_RANGE_DEFAULT = ;
   const long SCALAR_BAR_RANGE_VAL_MIN_DEFAULT = -1;
   const long SCALAR_BAR_RANGE_VAL_MAX_DEFAULT = -1;
   const string DISPLAY_DEFAULT = DISPLAY_EUCLIDEAN_NORM;
@@ -90,20 +89,25 @@ module MEDCALC
   };
 
   // A contour is an isoline in 2D and an isosurface in 3D
-//  struct ContourParameters {
-//    long fieldHandlerId;
-//    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
-//    ScalarBarRange scalarBarRange;
-//    MEDPresentationColorMap colorMap;
-//    long nbContours;
-//  };
-//
+  struct ContourParameters {   // Contour are only for scalar fields
+    long fieldHandlerId;
+    MEDPresentationScalarBarRange scalarBarRange;
+    MEDPresentationColorMap colorMap;
+    long nbContours;
+  };
+
 //  struct VectorFieldParameters {
 //    long fieldHandlerId;
+//    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
+//    MEDPresentationScalarBarRange scalarBarRange;
+//    MEDPresentationColorMap colorMap;
 //  };
 //
 //  struct SlicesParameters {
 //    long fieldHandlerId;
+//    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
+//    MEDPresentationScalarBarRange scalarBarRange;
+//    MEDPresentationColorMap colorMap;
 //    SliceOrientation orientation;
 //    long nbSlices;
 //  };
@@ -115,7 +119,7 @@ module MEDCALC
 //  struct PointSpriteParameters {
 //    long fieldHandlerId;
 //    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
-//    ScalarBarRange scalarBarRange;
+//    MEDPresentationScalarBarRange scalarBarRange;
 //    MEDPresentationColorMap colorMap;
 //  };
 
@@ -126,7 +130,8 @@ module MEDCALC
   interface MEDPresentationManager : SALOME::GenericObj
   {
     long makeScalarMap(in ScalarMapParameters params, in MEDPresentationViewMode viewMode);
-//    long makeContour(in ContourParameters params, in MEDPresentationViewMode viewMode);
+    long makeContour(in ContourParameters params, in MEDPresentationViewMode viewMode)
+      raises (SALOME::SALOME_Exception);
 //    long makeVectorField(in VectorFieldParameters params, in MEDPresentationViewMode viewMode);
 //    long makeSlices(in SlicesParameters params, in MEDPresentationViewMode viewMode);
 //    long makeDeflectionShape(in DeflectionShapeParameters params, in MEDPresentationViewMode viewMode);
@@ -138,9 +143,10 @@ module MEDCALC
     long getPresentationIntProperty(in long presId, in string propName);
 
     ScalarMapParameters getScalarMapParameters(in long presId);
+    ContourParameters getContourParameters(in long presId);
 
     void updateScalarMap(in long presId, in ScalarMapParameters params);
-//    void updateContour(in long presId, in ContourParameters params);
+    void updateContour(in long presId, in ContourParameters params);
 //    void updateVectorField(in long presId, in VectorFieldParameters params);
 //    void updateSlices(in long presId, in SlicesParameters params);
 //    void updateDeflectionShape(in long presId, in DeflectionShapeParameters params);
@@ -153,7 +159,7 @@ module MEDCALC
 
     // Low level ParaVis dump
     string getParavisDump(in long presId);
-    
+
 //    MEDPresentationViewMode getPresentationViewMode(in long presId);
     
     PresentationsList getAllPresentations();

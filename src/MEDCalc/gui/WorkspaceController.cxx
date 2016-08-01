@@ -36,6 +36,7 @@
 #include <SUIT_ResourceMgr.h>
 
 #include <QTimer>
+#include <QMessageBox>
 
 /*!
  * This class defines a DockWidget plugged in the SALOME application,
@@ -319,6 +320,10 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
   else if ( event->type == MEDCALC::EVENT_QUIT_SALOME ) {
     emit workspaceSignal(event); // forward to TestController
   }
+  else if ( event->type == MEDCALC::EVENT_ERROR ) {
+      std::string msg(event->msg);
+      QMessageBox::warning(_salomeModule->getApp()->desktop(), "Error", QString::fromStdString(msg));
+    }
 }
 
 /*!

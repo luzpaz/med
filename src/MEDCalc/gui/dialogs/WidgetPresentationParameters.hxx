@@ -53,6 +53,9 @@ public:
 
   void setPresName(const std::string& name);
 
+  int getNbContour() const;
+  void setNbContour(int nbContour);
+
   void toggleWidget(bool show);
   bool isShown() const;
   QComboBox * getComboBoxCompo();
@@ -61,11 +64,13 @@ signals:
   void comboScalarBarRangeIndexChanged(int);
   void comboColorMapIndexChanged(int);
   void comboCompoIndexChanged(int);
+  void spinBoxValueChanged(int);
 
 private slots:
   void onComboScalarBarRangeIndexChanged(int);
   void onComboColorMapIndexChanged(int);
   void onComboCompoIndexChanged(int);
+  void onSpinBoxValueChanged(int);
 
 private:
   Ui_WidgetPresentationParameters _ui; // instance of the class defined in ui_WidgetPresentationParameters.h

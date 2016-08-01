@@ -75,6 +75,7 @@ protected:
                   const MEDCALC::MEDPresentationColorMap colorMap,
                   const MEDCALC::MEDPresentationScalarBarRange sbRange);
   std::string getRenderViewCommand() const;
+  std::string getRenderViewVar() const;
   std::string getResetCameraCommand() const;
 
   std::string getComponentSelectionCommand() const;
@@ -131,12 +132,14 @@ protected:
 
   ///! Identifier (in the Python dump) of the render view
   int _renderViewPyId;
-  ///! ParaView object ID in the Python scripting commands
-  int _objId;
-  ///! ParaView display ID in the Python scripting commands
-  int _dispId;
-  ///! ParaView LUT ID in the Python scripting commands
-  int _lutId;
+  ///! ParaView object variable in the Python scripting commands (source object)
+  std::string _srcObjVar;
+  ///! ParaView object variable in the Python scripting commands (final object on which all display commands are done)
+  std::string _objVar;
+  ///! ParaView display variable in the Python scripting commands
+  std::string _dispVar;
+  ///! ParaView LUT variable in the Python scripting commands
+  std::string _lutVar;
 
 private:
   ///! Pipeline elements
