@@ -42,17 +42,17 @@ public:
   std::string getComponent() const;
   void setComponents(std::vector<std::string> compos, int selecIndex);
 
-  MEDCALC::MEDPresentationMeshMode getMeshMode() const;
-  void setMeshMode(MEDCALC::MEDPresentationMeshMode mode);
+  MEDCALC::MeshModeType getMeshMode() const;
+  void setMeshMode(MEDCALC::MeshModeType mode);
 
-  MEDCALC::MEDPresentationScalarBarRange getScalarBarRange() const;
-  void setScalarBarRange(MEDCALC::MEDPresentationScalarBarRange);
+  MEDCALC::ScalarBarRangeType getScalarBarRange() const;
+  void setScalarBarRange(MEDCALC::ScalarBarRangeType);
 
 //  double getScalarBarTimestep() const;
 //  double getScalarBarMinVal() const;
 //  double getScalarBarMaxVal() const;
-  MEDCALC::MEDPresentationColorMap getColorMap() const;
-  void setColorMap(MEDCALC::MEDPresentationColorMap);
+  MEDCALC::ColorMapType getColorMap() const;
+  void setColorMap(MEDCALC::ColorMapType);
 
   void setPresName(const std::string& name);
 
@@ -62,8 +62,8 @@ public:
   int getNbSlices() const;
   void setNbSlices(int nbSlices);
 
-  MEDCALC::MEDPresentationSliceOrientation getSliceOrientation() const;
-  void setSliceOrientation(MEDCALC::MEDPresentationSliceOrientation orient);
+  MEDCALC::SliceOrientationType getSliceOrientation() const;
+  void setSliceOrientation(MEDCALC::SliceOrientationType orient);
 
   void toggleWidget(bool show);
   bool isShown() const;

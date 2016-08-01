@@ -37,9 +37,9 @@ const std::string MEDPresentation::PROP_COLOR_MAP = "colorMap";
 const std::string MEDPresentation::PROP_SCALAR_BAR_RANGE = "scalarBarRange";
 
 MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name,
-                                 const MEDCALC::MEDPresentationViewMode viewMode,
-                                 const MEDCALC::MEDPresentationColorMap colorMap,
-                                 const MEDCALC::MEDPresentationScalarBarRange sbRange)
+                                 const MEDCALC::ViewModeType viewMode,
+                                 const MEDCALC::ColorMapType colorMap,
+                                 const MEDCALC::ScalarBarRangeType sbRange)
     : _fieldHandlerId(fieldHandlerId), _propertiesStr(),
       //_pipeline(0), _display(0)
       _selectedComponentIndex(-1),

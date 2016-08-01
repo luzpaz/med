@@ -47,9 +47,9 @@ void MEDWidgetHelper::loadParametersFromEngine()
       oss << MEDPresentation::PROP_COMPONENT << i;
       _allCompos.push_back(_presManager->getPresentationStringProperty(_presId, oss.str().c_str()));
     }
-  _colorMap = static_cast<MEDCALC::MEDPresentationColorMap>(
+  _colorMap = static_cast<MEDCALC::ColorMapType>(
       _presManager->getPresentationIntProperty(_presId, MEDPresentation::PROP_COLOR_MAP.c_str()));
-  _scalarBarRange = static_cast<MEDCALC::MEDPresentationScalarBarRange>(
+  _scalarBarRange = static_cast<MEDCALC::ScalarBarRangeType>(
       _presManager->getPresentationIntProperty(_presId, MEDPresentation::PROP_SCALAR_BAR_RANGE.c_str()));
 }
 

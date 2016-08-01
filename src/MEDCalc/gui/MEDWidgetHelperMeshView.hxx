@@ -46,7 +46,7 @@ protected:
   virtual void loadParametersFromEngine();
 
 private:
-  MEDCALC::MEDPresentationMeshMode _meshMode;
+  MEDCALC::MeshModeType _meshMode;
 };
 
 #endif /* SRC_MEDCALC_GUI_MEDWIDGETHELPERMESHVIEW_HXX_ */

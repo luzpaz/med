@@ -254,7 +254,7 @@ PresentationController::createActions()
 
 }
 
-MEDCALC::MEDPresentationViewMode
+MEDCALC::ViewModeType
 PresentationController::getSelectedViewMode() const
 {
   if (_salomeModule->action(OPTIONS_VIEW_MODE_REPLACE_ID)->isChecked()) {
@@ -274,13 +274,13 @@ PresentationController::getSelectedViewMode() const
   return MEDCALC::VIEW_MODE_REPLACE;
 }
 
-MEDCALC::MEDPresentationColorMap
+MEDCALC::ColorMapType
 PresentationController::getSelectedColorMap() const
 {
   return _widgetPresentationParameters->getColorMap();
 }
 
-MEDCALC::MEDPresentationScalarBarRange
+MEDCALC::ScalarBarRangeType
 PresentationController::getSelectedScalarBarRange() const
 {
   return _widgetPresentationParameters->getScalarBarRange();
@@ -401,7 +401,7 @@ PresentationController::onDeletePresentation()
 QString
 PresentationController::getViewModePython() const
 {
-  MEDCALC::MEDPresentationViewMode viewMode = getSelectedViewMode();
+  MEDCALC::ViewModeType viewMode = getSelectedViewMode();
   switch(viewMode) {
     case MEDCALC::VIEW_MODE_REPLACE: return "MEDCALC.VIEW_MODE_REPLACE";
     case MEDCALC::VIEW_MODE_OVERLAP: return "MEDCALC.VIEW_MODE_OVERLAP";
@@ -414,7 +414,7 @@ PresentationController::getViewModePython() const
 QString
 PresentationController::getColorMapPython() const
 {
-  MEDCALC::MEDPresentationColorMap colorMap = getSelectedColorMap();
+  MEDCALC::ColorMapType colorMap = getSelectedColorMap();
   switch(colorMap) {
     case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW: return "MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW";
     case MEDCALC::COLOR_MAP_COOL_TO_WARM: return "MEDCALC.COLOR_MAP_COOL_TO_WARM";
@@ -425,7 +425,7 @@ PresentationController::getColorMapPython() const
 QString
 PresentationController::getScalarBarRangePython() const
 {
-  MEDCALC::MEDPresentationScalarBarRange colorMap = getSelectedScalarBarRange();
+  MEDCALC::ScalarBarRangeType colorMap = getSelectedScalarBarRange();
   switch(colorMap) {
     case MEDCALC::SCALAR_BAR_ALL_TIMESTEPS: return "MEDCALC.SCALAR_BAR_ALL_TIMESTEPS";
     case MEDCALC::SCALAR_BAR_CURRENT_TIMESTEP: return "MEDCALC.SCALAR_BAR_CURRENT_TIMESTEP";
@@ -436,7 +436,7 @@ PresentationController::getScalarBarRangePython() const
 QString
 PresentationController::getMeshModePython(const int mode) const
 {
-  MEDCALC::MEDPresentationMeshMode mod = static_cast<MEDCALC::MEDPresentationMeshMode>(mode);
+  MEDCALC::MeshModeType mod = static_cast<MEDCALC::MeshModeType>(mode);
   switch(mod) {
     case MEDCALC::MESH_MODE_WIREFRAME:     return "MEDCALC.MESH_MODE_WIREFRAME";
     case MEDCALC::MESH_MODE_SURFACE:       return "MEDCALC.MESH_MODE_SURFACE";
@@ -448,7 +448,7 @@ PresentationController::getMeshModePython(const int mode) const
 QString
 PresentationController::getSliceOrientationPython(const int orientation) const
 {
-  MEDCALC::MEDPresentationSliceOrientation orient = static_cast<MEDCALC::MEDPresentationSliceOrientation>(orientation);
+  MEDCALC::SliceOrientationType orient = static_cast<MEDCALC::SliceOrientationType>(orientation);
   switch(orient) {
     case MEDCALC::SLICE_NORMAL_TO_X:   return "MEDCALC.SLICE_NORMAL_TO_X";
     case MEDCALC::SLICE_NORMAL_TO_Y:   return "MEDCALC.SLICE_NORMAL_TO_Y";
@@ -663,7 +663,7 @@ PresentationController::updateTreeViewWithNewPresentation(long fieldId, long pre
       oss.str().c_str(), type.c_str(),ico.c_str(), presentationId);
 
 
-  //  MEDCALC::MEDPresentationViewMode viewMode = MEDFactoryClient::getPresentationManager()->getPresentationViewMode(presentationId);
+  //  MEDCALC::ViewModeType viewMode = MEDFactoryClient::getPresentationManager()->getPresentationViewMode(presentationId);
   //
   //  // Remove sibling presentations if view mode is set to REPLACE
   //  if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {

@@ -40,7 +40,7 @@ void MEDWidgetHelperSlices::loadParametersFromEngine()
 {
   MEDWidgetHelper::loadParametersFromEngine();
   _nbSlices = _presManager->getPresentationIntProperty(_presId, MEDPresentationSlices::PROP_NB_SLICES.c_str());
-  _sliceOrientation = static_cast<MEDCALC::MEDPresentationSliceOrientation>(
+  _sliceOrientation = static_cast<MEDCALC::SliceOrientationType>(
       _presManager->getPresentationIntProperty(_presId, MEDPresentationSlices::PROP_SLICE_ORIENTATION.c_str()));
 }
 

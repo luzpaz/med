@@ -360,19 +360,19 @@ MEDModule::addActionInPopupMenu(int actionId,const QString& menus,const QString&
   mgr->setRule( this->action( actionId ), rule, QtxPopupMgr::VisibleRule );
 }
 
-//MEDCALC::MEDPresentationViewMode
+//MEDCALC::ViewModeType
 //MEDModule::getSelectedViewMode() const
 //{
 //  return _presentationController->getSelectedViewMode();
 //}
 //
-//MEDCALC::MEDPresentationColorMap
+//MEDCALC::ColorMapType
 //MEDModule::getSelectedColorMap() const
 //{
 //  return _presentationController->getSelectedColorMap();
 //}
 //
-//MEDCALC::MEDPresentationScalarBarRange
+//MEDCALC::ScalarBarRangeType
 //MEDModule::getSelectedScalarBarRange() const
 //{
 //  return _presentationController->getSelectedScalarBarRange();

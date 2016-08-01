@@ -24,7 +24,7 @@
 
 template<typename PresentationType, typename PresentationParameters>
 MEDPresentation::TypeID
-MEDPresentationManager_i::_makePresentation(const PresentationParameters params, const MEDCALC::MEDPresentationViewMode viewMode)
+MEDPresentationManager_i::_makePresentation(const PresentationParameters params, const MEDCALC::ViewModeType viewMode)
 {
   int activeViewId = getActiveViewPythonId();
 

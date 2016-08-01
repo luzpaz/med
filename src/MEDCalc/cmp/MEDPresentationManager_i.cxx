@@ -124,19 +124,19 @@ MEDPresentationManager_i::getPresentationIntProperty(MEDPresentation::TypeID pre
 }
 
 MEDPresentation::TypeID
-MEDPresentationManager_i::makeMeshView(const MEDCALC::MeshViewParameters& params, const MEDCALC::MEDPresentationViewMode viewMode)
+MEDPresentationManager_i::makeMeshView(const MEDCALC::MeshViewParameters& params, const MEDCALC::ViewModeType viewMode)
 {
   return _makePresentation<MEDPresentationMeshView>(params, viewMode);
 }
 
 MEDPresentation::TypeID
-MEDPresentationManager_i::makeScalarMap(const MEDCALC::ScalarMapParameters& params, const MEDCALC::MEDPresentationViewMode viewMode)
+MEDPresentationManager_i::makeScalarMap(const MEDCALC::ScalarMapParameters& params, const MEDCALC::ViewModeType viewMode)
 {
   return _makePresentation<MEDPresentationScalarMap>(params, viewMode);
 }
 
 MEDPresentation::TypeID
-MEDPresentationManager_i::makeContour(const MEDCALC::ContourParameters& params, const MEDCALC::MEDPresentationViewMode viewMode)
+MEDPresentationManager_i::makeContour(const MEDCALC::ContourParameters& params, const MEDCALC::ViewModeType viewMode)
 {
   return _makePresentation<MEDPresentationContour>(params, viewMode);
 }
@@ -148,7 +148,7 @@ MEDPresentationManager_i::makeContour(const MEDCALC::ContourParameters& params, 
 //}
 //
 MEDPresentation::TypeID
-MEDPresentationManager_i::makeSlices(const MEDCALC::SlicesParameters& params, const MEDCALC::MEDPresentationViewMode viewMode)
+MEDPresentationManager_i::makeSlices(const MEDCALC::SlicesParameters& params, const MEDCALC::ViewModeType viewMode)
 {
   return _makePresentation<MEDPresentationSlices>(params, viewMode);
 }
@@ -287,7 +287,7 @@ MEDPresentationManager_i::getActiveViewPythonId()
 }
 
 
-//MEDCALC::MEDPresentationViewMode
+//MEDCALC::ViewModeType
 //MEDPresentationManager_i::getPresentationViewMode(MEDPresentation::TypeID presentationID)
 //{
 //  MEDPresentation* pres = _getPresentation(presentationID);

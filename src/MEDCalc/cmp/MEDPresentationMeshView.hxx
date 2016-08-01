@@ -29,7 +29,7 @@ public:
   static const std::string TYPE_NAME;
   static const std::string PROP_MESH_MODE;
 
-  MEDPresentationMeshView(const MEDCALC::MeshViewParameters& params, const MEDCALC::MEDPresentationViewMode viewMode);
+  MEDPresentationMeshView(const MEDCALC::MeshViewParameters& params, const MEDCALC::ViewModeType viewMode);
   virtual ~MEDPresentationMeshView() {}
 
   void updatePipeline(const MEDCALC::MeshViewParameters& params);
@@ -38,7 +38,7 @@ public:
   void setParameters(const MEDCALC::MeshViewParameters & params) { _params = params; } ;
 
 protected:
-  void updateMeshMode(const MEDCALC::MEDPresentationMeshMode mode);
+  void updateMeshMode(const MEDCALC::MeshModeType mode);
   virtual void internalGeneratePipeline();
 
   std::string getMeshViewCommand() const;

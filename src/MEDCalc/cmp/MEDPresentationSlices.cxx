@@ -30,7 +30,7 @@ const std::string MEDPresentationSlices::PROP_NB_SLICES = "nbSlices";
 const std::string MEDPresentationSlices::PROP_SLICE_ORIENTATION = "slicesOrientation";
 
 MEDPresentationSlices::MEDPresentationSlices(const MEDCALC::SlicesParameters& params,
-                                               const MEDCALC::MEDPresentationViewMode viewMode) :
+                                               const MEDCALC::ViewModeType viewMode) :
         MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, params.colorMap, params.scalarBarRange),
         _params(params)
 {
@@ -163,7 +163,7 @@ MEDPresentationSlices::updateNbSlices(const int nbSlices)
 }
 
 void
-MEDPresentationSlices::updateOrientation(const MEDCALC::MEDPresentationSliceOrientation orientation)
+MEDPresentationSlices::updateOrientation(const MEDCALC::SliceOrientationType orientation)
 {
   _params.orientation = orientation;
 

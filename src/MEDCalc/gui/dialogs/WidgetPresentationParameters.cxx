@@ -198,7 +198,7 @@ int WidgetPresentationParameters::getNbSlices() const
 
 
 void
-WidgetPresentationParameters::setScalarBarRange(MEDCALC::MEDPresentationScalarBarRange sbrange)
+WidgetPresentationParameters::setScalarBarRange(MEDCALC::ScalarBarRangeType sbrange)
 {
   int idx;
   if (sbrange == MEDCALC::SCALAR_BAR_ALL_TIMESTEPS)
@@ -217,7 +217,7 @@ WidgetPresentationParameters::setScalarBarRange(MEDCALC::MEDPresentationScalarBa
 }
 
 void
-WidgetPresentationParameters::setColorMap(MEDCALC::MEDPresentationColorMap colorMap)
+WidgetPresentationParameters::setColorMap(MEDCALC::ColorMapType colorMap)
 {
   int idx = -1;
   if (colorMap == MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW)
@@ -237,7 +237,7 @@ WidgetPresentationParameters::setColorMap(MEDCALC::MEDPresentationColorMap color
 }
 
 void
-WidgetPresentationParameters::setMeshMode(MEDCALC::MEDPresentationMeshMode mode)
+WidgetPresentationParameters::setMeshMode(MEDCALC::MeshModeType mode)
 {
   // Show the widget:
   _ui.labelMeshMode->show();
@@ -269,7 +269,7 @@ WidgetPresentationParameters::setMeshMode(MEDCALC::MEDPresentationMeshMode mode)
 }
 
 void
-WidgetPresentationParameters::setSliceOrientation(MEDCALC::MEDPresentationSliceOrientation orient)
+WidgetPresentationParameters::setSliceOrientation(MEDCALC::SliceOrientationType orient)
 {
   // Show the widget:
   _ui.labelSliceOrient->show();
@@ -313,7 +313,7 @@ WidgetPresentationParameters::setSliceOrientation(MEDCALC::MEDPresentationSliceO
 }
 
 
-MEDCALC::MEDPresentationSliceOrientation
+MEDCALC::SliceOrientationType
 WidgetPresentationParameters::getSliceOrientation() const
 {
   QString sbrange = _ui.comboBoxSliceOrient->currentText();
@@ -343,7 +343,7 @@ WidgetPresentationParameters::getSliceOrientation() const
   return MEDCALC::SLICE_NORMAL_TO_X;
 }
 
-MEDCALC::MEDPresentationMeshMode
+MEDCALC::MeshModeType
 WidgetPresentationParameters::getMeshMode() const
 {
   QString mesm = _ui.comboBoxMesh->currentText();
@@ -362,7 +362,7 @@ WidgetPresentationParameters::getMeshMode() const
 }
 
 
-MEDCALC::MEDPresentationScalarBarRange
+MEDCALC::ScalarBarRangeType
 WidgetPresentationParameters::getScalarBarRange() const
 {
   QString sbrange = _ui.comboBoxScalarBarRange->currentText();
@@ -395,7 +395,7 @@ WidgetPresentationParameters::getScalarBarRange() const
 //  return _ui.doubleSpinBoxMaxVal->value();
 //}
 
-MEDCALC::MEDPresentationColorMap
+MEDCALC::ColorMapType
 WidgetPresentationParameters::getColorMap() const
 {
   QString colorMap = _ui.comboBoxColorMap->currentText();

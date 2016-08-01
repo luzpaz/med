@@ -48,9 +48,9 @@ public:
 
   void createActions();
 
-  MEDCALC::MEDPresentationViewMode getSelectedViewMode() const;
-  MEDCALC::MEDPresentationColorMap getSelectedColorMap() const;
-  MEDCALC::MEDPresentationScalarBarRange getSelectedScalarBarRange() const;
+  MEDCALC::ViewModeType getSelectedViewMode() const;
+  MEDCALC::ColorMapType getSelectedColorMap() const;
+  MEDCALC::ScalarBarRangeType getSelectedScalarBarRange() const;
 
   void showDockWidgets(bool isVisible);
 

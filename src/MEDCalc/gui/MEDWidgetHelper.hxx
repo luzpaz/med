@@ -76,10 +76,10 @@ protected:
   std::vector<std::string> _allCompos; // All available components
 
   // Color map
-  MEDCALC::MEDPresentationColorMap _colorMap;
+  MEDCALC::ColorMapType _colorMap;
 
   // Scalar bar range
-  MEDCALC::MEDPresentationScalarBarRange _scalarBarRange;
+  MEDCALC::ScalarBarRangeType _scalarBarRange;
 };
 
 #endif

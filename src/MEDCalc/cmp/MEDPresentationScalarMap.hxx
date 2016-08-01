@@ -29,7 +29,7 @@ class MEDCALC_EXPORT MEDPresentationScalarMap : public MEDPresentation
 public:
   static const std::string TYPE_NAME;
 
-  MEDPresentationScalarMap(const MEDCALC::ScalarMapParameters& params, const MEDCALC::MEDPresentationViewMode viewMode);
+  MEDPresentationScalarMap(const MEDCALC::ScalarMapParameters& params, const MEDCALC::ViewModeType viewMode);
   virtual ~MEDPresentationScalarMap() {}
 
   void updatePipeline(const MEDCALC::ScalarMapParameters& params);
@@ -37,7 +37,7 @@ public:
   void getParameters(MEDCALC::ScalarMapParameters & params) const { params = _params; } ;
   void setParameters(const MEDCALC::ScalarMapParameters & params) { _params = params; } ;
 
-//  MEDCALC::MEDPresentationViewMode getViewMode() { return _params.viewMode; }
+//  MEDCALC::ViewModeType getViewMode() { return _params.viewMode; }
 
 protected:
   virtual void internalGeneratePipeline();

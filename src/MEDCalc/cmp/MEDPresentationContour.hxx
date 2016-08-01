@@ -29,7 +29,7 @@ public:
   static const std::string TYPE_NAME;
   static const std::string PROP_NB_CONTOUR;
 
-  MEDPresentationContour(const MEDCALC::ContourParameters& params, const MEDCALC::MEDPresentationViewMode viewMode);
+  MEDPresentationContour(const MEDCALC::ContourParameters& params, const MEDCALC::ViewModeType viewMode);
   virtual ~MEDPresentationContour() {}
 
   void updatePipeline(const MEDCALC::ContourParameters& params);

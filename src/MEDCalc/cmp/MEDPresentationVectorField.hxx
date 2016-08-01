@@ -32,7 +32,7 @@ public:
   virtual ~MEDPresentationVectorField() {}
 
   void updatePipeline(const MEDCALC::VectorFieldParameters& params);
-  MEDCALC::MEDPresentationViewMode getViewMode() { return _params.viewMode; }
+  MEDCALC::ViewModeType getViewMode() { return _params.viewMode; }
 
 protected:
   virtual void internalGeneratePipeline();

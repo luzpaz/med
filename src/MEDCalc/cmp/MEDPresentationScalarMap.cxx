@@ -31,7 +31,7 @@
 const std::string MEDPresentationScalarMap::TYPE_NAME = "MEDPresentationScalarMap";
 
 MEDPresentationScalarMap::MEDPresentationScalarMap(const MEDCALC::ScalarMapParameters& params,
-                                                   const MEDCALC::MEDPresentationViewMode viewMode) :
+                                                   const MEDCALC::ViewModeType viewMode) :
     MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, params.colorMap, params.scalarBarRange), _params(params)
 {
 }

@@ -98,7 +98,7 @@ MEDPresentation::updateComponent(const std::string& newCompo)
 
 template<typename PresentationType, typename PresentationParameters>
 void
-MEDPresentation::updateColorMap(MEDCALC::MEDPresentationColorMap colorMap)
+MEDPresentation::updateColorMap(MEDCALC::ColorMapType colorMap)
 {
   PresentationType * p = static_cast<PresentationType*>(this);
 
@@ -123,7 +123,7 @@ MEDPresentation::updateColorMap(MEDCALC::MEDPresentationColorMap colorMap)
 
 template<typename PresentationType, typename PresentationParameters>
 void
-MEDPresentation::updateScalarBarRange(MEDCALC::MEDPresentationScalarBarRange sbRange)
+MEDPresentation::updateScalarBarRange(MEDCALC::ScalarBarRangeType sbRange)
 {
   PresentationType * p = static_cast<PresentationType*>(this);
 

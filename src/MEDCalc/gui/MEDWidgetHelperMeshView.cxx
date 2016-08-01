@@ -38,7 +38,7 @@ MEDWidgetHelperMeshView::~MEDWidgetHelperMeshView()
 void MEDWidgetHelperMeshView::loadParametersFromEngine()
 {
   MEDWidgetHelper::loadParametersFromEngine();
-  _meshMode = static_cast<MEDCALC::MEDPresentationMeshMode>(
+  _meshMode = static_cast<MEDCALC::MeshModeType>(
           _presManager->getPresentationIntProperty(_presId, MEDPresentationMeshView::PROP_MESH_MODE.c_str()));
 }
 

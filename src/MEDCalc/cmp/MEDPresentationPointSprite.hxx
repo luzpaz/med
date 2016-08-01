@@ -32,7 +32,7 @@ public:
   virtual ~MEDPresentationPointSprite() {}
 
   void updatePipeline(const MEDCALC::PointSpriteParameters& params);
-  MEDCALC::MEDPresentationViewMode getViewMode() { return _params.viewMode; }
+  MEDCALC::ViewModeType getViewMode() { return _params.viewMode; }
 
 protected:
   virtual void internalGeneratePipeline();

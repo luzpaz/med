@@ -30,7 +30,7 @@ public:
   static const std::string PROP_NB_SLICES;
   static const std::string PROP_SLICE_ORIENTATION;
 
-  MEDPresentationSlices(const MEDCALC::SlicesParameters& params, const MEDCALC::MEDPresentationViewMode viewMode);
+  MEDPresentationSlices(const MEDCALC::SlicesParameters& params, const MEDCALC::ViewModeType viewMode);
   virtual ~MEDPresentationSlices() {}
 
   void updatePipeline(const MEDCALC::SlicesParameters& params);
@@ -40,7 +40,7 @@ public:
 
 protected:
   void updateNbSlices(const int nbSlices);
-  void updateOrientation(const MEDCALC::MEDPresentationSliceOrientation orientation);
+  void updateOrientation(const MEDCALC::SliceOrientationType orientation);
   virtual void internalGeneratePipeline();
 
   std::string getNbSlicesCommand() const;

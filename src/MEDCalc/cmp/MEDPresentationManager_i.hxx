@@ -39,13 +39,13 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
 
   static MEDPresentationManager_i* getInstance();
 
-  MEDCALC_EXPORT MEDPresentation::TypeID makeMeshView(const MEDCALC::MeshViewParameters&, const MEDCALC::MEDPresentationViewMode);
-  MEDCALC_EXPORT MEDPresentation::TypeID makeScalarMap(const MEDCALC::ScalarMapParameters&, const MEDCALC::MEDPresentationViewMode);
-  MEDCALC_EXPORT MEDPresentation::TypeID makeContour(const MEDCALC::ContourParameters&, const MEDCALC::MEDPresentationViewMode);
-//  MEDCALC_EXPORT MEDPresentation::TypeID makeVectorField(const MEDCALC::VectorFieldParameters&, const MEDCALC::MEDPresentationViewMode);
-  MEDCALC_EXPORT MEDPresentation::TypeID makeSlices(const MEDCALC::SlicesParameters&, const MEDCALC::MEDPresentationViewMode);
-//  MEDCALC_EXPORT MEDPresentation::TypeID makeDeflectionShape(const MEDCALC::DeflectionShapeParameters&, const MEDCALC::MEDPresentationViewMode);
-//  MEDCALC_EXPORT MEDPresentation::TypeID makePointSprite(const MEDCALC::PointSpriteParameters&, const MEDCALC::MEDPresentationViewMode);
+  MEDCALC_EXPORT MEDPresentation::TypeID makeMeshView(const MEDCALC::MeshViewParameters&, const MEDCALC::ViewModeType);
+  MEDCALC_EXPORT MEDPresentation::TypeID makeScalarMap(const MEDCALC::ScalarMapParameters&, const MEDCALC::ViewModeType);
+  MEDCALC_EXPORT MEDPresentation::TypeID makeContour(const MEDCALC::ContourParameters&, const MEDCALC::ViewModeType);
+//  MEDCALC_EXPORT MEDPresentation::TypeID makeVectorField(const MEDCALC::VectorFieldParameters&, const MEDCALC::ViewModeType);
+  MEDCALC_EXPORT MEDPresentation::TypeID makeSlices(const MEDCALC::SlicesParameters&, const MEDCALC::ViewModeType);
+//  MEDCALC_EXPORT MEDPresentation::TypeID makeDeflectionShape(const MEDCALC::DeflectionShapeParameters&, const MEDCALC::ViewModeType);
+//  MEDCALC_EXPORT MEDPresentation::TypeID makePointSprite(const MEDCALC::PointSpriteParameters&, const MEDCALC::ViewModeType);
 
   MEDCALC_EXPORT void setPresentationStringProperty(MEDPresentation::TypeID presentationID, const char* propName, const char* propValue);
   MEDCALC_EXPORT char* getPresentationStringProperty(MEDPresentation::TypeID presentationID, const char* propName);
@@ -69,7 +69,7 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   MEDCALC_EXPORT CORBA::Boolean removePresentation(MEDPresentation::TypeID);
   MEDCALC_EXPORT CORBA::Boolean activateView(MEDPresentation::TypeID);
   MEDCALC_EXPORT CORBA::Long getActiveViewPythonId();
-//  MEDCALC_EXPORT MEDCALC::MEDPresentationViewMode getPresentationViewMode(MEDPresentation::TypeID);
+//  MEDCALC_EXPORT MEDCALC::ViewModeType getPresentationViewMode(MEDPresentation::TypeID);
   MEDCALC_EXPORT char* getParavisDump(MEDPresentation::TypeID presentationID);
   MEDCALC_EXPORT MEDCALC::PresentationsList* getAllPresentations();
 
@@ -81,7 +81,7 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
 
   // Create a new presentation instance and return its unique ID
   template<typename PresentationType, typename PresentationParameters>
-  MEDPresentation::TypeID _makePresentation(const PresentationParameters params, MEDCALC::MEDPresentationViewMode viewMode);
+  MEDPresentation::TypeID _makePresentation(const PresentationParameters params, MEDCALC::ViewModeType viewMode);
 
   // Update presentation
   template<typename PresentationType, typename PresentationParameters>

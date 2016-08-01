@@ -29,7 +29,7 @@ const std::string MEDPresentationMeshView::TYPE_NAME = "MEDPresentationMeshView"
 const std::string MEDPresentationMeshView::PROP_MESH_MODE = "meshMode";
 
 MEDPresentationMeshView::MEDPresentationMeshView(const MEDCALC::MeshViewParameters& params,
-                                               const MEDCALC::MEDPresentationViewMode viewMode) :
+                                               const MEDCALC::ViewModeType viewMode) :
         // Cheating a bit here - a mesh view doesn't need a color map or a range:
         MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, MEDCALC::COLOR_MAP_DEFAULT,
                         MEDCALC::SCALAR_BAR_RANGE_DEFAULT),
@@ -96,7 +96,7 @@ MEDPresentationMeshView::updatePipeline(const MEDCALC::MeshViewParameters& param
 }
 
 void
-MEDPresentationMeshView::updateMeshMode(const MEDCALC::MEDPresentationMeshMode mode)
+MEDPresentationMeshView::updateMeshMode(const MEDCALC::MeshModeType mode)
 {
   _params.mode = mode;
 

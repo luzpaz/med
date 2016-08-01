@@ -70,9 +70,9 @@ protected:
   static int GeneratePythonId();
 
   MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name,
-                  const MEDCALC::MEDPresentationViewMode viewMode,
-                  const MEDCALC::MEDPresentationColorMap colorMap,
-                  const MEDCALC::MEDPresentationScalarBarRange sbRange);
+                  const MEDCALC::ViewModeType viewMode,
+                  const MEDCALC::ColorMapType colorMap,
+                  const MEDCALC::ScalarBarRangeType sbRange);
   std::string getRenderViewCommand() const;
   std::string getRenderViewVar() const;
   std::string getResetCameraCommand() const;
@@ -91,16 +91,16 @@ protected:
 
   void fillAvailableFieldComponents();
 
-//  virtual MEDCALC::MEDPresentationViewMode getViewMode() = 0;
+//  virtual MEDCALC::ViewModeType getViewMode() = 0;
 
   template<typename PresentationType, typename PresentationParameters>
   void updateComponent(const std::string& newCompo);
 
   template<typename PresentationType, typename PresentationParameters>
-  void updateColorMap(MEDCALC::MEDPresentationColorMap colorMap);
+  void updateColorMap(MEDCALC::ColorMapType colorMap);
 
   template<typename PresentationType, typename PresentationParameters>
-  void updateScalarBarRange(MEDCALC::MEDPresentationScalarBarRange sbRange);
+  void updateScalarBarRange(MEDCALC::ScalarBarRangeType sbRange);
 
   template<typename PresentationType, typename PresentationParameters>
   void getParameters(PresentationParameters& params) const;
@@ -125,9 +125,9 @@ protected:
   MEDPresentation::TypeID _fieldHandlerId;
 
   int _selectedComponentIndex;
-  MEDCALC::MEDPresentationViewMode _viewMode;
-  MEDCALC::MEDPresentationColorMap _colorMap;
-  MEDCALC::MEDPresentationScalarBarRange _sbRange;
+  MEDCALC::ViewModeType _viewMode;
+  MEDCALC::ColorMapType _colorMap;
+  MEDCALC::ScalarBarRangeType _sbRange;
 
   ///! Identifier (in the Python dump) of the render view
   int _renderViewPyId;

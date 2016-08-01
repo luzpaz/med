@@ -27,24 +27,24 @@ module MEDCALC
 {
   /* Enumerations and constants */
 
-  enum MEDPresentationViewMode {
+  enum ViewModeType {
     VIEW_MODE_OVERLAP,
     VIEW_MODE_REPLACE,
     VIEW_MODE_NEW_LAYOUT,
     VIEW_MODE_SPLIT_VIEW
   };
 
-  enum MEDPresentationColorMap {
+  enum ColorMapType {
     COLOR_MAP_BLUE_TO_RED_RAINBOW,
     COLOR_MAP_COOL_TO_WARM
   };
 
-  enum MEDPresentationScalarBarRange {
+  enum ScalarBarRangeType {
     SCALAR_BAR_ALL_TIMESTEPS,
     SCALAR_BAR_CURRENT_TIMESTEP
   };
 
-  enum MEDPresentationMeshMode {
+  enum MeshModeType {
     MESH_MODE_WIREFRAME,
     MESH_MODE_SURFACE_EDGES,
     MESH_MODE_SURFACE
@@ -64,7 +64,7 @@ module MEDCALC
 
   const string DISPLAY_EUCLIDEAN_NORM = "";  // Void string to avoid clash with a real component name -- never used actually?
 
-  enum MEDPresentationSliceOrientation {
+  enum SliceOrientationType {
     SLICE_NORMAL_TO_X,
     SLICE_NORMAL_TO_Y,
     SLICE_NORMAL_TO_Z,
@@ -76,14 +76,14 @@ module MEDCALC
 
   /* Default values */
 
-  const MEDPresentationViewMode VIEW_MODE_DEFAULT = VIEW_MODE_REPLACE;
-  const MEDPresentationColorMap COLOR_MAP_DEFAULT = COLOR_MAP_BLUE_TO_RED_RAINBOW;
-  const MEDPresentationScalarBarRange SCALAR_BAR_RANGE_DEFAULT = SCALAR_BAR_ALL_TIMESTEPS;
-  const MEDPresentationMeshMode MESH_MODE_DEFAULT = MESH_MODE_WIREFRAME;
+  const ViewModeType VIEW_MODE_DEFAULT = VIEW_MODE_REPLACE;
+  const ColorMapType COLOR_MAP_DEFAULT = COLOR_MAP_BLUE_TO_RED_RAINBOW;
+  const ScalarBarRangeType SCALAR_BAR_RANGE_DEFAULT = SCALAR_BAR_ALL_TIMESTEPS;
+  const MeshModeType MESH_MODE_DEFAULT = MESH_MODE_WIREFRAME;
 //  const long SCALAR_BAR_RANGE_VAL_MIN_DEFAULT = -1;
 //  const long SCALAR_BAR_RANGE_VAL_MAX_DEFAULT = -1;
   const string DISPLAY_DEFAULT = DISPLAY_EUCLIDEAN_NORM;
-  const MEDPresentationSliceOrientation SLICE_ORIENTATION_DEFAULT = SLICE_NORMAL_TO_X;
+  const SliceOrientationType SLICE_ORIENTATION_DEFAULT = SLICE_NORMAL_TO_X;
   const long NB_CONTOURS_DEFAULT = 10;
   const long NB_SLICES_DEFAULT = 1;
 
@@ -92,38 +92,38 @@ module MEDCALC
   // Just showing the mesh 
   struct MeshViewParameters {
     long fieldHandlerId;   // TODO should be a meshHandlerId really ...
-    MEDPresentationMeshMode mode;
+    MeshModeType mode;
   };
 
   // A simple scalar map
   struct ScalarMapParameters {
     long fieldHandlerId;
     string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
-    MEDPresentationScalarBarRange scalarBarRange;
-    MEDPresentationColorMap colorMap;
+    ScalarBarRangeType scalarBarRange;
+    ColorMapType colorMap;
   };
 
   // A contour is an isoline in 2D and an isosurface in 3D
   struct ContourParameters {   // Contour are only for scalar fields
     long fieldHandlerId;
-    MEDPresentationScalarBarRange scalarBarRange;
-    MEDPresentationColorMap colorMap;
+    ScalarBarRangeType scalarBarRange;
+    ColorMapType colorMap;
     long nbContours;
   };
 
 //  struct VectorFieldParameters {
 //    long fieldHandlerId;
 //    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
-//    MEDPresentationScalarBarRange scalarBarRange;
-//    MEDPresentationColorMap colorMap;
+//    ScalarBarRangeType scalarBarRange;
+//    ColorMapType colorMap;
 //  };
 //
   struct SlicesParameters {
     long fieldHandlerId;
     string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
-    MEDPresentationScalarBarRange scalarBarRange;
-    MEDPresentationColorMap colorMap;
-    MEDPresentationSliceOrientation orientation;
+    ScalarBarRangeType scalarBarRange;
+    ColorMapType colorMap;
+    SliceOrientationType orientation;
     long nbSlices;
   };
 //
@@ -134,8 +134,8 @@ module MEDCALC
 //  struct PointSpriteParameters {
 //    long fieldHandlerId;
 //    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
-//    MEDPresentationScalarBarRange scalarBarRange;
-//    MEDPresentationColorMap colorMap;
+//    ScalarBarRangeType scalarBarRange;
+//    ColorMapType colorMap;
 //  };
 
   typedef sequence<long> PresentationsList;
@@ -144,14 +144,14 @@ module MEDCALC
 
   interface MEDPresentationManager : SALOME::GenericObj
   {
-    long makeMeshView(in MeshViewParameters params, in MEDPresentationViewMode viewMode);
-    long makeScalarMap(in ScalarMapParameters params, in MEDPresentationViewMode viewMode);
-    long makeContour(in ContourParameters params, in MEDPresentationViewMode viewMode)
+    long makeMeshView(in MeshViewParameters params, in ViewModeType viewMode);
+    long makeScalarMap(in ScalarMapParameters params, in ViewModeType viewMode);
+    long makeContour(in ContourParameters params, in ViewModeType viewMode)
       raises (SALOME::SALOME_Exception);
-//    long makeVectorField(in VectorFieldParameters params, in MEDPresentationViewMode viewMode);
-    long makeSlices(in SlicesParameters params, in MEDPresentationViewMode viewMode);
-//    long makeDeflectionShape(in DeflectionShapeParameters params, in MEDPresentationViewMode viewMode);
-//    long makePointSprite(in PointSpriteParameters params, in MEDPresentationViewMode viewMode);
+//    long makeVectorField(in VectorFieldParameters params, in ViewModeType viewMode);
+    long makeSlices(in SlicesParameters params, in ViewModeType viewMode);
+//    long makeDeflectionShape(in DeflectionShapeParameters params, in ViewModeType viewMode);
+//    long makePointSprite(in PointSpriteParameters params, in ViewModeType viewMode);
 
     void setPresentationStringProperty(in long presId, in string propName, in string propValue);
     string getPresentationStringProperty(in long presId, in string propName);
@@ -179,7 +179,7 @@ module MEDCALC
     // Low level ParaVis dump
     string getParavisDump(in long presId);
 
-//    MEDPresentationViewMode getPresentationViewMode(in long presId);
+//    ViewModeType getPresentationViewMode(in long presId);
     
     PresentationsList getAllPresentations();
   };

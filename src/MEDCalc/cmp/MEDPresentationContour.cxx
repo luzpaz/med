@@ -29,7 +29,7 @@ const std::string MEDPresentationContour::TYPE_NAME = "MEDPresentationContour";
 const std::string MEDPresentationContour::PROP_NB_CONTOUR = "nbContour";
 
 MEDPresentationContour::MEDPresentationContour(const MEDCALC::ContourParameters& params,
-                                               const MEDCALC::MEDPresentationViewMode viewMode) :
+                                               const MEDCALC::ViewModeType viewMode) :
         MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, params.colorMap, params.scalarBarRange),
         _params(params)
 {

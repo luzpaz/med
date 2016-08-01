@@ -48,7 +48,7 @@ protected:
 
 private:
   int _nbSlices;
-  MEDCALC::MEDPresentationSliceOrientation _sliceOrientation;
+  MEDCALC::SliceOrientationType _sliceOrientation;
 };
 
 #endif /* SRC_MEDCALC_GUI_MEDWIDGETHELPERSLICES_HXX_ */
