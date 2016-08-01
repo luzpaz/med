@@ -62,6 +62,7 @@ signals:
   void presentationSignal(const PresentationEvent*);
 
 protected slots:
+  void onVisualizeMeshView();
   void onVisualizeScalarMap();
   void onVisualizeContour();
   void onVisualizeVectorField();
@@ -90,6 +91,8 @@ private:
   QString getViewModePython() const;
   QString getColorMapPython() const;
   QString getScalarBarRangePython() const;
+  QString getMeshModePython(const int mode) const;
+  QString getSliceOrientationPython(const int orient) const;
 
 private:
   MEDModule* _salomeModule;

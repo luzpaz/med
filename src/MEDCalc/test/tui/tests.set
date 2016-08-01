@@ -22,4 +22,7 @@ SET(TEST_NAMES
   load_file
   import_pvsimple
 #  scalar_map
+#  contour
+#  slices
+#  mesh_view
 )

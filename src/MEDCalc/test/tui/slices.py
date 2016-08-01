@@ -27,10 +27,10 @@ from medcalc.medconsole import accessField
 
 from medcalc_testutils import GetMEDFileDirTUI
 
-datafile = os.path.join(GetMEDFileDirTUI(), "smooth_surface_and_field.med")
+datafile = os.path.join(GetMEDFileDirTUI(), "agitateur.med")
 source_id = medcalc.LoadDataSource(datafile)
 
-presentation_id = medcalc.MakeScalarMap(accessField(0), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
+presentation_id = medcalc.MakeSlices(accessField(0), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
 sleep(1)
 medcalc.RemovePresentation(presentation_id)
 sleep(1)

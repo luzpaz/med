@@ -30,10 +30,14 @@ WidgetPresentationParameters::WidgetPresentationParameters(QWidget* parent)
   toggleWidget(false);
   QObject::connect(_ui.comboBoxCompo,          SIGNAL(currentIndexChanged(int)),
                    this,                       SLOT(onComboCompoIndexChanged(int)) );
+  QObject::connect(_ui.comboBoxMesh,          SIGNAL(currentIndexChanged(int)),
+                     this,                       SLOT(onComboMeshIndexChanged(int)) );
   QObject::connect(_ui.comboBoxScalarBarRange, SIGNAL(currentIndexChanged(int)),
                    this,                       SLOT(onComboScalarBarRangeIndexChanged(int)) );
   QObject::connect(_ui.comboBoxColorMap,       SIGNAL(currentIndexChanged(int)),
                    this,                       SLOT(onComboColorMapIndexChanged(int)) );
+  QObject::connect(_ui.comboBoxSliceOrient,       SIGNAL(currentIndexChanged(int)),
+                   this,                       SLOT(onComboOrientIndexChanged(int)) );
   QObject::connect(_ui.spinBox,                SIGNAL(valueChanged(int)),
                      this,                     SLOT(onSpinBoxValueChanged(int)) );
 }
@@ -42,6 +46,19 @@ void
 WidgetPresentationParameters::onComboCompoIndexChanged(int idx)
 {
   if (!_blockSig) emit comboCompoIndexChanged(idx);
+}
+
+void
+WidgetPresentationParameters::onComboOrientIndexChanged(int idx)
+{
+  if (!_blockSig) emit comboOrientIndexChanged(idx);
+}
+
+
+void
+WidgetPresentationParameters::onComboMeshIndexChanged(int idx)
+{
+  if (!_blockSig) emit comboMeshIndexChanged(idx);
 }
 
 void
@@ -63,10 +80,20 @@ WidgetPresentationParameters::onSpinBoxValueChanged(int val)
 }
 
 void
+WidgetPresentationParameters::toggleCommonFieldWidget(bool show)
+{
+  _blockSig = true;
+  _ui.commonWidget->setEnabled(show);
+  _blockSig = false;
+}
+
+void
 WidgetPresentationParameters::toggleWidget(bool show)
 {
   if (!show)
     {
+      toggleCommonFieldWidget(true);
+
       _blockSig = true;
       _ui.widgetDynamic->hide();
       setPresName("Choose a presentation");
@@ -80,6 +107,8 @@ WidgetPresentationParameters::toggleWidget(bool show)
       // It is the WidgetHelper responsability to re-show the widgets it needs
       _ui.labelCompo->hide();
       _ui.comboBoxCompo->hide();
+      _ui.labelMeshMode->hide();
+      _ui.comboBoxMesh->hide();
       _ui.labelSpinBox->hide();
       _ui.spinBox->hide();
       _ui.labelSliceOrient->hide();
@@ -129,7 +158,7 @@ WidgetPresentationParameters::setNbContour(int nbContour)
     }
 
   // Show the widget:
-  _ui.labelSpinBox->setText(tr("LAB_NB_CONTOUR"));
+  _ui.labelSpinBox->setText(tr("LAB_NB_CONTOURS"));
   _ui.labelSpinBox->show();
   _ui.spinBox->show();
 
@@ -138,10 +167,35 @@ WidgetPresentationParameters::setNbContour(int nbContour)
   _blockSig = false;
 }
 
+void
+WidgetPresentationParameters::setNbSlices(int nbSlices)
+{
+  if (nbSlices <= 0)
+    {
+      //TODO throw?
+      STDLOG("WidgetPresentationParameters::setNbSlices(): invalid number of slices!");
+    }
+
+  // Show the widget:
+  _ui.labelSpinBox->setText(tr("LAB_NB_SLICES"));
+  _ui.labelSpinBox->show();
+  _ui.spinBox->show();
+
+  _blockSig = true;
+  _ui.spinBox->setValue(nbSlices);
+  _blockSig = false;
+}
+
 int WidgetPresentationParameters::getNbContour() const
 {
   return _ui.spinBox->value();
 }
+
+int WidgetPresentationParameters::getNbSlices() const
+{
+  return _ui.spinBox->value();
+}
+
 
 void
 WidgetPresentationParameters::setScalarBarRange(MEDCALC::MEDPresentationScalarBarRange sbrange)
@@ -165,7 +219,7 @@ WidgetPresentationParameters::setScalarBarRange(MEDCALC::MEDPresentationScalarBa
 void
 WidgetPresentationParameters::setColorMap(MEDCALC::MEDPresentationColorMap colorMap)
 {
-  int idx;
+  int idx = -1;
   if (colorMap == MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW)
     idx = _ui.comboBoxColorMap->findText(tr("LAB_BLUE_TO_RED"));
   else if (colorMap == MEDCALC::COLOR_MAP_COOL_TO_WARM)
@@ -180,6 +234,131 @@ WidgetPresentationParameters::setColorMap(MEDCALC::MEDPresentationColorMap color
 
   else
     STDLOG("Strange!! No matching found - unable to set color map in GUI.");
+}
+
+void
+WidgetPresentationParameters::setMeshMode(MEDCALC::MEDPresentationMeshMode mode)
+{
+  // Show the widget:
+  _ui.labelMeshMode->show();
+  _ui.comboBoxMesh->show();
+
+  int idx;
+  switch(mode)
+  {
+    case MEDCALC::MESH_MODE_WIREFRAME:
+      idx = _ui.comboBoxMesh->findText(tr("LAB_MESH_WIREFRAME"));
+      break;
+    case MEDCALC::MESH_MODE_SURFACE:
+      idx = _ui.comboBoxMesh->findText(tr("LAB_MESH_SURFACE"));
+      break;
+    case MEDCALC::MESH_MODE_SURFACE_EDGES:
+      idx = _ui.comboBoxMesh->findText(tr("LAB_MESH_SURF_EDGES"));
+      break;
+    default:
+      idx = -1;
+  }
+  if (idx >= 0)
+    {
+      _blockSig = true;
+      _ui.comboBoxMesh->setCurrentIndex(idx);
+      _blockSig = false;
+    }
+  else
+    STDLOG("Strange!! No matching found - unable to set mesh mode in GUI.");
+}
+
+void
+WidgetPresentationParameters::setSliceOrientation(MEDCALC::MEDPresentationSliceOrientation orient)
+{
+  // Show the widget:
+  _ui.labelSliceOrient->show();
+  _ui.comboBoxSliceOrient->show();
+
+  int idx;
+  switch(orient)
+  {
+    case MEDCALC::SLICE_NORMAL_TO_X:
+      idx = _ui.comboBoxSliceOrient->findText(tr("LAB_SLICE_NORMAL_TO_X"));
+      break;
+    case MEDCALC::SLICE_NORMAL_TO_Y:
+      idx = _ui.comboBoxSliceOrient->findText(tr("LAB_SLICE_NORMAL_TO_Y"));
+      break;
+    case MEDCALC::SLICE_NORMAL_TO_Z:
+      idx = _ui.comboBoxSliceOrient->findText(tr("LAB_SLICE_NORMAL_TO_Z"));
+      break;
+    case MEDCALC::SLICE_NORMAL_TO_XY:
+      idx = _ui.comboBoxSliceOrient->findText(tr("LAB_SLICE_NORMAL_TO_XY"));
+      break;
+    case MEDCALC::SLICE_NORMAL_TO_XZ:
+      idx = _ui.comboBoxSliceOrient->findText(tr("LAB_SLICE_NORMAL_TO_XZ"));
+      break;
+    case MEDCALC::SLICE_NORMAL_TO_YZ:
+      idx = _ui.comboBoxSliceOrient->findText(tr("LAB_SLICE_NORMAL_TO_YZ"));
+      break;
+    case MEDCALC::SLICE_NORMAL_TO_XYZ:
+      idx = _ui.comboBoxSliceOrient->findText(tr("LAB_SLICE_NORMAL_TO_XYZ"));
+      break;
+    default:
+      idx = -1;
+  }
+  if (idx >= 0)
+    {
+      _blockSig = true;
+      _ui.comboBoxSliceOrient->setCurrentIndex(idx);
+      _blockSig = false;
+    }
+  else
+    STDLOG("Strange!! No matching found - unable to set slice orientation in GUI.");
+}
+
+
+MEDCALC::MEDPresentationSliceOrientation
+WidgetPresentationParameters::getSliceOrientation() const
+{
+  QString sbrange = _ui.comboBoxSliceOrient->currentText();
+  if (sbrange == tr("LAB_SLICE_NORMAL_TO_X")) {
+      return MEDCALC::SLICE_NORMAL_TO_X;
+  }
+  else if (sbrange == tr("LAB_SLICE_NORMAL_TO_Y")) {
+      return MEDCALC::SLICE_NORMAL_TO_Y;
+  }
+  else if (sbrange == tr("LAB_SLICE_NORMAL_TO_Z")) {
+      return MEDCALC::SLICE_NORMAL_TO_Z;
+  }
+  else if (sbrange == tr("LAB_SLICE_NORMAL_TO_XY")) {
+      return MEDCALC::SLICE_NORMAL_TO_XY;
+  }
+  else if (sbrange == tr("LAB_SLICE_NORMAL_TO_XZ")) {
+      return MEDCALC::SLICE_NORMAL_TO_XZ;
+  }
+  else if (sbrange == tr("LAB_SLICE_NORMAL_TO_YZ")) {
+      return MEDCALC::SLICE_NORMAL_TO_YZ;
+  }
+  else if (sbrange == tr("LAB_SLICE_NORMAL_TO_XYZ")) {
+      return MEDCALC::SLICE_NORMAL_TO_XYZ;
+  }
+  // Should not happen
+  STDLOG("Strange!! No matching found - returning SLICE_NORMAL_TO_X.");
+  return MEDCALC::SLICE_NORMAL_TO_X;
+}
+
+MEDCALC::MEDPresentationMeshMode
+WidgetPresentationParameters::getMeshMode() const
+{
+  QString mesm = _ui.comboBoxMesh->currentText();
+  if (mesm == tr("LAB_MESH_WIREFRAME")) {
+      return MEDCALC::MESH_MODE_WIREFRAME;
+  }
+  else if (mesm == tr("LAB_MESH_SURFACE")) {
+      return MEDCALC::MESH_MODE_SURFACE;
+  }
+  else if (mesm == tr("LAB_MESH_SURF_EDGES")) {
+      return MEDCALC::MESH_MODE_SURFACE_EDGES;
+  }
+  // Should not happen
+  STDLOG("Strange!! No matching found - returning MESH_MODE_WIREFRAME.");
+  return MEDCALC::MESH_MODE_WIREFRAME;
 }
 
 
@@ -229,12 +408,6 @@ WidgetPresentationParameters::getColorMap() const
   // Should not happen
   STDLOG("Strange!! No matching color map found - returning blue to red.");
   return MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW;
-}
-
-QComboBox *
-WidgetPresentationParameters::getComboBoxCompo()
-{
-  return _ui.comboBoxCompo;
 }
 
 void

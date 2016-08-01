@@ -17,34 +17,34 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_CONTOUR_HXX_
-#define SRC_MEDCALC_CMP_MEDPRESENTATION_CONTOUR_HXX_
+#ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_MESHVIEW_HXX_
+#define SRC_MEDCALC_CMP_MEDPRESENTATION_MESHVIEW_HXX_
 
 #include "MEDCALC.hxx"
 #include "MEDPresentation.hxx"
 
-class MEDCALC_EXPORT MEDPresentationContour : public MEDPresentation
+class MEDCALC_EXPORT MEDPresentationMeshView : public MEDPresentation
 {
 public:
   static const std::string TYPE_NAME;
-  static const std::string PROP_NB_CONTOUR;
+  static const std::string PROP_MESH_MODE;
 
-  MEDPresentationContour(const MEDCALC::ContourParameters& params, const MEDCALC::MEDPresentationViewMode viewMode);
-  virtual ~MEDPresentationContour() {}
+  MEDPresentationMeshView(const MEDCALC::MeshViewParameters& params, const MEDCALC::MEDPresentationViewMode viewMode);
+  virtual ~MEDPresentationMeshView() {}
 
-  void updatePipeline(const MEDCALC::ContourParameters& params);
+  void updatePipeline(const MEDCALC::MeshViewParameters& params);
 
-  void getParameters(MEDCALC::ContourParameters & params) const { params = _params; } ;
-  void setParameters(const MEDCALC::ContourParameters & params) { _params = params; } ;
+  void getParameters(MEDCALC::MeshViewParameters & params) const { params = _params; } ;
+  void setParameters(const MEDCALC::MeshViewParameters & params) { _params = params; } ;
 
 protected:
-  void updateNbContours(const int nbContours);
+  void updateMeshMode(const MEDCALC::MEDPresentationMeshMode mode);
   virtual void internalGeneratePipeline();
 
-  std::string getContourCommand() const;
+  std::string getMeshViewCommand() const;
 
 private:
-  MEDCALC::ContourParameters _params;
+  MEDCALC::MeshViewParameters _params;
 };
 
 #endif

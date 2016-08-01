@@ -44,6 +44,13 @@ module MEDCALC
     SCALAR_BAR_CURRENT_TIMESTEP
   };
 
+  enum MEDPresentationMeshMode {
+    MESH_MODE_WIREFRAME,
+    MESH_MODE_SURFACE_EDGES,
+    MESH_MODE_SURFACE
+  };
+  
+  
 
 //  struct ScalarBarRange {
 //    // (valMin,valMax) defines the scalar bar range from:
@@ -57,7 +64,7 @@ module MEDCALC
 
   const string DISPLAY_EUCLIDEAN_NORM = "";  // Void string to avoid clash with a real component name -- never used actually?
 
-  enum SliceOrientation {
+  enum MEDPresentationSliceOrientation {
     SLICE_NORMAL_TO_X,
     SLICE_NORMAL_TO_Y,
     SLICE_NORMAL_TO_Z,
@@ -72,15 +79,23 @@ module MEDCALC
   const MEDPresentationViewMode VIEW_MODE_DEFAULT = VIEW_MODE_REPLACE;
   const MEDPresentationColorMap COLOR_MAP_DEFAULT = COLOR_MAP_BLUE_TO_RED_RAINBOW;
   const MEDPresentationScalarBarRange SCALAR_BAR_RANGE_DEFAULT = SCALAR_BAR_ALL_TIMESTEPS;
-  const long SCALAR_BAR_RANGE_VAL_MIN_DEFAULT = -1;
-  const long SCALAR_BAR_RANGE_VAL_MAX_DEFAULT = -1;
+  const MEDPresentationMeshMode MESH_MODE_DEFAULT = MESH_MODE_WIREFRAME;
+//  const long SCALAR_BAR_RANGE_VAL_MIN_DEFAULT = -1;
+//  const long SCALAR_BAR_RANGE_VAL_MAX_DEFAULT = -1;
   const string DISPLAY_DEFAULT = DISPLAY_EUCLIDEAN_NORM;
-  const SliceOrientation SLICE_ORIENTATION_DEFAULT = SLICE_NORMAL_TO_Z;
+  const MEDPresentationSliceOrientation SLICE_ORIENTATION_DEFAULT = SLICE_NORMAL_TO_X;
   const long NB_CONTOURS_DEFAULT = 10;
   const long NB_SLICES_DEFAULT = 1;
 
   /* Structs */
 
+  // Just showing the mesh 
+  struct MeshViewParameters {
+    long fieldHandlerId;   // TODO should be a meshHandlerId really ...
+    MEDPresentationMeshMode mode;
+  };
+
+  // A simple scalar map
   struct ScalarMapParameters {
     long fieldHandlerId;
     string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
@@ -103,14 +118,14 @@ module MEDCALC
 //    MEDPresentationColorMap colorMap;
 //  };
 //
-//  struct SlicesParameters {
-//    long fieldHandlerId;
-//    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
-//    MEDPresentationScalarBarRange scalarBarRange;
-//    MEDPresentationColorMap colorMap;
-//    SliceOrientation orientation;
-//    long nbSlices;
-//  };
+  struct SlicesParameters {
+    long fieldHandlerId;
+    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
+    MEDPresentationScalarBarRange scalarBarRange;
+    MEDPresentationColorMap colorMap;
+    MEDPresentationSliceOrientation orientation;
+    long nbSlices;
+  };
 //
 //  struct DeflectionShapeParameters {
 //    long fieldHandlerId;
@@ -129,11 +144,12 @@ module MEDCALC
 
   interface MEDPresentationManager : SALOME::GenericObj
   {
+    long makeMeshView(in MeshViewParameters params, in MEDPresentationViewMode viewMode);
     long makeScalarMap(in ScalarMapParameters params, in MEDPresentationViewMode viewMode);
     long makeContour(in ContourParameters params, in MEDPresentationViewMode viewMode)
       raises (SALOME::SALOME_Exception);
 //    long makeVectorField(in VectorFieldParameters params, in MEDPresentationViewMode viewMode);
-//    long makeSlices(in SlicesParameters params, in MEDPresentationViewMode viewMode);
+    long makeSlices(in SlicesParameters params, in MEDPresentationViewMode viewMode);
 //    long makeDeflectionShape(in DeflectionShapeParameters params, in MEDPresentationViewMode viewMode);
 //    long makePointSprite(in PointSpriteParameters params, in MEDPresentationViewMode viewMode);
 
@@ -142,13 +158,16 @@ module MEDCALC
     void setPresentationIntProperty(in long presId, in string propName, in long propValue);
     long getPresentationIntProperty(in long presId, in string propName);
 
+    MeshViewParameters  getMeshViewParameters(in long presId);
     ScalarMapParameters getScalarMapParameters(in long presId);
-    ContourParameters getContourParameters(in long presId);
+    ContourParameters   getContourParameters(in long presId);
+    SlicesParameters     getSlicesParameters(in long presId);
 
+    void updateMeshView(in long presId, in MeshViewParameters params);
     void updateScalarMap(in long presId, in ScalarMapParameters params);
     void updateContour(in long presId, in ContourParameters params);
 //    void updateVectorField(in long presId, in VectorFieldParameters params);
-//    void updateSlices(in long presId, in SlicesParameters params);
+    void updateSlices(in long presId, in SlicesParameters params);
 //    void updateDeflectionShape(in long presId, in DeflectionShapeParameters params);
 //    void updatePointSprite(in long presId, in PointSpriteParameters params);
 

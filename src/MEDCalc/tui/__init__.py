@@ -39,19 +39,24 @@ from medio import LoadDataSource
 from medio import LoadImageAsDataSource
 
 # Presentations
+from medpresentation import MakeMeshView
 from medpresentation import MakeScalarMap
 from medpresentation import MakeContour
 #from medpresentation import MakeVectorField
-#from medpresentation import MakeSlices
+from medpresentation import MakeSlices
 #from medpresentation import MakeDeflectionShape
 #from medpresentation import MakePointSprite
 from medpresentation import RemovePresentation
 
+from medpresentation import GetMeshViewParameters
 from medpresentation import GetScalarMapParameters
 from medpresentation import GetContourParameters
+from medpresentation import GetSlicesParameters
 
+from medpresentation import UpdateMeshView
 from medpresentation import UpdateScalarMap
 from medpresentation import UpdateContour
+from medpresentation import UpdateSlices
 
 # Console commands
 import medconsole

@@ -85,12 +85,7 @@ MEDPresentationScalarMap::updatePipeline(const MEDCALC::ScalarMapParameters& par
     throw KERNEL::createSalomeException("Unexpected updatePipeline error! Mismatching fieldHandlerId!");
 
   if (std::string(params.displayedComponent) != std::string(_params.displayedComponent))
-    {
-      STDLOG("about to updateCompo in scalar map");
-      STDLOG("from param " << params.displayedComponent);
-      STDLOG("from intern " << _params.displayedComponent);
-      updateComponent<MEDPresentationScalarMap, MEDCALC::ScalarMapParameters>(std::string(params.displayedComponent));
-    }
+    updateComponent<MEDPresentationScalarMap, MEDCALC::ScalarMapParameters>(std::string(params.displayedComponent));
   if (params.scalarBarRange != _params.scalarBarRange)
     updateScalarBarRange<MEDPresentationScalarMap, MEDCALC::ScalarMapParameters>(params.scalarBarRange);
   if (params.colorMap != _params.colorMap)

@@ -27,11 +27,15 @@
 #include "MEDPresentationManager_i.hxx"
 #include "XmedConsoleDriver.hxx"
 
+#include "MEDPresentationMeshView.hxx"
 #include "MEDPresentationScalarMap.hxx"
 #include "MEDPresentationContour.hxx"
+#include "MEDPresentationSlices.hxx"
 
+#include "MEDWidgetHelperMeshView.hxx"
 #include "MEDWidgetHelperScalarMap.hxx"
 #include "MEDWidgetHelperContour.hxx"
+#include "MEDWidgetHelperSlices.hxx"
 
 #include <SalomeApp_Application.h>
 #include <SalomeApp_Study.h>
@@ -170,10 +174,18 @@ PresentationController::createActions()
   int presentationToolbarId = _salomeModule->createTool("Presentations", "PresentationToolbar");
   int presentationMenuId = _salomeModule->createMenu(tr("MENU_PRESENTATIONS"), -1, 1);
 
+  label   = tr("LAB_PRESENTATION_MESH_VIEW");
+  tooltip = tr("TIP_PRESENTATION_MESH_VIEW");
+  QString icon = tr(_getIconName("ICO_PRESENTATION_MESH_VIEW").c_str());
+  int actionId;
+  actionId = _salomeModule->createStandardAction(label,this, SLOT(onVisualizeMeshView()),icon,tooltip);
+  _salomeModule->createTool(actionId, presentationToolbarId);
+  _salomeModule->action(actionId)->setIconVisibleInMenu(true);
+  _salomeModule->createMenu(actionId, presentationMenuId);
+
   label   = tr("LAB_PRESENTATION_SCALAR_MAP");
   tooltip = tr("TIP_PRESENTATION_SCALAR_MAP");
-  QString icon = tr(_getIconName("ICO_PRESENTATION_SCALAR_MAP").c_str());
-  int actionId;
+  icon = tr(_getIconName("ICO_PRESENTATION_SCALAR_MAP").c_str());
   actionId = _salomeModule->createStandardAction(label,this, SLOT(onVisualizeScalarMap()),icon,tooltip);
   _salomeModule->createTool(actionId, presentationToolbarId);
   _salomeModule->action(actionId)->setIconVisibleInMenu(true);
@@ -320,6 +332,12 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
 }
 
 void
+PresentationController::onVisualizeMeshView()
+{
+  this->visualize(PresentationEvent::EVENT_VIEW_OBJECT_MESH_VIEW);
+}
+
+void
 PresentationController::onVisualizeScalarMap()
 {
   this->visualize(PresentationEvent::EVENT_VIEW_OBJECT_SCALAR_MAP);
@@ -415,6 +433,34 @@ PresentationController::getScalarBarRangePython() const
   return QString();
 }
 
+QString
+PresentationController::getMeshModePython(const int mode) const
+{
+  MEDCALC::MEDPresentationMeshMode mod = static_cast<MEDCALC::MEDPresentationMeshMode>(mode);
+  switch(mod) {
+    case MEDCALC::MESH_MODE_WIREFRAME:     return "MEDCALC.MESH_MODE_WIREFRAME";
+    case MEDCALC::MESH_MODE_SURFACE:       return "MEDCALC.MESH_MODE_SURFACE";
+    case MEDCALC::MESH_MODE_SURFACE_EDGES: return "MEDCALC.MESH_MODE_SURFACE_EDGES";
+  }
+  return QString();
+}
+
+QString
+PresentationController::getSliceOrientationPython(const int orientation) const
+{
+  MEDCALC::MEDPresentationSliceOrientation orient = static_cast<MEDCALC::MEDPresentationSliceOrientation>(orientation);
+  switch(orient) {
+    case MEDCALC::SLICE_NORMAL_TO_X:   return "MEDCALC.SLICE_NORMAL_TO_X";
+    case MEDCALC::SLICE_NORMAL_TO_Y:   return "MEDCALC.SLICE_NORMAL_TO_Y";
+    case MEDCALC::SLICE_NORMAL_TO_Z:   return "MEDCALC.SLICE_NORMAL_TO_Z";
+    case MEDCALC::SLICE_NORMAL_TO_XY:  return "MEDCALC.SLICE_NORMAL_TO_XY";
+    case MEDCALC::SLICE_NORMAL_TO_XZ:  return "MEDCALC.SLICE_NORMAL_TO_XZ";
+    case MEDCALC::SLICE_NORMAL_TO_YZ:  return "MEDCALC.SLICE_NORMAL_TO_YZ";
+    case MEDCALC::SLICE_NORMAL_TO_XYZ: return "MEDCALC.SLICE_NORMAL_TO_XYZ";
+  }
+  return QString();
+}
+
 std::string
 PresentationController::getPresTypeFromWidgetHelper(int presId) const
 {
@@ -432,7 +478,11 @@ PresentationController::processPresentationEvent(const PresentationEvent* event)
   QString scalarBarRange = getScalarBarRangePython();
   MEDCALC::FieldHandler* fieldHandler = event->fieldHandler;
   QStringList commands;
-  if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SCALAR_MAP ) {
+  if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_MESH_VIEW ) {
+        commands += QString("presentation_id = medcalc.MakeMeshView(accessField(%1), viewMode=%2)").arg(fieldHandler->id).arg(viewMode);
+        commands += QString("presentation_id");
+    }
+  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SCALAR_MAP ) {
       commands += QString("presentation_id = medcalc.MakeScalarMap(accessField(%1), viewMode=%2, scalarBarRange=%3, colorMap=%4)")
           .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
       commands += QString("presentation_id");
@@ -446,10 +496,11 @@ PresentationController::processPresentationEvent(const PresentationEvent* event)
   //    commands += QString("presentation_id = medcalc.MakeVectorField(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
   //    commands += QString("presentation_id");
   //  }
-  //  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SLICES ) {
-  //    commands += QString("presentation_id = medcalc.MakeSlices(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-  //    commands += QString("presentation_id");
-  //  }
+    else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SLICES ) {
+      commands += QString("presentation_id = medcalc.MakeSlices(accessField(%1), viewMode=%2, scalarBarRange=%3, colorMap=%4)")
+        .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
+      commands += QString("presentation_id");
+    }
   //  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE ) {
   //    commands += QString("presentation_id = medcalc.MakeDeflectionShape(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
   //    commands += QString("presentation_id");
@@ -485,6 +536,25 @@ PresentationController::processPresentationEvent(const PresentationEvent* event)
       commands += QString("params.nbContours = %1").arg(event->anInteger);
       commands += QString("medcalc.UpdateContour(%1, params)").arg(event->presentationId);
   }
+  else if ( event->eventtype == PresentationEvent::EVENT_CHANGE_MESH_MODE ) {
+      std::string typ = getPresTypeFromWidgetHelper(event->presentationId);
+      commands += QString("params = medcalc.GetMeshViewParameters(%2)").arg(event->presentationId);
+      commands += QString("params.mode = %1").arg(getMeshModePython(event->anInteger));
+      commands += QString("medcalc.UpdateMeshView(%1, params)").arg(event->presentationId);
+  }
+  else if ( event->eventtype == PresentationEvent::EVENT_CHANGE_NB_SLICES ) {
+      std::string typ = getPresTypeFromWidgetHelper(event->presentationId);
+      commands += QString("params = medcalc.GetSlicesParameters(%2)").arg(event->presentationId);
+      commands += QString("params.nbSlices = %1").arg(event->anInteger);
+      commands += QString("medcalc.UpdateSlices(%1, params)").arg(event->presentationId);
+  }
+  else if ( event->eventtype == PresentationEvent::EVENT_CHANGE_SLICE_ORIENTATION ) {
+      std::string typ = getPresTypeFromWidgetHelper(event->presentationId);
+      commands += QString("params = medcalc.GetSlicesParameters(%2)").arg(event->presentationId);
+      commands += QString("params.orientation = %1").arg(getSliceOrientationPython(event->anInteger));
+      commands += QString("medcalc.UpdateSlices(%1, params)").arg(event->presentationId);
+  }
+
   else if ( event->eventtype == PresentationEvent::EVENT_DELETE_PRESENTATION ) {
       commands += QString("medcalc.RemovePresentation(%1)").arg(event->presentationId);
   }
@@ -502,25 +572,17 @@ PresentationController::findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager
   if (it != _presHelperMap.end())
     return (*it).second;
   MEDWidgetHelper * wh;
-  if (type == MEDPresentationScalarMap::TYPE_NAME)
+  if (type == MEDPresentationMeshView::TYPE_NAME)
+    wh = new MEDWidgetHelperMeshView(this, _presManager, presId, name, _widgetPresentationParameters);
+  else if (type == MEDPresentationScalarMap::TYPE_NAME)
     wh = new MEDWidgetHelperScalarMap(this, _presManager, presId, name, _widgetPresentationParameters);
   else if (type == MEDPresentationContour::TYPE_NAME)
     wh = new MEDWidgetHelperContour(this, _presManager, presId, name, _widgetPresentationParameters);
+  else if (type == MEDPresentationSlices::TYPE_NAME)
+      wh = new MEDWidgetHelperSlices(this, _presManager, presId, name, _widgetPresentationParameters);
   else
     {
-      //    case PRES_CONTOUR:
-      //// break;
-      //    case PRES_DEFLECTION:
-      ////          break;
-      //    case PRES_VECTOR_FIELD:
-      //  //        break;
-      //    case PRES_POINT_SPRITE:
-      //    //      break;
-      //    case PRES_POINT_SPRITE:
-      //      //    break;
-      //    default:
       STDLOG("findOrCreateWidgetHelper(): NOT IMPLEMENTED !!!");
-
     }
   _presHelperMap[presId] = wh;
   return wh;

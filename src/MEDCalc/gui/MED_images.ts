@@ -65,6 +65,10 @@
     </message>
     <!-- Presentation toolbar icons (default theme)-->
     <message>
+      <source>ICO_PRESENTATION_MESH_VIEW_DEFAULT</source>
+      <translation>mesh24.png</translation>
+    </message>    
+    <message>
       <source>ICO_PRESENTATION_SCALAR_MAP_DEFAULT</source>
       <translation>scalarmap24.png</translation>
     </message>
@@ -89,6 +93,10 @@
       <translation>pqNodeMapData24.png</translation>
     </message>
     <!-- Presentation tree icons (default theme)-->
+    <message>
+      <source>ICO_MEDPresentationMeshView_DEFAULT</source>
+      <translation>mesh16.png</translation>
+    </message>    
     <message>
       <source>ICO_MEDPresentationScalarMap_DEFAULT</source>
       <translation>scalarmap16.png</translation>
@@ -115,6 +123,10 @@
     </message>
     <!-- Presentation toolbar icons (modern theme)-->
     <message>
+      <source>ICO_PRESENTATION_MESH_VIEW_MODERN</source>
+      <translation>mesh24.png</translation>
+    </message>    
+    <message>
       <source>ICO_PRESENTATION_SCALAR_MAP_MODERN</source>
       <translation>scalarmap24.png</translation>
     </message>
@@ -139,6 +151,10 @@
       <translation>pqNodeMapData24.png</translation>
     </message>
     <!-- Presentation tree icons (modern theme)-->
+    <message>
+      <source>ICO_MEDPresentationMeshView_MODERN</source>
+      <translation>mesh16.png</translation>
+    </message>    
     <message>
       <source>ICO_MEDPresentationScalarMap_MODERN</source>
       <translation>scalarmap16.png</translation>
@@ -165,6 +181,10 @@
     </message>
     <!-- Presentation toolbar icons (classic theme)-->
     <message>
+      <source>ICO_PRESENTATION_MESH_VIEW_CLASSIC</source>
+      <translation>visu_mesh24.png</translation>
+    </message>    
+    <message>
       <source>ICO_PRESENTATION_SCALAR_MAP_CLASSIC</source>
       <translation>visu_scalars24.png</translation>
     </message>
@@ -189,6 +209,10 @@
       <translation>visu_points24.png</translation>
     </message>
     <!-- Presentation tree icons (classic theme)-->
+    <message>
+      <source>ICO_MEDPresentationMeshView_CLASSIC</source>
+      <translation>visu_mesh16.png</translation>
+    </message>
     <message>
       <source>ICO_MEDPresentationScalarMap_CLASSIC</source>
       <translation>visu_scalars16.png</translation>

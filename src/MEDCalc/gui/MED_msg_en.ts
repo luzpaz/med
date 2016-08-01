@@ -8,6 +8,14 @@
       <translation>Presentation parameters</translation>
     </message>
     <message>
+      <source>LAB_PRESENTATION_MESH_VIEW</source>
+      <translation>Mesh</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_MESH_VIEW</source>
+      <translation>Mesh</translation>
+    </message>
+    <message>
       <source>LAB_PRESENTATION_SCALAR_MAP</source>
       <translation>Scalar map</translation>
     </message>
@@ -66,6 +74,10 @@
     <message>
       <source>MENU_PRESENTATIONS</source>
       <translation>Presentations</translation>
+    </message>
+    <message>
+      <source>MEDPresentationMeshView</source>
+      <translation>Mesh view</translation>
     </message>
     <message>
       <source>MEDPresentationScalarMap</source>
@@ -211,6 +223,65 @@
       <source>LAB_COLOR_MAP</source>
       <translation>Color map:</translation>
     </message>
+
+    <message>
+      <source>LAB_MESH_WIREFRAME</source>
+      <translation>Wireframe</translation>
+    </message>
+    <message>
+      <source>LAB_MESH_SURFACE</source>
+      <translation>Surface</translation>
+    </message>
+    <message>
+      <source>LAB_MESH_SURF_EDGES</source>
+      <translation>Surface With Edges</translation>
+    </message>
+    <message>
+      <source>LAB_DISP_MESH_MODE</source>
+      <translation>Mesh display:</translation>
+    </message>
+    <message>
+      <source>LAB_NB_CONTOURS</source>
+      <translation>Number of contours:</translation>
+    </message>
+    <message>
+      <source>LAB_NB_SLICES</source>
+      <translation>Number of slices:</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_ORIENT</source>
+      <translation>Slice orientation:</translation>
+    </message>
+
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_X</source>
+      <translation>Normal to X</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_Y</source>
+      <translation>Normal to Y</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_Z</source>
+      <translation>Normal to Z</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_XY</source>
+      <translation>Normal to XY</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_XZ</source>
+      <translation>Normal to XZ</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_YZ</source>
+      <translation>Normal to YZ</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_XYZ</source>
+      <translation>Normal to XYZ</translation>
+    </message>
+    
   </context>
   <context>
     <name>DlgAlias</name>

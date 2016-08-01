@@ -21,6 +21,7 @@ INCLUDE(tests.set)
 
 SET(_test_files
     medfiles/smooth_surface_and_field.med
+    medfiles/agitateur.med
 )
 
 SET(TEST_INSTALL_DIRECTORY ${SALOME_MED_INSTALL_TEST}/MEDCalc/tui)

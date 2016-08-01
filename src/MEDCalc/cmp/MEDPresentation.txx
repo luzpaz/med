@@ -47,7 +47,6 @@ MEDPresentation::setParameters(const PresentationParameters& params)
   p->setParameters(params);
 }
 
-
 /**
  * Update the ParaVis pipeline so that the given component appears on screen.
  * Blank means "Euclidean norm"
@@ -63,8 +62,6 @@ MEDPresentation::updateComponent(const std::string& newCompo)
   p->getParameters(params);
   params.displayedComponent = newCompo.c_str();
   p->setParameters(params);
-
-
 
   int nbCompo = getIntProperty(MEDPresentation::PROP_NB_COMPONENTS);
   int idx = -1;

@@ -46,7 +46,6 @@ public:
   static const std::string PROP_NB_COMPONENTS;        // number of field components
   static const std::string PROP_SELECTED_COMPONENT;   // index of the selected component - 0 means Euclidean norm
   static const std::string PROP_COMPONENT;            // string prefix for all properties storing component names
-
   static const std::string PROP_COLOR_MAP;            // color map - TODO: arch fix - should be in params only
   static const std::string PROP_SCALAR_BAR_RANGE;     // scalar bar range - TODO: arch fix - should be in params only
 

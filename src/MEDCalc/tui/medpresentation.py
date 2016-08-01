@@ -23,6 +23,21 @@ from medcalc.medevents import notifyGui_addPresentation, notifyGui_removePresent
 
 __manager = medcalc.medcorba.factory.getPresentationManager()
 
+def MakeMeshView(proxy,
+                 viewMode=MEDCALC.VIEW_MODE_DEFAULT,
+                 meshMode=MEDCALC.MESH_MODE_DEFAULT):
+  # Create the presentation instance in CORBA engine
+  # The engine in turn creates the ParaView pipeline elements
+  params = MEDCALC.MeshViewParameters(proxy.id, meshMode)
+  try:
+    presentation_id = __manager.makeMeshView(params, viewMode)
+    notifyGui_addPresentation(proxy.id, presentation_id)
+    return presentation_id
+  except SALOME.SALOME_Exception as e:
+    notifyGui_error("An error occured while creating the mesh view:\n" + e.details.text)
+    raise Exception(e.details.text)
+
+
 def MakeScalarMap(proxy,
                   viewMode=MEDCALC.VIEW_MODE_DEFAULT,
                   displayedComponent=MEDCALC.DISPLAY_DEFAULT,
@@ -42,7 +57,6 @@ def MakeScalarMap(proxy,
 
 def MakeContour(proxy,
                 viewMode=MEDCALC.VIEW_MODE_DEFAULT,
-                displayedComponent=MEDCALC.DISPLAY_DEFAULT,
                 scalarBarRange=MEDCALC.SCALAR_BAR_RANGE_DEFAULT,
                 colorMap=MEDCALC.COLOR_MAP_DEFAULT,
                 nbContours=MEDCALC.NB_CONTOURS_DEFAULT
@@ -67,15 +81,24 @@ def MakeContour(proxy,
 #  return presentation_id
 ##
 #
-#def MakeSlices(proxy,
-#               viewMode=MEDCALC.VIEW_MODE_DEFAULT,
-#               orientation=MEDCALC.SLICE_ORIENTATION_DEFAULT,
-#               nbSlices=MEDCALC.NB_SLICES_DEFAULT
-#               ):
-#  params = MEDCALC.SlicesParameters(proxy.id, viewMode, orientation, nbSlices)
-#  presentation_id = __manager.makeSlices(params)
-#  notifyGui_addPresentation(proxy.id, presentation_id)
-#  return presentation_id
+def MakeSlices(proxy,
+                viewMode=MEDCALC.VIEW_MODE_DEFAULT,
+                displayedComponent=MEDCALC.DISPLAY_DEFAULT,
+                scalarBarRange=MEDCALC.SCALAR_BAR_RANGE_DEFAULT,
+                colorMap=MEDCALC.COLOR_MAP_DEFAULT,
+                sliceOrientation=MEDCALC.SLICE_ORIENTATION_DEFAULT,
+                nbSlices=MEDCALC.NB_SLICES_DEFAULT):
+  # Create the presentation instance in CORBA engine
+  # The engine in turn creates the ParaView pipeline elements
+  params = MEDCALC.SlicesParameters(proxy.id, displayedComponent,scalarBarRange, colorMap, 
+                                    sliceOrientation, nbSlices)
+  try:
+    presentation_id = __manager.makeSlices(params, viewMode)
+    notifyGui_addPresentation(proxy.id, presentation_id)
+    return presentation_id
+  except SALOME.SALOME_Exception as e:
+    notifyGui_error("An error occured while creating the slices:\n" + e.details.text)
+    raise Exception(e.details.text)
 ##
 #
 #def MakeDeflectionShape(proxy,
@@ -105,19 +128,20 @@ def RemovePresentation(presentation_id):
     notifyGui_removePresentation(presentation_id)
 #
 
-def GetScalarMapParameters(presentation_id):
-  # TODO: check that pres id is really a ScalarMap ...
-  params = __manager.getScalarMapParameters(presentation_id)
+def GetGENERICParameters(tag, presentation_id):
+  exec "params = __manager.get%sParameters(presentation_id)" % tag
   return params
 
-def GetContourParameters(presentation_id):
-  # TODO: check that pres id is really a ScalarMap ...
-  params = __manager.getContourParameters(presentation_id)
-  return params
+GetMeshViewParameters = lambda pres_id: GetGENERICParameters("MeshView", pres_id)
+GetScalarMapParameters = lambda pres_id: GetGENERICParameters("ScalarMap", pres_id)
+GetContourParameters = lambda pres_id: GetGENERICParameters("Contour", pres_id)
+GetSlicesParameters = lambda pres_id: GetGENERICParameters("Slices", pres_id)
 
-def UpdateScalarMap(presentation_id, params):
-  __manager.updateScalarMap(presentation_id, params)
 
-def UpdateContour(presentation_id, params):
-  __manager.updateContour(presentation_id, params)
+def UpdateGENERIC(tag, presentation_id, params):
+  exec "__manager.update%s(presentation_id, params)" % tag
 
+UpdateMeshView = lambda pres_id, params: UpdateGENERIC("MeshView", pres_id, params)
+UpdateScalarMap = lambda pres_id, params: UpdateGENERIC("ScalarMap", pres_id, params)
+UpdateContour = lambda pres_id, params: UpdateGENERIC("Contour", pres_id, params)
+UpdateSlices = lambda pres_id, params: UpdateGENERIC("Slices", pres_id, params)

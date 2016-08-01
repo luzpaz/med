@@ -39,10 +39,11 @@ SET(COMMON_SOURCES
   MEDPresentationManager_i.cxx
   MEDPresentation.cxx
   # presentations
+  MEDPresentationMeshView.cxx
   MEDPresentationScalarMap.cxx
   MEDPresentationContour.cxx
 #  MEDPresentationVectorField.cxx
-#  MEDPresentationSlices.cxx
+  MEDPresentationSlices.cxx
 #  MEDPresentationDeflectionShape.cxx
 #  MEDPresentationPointSprite.cxx
 )

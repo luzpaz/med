@@ -26,16 +26,25 @@
 class MEDCALC_EXPORT MEDPresentationSlices : public MEDPresentation
 {
 public:
-  MEDPresentationSlices(const MEDCALC::SlicesParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationSlices"), _params(params)
-  {}
+  static const std::string TYPE_NAME;
+  static const std::string PROP_NB_SLICES;
+  static const std::string PROP_SLICE_ORIENTATION;
+
+  MEDPresentationSlices(const MEDCALC::SlicesParameters& params, const MEDCALC::MEDPresentationViewMode viewMode);
   virtual ~MEDPresentationSlices() {}
 
   void updatePipeline(const MEDCALC::SlicesParameters& params);
-  MEDCALC::MEDPresentationViewMode getViewMode() { return _params.viewMode; }
+
+  void getParameters(MEDCALC::SlicesParameters & params) const { params = _params; } ;
+  void setParameters(const MEDCALC::SlicesParameters & params) { _params = params; } ;
 
 protected:
+  void updateNbSlices(const int nbSlices);
+  void updateOrientation(const MEDCALC::MEDPresentationSliceOrientation orientation);
   virtual void internalGeneratePipeline();
+
+  std::string getNbSlicesCommand() const;
+  std::string getOrientationCommand() const;
 
 private:
   MEDCALC::SlicesParameters _params;

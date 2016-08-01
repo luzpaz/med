@@ -22,9 +22,10 @@
 #include "Basics_Utils.hxx"
 
 // presentations
+#include "MEDPresentationMeshView.hxx"
 #include "MEDPresentationScalarMap.hxx"
 #include "MEDPresentationContour.hxx"
-//#include "MEDPresentationSlices.hxx"
+#include "MEDPresentationSlices.hxx"
 //#include "MEDPresentationVectorField.hxx"
 //#include "MEDPresentationDeflectionShape.hxx"
 //#include "MEDPresentationPointSprite.hxx"
@@ -123,6 +124,12 @@ MEDPresentationManager_i::getPresentationIntProperty(MEDPresentation::TypeID pre
 }
 
 MEDPresentation::TypeID
+MEDPresentationManager_i::makeMeshView(const MEDCALC::MeshViewParameters& params, const MEDCALC::MEDPresentationViewMode viewMode)
+{
+  return _makePresentation<MEDPresentationMeshView>(params, viewMode);
+}
+
+MEDPresentation::TypeID
 MEDPresentationManager_i::makeScalarMap(const MEDCALC::ScalarMapParameters& params, const MEDCALC::MEDPresentationViewMode viewMode)
 {
   return _makePresentation<MEDPresentationScalarMap>(params, viewMode);
@@ -140,11 +147,11 @@ MEDPresentationManager_i::makeContour(const MEDCALC::ContourParameters& params, 
 //  return _makePresentation<MEDPresentationVectorField>(params);
 //}
 //
-//MEDPresentation::TypeID
-//MEDPresentationManager_i::makeSlices(const MEDCALC::SlicesParameters& params)
-//{
-//  return _makePresentation<MEDPresentationSlices>(params);
-//}
+MEDPresentation::TypeID
+MEDPresentationManager_i::makeSlices(const MEDCALC::SlicesParameters& params, const MEDCALC::MEDPresentationViewMode viewMode)
+{
+  return _makePresentation<MEDPresentationSlices>(params, viewMode);
+}
 //
 //MEDPresentation::TypeID
 //MEDPresentationManager_i::makeDeflectionShape(const MEDCALC::DeflectionShapeParameters& params)
@@ -157,6 +164,15 @@ MEDPresentationManager_i::makeContour(const MEDCALC::ContourParameters& params, 
 //{
 //  return _makePresentation<MEDPresentationPointSprite>(params);
 //}
+
+MEDCALC::MeshViewParameters
+MEDPresentationManager_i::getMeshViewParameters(MEDPresentation::TypeID presentationID)
+{
+  MEDCALC::MeshViewParameters p;
+  _getParameters<MEDPresentationMeshView>(presentationID, p);
+  return p;
+}
+
 
 MEDCALC::ScalarMapParameters*
 MEDPresentationManager_i::getScalarMapParameters(MEDPresentation::TypeID presentationID)
@@ -173,6 +189,22 @@ MEDPresentationManager_i::getContourParameters(MEDPresentation::TypeID presentat
   MEDCALC::ContourParameters p;
   _getParameters<MEDPresentationContour>(presentationID, p);
   return p;
+}
+
+MEDCALC::SlicesParameters*
+MEDPresentationManager_i::getSlicesParameters(MEDPresentation::TypeID presentationID)
+{
+  MEDCALC::SlicesParameters* p = new MEDCALC::SlicesParameters();
+  _getParameters<MEDPresentationSlices>(presentationID, *p);
+  MEDCALC::SlicesParameters_var tmp(p);
+  return tmp._retn();
+}
+
+
+void
+MEDPresentationManager_i::updateMeshView(MEDPresentation::TypeID presentationID, const MEDCALC::MeshViewParameters& params)
+{
+  return _updatePresentation<MEDPresentationMeshView>(presentationID, params);
 }
 
 void
@@ -193,11 +225,11 @@ MEDPresentationManager_i::updateContour(MEDPresentation::TypeID presentationID, 
 //  return _updatePresentation<MEDPresentationVectorField>(presentationID, params);
 //}
 //
-//void
-//MEDPresentationManager_i::updateSlices(MEDPresentation::TypeID presentationID, const MEDCALC::SlicesParameters& params)
-//{
-//  return _updatePresentation<MEDPresentationSlices>(presentationID, params);
-//}
+void
+MEDPresentationManager_i::updateSlices(MEDPresentation::TypeID presentationID, const MEDCALC::SlicesParameters& params)
+{
+  return _updatePresentation<MEDPresentationSlices>(presentationID, params);
+}
 //
 //void
 //MEDPresentationManager_i::updateDeflectionShape(MEDPresentation::TypeID presentationID, const MEDCALC::DeflectionShapeParameters& params)

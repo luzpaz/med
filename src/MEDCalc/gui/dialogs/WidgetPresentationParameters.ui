@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>439</width>
-    <height>359</height>
+    <width>784</width>
+    <height>584</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -28,7 +28,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget" native="true">
+    <widget class="QWidget" name="commonWidget" native="true">
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="1">
        <widget class="QComboBox" name="comboBoxScalarBarRange">
@@ -54,20 +54,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QComboBox" name="comboBoxColorMap">
-        <item>
-         <property name="text">
-          <string>LAB_BLUE_TO_RED</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>LAB_COOL_TO_WARM</string>
-         </property>
-        </item>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_4">
         <property name="sizePolicy">
@@ -79,6 +65,23 @@
         <property name="text">
          <string>LAB_RANGE</string>
         </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="comboBoxColorMap">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <item>
+         <property name="text">
+          <string>LAB_BLUE_TO_RED</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_COOL_TO_WARM</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
@@ -95,13 +98,39 @@
     <widget class="QWidget" name="widgetDynamic" native="true">
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
+       <widget class="QLabel" name="labelMeshMode">
+        <property name="text">
+         <string>LAB_DISP_MESH_MODE</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="comboBoxMesh">
+        <item>
+         <property name="text">
+          <string>LAB_MESH_WIREFRAME</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_MESH_SURFACE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_MESH_SURF_EDGES</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
        <widget class="QLabel" name="labelCompo">
         <property name="text">
          <string>LAB_DISP_COMP</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2">
+      <item row="1" column="1">
        <widget class="QComboBox" name="comboBoxCompo">
         <item>
          <property name="text">
@@ -110,17 +139,17 @@
         </item>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="labelSpinBox">
         <property name="text">
          <string>LAB_SPIN_BOX</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QSpinBox" name="spinBox"/>
       </item>
-      <item row="1" column="2">
+      <item row="2" column="2">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -133,14 +162,14 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="labelSliceOrient">
         <property name="text">
          <string>LAB_SLICE_ORIENT</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" colspan="2">
+      <item row="3" column="1">
        <widget class="QComboBox" name="comboBoxSliceOrient">
         <item>
          <property name="text">
@@ -155,6 +184,26 @@
         <item>
          <property name="text">
           <string>LAB_SLICE_NORMAL_TO_Z</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_SLICE_NORMAL_TO_XY</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_SLICE_NORMAL_TO_XZ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_SLICE_NORMAL_TO_YZ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LAB_SLICE_NORMAL_TO_XYZ</string>
          </property>
         </item>
        </widget>

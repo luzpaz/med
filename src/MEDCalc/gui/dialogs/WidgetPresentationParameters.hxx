@@ -42,6 +42,9 @@ public:
   std::string getComponent() const;
   void setComponents(std::vector<std::string> compos, int selecIndex);
 
+  MEDCALC::MEDPresentationMeshMode getMeshMode() const;
+  void setMeshMode(MEDCALC::MEDPresentationMeshMode mode);
+
   MEDCALC::MEDPresentationScalarBarRange getScalarBarRange() const;
   void setScalarBarRange(MEDCALC::MEDPresentationScalarBarRange);
 
@@ -56,20 +59,31 @@ public:
   int getNbContour() const;
   void setNbContour(int nbContour);
 
+  int getNbSlices() const;
+  void setNbSlices(int nbSlices);
+
+  MEDCALC::MEDPresentationSliceOrientation getSliceOrientation() const;
+  void setSliceOrientation(MEDCALC::MEDPresentationSliceOrientation orient);
+
   void toggleWidget(bool show);
   bool isShown() const;
-  QComboBox * getComboBoxCompo();
+
+  void toggleCommonFieldWidget(bool show);
 
 signals:
   void comboScalarBarRangeIndexChanged(int);
   void comboColorMapIndexChanged(int);
   void comboCompoIndexChanged(int);
+  void comboOrientIndexChanged(int);
+  void comboMeshIndexChanged(int);
   void spinBoxValueChanged(int);
 
 private slots:
   void onComboScalarBarRangeIndexChanged(int);
   void onComboColorMapIndexChanged(int);
   void onComboCompoIndexChanged(int);
+  void onComboOrientIndexChanged(int);
+  void onComboMeshIndexChanged(int);
   void onSpinBoxValueChanged(int);
 
 private:

@@ -32,9 +32,9 @@ source_id = medcalc.LoadDataSource(datafile)
 
 # Field 0 = CONCENTRATION_ELEM_DOM (ON_CELLS) -> scalar
 presentation_id = medcalc.MakeContour(accessField(0), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
-sleep(2)
+sleep(1)
 medcalc.RemovePresentation(presentation_id)
-sleep(2)
+sleep(1)
 
 # Field 55 = VITESSE_ELEM_DOM (ON_CELLS) -> vector field, contour should fail.
 try:
@@ -42,4 +42,4 @@ try:
   sys.exit(-1);
 except:
   print "Contour failed as expected."
-sleep(2)
+sleep(1)
