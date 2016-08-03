@@ -25,8 +25,6 @@ SET(dist_admlocalm4_DATA
     check_bft.m4
     check_fvm.m4
     check_metis.m4
-    check_parmetis.m4
-    check_scotch.m4
     med_check_sizeof_medint.m4
     renumber.m4
     splitter.m4
