@@ -126,3 +126,6 @@ def notifyGui_termination():
   
 def notifyGui_error(msg):
   __notifyGui(MEDCALC.EVENT_ERROR, msg=msg)
+  
+def notifyGui_modifyPresentation(presId):
+  __notifyGui(MEDCALC.EVENT_MODIFY_PRESENTATION, presentationId=presId)

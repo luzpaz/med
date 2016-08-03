@@ -314,6 +314,9 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
   else if ( event->type == MEDCALC::EVENT_REMOVE_PRESENTATION ) {
     emit workspaceSignal(event); // forward to PresentationController
   }
+  else if ( event->type == MEDCALC::EVENT_MODIFY_PRESENTATION ) {
+      emit workspaceSignal(event); // forward to PresentationController
+  }
   else if ( event->type == MEDCALC::EVENT_PLAY_TEST ) {
     emit workspaceSignal(event); // forward to TestController
   }
@@ -323,7 +326,9 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
   else if ( event->type == MEDCALC::EVENT_ERROR ) {
       std::string msg(event->msg);
       QMessageBox::warning(_salomeModule->getApp()->desktop(), "Error", QString::fromStdString(msg));
-    }
+  }
+  else
+    STDLOG("WorkspaceController::processMedEvent(): Unhandled event!!!");
 }
 
 /*!

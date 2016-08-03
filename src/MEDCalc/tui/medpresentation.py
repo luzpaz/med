@@ -19,7 +19,7 @@
 
 import medcalc
 import MEDCALC, SALOME
-from medcalc.medevents import notifyGui_addPresentation, notifyGui_removePresentation, notifyGui_error
+from medcalc.medevents import notifyGui_addPresentation, notifyGui_removePresentation, notifyGui_error, notifyGui_modifyPresentation
 
 __manager = medcalc.medcorba.factory.getPresentationManager()
 
@@ -156,6 +156,7 @@ GetVectorFieldParameters = lambda pres_id: __GetGENERICParameters("VectorField",
 
 def __UpdateGENERIC(tag, presentation_id, params):
   exec "__manager.update%s(presentation_id, params)" % tag
+  notifyGui_modifyPresentation(presentation_id)
 
 UpdateMeshView = lambda pres_id, params: __UpdateGENERIC("MeshView", pres_id, params)
 UpdateScalarMap = lambda pres_id, params: __UpdateGENERIC("ScalarMap", pres_id, params)
