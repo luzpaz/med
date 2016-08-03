@@ -43,34 +43,21 @@ MEDPresentationScalarMap::internalGeneratePipeline()
 
   MEDPyLockWrapper lock;
 
-  std::ostringstream oss;
-  std::string view(getRenderViewVar());
-
-  pushAndExecPyLine( getRenderViewCommand() ); // instanciate __viewXXX
-
-  oss << _srcObjVar << " = pvs.MEDReader(FileName='" << _fileName << "');";
-  pushAndExecPyLine(oss.str()); oss.str("");
+  setOrCreateRenderView(); // instanciate __viewXXX
+  createSource();
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();
-//  dumpIntProperties();
-//  dumpStringProperties();
 
+  // Nothing to do in a scalar map, obj = source:
   pushAndExecPyLine(_objVar + " = " + _srcObjVar);
 
-  oss << _dispVar << " = pvs.Show(" << _objVar << ", " << view << ");";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << "pvs.ColorBy(" << _dispVar << ", ('" << _fieldType << "', '" << _fieldName << "'));";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _dispVar <<  ".SetScalarBarVisibility(" << view << ", True);";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << getRescaleCommand();
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _lutVar << " = pvs.GetColorTransferFunction('" << _fieldName << "');";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  pushAndExecPyLine(getColorMapCommand()); oss.str("");
-  pushAndExecPyLine(getResetCameraCommand());
-  pushAndExecPyLine("pvs.Render();");
+  showObject();
+  colorBy(_fieldType);
+  showScalarBar();
+  rescaleTransferFunction();
+  selectColorMap();
+  resetCameraAndRender();
 
   // Retrieve Python object for internal storage:
 //  PyObject* p_obj = getPythonObjectFromMain(obj.c_str());

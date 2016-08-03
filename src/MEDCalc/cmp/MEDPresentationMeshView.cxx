@@ -38,8 +38,8 @@ MEDPresentationMeshView::MEDPresentationMeshView(const MEDCALC::MeshViewParamete
   setIntProperty(MEDPresentationMeshView::PROP_MESH_MODE, params.mode);
 }
 
-std::string
-MEDPresentationMeshView::getMeshViewCommand() const
+void
+MEDPresentationMeshView::representationType()
 {
   std::ostringstream oss1;
 
@@ -59,8 +59,7 @@ MEDPresentationMeshView::getMeshViewCommand() const
       STDLOG(mes);
       throw KERNEL::createSalomeException(mes);
   }
-
-  return oss1.str();
+  pushAndExecPyLine(oss1.str());
 }
 
 void
@@ -70,19 +69,16 @@ MEDPresentationMeshView::internalGeneratePipeline()
 
   MEDPyLockWrapper lock;
 
-  std::ostringstream oss;
-  std::string view(getRenderViewVar());
+  createSource();
+  setOrCreateRenderView();
 
-  oss << _srcObjVar << " = pvs.MEDReader(FileName='" << _fileName << "');";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  pushAndExecPyLine( getRenderViewCommand() ); // instanciate __viewXXX
+  std::ostringstream oss;
   oss << _objVar << " = " << _srcObjVar << ";";
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _dispVar << " = pvs.Show(" << _objVar << ", " << view << ");";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  pushAndExecPyLine(getMeshViewCommand());
-  pushAndExecPyLine(getResetCameraCommand());
-  pushAndExecPyLine("pvs.Render();");
+
+  showObject();
+  representationType();
+  resetCameraAndRender();
 }
 
 void
@@ -106,8 +102,7 @@ MEDPresentationMeshView::updateMeshMode(const MEDCALC::MeshModeType mode)
   // Update the pipeline:
   {
     MEDPyLockWrapper lock;
-    std::string cmd = getMeshViewCommand();
-    pushAndExecPyLine(cmd);
+    representationType();
     pushAndExecPyLine("pvs.Render();");
   }
 }

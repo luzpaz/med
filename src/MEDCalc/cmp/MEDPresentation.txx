@@ -89,8 +89,7 @@ MEDPresentation::updateComponent(const std::string& newCompo)
     MEDPyLockWrapper lock;
 
     std::ostringstream oss;
-    std::string cmd = getComponentSelectionCommand();
-    pushAndExecPyLine(cmd);
+    selectFieldComponent();
     pushAndExecPyLine("pvs.Render();");
   }
 
@@ -115,8 +114,7 @@ MEDPresentation::updateColorMap(MEDCALC::ColorMapType colorMap)
   // Update the pipeline:
   {
     MEDPyLockWrapper lock;
-    std::string cmd = getColorMapCommand();
-    pushAndExecPyLine(cmd);
+    selectColorMap();
     pushAndExecPyLine("pvs.Render();");
   }
 }
@@ -140,8 +138,7 @@ MEDPresentation::updateScalarBarRange(MEDCALC::ScalarBarRangeType sbRange)
   // Update the pipeline:
   {
     MEDPyLockWrapper lock;
-    std::string cmd = getRescaleCommand();
-    pushAndExecPyLine(cmd);
+    rescaleTransferFunction();
     pushAndExecPyLine("pvs.Render();");
   }
 }

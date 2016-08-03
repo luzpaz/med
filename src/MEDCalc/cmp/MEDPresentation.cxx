@@ -57,6 +57,7 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const s
   _fileName = dataSHandler->uri;
   _fieldName = fieldHandler->fieldname;
   _fieldType = getFieldTypeString((MEDCoupling::TypeOfField) fieldHandler->type);
+  _meshName = meshHandler->name;
 
   if (_fileName.substr(0, 7) != std::string("file://")) {
     const char* msg = "MEDPresentation(): Data source is not a file! Can not proceed.";
@@ -209,6 +210,9 @@ MEDPresentation::getIntProperty(const std::string& propName) const
  }
 
 
+/**
+* @return a borrowed reference. Do not DECRREF!
+*/
 PyObject*
 MEDPresentation::getPythonObjectFromMain(const char* python_var) const
 {
@@ -244,74 +248,123 @@ MEDPresentation::getRenderViewVar() const
   return oss.str();
 }
 
-std::string
-MEDPresentation::getRenderViewCommand() const
+void
+MEDPresentation::createSource()
 {
-  std::ostringstream oss, oss2;
+  std::ostringstream oss;
+  oss << _srcObjVar << " = pvs.MEDReader(FileName='" << _fileName << "');";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _srcObjVar << ".GenerateVectors = 1;";
+  pushAndExecPyLine(oss.str()); oss.str("");
+}
+
+void
+MEDPresentation::setOrCreateRenderView()
+{
+  std::ostringstream oss2;
 
   std::string view(getRenderViewVar());
-  oss2 << "pvs._DisableFirstRenderCameraReset();" << std::endl;
+  oss2 << "pvs._DisableFirstRenderCameraReset();";
+  pushAndExecPyLine(oss2.str()); oss2.str("");
   if (_viewMode == MEDCALC::VIEW_MODE_OVERLAP) {
       // this might potentially re-assign to an existing view variable, but this is OK, we
       // normally reassign exaclty the same RenderView object.
-      oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');" << std::endl;
+      oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
   } else if (_viewMode == MEDCALC::VIEW_MODE_REPLACE) {
       // same as above
-      oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');" << std::endl;
-      oss2 << "pvs.active_objects.source and pvs.Hide(view=" << view << ");" << std::endl;
-      oss2 << "pvs.Render();" << std::endl;
+      oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
+      oss2 << "pvs.active_objects.source and pvs.Hide(view=" << view << ");";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
+      oss2 << "pvs.Render();";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
   } else if (_viewMode == MEDCALC::VIEW_MODE_NEW_LAYOUT) {
-      oss2 <<  "__layout1 = pvs.servermanager.misc.ViewLayout(registrationGroup='layouts');" << std::endl;
-      oss2 << view << " = pvs.CreateView('RenderView');" << std::endl;
+      oss2 <<  "__layout1 = pvs.servermanager.misc.ViewLayout(registrationGroup='layouts');";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
+      oss2 << view << " = pvs.CreateView('RenderView');";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
   } else if (_viewMode == MEDCALC::VIEW_MODE_SPLIT_VIEW) {
-      oss2 << view << " = pvs.CreateView('RenderView');" << std::endl;
+      oss2 << view << " = pvs.CreateView('RenderView');";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
   }
-  return oss2.str();
 }
 
-std::string
-MEDPresentation::getResetCameraCommand() const
+void
+MEDPresentation::resetCameraAndRender()
 {
-  return getRenderViewVar() + ".ResetCamera();";
+  pushAndExecPyLine(getRenderViewVar() + ".ResetCamera();");
+  pushAndExecPyLine("pvs.Render();");
 }
 
-std::string
-MEDPresentation::getComponentSelectionCommand() const
+void
+MEDPresentation::selectFieldComponent()
 {
   std::ostringstream oss, oss_l;
   std::string ret;
 
   if (_selectedComponentIndex != -1)
     {
-      oss << _lutVar << ".VectorMode = 'Component';\n";
+      oss << _lutVar << ".VectorMode = 'Component';";
+      pushAndExecPyLine(oss.str()); oss.str("");
       oss << _lutVar << ".VectorComponent = " << _selectedComponentIndex << ";";
+      pushAndExecPyLine(oss.str()); oss.str("");
     }
   else  // Euclidean norm
     {
       oss << _lutVar << ".VectorMode = 'Magnitude';";
+      pushAndExecPyLine(oss.str()); oss.str("");
     }
-  return oss.str();
 }
 
-std::string
-MEDPresentation::getColorMapCommand() const
+void
+MEDPresentation::selectColorMap()
 {
-  std::string ret;
+  std::ostringstream oss, oss2;
+
+  oss2 << _lutVar << " = pvs.GetColorTransferFunction('" << _fieldName << "');";
+  pushAndExecPyLine(oss2.str());
+
   switch (_colorMap) {
   case MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW:
-    ret = _lutVar + ".ApplyPreset('Blue to Red Rainbow',True);";
+    oss << _lutVar << ".ApplyPreset('Blue to Red Rainbow',True);";
     break;
   case MEDCALC::COLOR_MAP_COOL_TO_WARM:
-    ret = _lutVar + ".ApplyPreset('Cool to Warm',True);";
+    oss << _lutVar << ".ApplyPreset('Cool to Warm',True);";
     break;
   default:
     STDLOG("MEDPresentation::getColorMapCommand(): invalid colormap!");
     throw KERNEL::createSalomeException("MEDPresentation::getColorMapCommand(): invalid colormap!");
   }
-  return ret;
+  pushAndExecPyLine(oss.str());
 }
-std::string
-MEDPresentation::getRescaleCommand() const
+
+void
+MEDPresentation::showObject()
+{
+  std::ostringstream oss;
+  oss << _dispVar << " = pvs.Show(" << _objVar << ", " << getRenderViewVar() << ");";
+  pushAndExecPyLine(oss.str());
+}
+
+void
+MEDPresentation::showScalarBar()
+{
+  std::ostringstream oss;
+  oss << _dispVar <<  ".SetScalarBarVisibility(" << getRenderViewVar() << ", True);";
+  pushAndExecPyLine(oss.str());
+}
+
+void
+MEDPresentation::colorBy(const std::string & fieldType)
+{
+  std::ostringstream oss;
+  oss << "pvs.ColorBy(" << _dispVar << ", ('" << fieldType << "', '" << _fieldName << "'));";
+  pushAndExecPyLine(oss.str());
+}
+
+void
+MEDPresentation::rescaleTransferFunction()
 {
   std::string ret;
   switch(_sbRange)
@@ -326,7 +379,7 @@ MEDPresentation::getRescaleCommand() const
       STDLOG("MEDPresentation::getRescaleCommand(): invalid range!");
       throw KERNEL::createSalomeException("MEDPresentation::getRescaleCommand(): invalid range!");
   }
-  return ret;
+  pushAndExecPyLine(ret);
 }
 
 int
@@ -416,3 +469,97 @@ MEDPresentation::fillAvailableFieldComponents()
     }
 }
 
+/**
+ * In case where a CELLS field needs to be converted to POINT field.
+ * This updates the source object to become the result of the CellDatatoPointData filter.
+ */
+void
+MEDPresentation::applyCellToPointIfNeeded()
+{
+  std::ostringstream oss, oss2;
+  // Apply Cell data to point data:
+  oss2 << "__srcObj" << GeneratePythonId();
+  oss << oss2.str() << " = pvs.CellDatatoPointData(Input=" << _srcObjVar << ");";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  // Now the source becomes the result of the CellDatatoPointData:
+  _srcObjVar = oss2.str();
+}
+
+/**
+ * Convert a vector field into a 3D vector field:
+ *  - if the vector field is already 3D, nothing to do
+ *  - if it is 2D, then add a null component
+ *  - otherwise (tensor field, scalar field) throw
+ */
+void
+MEDPresentation::convertTo3DVectorField()
+{
+  std::ostringstream oss, oss1, oss2, oss3;
+
+  int nbCompo = getIntProperty(MEDPresentation::PROP_NB_COMPONENTS);
+  if (nbCompo < 2 || nbCompo > 3)
+    {
+      oss << "The field '" << _fieldName << "' must have 2 or 3 components for this presentation!";
+      STDLOG(oss.str());
+      throw KERNEL::createSalomeException(oss.str().c_str());
+    }
+  if (nbCompo == 3)
+    return;
+
+  // Apply calculator:
+  oss2 << "__srcObj" << GeneratePythonId();
+  oss << oss2.str() << " = pvs.Calculator(Input=" << _srcObjVar << ");";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  // Now the source becomes the result of the CellDatatoPointData:
+  _srcObjVar = oss2.str();
+  std::string typ;
+  if(_fieldType == "CELLS")
+    typ = "Cell Data";
+  else if(_fieldType == "POINTS")
+    typ = "Point Data";
+  else
+    {
+      oss3 << "Field '" << _fieldName << "' has invalid field type";
+      STDLOG(oss3.str());
+      throw KERNEL::createSalomeException(oss3.str().c_str());
+    }
+  oss << _srcObjVar << ".AttributeMode = '" <<  typ << "';";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _srcObjVar << ".ResultArrayName = '" <<  _fieldName << "_CALC';";  // will never be needed I think
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _srcObjVar << ".Function = '" <<  _fieldName << "_0*iHat + " << _fieldName << "_1*jHat + 0.0*zHat';";
+  pushAndExecPyLine(oss.str()); oss.str("");
+}
+
+//double
+//MEDPresentation::computeCellAverageSize()
+//{
+//  std::ostringstream oss;
+//  oss << "import MEDLoader;";
+//  pushAndExecPyLine(oss.str()); oss.str("");
+//  oss << "__mesh = MEDLoader.ReadMeshFromFile('" << _fileName << "', '" << _meshName << "');";
+//  pushAndExecPyLine(oss.str()); oss.str("");
+//
+//  oss << "__bb = __mesh.getBoundingBox()";
+//  pushAndExecPyLine(oss.str()); oss.str("");
+//  oss << "__deltas = [x[1]-x[0] for x in __bb];";
+//  pushAndExecPyLine(oss.str()); oss.str("");
+//  oss << "__vol = reduce(lambda x,y:x*y, __deltas, 1.0);";
+//  pushAndExecPyLine(oss.str()); oss.str("");
+//  // Average cell size is the the n-th root of average volume of a cell, with n being the space dimension
+//  oss << "__cellSize = (__vol/__mesh.getNumberOfCells())**(1.0/len(__bb));";
+//  pushAndExecPyLine(oss.str()); oss.str("");
+//
+//  PyObject * pyObj = getPythonObjectFromMain("__cellSize");
+//  bool err = false;
+//  if (!pyObj || !PyFloat_Check(pyObj)) {  /* nothing to do, err handler below */}
+//  else {
+//      double ret= PyFloat_AsDouble(pyObj);
+//      if(!PyErr_Occurred())
+//        return ret;
+//    }
+//  // From here, an error for sure.
+//  const char * msg = "MEDPresentation::computeCellAverageSize(): Python error.";
+//  STDLOG(msg);
+//  throw KERNEL::createSalomeException(msg);
+//}

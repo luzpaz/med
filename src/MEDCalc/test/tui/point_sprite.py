@@ -17,15 +17,24 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(TEST_NAMES
-  access_API
-  load_file
-  import_pvsimple
-#  scalar_map
-#  contour
-#  slices
-#  mesh_view
-#  point_sprite
-#  vector_field
-#  deflection_shape
-)
+import os
+from time import sleep
+
+import medcalc
+medcalc.medconsole.setConsoleGlobals(globals())
+import MEDCALC
+from medcalc.medconsole import accessField
+
+from medcalc_testutils import GetMEDFileDirTUI
+
+if 1:
+  datafile = os.path.join(GetMEDFileDirTUI(), "smooth_surface_and_field.med")
+  source_id = medcalc.LoadDataSource(datafile)
+  presentation_id = medcalc.MakePointSprite(accessField(0), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
+else:
+  datafile = os.path.join(GetMEDFileDirTUI(), "agitateur.med")
+  source_id = medcalc.LoadDataSource(datafile)
+  presentation_id = medcalc.MakePointSprite(accessField(55), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
+  
+sleep(1)
+medcalc.RemovePresentation(presentation_id)

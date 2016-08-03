@@ -38,17 +38,16 @@ MEDPresentationSlices::MEDPresentationSlices(const MEDCALC::SlicesParameters& pa
   setIntProperty(MEDPresentationSlices::PROP_SLICE_ORIENTATION, params.orientation);
 }
 
-std::string
-MEDPresentationSlices::getNbSlicesCommand() const
+void
+MEDPresentationSlices::setNumberOfSlices()
 {
   std::ostringstream oss1;
   // TODO
 //  oss1 << _objVar << ".SliceType.Normal = " << norm << ";";
-  return oss1.str();
 }
 
-std::string
-MEDPresentationSlices::getOrientationCommand() const
+void
+MEDPresentationSlices::selectSliceOrientation()
 {
   std::ostringstream oss1;
   std::string norm;
@@ -83,7 +82,7 @@ MEDPresentationSlices::getOrientationCommand() const
   }
 
   oss1 << _objVar << ".SliceType.Normal = " << norm << ";";
-  return oss1.str();
+  pushAndExecPyLine(oss1.str()); oss1.str("");
 }
 
 
@@ -95,35 +94,28 @@ MEDPresentationSlices::internalGeneratePipeline()
   MEDPyLockWrapper lock;
 
   std::ostringstream oss_o, oss;
-  std::string view(getRenderViewVar());
 
-  oss << _srcObjVar << " = pvs.MEDReader(FileName='" << _fileName << "');";
-  pushAndExecPyLine(oss.str()); oss.str("");
+  createSource();
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();
-  pushAndExecPyLine( getRenderViewCommand() ); // instanciate __viewXXX
+  setOrCreateRenderView(); // instanciate __viewXXX
+
   oss << _objVar << " = pvs.Slice(Input=" << _srcObjVar << ");";
   pushAndExecPyLine(oss.str()); oss.str("");
+
+  showObject();
+
   oss << _objVar << ".SliceType = 'Plane';";
   pushAndExecPyLine(oss.str()); oss.str("");
 
   // Set slice orientation
-  pushAndExecPyLine(getOrientationCommand());
-
-  oss << _dispVar << " = pvs.Show(" << _objVar << ", " << view << ");";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << "pvs.ColorBy(" << _dispVar << ", ('" << _fieldType << "', '" << _fieldName << "'));";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _dispVar <<  ".SetScalarBarVisibility(" << view << ", True);";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << getRescaleCommand();
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _lutVar << " = pvs.GetColorTransferFunction('" << _fieldName << "');";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  pushAndExecPyLine(getColorMapCommand()); oss.str("");
-  pushAndExecPyLine(getResetCameraCommand());
-  pushAndExecPyLine("pvs.Render();");
+  selectSliceOrientation();
+  colorBy(_fieldType);
+  showScalarBar();
+  rescaleTransferFunction();
+  selectColorMap();
+  resetCameraAndRender();
 }
 
 void
@@ -156,8 +148,7 @@ MEDPresentationSlices::updateNbSlices(const int nbSlices)
   // Update the pipeline:
   {
     MEDPyLockWrapper lock;
-    std::string cmd = getNbSlicesCommand();
-    pushAndExecPyLine(cmd);
+    setNumberOfSlices();
     pushAndExecPyLine("pvs.Render();");
   }
 }
@@ -173,8 +164,7 @@ MEDPresentationSlices::updateOrientation(const MEDCALC::SliceOrientationType ori
   // Update the pipeline:
   {
     MEDPyLockWrapper lock;
-    std::string cmd = getOrientationCommand();
-    pushAndExecPyLine(cmd);
+    selectSliceOrientation();
     pushAndExecPyLine("pvs.Render();");
   }
 }

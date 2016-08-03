@@ -17,26 +17,21 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "MEDWidgetHelperScalarMap.hxx"
-#include "MEDPresentationScalarMap.hxx"  // from component side.
+#include "MEDWidgetHelperComponent.hxx"
 #include "PresentationController.hxx"
 
-#include <sstream>
-
-MEDWidgetHelperScalarMap::MEDWidgetHelperScalarMap(const PresentationController * presController, MEDCALC::MEDPresentationManager_ptr presManager, int presId,
+MEDWidgetHelperComponent::MEDWidgetHelperComponent(const PresentationController * presController, MEDCALC::MEDPresentationManager_ptr presManager, int presId,
                                                    const std::string & presName, WidgetPresentationParameters * paramW):
   MEDWidgetHelper(presController, presManager, presId, presName, paramW)
-{
-}
-
-MEDWidgetHelperScalarMap::~MEDWidgetHelperScalarMap()
 {}
 
-void MEDWidgetHelperScalarMap::udpateWidget()
+MEDWidgetHelperComponent::~MEDWidgetHelperComponent()
+{}
+
+void MEDWidgetHelperComponent::udpateWidget()
 {
   MEDWidgetHelper::udpateWidget();
 
-  // Scalar map presentation needs the component name, that's all.
   _paramWidget->setComponents(_allCompos, _selectedCompo);
 
   // Connect combo box changes
@@ -45,7 +40,7 @@ void MEDWidgetHelperScalarMap::udpateWidget()
   QObject::connect( _paramWidget, SIGNAL(comboCompoIndexChanged(int)), this, SLOT(onComponentChanged(int)) );
 }
 
-void MEDWidgetHelperScalarMap::releaseWidget()
+void MEDWidgetHelperComponent::releaseWidget()
 {
   MEDWidgetHelper::releaseWidget();
 

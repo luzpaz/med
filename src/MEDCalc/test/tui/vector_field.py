@@ -17,15 +17,24 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(TEST_NAMES
-  access_API
-  load_file
-  import_pvsimple
-#  scalar_map
-#  contour
-#  slices
-#  mesh_view
-#  point_sprite
-#  vector_field
-#  deflection_shape
-)
+import os
+from time import sleep
+
+import medcalc
+medcalc.medconsole.setConsoleGlobals(globals())
+import MEDCALC
+from medcalc.medconsole import accessField
+
+from medcalc_testutils import GetMEDFileDirTUI
+
+datafile = os.path.join(GetMEDFileDirTUI(), "agitateur.med")
+source_id = medcalc.LoadDataSource(datafile)
+
+# Field 55 = VITESSE_ELEM_DOM (ON_CELLS)
+presentation_id = medcalc.MakeVectorField(accessField(57), viewMode=MEDCALC.VIEW_MODE_REPLACE, 
+                                          colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW,
+                                          scalarBarRange=MEDCALC.SCALAR_BAR_CURRENT_TIMESTEP
+                                          )
+sleep(1)
+medcalc.RemovePresentation(presentation_id)
+sleep(1)

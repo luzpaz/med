@@ -39,7 +39,7 @@ SET(MEDCALCGUI_SOURCES
     XmedDataModel.cxx
     MEDWidgetHelper.cxx
     MEDWidgetHelperMeshView.cxx
-    MEDWidgetHelperScalarMap.cxx
+    MEDWidgetHelperComponent.cxx
     MEDWidgetHelperContour.cxx
     MEDWidgetHelperSlices.cxx
 )
@@ -57,9 +57,12 @@ SET(MEDCALCGUI_HEADERS
   ProcessingController.hxx
   MEDWidgetHelper.hxx
   MEDWidgetHelperMeshView.hxx
+  MEDWidgetHelperComponent.hxx
   MEDWidgetHelperScalarMap.hxx
   MEDWidgetHelperContour.hxx
   MEDWidgetHelperSlices.hxx
+  MEDWidgetHelperPointSprite.hxx
+  MEDWidgetHelperVectorField.hxx
   )
  
 IF(SALOME_MED_WITH_QTTESTING)

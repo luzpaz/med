@@ -41,7 +41,7 @@ protected:
   void updateMeshMode(const MEDCALC::MeshModeType mode);
   virtual void internalGeneratePipeline();
 
-  std::string getMeshViewCommand() const;
+  void representationType();
 
 private:
   MEDCALC::MeshViewParameters _params;

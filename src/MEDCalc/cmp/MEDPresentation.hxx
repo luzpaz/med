@@ -73,13 +73,18 @@ protected:
                   const MEDCALC::ViewModeType viewMode,
                   const MEDCALC::ColorMapType colorMap,
                   const MEDCALC::ScalarBarRangeType sbRange);
-  std::string getRenderViewCommand() const;
   std::string getRenderViewVar() const;
-  std::string getResetCameraCommand() const;
 
-  std::string getComponentSelectionCommand() const;
-  std::string getColorMapCommand() const;
-  std::string getRescaleCommand() const;
+  // The most common elements of the ParaView pipeline:
+  void setOrCreateRenderView();
+  void createSource();
+  void selectFieldComponent();
+  void showObject();
+  void colorBy(const std::string & fieldType);
+  void showScalarBar();
+  void rescaleTransferFunction();
+  void selectColorMap();
+  void resetCameraAndRender();
 
   virtual void internalGeneratePipeline();
   PyObject* getPythonObjectFromMain(const char* var) const;
@@ -90,6 +95,10 @@ protected:
   MEDPresentation::TypeID getID() const { return _fieldHandlerId; }
 
   void fillAvailableFieldComponents();
+  void applyCellToPointIfNeeded();
+  void convertTo3DVectorField();
+//  double computeCellAverageSize();
+  //void computeFieldRange
 
 //  virtual MEDCALC::ViewModeType getViewMode() = 0;
 
@@ -118,6 +127,7 @@ private:
   void updatePipeline(const PresentationParameters& params);
 
 protected:
+  std::string _meshName;
   std::string _fileName;
   std::string _fieldName;
   std::string _fieldType;

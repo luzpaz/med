@@ -17,39 +17,83 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#include "MEDPyLockWrapper.hxx"
+
 #include "MEDPresentationVectorField.hxx"
+#include "MEDPresentationException.hxx"
+
+#include <SALOME_KernelServices.hxx>
+#undef LOG  // should be fixed in KERNEL - double definition
+#include <Basics_Utils.hxx>
+
+#include <sstream>
+
+const std::string MEDPresentationVectorField::TYPE_NAME = "MEDPresentationVectorField";
+
+MEDPresentationVectorField::MEDPresentationVectorField(const MEDCALC::VectorFieldParameters& params,
+                                                   const MEDCALC::ViewModeType viewMode) :
+    MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, params.colorMap, params.scalarBarRange), _params(params)
+{
+}
 
 void
 MEDPresentationVectorField::internalGeneratePipeline()
 {
-//  PyGILState_STATE _gil_state = PyGILState_Ensure();
-//
-//  std::string cmd = std::string("import pvsimple as pvs;");
-//  cmd += getRenderViewCommand(_params.viewMode); // define __view1
-//
-//  cmd += std::string("__obj1 = pvs.MEDReader(FileName='") + _fileName + std::string("');");
-//  cmd += std::string("__disp1 = pvs.Show(__obj1, __view1);");
-//  cmd += std::string("pvs.ColorBy(__disp1, ('") + _fieldType + std::string("', '") + _fieldName + std::string("'));");
-//  cmd += std::string("__disp1.SetScalarBarVisibility(__view1, True);");
-//  cmd += std::string("__disp1.RescaleTransferFunctionToDataRangeOverTime();");
-//  cmd += std::string("__disp1.SetRepresentationType('3D Glyphs');");
-//  cmd += std::string("pvs.Render();");
-//
-//  cmd += getResetCameraCommand();
-//
-//  //std::cerr << "Python command:" << std::endl;
-//  //std::cerr << cmd << std::endl;
-//  PyRun_SimpleString(cmd.c_str());
-//  // Retrieve Python object for internal storage:
-//  PyObject* obj = getPythonObjectFromMain("__obj1");
-//  PyObject* disp = getPythonObjectFromMain("__disp1");
-//  pushInternal(obj, disp);
-//
-//  PyGILState_Release(_gil_state);
+  MEDPresentation::internalGeneratePipeline();
+
+  MEDPyLockWrapper lock;
+
+  setOrCreateRenderView();
+  createSource();
+
+  // Populate internal array of available components:
+  fillAvailableFieldComponents();
+  if (getIntProperty(MEDPresentation::PROP_NB_COMPONENTS) <= 1)
+    {
+      const char * msg = "Vector field presentation does not work for scalar  field!"; // this message will appear in GUI too
+      STDLOG(msg);
+      throw KERNEL::createSalomeException(msg);
+    }
+
+  std::ostringstream oss;
+  oss << _objVar << " = pvs.Glyph(Input=" << _srcObjVar << ", GlyphType='Arrow');";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
+  showObject(); // to be done first so that the scale factor computation properly works
+
+  oss << _objVar << ".Scalars = ['"<< _fieldType << "', 'None'];";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _objVar << ".Vectors = ['"<< _fieldType << "', '" << _fieldName << "'];";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _objVar << ".ScaleMode = 'vector';";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _objVar << ".GlyphMode = 'All Points';";
+  pushAndExecPyLine(oss.str()); oss.str("");
+//  oss << _objVar << "GlyphTransform = 'Transform2';";  // not sure this is really needed?
+//  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _objVar << ".ScaleFactor = 0.1;";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  // Auto-tuning of the scale factor:
+//  oss << "import medcalc; medcalc.SetDefaultScaleFactor(active=" << _objVar << ");";
+//  pushAndExecPyLine(oss.str()); oss.str("");
+
+  colorBy("POINTS");
+  showScalarBar();
+  rescaleTransferFunction();
+  selectColorMap();
+  resetCameraAndRender();
 }
 
 void
 MEDPresentationVectorField::updatePipeline(const MEDCALC::VectorFieldParameters& params)
 {
-  // :TODO:
+  if (params.fieldHandlerId != _params.fieldHandlerId)
+    throw KERNEL::createSalomeException("Unexpected updatePipeline error! Mismatching fieldHandlerId!");
+
+  if (std::string(params.displayedComponent) != std::string(_params.displayedComponent))
+    updateComponent<MEDPresentationVectorField, MEDCALC::VectorFieldParameters>(std::string(params.displayedComponent));
+  if (params.scalarBarRange != _params.scalarBarRange)
+    updateScalarBarRange<MEDPresentationVectorField, MEDCALC::VectorFieldParameters>(params.scalarBarRange);
+  if (params.colorMap != _params.colorMap)
+    updateColorMap<MEDPresentationVectorField, MEDCALC::VectorFieldParameters>(params.colorMap);
 }

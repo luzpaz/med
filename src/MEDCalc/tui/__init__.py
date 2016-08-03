@@ -42,21 +42,29 @@ from medio import LoadImageAsDataSource
 from medpresentation import MakeMeshView
 from medpresentation import MakeScalarMap
 from medpresentation import MakeContour
-#from medpresentation import MakeVectorField
+from medpresentation import MakeVectorField
 from medpresentation import MakeSlices
-#from medpresentation import MakeDeflectionShape
-#from medpresentation import MakePointSprite
+from medpresentation import MakePointSprite
 from medpresentation import RemovePresentation
+#from medpresentation import MakeDeflectionShape
 
 from medpresentation import GetMeshViewParameters
 from medpresentation import GetScalarMapParameters
 from medpresentation import GetContourParameters
 from medpresentation import GetSlicesParameters
+from medpresentation import GetPointSpriteParameters
+from medpresentation import GetVectorFieldParameters
+#from medpresentation import GetDeflectionShapeParameters
 
 from medpresentation import UpdateMeshView
 from medpresentation import UpdateScalarMap
 from medpresentation import UpdateContour
 from medpresentation import UpdateSlices
+from medpresentation import UpdateVectorField
+from medpresentation import UpdatePointSprite
+#from medpresentation import UpdateDeflectionShape
+
+from medpresentation import SetDefaultScaleFactor, ComputeCellAverageSize, GetDomainCenter
 
 # Console commands
 import medconsole

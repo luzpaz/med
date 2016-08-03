@@ -17,31 +17,30 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_VECTORFIELD_HXX_
-#define SRC_MEDCALC_CMP_MEDPRESENTATION_VECTORFIELD_HXX_
+#ifndef SRC_MEDCALC_GUI_MEDWIDGETHELPERCOMPONENT_HXX_
+#define SRC_MEDCALC_GUI_MEDWIDGETHELPERCOMPONENT_HXX_
 
-#include "MEDCALC.hxx"
-#include "MEDPresentation.hxx"
+#include "MEDWidgetHelper.hxx"
 
-class MEDCALC_EXPORT MEDPresentationVectorField : public MEDPresentation
+class PresentationController;
+
+/**
+ * Abstract class to manage all presentations having only the component name to change.
+ */
+class MEDWidgetHelperComponent: public MEDWidgetHelper
 {
+  Q_OBJECT
+
 public:
-  static const std::string TYPE_NAME;
+  MEDWidgetHelperComponent(const PresentationController* presController,
+                           MEDCALC::MEDPresentationManager_ptr presManager, int presId, const std::string & presName,
+                           WidgetPresentationParameters * paramW);
+  virtual ~MEDWidgetHelperComponent();
 
-  MEDPresentationVectorField(const MEDCALC::VectorFieldParameters& params, const MEDCALC::ViewModeType viewMode);
-  virtual ~MEDPresentationVectorField() {}
+  virtual void udpateWidget();
+  virtual void releaseWidget();
 
-  void updatePipeline(const MEDCALC::VectorFieldParameters& params);
-
-  void getParameters(MEDCALC::VectorFieldParameters & params) const { params = _params; } ;
-  void setParameters(const MEDCALC::VectorFieldParameters & params) { _params = params; } ;
-
-protected:
-  virtual void internalGeneratePipeline();
-
-private:
-  MEDCALC::VectorFieldParameters _params;
-
+  virtual std::string getPythonTag() const = 0;
 };
 
-#endif
+#endif /* SRC_MEDCALC_GUI_MEDWIDGETHELPERCOMPONENT_HXX_ */

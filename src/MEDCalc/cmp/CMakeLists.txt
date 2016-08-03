@@ -42,10 +42,10 @@ SET(COMMON_SOURCES
   MEDPresentationMeshView.cxx
   MEDPresentationScalarMap.cxx
   MEDPresentationContour.cxx
-#  MEDPresentationVectorField.cxx
+  MEDPresentationVectorField.cxx
   MEDPresentationSlices.cxx
-#  MEDPresentationDeflectionShape.cxx
-#  MEDPresentationPointSprite.cxx
+  MEDPresentationPointSprite.cxx
+#  MEDPresentationDeflectionShape.cxx  
 )
 
 SET(MEDFactoryEngine_SOURCES

@@ -41,7 +41,7 @@ protected:
   void updateNbContours(const int nbContours);
   virtual void internalGeneratePipeline();
 
-  std::string getContourCommand() const;
+  void setNumberContours();
 
 private:
   MEDCALC::ContourParameters _params;

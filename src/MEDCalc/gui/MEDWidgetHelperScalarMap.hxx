@@ -20,22 +20,22 @@
 #ifndef SRC_MEDCALC_GUI_MEDWIDGETHELPERSCALARMAP_HXX_
 #define SRC_MEDCALC_GUI_MEDWIDGETHELPERSCALARMAP_HXX_
 
-#include "MEDWidgetHelper.hxx"
+#include "MEDWidgetHelperComponent.hxx"
 
 class PresentationController;
 
-class MEDWidgetHelperScalarMap: public MEDWidgetHelper
+class MEDWidgetHelperScalarMap: public MEDWidgetHelperComponent
 {
   Q_OBJECT
 
 public:
   MEDWidgetHelperScalarMap(const PresentationController* presController,
                            MEDCALC::MEDPresentationManager_ptr presManager, int presId, const std::string & presName,
-                           WidgetPresentationParameters * paramW);
-  virtual ~MEDWidgetHelperScalarMap();
+                           WidgetPresentationParameters * paramW):
+      MEDWidgetHelperComponent(presController, presManager, presId, presName, paramW)
+  {}
 
-  virtual void udpateWidget();
-  virtual void releaseWidget();
+  virtual ~MEDWidgetHelperScalarMap() {}
 
   virtual std::string getPythonTag() const { return "ScalarMap"; }
 };

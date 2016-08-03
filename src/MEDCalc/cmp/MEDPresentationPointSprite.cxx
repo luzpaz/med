@@ -17,39 +17,90 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#include "MEDPyLockWrapper.hxx"
+
 #include "MEDPresentationPointSprite.hxx"
+#include "MEDPresentationException.hxx"
+
+#include <SALOME_KernelServices.hxx>
+#undef LOG  // should be fixed in KERNEL - double definition
+#include <Basics_Utils.hxx>
+
+#include <sstream>
+
+const std::string MEDPresentationPointSprite::TYPE_NAME = "MEDPresentationPointSprite";
+
+MEDPresentationPointSprite::MEDPresentationPointSprite(const MEDCALC::PointSpriteParameters& params,
+                                                   const MEDCALC::ViewModeType viewMode) :
+    MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, params.colorMap, params.scalarBarRange), _params(params)
+{
+}
 
 void
 MEDPresentationPointSprite::internalGeneratePipeline()
 {
-//  PyGILState_STATE _gil_state = PyGILState_Ensure();
-//
-//  std::string cmd = std::string("import pvsimple as pvs;");
-//  cmd += getRenderViewCommand(_params.viewMode); // define __view1
-//
-//  cmd += std::string("__obj1 = pvs.MEDReader(FileName='") + _fileName + std::string("');");
-//  cmd += std::string("__disp1 = pvs.Show(__obj1, __view1);");
-//  cmd += std::string("pvs.ColorBy(__disp1, ('") + _fieldType + std::string("', '") + _fieldName + std::string("'));");
-//  cmd += std::string("__disp1.SetScalarBarVisibility(__view1, True);");
-//  cmd += std::string("__disp1.RescaleTransferFunctionToDataRangeOverTime();");
-//  cmd += std::string("__disp1.SetRepresentationType('Point Sprite');");
-//  cmd += std::string("pvs.Render();");
-//
-//  cmd += getResetCameraCommand();
-//
-//  //std::cerr << "Python command:" << std::endl;
-//  //std::cerr << cmd << std::endl;
-//  PyRun_SimpleString(cmd.c_str());
-//  // Retrieve Python object for internal storage:
-//  PyObject* obj = getPythonObjectFromMain("__obj1");
-//  PyObject* disp = getPythonObjectFromMain("__disp1");
-//  pushInternal(obj, disp);
-//
-//  PyGILState_Release(_gil_state);
+  MEDPresentation::internalGeneratePipeline();
+
+  MEDPyLockWrapper lock;
+
+  setOrCreateRenderView(); // instanciate __viewXXX
+  createSource();
+
+  // Populate internal array of available components:
+  fillAvailableFieldComponents();
+  int nbCompo = getIntProperty(MEDPresentation::PROP_NB_COMPONENTS);
+
+  // Point sprite needs point data:
+  applyCellToPointIfNeeded();
+
+  pushAndExecPyLine(_objVar + " = " + _srcObjVar);
+
+  showObject(); // needs to be done before cell size computation to be sure ParaView has computed bounds, etc ...
+
+  // Compute cell average size in the mesh to have a nice scaling ratio:
+  std::ostringstream oss;
+  oss << "import medcalc; __avgSize=medcalc.ComputeCellAverageSize(" << _srcObjVar << ");";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
+  colorBy("POINTS");  // like in Contour
+
+  // Set point sprite:
+  oss << _dispVar << ".SetRepresentationType('Point Sprite');";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _dispVar << ".PointSpriteDefaultsInitialized = 1;";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _dispVar << ".RadiusArray = ['POINTS', '" << _fieldName << "'];";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _dispVar << ".RadiusMode = 'Scalar';";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
+  oss << _dispVar << ".RadiusVectorComponent = " << _selectedComponentIndex << ";";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _dispVar << ".RadiusIsProportional = 0 ;";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _dispVar << ".RadiusTransferFunctionEnabled = 1 ;";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _dispVar << ".MaxPixelSize = 30 ;";   // Avoid too big balls
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _dispVar << ".RadiusRange = [0.0, __avgSize];";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
+  showScalarBar();
+  rescaleTransferFunction();
+  selectColorMap();
+  resetCameraAndRender();
 }
 
 void
 MEDPresentationPointSprite::updatePipeline(const MEDCALC::PointSpriteParameters& params)
 {
-  // :TODO:
+  if (params.fieldHandlerId != _params.fieldHandlerId)
+    throw KERNEL::createSalomeException("Unexpected updatePipeline error! Mismatching fieldHandlerId!");
+
+  if (std::string(params.displayedComponent) != std::string(_params.displayedComponent))
+    updateComponent<MEDPresentationPointSprite, MEDCALC::PointSpriteParameters>(std::string(params.displayedComponent));
+  if (params.scalarBarRange != _params.scalarBarRange)
+    updateScalarBarRange<MEDPresentationPointSprite, MEDCALC::PointSpriteParameters>(params.scalarBarRange);
+  if (params.colorMap != _params.colorMap)
+    updateColorMap<MEDPresentationPointSprite, MEDCALC::PointSpriteParameters>(params.colorMap);
 }

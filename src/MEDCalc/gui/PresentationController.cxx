@@ -31,11 +31,17 @@
 #include "MEDPresentationScalarMap.hxx"
 #include "MEDPresentationContour.hxx"
 #include "MEDPresentationSlices.hxx"
+#include "MEDPresentationPointSprite.hxx"
+#include "MEDPresentationVectorField.hxx"
+//#include "MEDPresentationDeflectionShape.hxx"
 
 #include "MEDWidgetHelperMeshView.hxx"
 #include "MEDWidgetHelperScalarMap.hxx"
 #include "MEDWidgetHelperContour.hxx"
 #include "MEDWidgetHelperSlices.hxx"
+#include "MEDWidgetHelperPointSprite.hxx"
+#include "MEDWidgetHelperVectorField.hxx"
+//#include "MEDWidgetHelperDeflectionShape.hxx"
 
 #include <SalomeApp_Application.h>
 #include <SalomeApp_Study.h>
@@ -489,26 +495,28 @@ PresentationController::processPresentationEvent(const PresentationEvent* event)
   }
   else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_CONTOUR ) {
       commands += QString("presentation_id = medcalc.MakeContour(accessField(%1), viewMode=%2, scalarBarRange=%3, colorMap=%4)")
-        .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
+            .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
       commands += QString("presentation_id");
   }
-  //  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_VECTOR_FIELD ) {
-  //    commands += QString("presentation_id = medcalc.MakeVectorField(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-  //    commands += QString("presentation_id");
-  //  }
-    else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SLICES ) {
+  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SLICES ) {
       commands += QString("presentation_id = medcalc.MakeSlices(accessField(%1), viewMode=%2, scalarBarRange=%3, colorMap=%4)")
-        .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
+            .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
       commands += QString("presentation_id");
-    }
+  }
+  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_VECTOR_FIELD ) {
+      commands += QString("presentation_id = medcalc.MakeVectorField(accessField(%1), viewMode=%2, scalarBarRange=%3, colorMap=%4)")
+          .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
+      commands += QString("presentation_id");
+  }
+  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_POINT_SPRITE ) {
+      commands += QString("presentation_id = medcalc.MakePointSprite(accessField(%1), viewMode=%2, scalarBarRange=%3, colorMap=%4)")
+              .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
+      commands += QString("presentation_id");
+  }
+
   //  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE ) {
   //    commands += QString("presentation_id = medcalc.MakeDeflectionShape(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
   //    commands += QString("presentation_id");
-  //  }
-  //  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_POINT_SPRITE ) {
-  //    commands += QString("presentation_id = medcalc.MakePointSprite(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-  //    commands += QString("presentation_id");
-  //  }
 
   // [ABN] using event mechanism for this is awkward? TODO: direct implementation in each
   // dedicated widget helper class?
@@ -571,7 +579,7 @@ PresentationController::findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager
   std::map<int, MEDWidgetHelper *>::const_iterator it =_presHelperMap.find(presId);
   if (it != _presHelperMap.end())
     return (*it).second;
-  MEDWidgetHelper * wh;
+  MEDWidgetHelper * wh = 0;
   if (type == MEDPresentationMeshView::TYPE_NAME)
     wh = new MEDWidgetHelperMeshView(this, _presManager, presId, name, _widgetPresentationParameters);
   else if (type == MEDPresentationScalarMap::TYPE_NAME)
@@ -579,10 +587,15 @@ PresentationController::findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager
   else if (type == MEDPresentationContour::TYPE_NAME)
     wh = new MEDWidgetHelperContour(this, _presManager, presId, name, _widgetPresentationParameters);
   else if (type == MEDPresentationSlices::TYPE_NAME)
-      wh = new MEDWidgetHelperSlices(this, _presManager, presId, name, _widgetPresentationParameters);
+    wh = new MEDWidgetHelperSlices(this, _presManager, presId, name, _widgetPresentationParameters);
+  else if (type == MEDPresentationVectorField::TYPE_NAME)
+    wh = new MEDWidgetHelperVectorField(this, _presManager, presId, name, _widgetPresentationParameters);
+  else if (type == MEDPresentationPointSprite::TYPE_NAME)
+    wh = new MEDWidgetHelperPointSprite(this, _presManager, presId, name, _widgetPresentationParameters);
   else
     {
-      STDLOG("findOrCreateWidgetHelper(): NOT IMPLEMENTED !!!");
+      const char * msg ="findOrCreateWidgetHelper(): NOT IMPLEMENTED !!!";
+      STDLOG(msg);
     }
   _presHelperMap[presId] = wh;
   return wh;

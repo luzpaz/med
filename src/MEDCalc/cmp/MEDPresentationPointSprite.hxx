@@ -26,13 +26,15 @@
 class MEDCALC_EXPORT MEDPresentationPointSprite : public MEDPresentation
 {
 public:
-  MEDPresentationPointSprite(const MEDCALC::PointSpriteParameters& params) :
-    MEDPresentation(params.fieldHandlerId, "MEDPresentationPointSprite"), _params(params)
-  {}
+  static const std::string TYPE_NAME;
+
+  MEDPresentationPointSprite(const MEDCALC::PointSpriteParameters& params, const MEDCALC::ViewModeType viewMode);
   virtual ~MEDPresentationPointSprite() {}
 
   void updatePipeline(const MEDCALC::PointSpriteParameters& params);
-  MEDCALC::ViewModeType getViewMode() { return _params.viewMode; }
+
+  void getParameters(MEDCALC::PointSpriteParameters & params) const { params = _params; } ;
+  void setParameters(const MEDCALC::PointSpriteParameters & params) { _params = params; } ;
 
 protected:
   virtual void internalGeneratePipeline();

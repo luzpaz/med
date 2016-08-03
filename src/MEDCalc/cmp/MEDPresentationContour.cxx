@@ -36,15 +36,17 @@ MEDPresentationContour::MEDPresentationContour(const MEDCALC::ContourParameters&
   setIntProperty(MEDPresentationContour::PROP_NB_CONTOUR, params.nbContours);
 }
 
-std::string
-MEDPresentationContour::getContourCommand() const
+void
+MEDPresentationContour::setNumberContours()
 {
-  std::ostringstream oss1;
+  std::ostringstream oss;
 
-  oss1 << "min_max = " << _srcObjVar << ".PointData.GetArray('" << _fieldName << "').GetRange();\n";
-  oss1 << "delta = (min_max[1]-min_max[0])/float(" << _params.nbContours << ");\n";
-  oss1 << _objVar << ".Isosurfaces = [min_max[0]+0.5*delta+i*delta for i in range(" << _params.nbContours << ")];\n";
-  return oss1.str();
+  oss << "min_max = " << _srcObjVar << ".PointData.GetArray('" << _fieldName << "').GetRange();";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << "delta = (min_max[1]-min_max[0])/float(" << _params.nbContours << ");";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _objVar << ".Isosurfaces = [min_max[0]+0.5*delta+i*delta for i in range(" << _params.nbContours << ")];";
+  pushAndExecPyLine(oss.str()); oss.str("");
 }
 
 void
@@ -54,11 +56,7 @@ MEDPresentationContour::internalGeneratePipeline()
 
   MEDPyLockWrapper lock;
 
-  std::ostringstream oss_o, oss;
-  std::string view(getRenderViewVar());
-
-  oss << _srcObjVar << " = pvs.MEDReader(FileName='" << _fileName << "');";
-  pushAndExecPyLine(oss.str()); oss.str("");
+  createSource();
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();
@@ -69,41 +67,27 @@ MEDPresentationContour::internalGeneratePipeline()
       throw KERNEL::createSalomeException(msg);
     }
 
-  pushAndExecPyLine( getRenderViewCommand() ); // instanciate __viewXXX
+  setOrCreateRenderView(); // instanciate __viewXXX
 
-  if(_fieldType == "CELLS")
-    {
-      // In case of a CELLS field need to convert to POINT field, and update source
-      STDLOG("Applying CellDatatoPointData filter");
-      std::ostringstream oss2, oss4;
-      // Apply Cell data to point data:
-      oss2 << "__obj" << GeneratePythonId();
-      oss << oss2.str() << " = pvs.CellDatatoPointData(Input=" << _srcObjVar << ");";
-      pushAndExecPyLine(oss.str()); oss.str("");
-      // Now the source becomes the result of the CellDatatoPointData:
-      _srcObjVar = oss2.str();
-    }
+  // Contour needs point data:
+  applyCellToPointIfNeeded();
+
+  std::ostringstream oss;
   oss << _objVar << " = pvs.Contour(Input=" << _srcObjVar << ");";
   pushAndExecPyLine(oss.str()); oss.str("");
+
+  showObject();
+
   oss << _objVar << ".ContourBy = ['POINTS', '" << _fieldName << "'];";
   pushAndExecPyLine(oss.str()); oss.str("");
 
   // Set number of contours
-  pushAndExecPyLine(getContourCommand());
-
-  oss << _dispVar << " = pvs.Show(" << _objVar << ", " << view << ");";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << "pvs.ColorBy(" << _dispVar << ", ('POINTS', '" << _fieldName << "'));";  // necessarily POINTS
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _dispVar <<  ".SetScalarBarVisibility(" << view << ", True);";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << getRescaleCommand();
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _lutVar << " = pvs.GetColorTransferFunction('" << _fieldName << "');";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  pushAndExecPyLine(getColorMapCommand()); oss.str("");
-  pushAndExecPyLine(getResetCameraCommand());
-  pushAndExecPyLine("pvs.Render();");
+  setNumberContours();
+  colorBy("POINTS");    // necessarily POINTS because of the conversion above
+  showScalarBar();
+  rescaleTransferFunction();
+  selectColorMap();
+  resetCameraAndRender();
 }
 
 void
@@ -132,8 +116,7 @@ MEDPresentationContour::updateNbContours(const int nbContours)
   // Update the pipeline:
   {
     MEDPyLockWrapper lock;
-    std::string cmd = getContourCommand();
-    pushAndExecPyLine(cmd);
+    setNumberContours();
     pushAndExecPyLine("pvs.Render();");
   }
 }

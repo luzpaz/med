@@ -26,9 +26,9 @@
 #include "MEDPresentationScalarMap.hxx"
 #include "MEDPresentationContour.hxx"
 #include "MEDPresentationSlices.hxx"
-//#include "MEDPresentationVectorField.hxx"
+#include "MEDPresentationVectorField.hxx"
 //#include "MEDPresentationDeflectionShape.hxx"
-//#include "MEDPresentationPointSprite.hxx"
+#include "MEDPresentationPointSprite.hxx"
 
 #include <SALOME_KernelServices.hxx>
 
@@ -141,12 +141,12 @@ MEDPresentationManager_i::makeContour(const MEDCALC::ContourParameters& params, 
   return _makePresentation<MEDPresentationContour>(params, viewMode);
 }
 
-//MEDPresentation::TypeID
-//MEDPresentationManager_i::makeVectorField(const MEDCALC::VectorFieldParameters& params)
-//{
-//  return _makePresentation<MEDPresentationVectorField>(params);
-//}
-//
+MEDPresentation::TypeID
+MEDPresentationManager_i::makeVectorField(const MEDCALC::VectorFieldParameters& params, const MEDCALC::ViewModeType viewMode)
+{
+  return _makePresentation<MEDPresentationVectorField>(params, viewMode);
+}
+
 MEDPresentation::TypeID
 MEDPresentationManager_i::makeSlices(const MEDCALC::SlicesParameters& params, const MEDCALC::ViewModeType viewMode)
 {
@@ -158,12 +158,12 @@ MEDPresentationManager_i::makeSlices(const MEDCALC::SlicesParameters& params, co
 //{
 //  return _makePresentation<MEDPresentationDeflectionShape>(params);
 //}
-//
-//MEDPresentation::TypeID
-//MEDPresentationManager_i::makePointSprite(const MEDCALC::PointSpriteParameters& params)
-//{
-//  return _makePresentation<MEDPresentationPointSprite>(params);
-//}
+
+MEDPresentation::TypeID
+MEDPresentationManager_i::makePointSprite(const MEDCALC::PointSpriteParameters& params, const MEDCALC::ViewModeType viewMode)
+{
+  return _makePresentation<MEDPresentationPointSprite>(params, viewMode);
+}
 
 MEDCALC::MeshViewParameters
 MEDPresentationManager_i::getMeshViewParameters(MEDPresentation::TypeID presentationID)
@@ -200,6 +200,23 @@ MEDPresentationManager_i::getSlicesParameters(MEDPresentation::TypeID presentati
   return tmp._retn();
 }
 
+MEDCALC::VectorFieldParameters*
+MEDPresentationManager_i::getVectorFieldParameters(MEDPresentation::TypeID presentationID)
+{
+  MEDCALC::VectorFieldParameters* p = new MEDCALC::VectorFieldParameters();
+  _getParameters<MEDPresentationVectorField>(presentationID, *p);
+  MEDCALC::VectorFieldParameters_var tmp(p);
+  return tmp._retn();
+}
+
+MEDCALC::PointSpriteParameters*
+MEDPresentationManager_i::getPointSpriteParameters(MEDPresentation::TypeID presentationID)
+{
+  MEDCALC::PointSpriteParameters* p = new MEDCALC::PointSpriteParameters();
+  _getParameters<MEDPresentationPointSprite>(presentationID, *p);
+  MEDCALC::PointSpriteParameters_var tmp(p);
+  return tmp._retn();
+}
 
 void
 MEDPresentationManager_i::updateMeshView(MEDPresentation::TypeID presentationID, const MEDCALC::MeshViewParameters& params)
@@ -219,12 +236,12 @@ MEDPresentationManager_i::updateContour(MEDPresentation::TypeID presentationID, 
   return _updatePresentation<MEDPresentationContour>(presentationID, params);
 }
 
-//void
-//MEDPresentationManager_i::updateVectorField(MEDPresentation::TypeID presentationID, const MEDCALC::VectorFieldParameters& params)
-//{
-//  return _updatePresentation<MEDPresentationVectorField>(presentationID, params);
-//}
-//
+void
+MEDPresentationManager_i::updateVectorField(MEDPresentation::TypeID presentationID, const MEDCALC::VectorFieldParameters& params)
+{
+  return _updatePresentation<MEDPresentationVectorField>(presentationID, params);
+}
+
 void
 MEDPresentationManager_i::updateSlices(MEDPresentation::TypeID presentationID, const MEDCALC::SlicesParameters& params)
 {
@@ -236,12 +253,12 @@ MEDPresentationManager_i::updateSlices(MEDPresentation::TypeID presentationID, c
 //{
 //  return _updatePresentation<MEDPresentationDeflectionShape>(presentationID, params);
 //}
-//
-//void
-//MEDPresentationManager_i::updatePointSprite(MEDPresentation::TypeID presentationID, const MEDCALC::PointSpriteParameters& params)
-//{
-//  return _updatePresentation<MEDPresentationPointSprite>(presentationID, params);
-//}
+
+void
+MEDPresentationManager_i::updatePointSprite(MEDPresentation::TypeID presentationID, const MEDCALC::PointSpriteParameters& params)
+{
+  return _updatePresentation<MEDPresentationPointSprite>(presentationID, params);
+}
 
 CORBA::Boolean
 MEDPresentationManager_i::removePresentation(MEDPresentation::TypeID presentationID)
