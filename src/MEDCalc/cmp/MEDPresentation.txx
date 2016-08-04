@@ -90,9 +90,10 @@ MEDPresentation::updateComponent(const std::string& newCompo)
 
     std::ostringstream oss;
     selectFieldComponent();
+    // The component has changed, we need to rescale the scalar bar to adapt:
+    rescaleTransferFunction();
     pushAndExecPyLine("pvs.Render();");
   }
-
 }
 
 template<typename PresentationType, typename PresentationParameters>

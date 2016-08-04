@@ -743,6 +743,7 @@ PresentationController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
             STDLOG("Removing pres " << (*lstModule)[i] << " from OB.");
           // Presentation in module but not in manager anymore: to be deleted from OB:
           updateTreeViewForPresentationRemoval((*lstModule)[i]);
+          onPresentationSelected(-1, "", ""); // make sure param widget is hidden
           }
       }
   }
