@@ -28,16 +28,19 @@ MEDWidgetHelperComponent::MEDWidgetHelperComponent(const PresentationController 
 MEDWidgetHelperComponent::~MEDWidgetHelperComponent()
 {}
 
-void MEDWidgetHelperComponent::udpateWidget()
+void MEDWidgetHelperComponent::updateWidget(bool connect)
 {
-  MEDWidgetHelper::udpateWidget();
+  MEDWidgetHelper::updateWidget(connect);
 
   _paramWidget->setComponents(_allCompos, _selectedCompo);
 
-  // Connect combo box changes
-  QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
-                    _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
-  QObject::connect( _paramWidget, SIGNAL(comboCompoIndexChanged(int)), this, SLOT(onComponentChanged(int)) );
+  if (connect)
+    {
+      // Connect combo box changes
+      QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
+                        _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
+      QObject::connect( _paramWidget, SIGNAL(comboCompoIndexChanged(int)), this, SLOT(onComponentChanged(int)) );
+    }
 }
 
 void MEDWidgetHelperComponent::releaseWidget()

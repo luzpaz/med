@@ -40,7 +40,7 @@ class MEDWidgetHelper : public QObject
 public:
   virtual ~MEDWidgetHelper();
 
-  virtual void udpateWidget();
+  virtual void updateWidget(bool connect);
   virtual void releaseWidget();
 
   ///! Returns the string X in the Python command "Update<X>" or "Get<X>Parameters"

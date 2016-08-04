@@ -28,15 +28,15 @@ WidgetPresentationParameters::WidgetPresentationParameters(QWidget* parent)
   _ui.setupUi(this); // To be done first
 
   toggleWidget(false);
-  QObject::connect(_ui.comboBoxCompo,          SIGNAL(currentIndexChanged(int)),
+  QObject::connect(_ui.comboBoxCompo,          SIGNAL(activated(int)),
                    this,                       SLOT(onComboCompoIndexChanged(int)) );
-  QObject::connect(_ui.comboBoxMesh,          SIGNAL(currentIndexChanged(int)),
+  QObject::connect(_ui.comboBoxMesh,          SIGNAL(activated(int)),
                      this,                       SLOT(onComboMeshIndexChanged(int)) );
-  QObject::connect(_ui.comboBoxScalarBarRange, SIGNAL(currentIndexChanged(int)),
+  QObject::connect(_ui.comboBoxScalarBarRange, SIGNAL(activated(int)),
                    this,                       SLOT(onComboScalarBarRangeIndexChanged(int)) );
-  QObject::connect(_ui.comboBoxColorMap,       SIGNAL(currentIndexChanged(int)),
+  QObject::connect(_ui.comboBoxColorMap,       SIGNAL(activated(int)),
                    this,                       SLOT(onComboColorMapIndexChanged(int)) );
-  QObject::connect(_ui.comboBoxSliceOrient,       SIGNAL(currentIndexChanged(int)),
+  QObject::connect(_ui.comboBoxSliceOrient,       SIGNAL(activated(int)),
                    this,                       SLOT(onComboOrientIndexChanged(int)) );
   QObject::connect(_ui.spinBox,                SIGNAL(valueChanged(int)),
                      this,                     SLOT(onSpinBoxValueChanged(int)) );
@@ -96,7 +96,7 @@ WidgetPresentationParameters::toggleWidget(bool show)
 
       _blockSig = true;
       _ui.widgetDynamic->hide();
-      setPresName("Choose a presentation");
+      setPresName(tr("LAB_DEFAULT_DYN_TITLE").toStdString());
       // reset colorMap and scalarBarRange:
       setColorMap(MEDCALC::COLOR_MAP_DEFAULT);
       setScalarBarRange(MEDCALC::SCALAR_BAR_RANGE_DEFAULT);
@@ -135,22 +135,26 @@ WidgetPresentationParameters::getComponent() const
 void
 WidgetPresentationParameters::setComponents(vector<string> compos, int selecIndex)
 {
+  _blockSig = true;
+
   // Show the widget:
   _ui.labelCompo->show();
   _ui.comboBoxCompo->show();
 
-  _blockSig = true;
   _ui.comboBoxCompo->clear();
   _ui.comboBoxCompo->addItem(tr("LAB_EUCLIDEAN_NORM"));
   for(vector<string>::const_iterator it = compos.begin(); it != compos.end(); ++it)
     _ui.comboBoxCompo->addItem(QString::fromStdString(*it));
   _ui.comboBoxCompo->setCurrentIndex(selecIndex);
+
   _blockSig = false;
 }
 
 void
 WidgetPresentationParameters::setNbContour(int nbContour)
 {
+  _blockSig = true;
+
   if (nbContour <= 0)
     {
       //TODO throw?
@@ -161,15 +165,16 @@ WidgetPresentationParameters::setNbContour(int nbContour)
   _ui.labelSpinBox->setText(tr("LAB_NB_CONTOURS"));
   _ui.labelSpinBox->show();
   _ui.spinBox->show();
-
-  _blockSig = true;
   _ui.spinBox->setValue(nbContour);
+
   _blockSig = false;
 }
 
 void
 WidgetPresentationParameters::setNbSlices(int nbSlices)
 {
+  _blockSig = true;
+
   if (nbSlices <= 0)
     {
       //TODO throw?
@@ -180,9 +185,8 @@ WidgetPresentationParameters::setNbSlices(int nbSlices)
   _ui.labelSpinBox->setText(tr("LAB_NB_SLICES"));
   _ui.labelSpinBox->show();
   _ui.spinBox->show();
-
-  _blockSig = true;
   _ui.spinBox->setValue(nbSlices);
+
   _blockSig = false;
 }
 
@@ -200,6 +204,8 @@ int WidgetPresentationParameters::getNbSlices() const
 void
 WidgetPresentationParameters::setScalarBarRange(MEDCALC::ScalarBarRangeType sbrange)
 {
+  _blockSig = true;
+
   int idx;
   if (sbrange == MEDCALC::SCALAR_BAR_ALL_TIMESTEPS)
     idx = _ui.comboBoxScalarBarRange->findText(tr("LAB_ALL_TIMESTEPS"));
@@ -207,18 +213,18 @@ WidgetPresentationParameters::setScalarBarRange(MEDCALC::ScalarBarRangeType sbra
     idx = _ui.comboBoxScalarBarRange->findText(tr("LAB_CURRENT_TIMESTEP"));
 
   if (idx >= 0)
-    {
-      _blockSig = true;
       _ui.comboBoxScalarBarRange->setCurrentIndex(idx);
-      _blockSig = false;
-    }
   else
     STDLOG("Strange!! No matching found - unable to set scalar bar range in GUI.");
+
+  _blockSig = false;
 }
 
 void
 WidgetPresentationParameters::setColorMap(MEDCALC::ColorMapType colorMap)
 {
+  _blockSig = true;
+
   int idx = -1;
   if (colorMap == MEDCALC::COLOR_MAP_BLUE_TO_RED_RAINBOW)
     idx = _ui.comboBoxColorMap->findText(tr("LAB_BLUE_TO_RED"));
@@ -226,19 +232,18 @@ WidgetPresentationParameters::setColorMap(MEDCALC::ColorMapType colorMap)
     idx = _ui.comboBoxColorMap->findText(tr("LAB_COOL_TO_WARM"));
 
   if (idx >= 0)
-    {
-      _blockSig = true;
       _ui.comboBoxColorMap->setCurrentIndex(idx);
-      _blockSig = false;
-    }
-
   else
     STDLOG("Strange!! No matching found - unable to set color map in GUI.");
+
+  _blockSig = false;
 }
 
 void
 WidgetPresentationParameters::setMeshMode(MEDCALC::MeshModeType mode)
 {
+  _blockSig = true;
+
   // Show the widget:
   _ui.labelMeshMode->show();
   _ui.comboBoxMesh->show();
@@ -259,18 +264,18 @@ WidgetPresentationParameters::setMeshMode(MEDCALC::MeshModeType mode)
       idx = -1;
   }
   if (idx >= 0)
-    {
-      _blockSig = true;
       _ui.comboBoxMesh->setCurrentIndex(idx);
-      _blockSig = false;
-    }
   else
     STDLOG("Strange!! No matching found - unable to set mesh mode in GUI.");
+
+  _blockSig = false;
 }
 
 void
 WidgetPresentationParameters::setSliceOrientation(MEDCALC::SliceOrientationType orient)
 {
+  _blockSig = true;
+
   // Show the widget:
   _ui.labelSliceOrient->show();
   _ui.comboBoxSliceOrient->show();
@@ -303,13 +308,11 @@ WidgetPresentationParameters::setSliceOrientation(MEDCALC::SliceOrientationType 
       idx = -1;
   }
   if (idx >= 0)
-    {
-      _blockSig = true;
-      _ui.comboBoxSliceOrient->setCurrentIndex(idx);
-      _blockSig = false;
-    }
+    _ui.comboBoxSliceOrient->setCurrentIndex(idx);
   else
     STDLOG("Strange!! No matching found - unable to set slice orientation in GUI.");
+
+  _blockSig = false;
 }
 
 

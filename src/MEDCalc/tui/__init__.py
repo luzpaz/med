@@ -64,7 +64,7 @@ from medpresentation import UpdateVectorField
 from medpresentation import UpdatePointSprite
 #from medpresentation import UpdateDeflectionShape
 
-from medpresentation import SetDefaultScaleFactor, ComputeCellAverageSize, GetDomainCenter
+from medpresentation import SetDefaultScaleFactor, ComputeCellAverageSize, GetDomainCenter, GetSliceOrigins
 
 # Console commands
 import medconsole

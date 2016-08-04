@@ -42,19 +42,22 @@ void MEDWidgetHelperMeshView::loadParametersFromEngine()
           _presManager->getPresentationIntProperty(_presId, MEDPresentationMeshView::PROP_MESH_MODE.c_str()));
 }
 
-void MEDWidgetHelperMeshView::udpateWidget()
+void MEDWidgetHelperMeshView::updateWidget(bool connect)
 {
-  MEDWidgetHelper::udpateWidget();
+  MEDWidgetHelper::updateWidget(connect);
 
   // MeshView presentation needs the mesh mode that's all.
   _paramWidget->setMeshMode(_meshMode);
   // Hide color map and scalar bar range
   _paramWidget->toggleCommonFieldWidget(false);
 
-  // Connect combo box changes
-  QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
-                    _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
-  QObject::connect( _paramWidget, SIGNAL(comboMeshIndexChanged(int)), this, SLOT(onMeshModeChanged(int)) );
+  if (connect)
+    {
+      // Connect combo box changes
+      QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
+                        _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
+      QObject::connect( _paramWidget, SIGNAL(comboMeshIndexChanged(int)), this, SLOT(onMeshModeChanged(int)) );
+    }
 }
 
 void MEDWidgetHelperMeshView::releaseWidget()

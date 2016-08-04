@@ -34,7 +34,7 @@ public:
                            WidgetPresentationParameters * paramW);
   virtual ~MEDWidgetHelperSlices();
 
-  virtual void udpateWidget();
+  virtual void updateWidget(bool connect);
   virtual void releaseWidget();
 
   virtual std::string getPythonTag() const { return "Slices"; }

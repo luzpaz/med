@@ -180,6 +180,10 @@
   <context>
     <name>WidgetPresentationParameters</name>
     <message>
+      <source>LAB_DEFAULT_DYN_TITLE</source>
+      <translation>Default parameters</translation>
+    </message>    
+    <message>
       <source>LAB_DISP_COMP</source>
       <translation>Displayed component:</translation>
     </message>

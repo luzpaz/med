@@ -37,7 +37,7 @@ public:
                            WidgetPresentationParameters * paramW);
   virtual ~MEDWidgetHelperComponent();
 
-  virtual void udpateWidget();
+  virtual void updateWidget(bool connect);
   virtual void releaseWidget();
 
   virtual std::string getPythonTag() const = 0;

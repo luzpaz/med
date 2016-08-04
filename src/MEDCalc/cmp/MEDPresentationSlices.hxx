@@ -43,8 +43,12 @@ protected:
   void updateOrientation(const MEDCALC::SliceOrientationType orientation);
   virtual void internalGeneratePipeline();
 
-  void setNumberOfSlices();
-  void selectSliceOrientation();
+  void generateSlices();
+  void clearPreviousSlices();
+  void generateAndDisplay();
+  void selectSliceOrientation(const std::string & obj);
+
+  std::string getNormalVector() const;
 
 private:
   MEDCALC::SlicesParameters _params;

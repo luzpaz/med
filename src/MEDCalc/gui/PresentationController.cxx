@@ -619,7 +619,7 @@ PresentationController::onPresentationSelected(int presId, const QString& presTy
       _presManager->activateView(presId);
       // Update widgets parameters
       _currentWidgetHelper = findOrCreateWidgetHelper(_presManager, presId, presType.toStdString(), presName.toStdString());
-      _currentWidgetHelper->udpateWidget();
+      _currentWidgetHelper->updateWidget(true);
     }
 }
 
@@ -752,7 +752,7 @@ PresentationController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
   else if ( event->type == MEDCALC::EVENT_MODIFY_PRESENTATION ) {
       // Update parameter widget if shown:
       if(_currentWidgetHelper)
-        _currentWidgetHelper->udpateWidget();
+        _currentWidgetHelper->updateWidget(false);
   }
 }
 

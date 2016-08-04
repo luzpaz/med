@@ -39,52 +39,85 @@ MEDPresentationSlices::MEDPresentationSlices(const MEDCALC::SlicesParameters& pa
 }
 
 void
-MEDPresentationSlices::setNumberOfSlices()
+MEDPresentationSlices::generateSlices()
 {
-  std::ostringstream oss1;
-  // TODO
-//  oss1 << _objVar << ".SliceType.Normal = " << norm << ";";
+  std::ostringstream oss;
+  int nbSlices = getIntProperty(MEDPresentationSlices::PROP_NB_SLICES);
+  std::string normal = getNormalVector();
+
+  oss << "import medcalc; __origins = medcalc.GetSliceOrigins(" << _srcObjVar << ", " << nbSlices << ", " << normal << ");";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  pushAndExecPyLine("__objLst = [];");
+  oss << "for sliceNum in range(" << nbSlices << "):\n";
+  oss << "  obj = pvs.Slice(Input=" << _srcObjVar << ")\n";
+  oss << "  obj.SliceType = 'Plane'\n";
+  oss << "  obj.SliceType.Normal = " << normal << "\n";
+  oss << "  obj.SliceType.Origin = __origins[sliceNum]\n";
+  oss << "  __objLst.append(obj)\n\n";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
+  oss << _objVar << " = pvs.GroupDatasets(Input=__objLst);";
+  pushAndExecPyLine(oss.str()); oss.str("");
 }
 
 void
-MEDPresentationSlices::selectSliceOrientation()
+MEDPresentationSlices::generateAndDisplay()
 {
-  std::ostringstream oss1;
-  std::string norm;
+  generateSlices();
+  showObject();
 
+  colorBy(_fieldType);
+  showScalarBar();
+  rescaleTransferFunction();
+  selectColorMap();
+  resetCameraAndRender();
+}
+
+
+void
+MEDPresentationSlices::clearPreviousSlices()
+{
+  std::ostringstream oss;
+
+  pushAndExecPyLine("for sliceNum, _ in enumerate(__objLst):\n  pvs.Delete(__objLst[sliceNum]);");
+  oss <<            "pvs.Delete(" << _objVar << ");";
+  pushAndExecPyLine(oss.str()); oss.str("");
+}
+
+std::string
+MEDPresentationSlices::getNormalVector() const
+{
   switch(_params.orientation)
   {
     case MEDCALC::SLICE_NORMAL_TO_X:
-      norm = "[1.0, 0.0, 0.0]";
-      break;
+      return "[1.0, 0.0, 0.0]";
     case MEDCALC::SLICE_NORMAL_TO_Y:
-      norm = "[0.0, 1.0, 0.0]";
-      break;
+      return "[0.0, 1.0, 0.0]";
     case MEDCALC::SLICE_NORMAL_TO_Z:
-      norm = "[0.0, 0.0, 1.0]";
-      break;
+      return "[0.0, 0.0, 1.0]";
     case MEDCALC::SLICE_NORMAL_TO_XY:
-      norm = "[1.0, 1.0, 0.0]";
-      break;
+      return "[1.0, 1.0, 0.0]";
     case MEDCALC::SLICE_NORMAL_TO_XZ:
-      norm = "[1.0, 0.0, 1.0]";
-      break;
+      return "[1.0, 0.0, 1.0]";
     case MEDCALC::SLICE_NORMAL_TO_YZ:
-      norm = "[0.0, 1.0, 1.0]";
-      break;
+      return "[0.0, 1.0, 1.0]";
     case MEDCALC::SLICE_NORMAL_TO_XYZ:
-      norm = "[1.0, 1.0, 1.0]";
-      break;
+      return "[1.0, 1.0, 1.0]";
     default:
       const char * mes = "Unexpected getSliceOrientationCommand() error!";
       STDLOG(mes);
       throw KERNEL::createSalomeException(mes);
   }
-
-  oss1 << _objVar << ".SliceType.Normal = " << norm << ";";
-  pushAndExecPyLine(oss1.str()); oss1.str("");
+  return ""; // never happens
 }
 
+void
+MEDPresentationSlices::selectSliceOrientation(const std::string & obj)
+{
+  std::ostringstream oss1;
+  oss1 << obj << ".SliceType.Normal = " << getNormalVector() << ";";
+  pushAndExecPyLine(oss1.str()); oss1.str("");
+}
 
 void
 MEDPresentationSlices::internalGeneratePipeline()
@@ -101,21 +134,8 @@ MEDPresentationSlices::internalGeneratePipeline()
   fillAvailableFieldComponents();
   setOrCreateRenderView(); // instanciate __viewXXX
 
-  oss << _objVar << " = pvs.Slice(Input=" << _srcObjVar << ");";
-  pushAndExecPyLine(oss.str()); oss.str("");
-
-  showObject();
-
-  oss << _objVar << ".SliceType = 'Plane';";
-  pushAndExecPyLine(oss.str()); oss.str("");
-
-  // Set slice orientation
-  selectSliceOrientation();
-  colorBy(_fieldType);
-  showScalarBar();
-  rescaleTransferFunction();
-  selectColorMap();
-  resetCameraAndRender();
+  // Now create the initial number of slices
+  generateAndDisplay();
 }
 
 void
@@ -148,8 +168,8 @@ MEDPresentationSlices::updateNbSlices(const int nbSlices)
   // Update the pipeline:
   {
     MEDPyLockWrapper lock;
-    setNumberOfSlices();
-    pushAndExecPyLine("pvs.Render();");
+    clearPreviousSlices();
+    generateAndDisplay();
   }
 }
 
@@ -159,13 +179,14 @@ MEDPresentationSlices::updateOrientation(const MEDCALC::SliceOrientationType ori
   _params.orientation = orientation;
 
   // GUI helper:
-  setIntProperty(MEDPresentationSlices::PROP_SLICE_ORIENTATION, orientation);
+  setIntProperty(MEDPresentationSlices::PROP_SLICE_ORIENTATION, static_cast<int>(orientation));
 
   // Update the pipeline:
   {
     MEDPyLockWrapper lock;
-    selectSliceOrientation();
-    pushAndExecPyLine("pvs.Render();");
+
+    clearPreviousSlices();
+    generateAndDisplay();
   }
 }
 

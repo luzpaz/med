@@ -44,19 +44,22 @@ void MEDWidgetHelperSlices::loadParametersFromEngine()
       _presManager->getPresentationIntProperty(_presId, MEDPresentationSlices::PROP_SLICE_ORIENTATION.c_str()));
 }
 
-void MEDWidgetHelperSlices::udpateWidget()
+void MEDWidgetHelperSlices::updateWidget(bool connect)
 {
-  MEDWidgetHelper::udpateWidget();
+  MEDWidgetHelper::updateWidget(connect);
   STDLOG("MEDWidgetHelperSlices::udpateWidget() nbSlices is " << _nbSlices);
 
-//  _paramWidget->setNbSlices(_nbSlices);        // TODO: uncomment when ready to deal with slice number
+  _paramWidget->setNbSlices(_nbSlices);
   _paramWidget->setSliceOrientation(_sliceOrientation);
 
   // Connect combo box changes
-  QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
-                    _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
-  QObject::connect( _paramWidget, SIGNAL(spinBoxValueChanged(int)), this, SLOT(onNbSlicesChanged(int)) );
-  QObject::connect( _paramWidget, SIGNAL(comboOrientIndexChanged(int)), this, SLOT(onSliceOrientationChanged(int)) );
+  if (connect)
+    {
+      QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
+                        _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
+      QObject::connect( _paramWidget, SIGNAL(spinBoxValueChanged(int)), this, SLOT(onNbSlicesChanged(int)) );
+      QObject::connect( _paramWidget, SIGNAL(comboOrientIndexChanged(int)), this, SLOT(onSliceOrientationChanged(int)) );
+    }
 }
 
 void MEDWidgetHelperSlices::releaseWidget()
@@ -83,7 +86,7 @@ void MEDWidgetHelperSlices::onNbSlicesChanged(int nbSlices)
 
 void MEDWidgetHelperSlices::onSliceOrientationChanged(int sliceOrient)
 {
-  STDLOG("MEDWidgetHelperSlices::onNbSlicesChanged");
+  STDLOG("MEDWidgetHelperSlices::onSliceOrientationChanged");
   PresentationEvent* event = new PresentationEvent();
   event->eventtype = PresentationEvent::EVENT_CHANGE_SLICE_ORIENTATION;
   event->presentationId = _presId;

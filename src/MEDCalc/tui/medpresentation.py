@@ -270,3 +270,27 @@ def SetDefaultScaleFactor(active=None):
       scalefactor = scaledextent / divisor 
       active.ScaleFactor = scalefactor
       return
+
+def GetSliceOrigins(obj, nbSlices, normal):
+  """
+  Compute all origin points for the position of the slices.
+  @param normal is a list of 3 floats either 0 or 1 indicating the normal vector of the slices
+  """
+  from math import sqrt
+  bb = obj.GetDataInformation().GetBounds()
+  bb = zip(bb[::2], bb[1::2])
+  origin = [x[0] + 0.5*(x[1]-x[0]) for x in bb]
+  deltas = [x[1]-x[0] for x in bb]
+  # Compute extent of slices:
+  l = [normal[i]*deltas[i]**2 for i in range(3)]   # either the X extend, or the XY diagonal, or the XYZ diagonal
+  plus = lambda x,y: x+y
+  extent = sqrt(reduce(plus, l, 0.0))
+  norm = sqrt(reduce(plus, normal, 0.0))
+  normal = [normal[i]/norm for i in range(3)]
+  origins = []
+  step = extent/nbSlices
+  for j in range(nbSlices):
+    orig_j = [origin[i]+normal[i]*(-0.5*extent + step*(0.5+j)) for i in range(3)]
+    origins.append(orig_j)
+  return origins
+

@@ -53,7 +53,7 @@ void MEDWidgetHelper::loadParametersFromEngine()
       _presManager->getPresentationIntProperty(_presId, MEDPresentation::PROP_SCALAR_BAR_RANGE.c_str()));
 }
 
-void MEDWidgetHelper::udpateWidget()
+void MEDWidgetHelper::updateWidget(bool connect)
 {
   // Set presentation name
   _paramWidget->setPresName(_presName);
@@ -67,8 +67,11 @@ void MEDWidgetHelper::udpateWidget()
   _paramWidget->setColorMap(_colorMap);
   _paramWidget->setScalarBarRange(_scalarBarRange);
 
-  QObject::connect( _paramWidget, SIGNAL(comboScalarBarRangeIndexChanged(int)), this, SLOT(onScalarBarRangeChanged(int)) );
-  QObject::connect( _paramWidget, SIGNAL(comboColorMapIndexChanged(int)), this, SLOT(onColorMapChanged(int)) );
+  if (connect)
+    {
+      QObject::connect( _paramWidget, SIGNAL(comboScalarBarRangeIndexChanged(int)), this, SLOT(onScalarBarRangeChanged(int)) );
+      QObject::connect( _paramWidget, SIGNAL(comboColorMapIndexChanged(int)), this, SLOT(onColorMapChanged(int)) );
+    }
 }
 
 void MEDWidgetHelper::releaseWidget()

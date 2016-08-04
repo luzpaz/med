@@ -41,20 +41,21 @@ void MEDWidgetHelperContour::loadParametersFromEngine()
   _nbContours = _presManager->getPresentationIntProperty(_presId, MEDPresentationContour::PROP_NB_CONTOUR.c_str());
 }
 
-void MEDWidgetHelperContour::udpateWidget()
+void MEDWidgetHelperContour::updateWidget(bool connect)
 {
-  MEDWidgetHelper::udpateWidget();
+  MEDWidgetHelper::updateWidget(connect);
   STDLOG("MEDWidgetHelperContour::udpateWidget() nbContour is " << _nbContours);
 
   // Contour presentation needs the number of contours
-//  _paramWidget->setComponents(_allCompos, _selectedCompo);
   _paramWidget->setNbContour(_nbContours);
 
   // Connect combo box changes
-  QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
-                    _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
-//  QObject::connect( _paramWidget, SIGNAL(comboCompoIndexChanged(int)), this, SLOT(onComponentChanged(int)) );
-  QObject::connect( _paramWidget, SIGNAL(spinBoxValueChanged(int)), this, SLOT(onNbContourChanged(int)) );
+  if (connect)
+    {
+      QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
+                        _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
+      QObject::connect( _paramWidget, SIGNAL(spinBoxValueChanged(int)), this, SLOT(onNbContourChanged(int)) );
+    }
 }
 
 void MEDWidgetHelperContour::releaseWidget()
