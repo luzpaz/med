@@ -84,6 +84,7 @@ protected:
   void showScalarBar();
   void rescaleTransferFunction();
   void selectColorMap();
+  void fixScalarBarTitle();
   void resetCameraAndRender();
 
   virtual void internalGeneratePipeline();

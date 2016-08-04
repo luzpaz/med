@@ -317,6 +317,25 @@ MEDPresentation::selectFieldComponent()
     }
 }
 
+/**
+ * Needs the LUT, so to be called after selectColorMap for the first time.
+ */
+void
+MEDPresentation::fixScalarBarTitle()
+{
+  // get selected component name:
+  std::string compoName("Magnitude");
+  if (_selectedComponentIndex != -1)
+    {
+      std::ostringstream oss1;
+      oss1 << MEDPresentation::PROP_COMPONENT << _selectedComponentIndex;
+      compoName = getStringProperty(oss1.str());
+    }
+  std::ostringstream oss;
+  oss << "pvs.GetScalarBar(" << _lutVar << ").ComponentTitle = '" << compoName << "';";
+  pushAndExecPyLine(oss.str()); oss.str("");
+}
+
 void
 MEDPresentation::selectColorMap()
 {
@@ -366,20 +385,20 @@ MEDPresentation::colorBy(const std::string & fieldType)
 void
 MEDPresentation::rescaleTransferFunction()
 {
-  std::string ret;
+  std::ostringstream oss;
   switch(_sbRange)
   {
     case MEDCALC::SCALAR_BAR_ALL_TIMESTEPS:
-      ret = _dispVar + ".RescaleTransferFunctionToDataRangeOverTime();";
+      oss << _dispVar << ".RescaleTransferFunctionToDataRangeOverTime();";
       break;
     case MEDCALC::SCALAR_BAR_CURRENT_TIMESTEP:
-      ret = _dispVar + ".RescaleTransferFunctionToDataRange(False);";
+      oss << _dispVar << ".RescaleTransferFunctionToDataRange(False);";
       break;
     default:
       STDLOG("MEDPresentation::getRescaleCommand(): invalid range!");
       throw KERNEL::createSalomeException("MEDPresentation::getRescaleCommand(): invalid range!");
   }
-  pushAndExecPyLine(ret);
+  pushAndExecPyLine(oss.str()); oss.str("");
 }
 
 int
