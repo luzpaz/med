@@ -84,9 +84,10 @@ MEDPresentationContour::internalGeneratePipeline()
   // Set number of contours
   setNumberContours();
   colorBy("POINTS");    // necessarily POINTS because of the conversion above
+
   showScalarBar();
-  rescaleTransferFunction();
   selectColorMap();
+  rescaleTransferFunction();
   resetCameraAndRender();
 }
 

@@ -74,13 +74,12 @@ def MakeContour(proxy,
 
 def MakeVectorField(proxy,
                   viewMode=MEDCALC.VIEW_MODE_DEFAULT,
-                  displayedComponent=MEDCALC.DISPLAY_DEFAULT,
                   scalarBarRange=MEDCALC.SCALAR_BAR_RANGE_DEFAULT,
                   colorMap=MEDCALC.COLOR_MAP_DEFAULT
                   ):
   # Create the presentation instance in CORBA engine
   # The engine in turn creates the ParaView pipeline elements
-  params = MEDCALC.VectorFieldParameters(proxy.id, displayedComponent, scalarBarRange, colorMap)
+  params = MEDCALC.VectorFieldParameters(proxy.id, scalarBarRange, colorMap)
   try:
     presentation_id = __manager.makeVectorField(params, viewMode)
     notifyGui_addPresentation(proxy.id, presentation_id)
@@ -185,91 +184,6 @@ def GetDomainCenter(obj):
   bb = zip(bb[::2], bb[1::2])
   mids = [x[0] + 0.5*(x[1]-x[0]) for x in bb]
   return mids
-
-# Taken from paraview.simple from CEA ParaView's version:
-def SetDefaultScaleFactor(active=None):
-    """Provides a good display to the bounding box of the mesh and min / max of the field.
-    This method available for filters: Warp By Vector, Glyph and Tensor Glyph"""
-    if not active:
-        active = GetActiveSource()
-    if not active:
-        return
-    name = active.__class__.__name__
-    if (name == 'WarpByVector'  or name == 'TensorGlyph') and hasattr(active, 'ScaleFactor'):
-      import math
-      datainfo = active.GetProperty("Input").SMProperty.GetProxy(0).GetDataInformation()
-      if not datainfo:
-          active.ScaleFactor = 1.0
-          return
-      nbcells = datainfo.GetNumberOfCells()
-      nbpoints = datainfo.GetNumberOfPoints()
-      nbelem = nbcells
-      if nbelem == 0:
-          nbelem = nbpoints
-      abounds = datainfo.GetBounds()
-      volume = 1
-      vol = 0
-      idim = 0
-      i = 0
-      eps = 1.0e-38
-      while i < 6 :
-          vol = math.fabs( abounds[i+1] - abounds[i] )
-          if vol > 0:
-            idim += 1
-            volume *= vol
-          i += 2
-      if nbelem == 0 or math.fabs(idim) < eps:
-          active.ScaleFactor = 0.0
-          return
-      volume /= nbelem
-      scalefactor = pow( volume, 1.0 / idim )
-      maximum = 1.0
-      property = active.GetProperty('ScaleFactor')
-      domain = None
-      if property.GetDomain('vector_range').__class__.__name__ == 'vtkSMArrayRangeDomain':
-          domain = property.GetDomain('vector_range')
-      if property.GetDomain('tensor_range').__class__.__name__ == 'vtkSMArrayRangeDomain':
-          domain = property.GetDomain('tensor_range')
-      if not domain is None:
-          if domain.GetMaximumExists(3):
-            maximum = domain.GetMaximum(3)
-      if math.fabs(maximum) > eps:
-          scalefactor /= maximum
-      active.ScaleFactor = scalefactor
-      return
-    if name == 'Glyph' and hasattr(active, 'ScaleFactor') and hasattr(active, 'UseCellsCenter') and hasattr(active, 'ScaleMode'):
-      import math
-      scaledextent = 1.0
-      property = active.GetProperty('ScaleFactor')
-      bounds_domain = property.GetDomain('bounds')
-      if bounds_domain.__class__.__name__ == 'vtkSMBoundsDomain':
-          if bounds_domain.GetMaximumExists(0):
-            scaledextent = bounds_domain.GetMaximum(0)
-      usecellscenter = active.GetProperty('UseCellsCenter').GetData()
-      sdomain = "cells_"
-      if usecellscenter == 0:
-          sdomain = "points_"
-      divisor = 1.0
-      scalemode_domain = active.GetProperty('ScaleMode')
-      scalemode = scalemode_domain.ConvertValue(scalemode_domain.GetData())
-      if scalemode == 0:
-          sdomain += "scalar_range"
-          domain = property.GetDomain(sdomain)
-          if domain.__class__.__name__ == 'vtkSMArrayRangeDomain':
-            if domain.GetMaximumExists(0):
-                divisor = domain.GetMaximum(0)
-      if scalemode == 1 or scalemode == 2:
-          sdomain += "vector_range"
-          domain = property.GetDomain(sdomain)
-          if domain.__class__.__name__ == 'vtkSMArrayRangeDomain':
-            if domain.GetMaximumExists(3):
-                divisor = domain.GetMaximum(3)
-      divisor = math.fabs(divisor)
-      if divisor < 0.000000001:
-          divisor = 1
-      scalefactor = scaledextent / divisor 
-      active.ScaleFactor = scalefactor
-      return
 
 def GetSliceOrigins(obj, nbSlices, normal):
   """

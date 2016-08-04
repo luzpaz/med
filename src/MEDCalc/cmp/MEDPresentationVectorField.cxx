@@ -37,6 +37,17 @@ MEDPresentationVectorField::MEDPresentationVectorField(const MEDCALC::VectorFiel
 }
 
 void
+MEDPresentationVectorField::autoScale()
+{
+  std::ostringstream oss;
+  oss << "import medcalc;";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _objVar << ".ScaleFactor = 2.0*medcalc.ComputeCellAverageSize(__srcObj0)/(" << _rangeVar
+      << "[1]-" << _rangeVar << "[0]);";
+  pushAndExecPyLine(oss.str()); oss.str("");
+}
+
+void
 MEDPresentationVectorField::internalGeneratePipeline()
 {
   MEDPresentation::internalGeneratePipeline();
@@ -50,7 +61,7 @@ MEDPresentationVectorField::internalGeneratePipeline()
   fillAvailableFieldComponents();
   if (getIntProperty(MEDPresentation::PROP_NB_COMPONENTS) <= 1)
     {
-      const char * msg = "Vector field presentation does not work for scalar  field!"; // this message will appear in GUI too
+      const char * msg = "Vector field presentation does not work for scalar field!"; // this message will appear in GUI too
       STDLOG(msg);
       throw KERNEL::createSalomeException(msg);
     }
@@ -69,18 +80,18 @@ MEDPresentationVectorField::internalGeneratePipeline()
   pushAndExecPyLine(oss.str()); oss.str("");
   oss << _objVar << ".GlyphMode = 'All Points';";
   pushAndExecPyLine(oss.str()); oss.str("");
-//  oss << _objVar << "GlyphTransform = 'Transform2';";  // not sure this is really needed?
-//  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _objVar << "GlyphTransform = 'Transform2';";  // not sure this is really needed?
+  pushAndExecPyLine(oss.str()); oss.str("");
   oss << _objVar << ".ScaleFactor = 0.1;";
   pushAndExecPyLine(oss.str()); oss.str("");
-  // Auto-tuning of the scale factor:
-//  oss << "import medcalc; medcalc.SetDefaultScaleFactor(active=" << _objVar << ");";
-//  pushAndExecPyLine(oss.str()); oss.str("");
 
   colorBy("POINTS");
   showScalarBar();
-  rescaleTransferFunction();
   selectColorMap();
+  rescaleTransferFunction();
+
+  autoScale();   // to be called after transfer function so we have the range
+
   resetCameraAndRender();
 }
 
@@ -90,10 +101,12 @@ MEDPresentationVectorField::updatePipeline(const MEDCALC::VectorFieldParameters&
   if (params.fieldHandlerId != _params.fieldHandlerId)
     throw KERNEL::createSalomeException("Unexpected updatePipeline error! Mismatching fieldHandlerId!");
 
-  if (std::string(params.displayedComponent) != std::string(_params.displayedComponent))
-    updateComponent<MEDPresentationVectorField, MEDCALC::VectorFieldParameters>(std::string(params.displayedComponent));
   if (params.scalarBarRange != _params.scalarBarRange)
-    updateScalarBarRange<MEDPresentationVectorField, MEDCALC::VectorFieldParameters>(params.scalarBarRange);
+    {
+      updateScalarBarRange<MEDPresentationVectorField, MEDCALC::VectorFieldParameters>(params.scalarBarRange);
+      autoScale();
+      pushAndExecPyLine("pvs.Render();");
+    }
   if (params.colorMap != _params.colorMap)
     updateColorMap<MEDPresentationVectorField, MEDCALC::VectorFieldParameters>(params.colorMap);
 }

@@ -55,8 +55,8 @@ MEDPresentationScalarMap::internalGeneratePipeline()
   showObject();
   colorBy(_fieldType);
   showScalarBar();
-  rescaleTransferFunction();
   selectColorMap();
+  rescaleTransferFunction();
   resetCameraAndRender();
 
   // Retrieve Python object for internal storage:

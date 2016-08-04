@@ -57,7 +57,7 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   MEDCALC_EXPORT MEDCALC::ScalarMapParameters* getScalarMapParameters(MEDPresentation::TypeID presentationID);
   MEDCALC_EXPORT MEDCALC::ContourParameters    getContourParameters(MEDPresentation::TypeID presentationID);
   MEDCALC_EXPORT MEDCALC::SlicesParameters*    getSlicesParameters(MEDPresentation::TypeID presentationID);
-  MEDCALC_EXPORT MEDCALC::VectorFieldParameters*    getVectorFieldParameters(MEDPresentation::TypeID presentationID);
+  MEDCALC_EXPORT MEDCALC::VectorFieldParameters     getVectorFieldParameters(MEDPresentation::TypeID presentationID);
   MEDCALC_EXPORT MEDCALC::PointSpriteParameters*    getPointSpriteParameters(MEDPresentation::TypeID presentationID);
 
   MEDCALC_EXPORT void updateMeshView(MEDPresentation::TypeID, const MEDCALC::MeshViewParameters&);

@@ -92,7 +92,6 @@ MEDPresentation::updateComponent(const std::string& newCompo)
     selectFieldComponent();
     // The component has changed, we need to rescale the scalar bar to adapt:
     rescaleTransferFunction();
-    fixScalarBarTitle();   // should be fixed in PV one day!
     pushAndExecPyLine("pvs.Render();");
   }
 }

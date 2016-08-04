@@ -20,11 +20,11 @@
 #ifndef SRC_MEDCALC_GUI_MEDWIDGETHELPERSLICES_HXX_
 #define SRC_MEDCALC_GUI_MEDWIDGETHELPERSLICES_HXX_
 
-#include "MEDWidgetHelper.hxx"
+#include "MEDWidgetHelperComponent.hxx"
 
 class PresentationController;
 
-class MEDWidgetHelperSlices: public MEDWidgetHelper
+class MEDWidgetHelperSlices: public MEDWidgetHelperComponent
 {
   Q_OBJECT
 

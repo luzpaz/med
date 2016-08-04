@@ -28,7 +28,7 @@
 MEDWidgetHelperSlices::MEDWidgetHelperSlices(const PresentationController * presController,
                                                MEDCALC::MEDPresentationManager_ptr presManager, int presId,
                                                const std::string & presName, WidgetPresentationParameters * paramW):
-  MEDWidgetHelper(presController, presManager, presId, presName, paramW),
+  MEDWidgetHelperComponent(presController, presManager, presId, presName, paramW),
   _nbSlices(-1),
   _sliceOrientation(MEDCALC::SLICE_ORIENTATION_DEFAULT)
 {}
@@ -46,8 +46,7 @@ void MEDWidgetHelperSlices::loadParametersFromEngine()
 
 void MEDWidgetHelperSlices::updateWidget(bool connect)
 {
-  MEDWidgetHelper::updateWidget(connect);
-  STDLOG("MEDWidgetHelperSlices::udpateWidget() nbSlices is " << _nbSlices);
+  MEDWidgetHelperComponent::updateWidget(connect);
 
   _paramWidget->setNbSlices(_nbSlices);
   _paramWidget->setSliceOrientation(_sliceOrientation);
@@ -55,8 +54,6 @@ void MEDWidgetHelperSlices::updateWidget(bool connect)
   // Connect combo box changes
   if (connect)
     {
-      QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
-                        _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
       QObject::connect( _paramWidget, SIGNAL(spinBoxValueChanged(int)), this, SLOT(onNbSlicesChanged(int)) );
       QObject::connect( _paramWidget, SIGNAL(comboOrientIndexChanged(int)), this, SLOT(onSliceOrientationChanged(int)) );
     }
@@ -66,8 +63,6 @@ void MEDWidgetHelperSlices::releaseWidget()
 {
   MEDWidgetHelper::releaseWidget();
 
-  QObject::disconnect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
-                       _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
   QObject::disconnect( _paramWidget, SIGNAL(spinBoxValueChanged(int)), this, SLOT(onNbSlicesChanged(int)) );
   QObject::disconnect( _paramWidget, SIGNAL(comboOrientIndexChanged(int)), this, SLOT(onSliceOrientationChanged(int)) );
 }

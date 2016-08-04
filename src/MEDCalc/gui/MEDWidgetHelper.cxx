@@ -69,6 +69,8 @@ void MEDWidgetHelper::updateWidget(bool connect)
 
   if (connect)
     {
+      QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
+                              _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
       QObject::connect( _paramWidget, SIGNAL(comboScalarBarRangeIndexChanged(int)), this, SLOT(onScalarBarRangeChanged(int)) );
       QObject::connect( _paramWidget, SIGNAL(comboColorMapIndexChanged(int)), this, SLOT(onColorMapChanged(int)) );
     }
@@ -76,6 +78,8 @@ void MEDWidgetHelper::updateWidget(bool connect)
 
 void MEDWidgetHelper::releaseWidget()
 {
+  QObject::disconnect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
+                          _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
   QObject::disconnect( _paramWidget, SIGNAL(comboScalarBarRangeIndexChanged(int)), this, SLOT(onScalarBarRangeChanged(int)) );
   QObject::disconnect( _paramWidget, SIGNAL(comboColorMapIndexChanged(int)), this, SLOT(onColorMapChanged(int)) );
 

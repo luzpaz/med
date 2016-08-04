@@ -68,8 +68,8 @@ MEDPresentationSlices::generateAndDisplay()
 
   colorBy(_fieldType);
   showScalarBar();
-  rescaleTransferFunction();
   selectColorMap();
+  rescaleTransferFunction();
   resetCameraAndRender();
 }
 

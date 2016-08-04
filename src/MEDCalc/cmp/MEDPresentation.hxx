@@ -84,7 +84,7 @@ protected:
   void showScalarBar();
   void rescaleTransferFunction();
   void selectColorMap();
-  void fixScalarBarTitle();
+  void scalarBarTitle();
   void resetCameraAndRender();
 
   virtual void internalGeneratePipeline();
@@ -150,6 +150,8 @@ protected:
   std::string _dispVar;
   ///! ParaView LUT variable in the Python scripting commands
   std::string _lutVar;
+  ///! ParaView variable in Python holding the data range
+  std::string _rangeVar;
 
 private:
   ///! Pipeline elements

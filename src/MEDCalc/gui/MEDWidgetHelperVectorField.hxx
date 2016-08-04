@@ -24,7 +24,7 @@
 
 class PresentationController;
 
-class MEDWidgetHelperVectorField: public MEDWidgetHelperComponent
+class MEDWidgetHelperVectorField: public MEDWidgetHelper
 {
   Q_OBJECT
 
@@ -32,12 +32,12 @@ public:
   MEDWidgetHelperVectorField(const PresentationController* presController,
                            MEDCALC::MEDPresentationManager_ptr presManager, int presId, const std::string & presName,
                            WidgetPresentationParameters * paramW):
-     MEDWidgetHelperComponent(presController, presManager, presId, presName, paramW)
+     MEDWidgetHelper(presController, presManager, presId, presName, paramW)
   {}
-
   virtual ~MEDWidgetHelperVectorField() {}
 
   virtual std::string getPythonTag() const { return "VectorField"; }
+
 };
 
 #endif /* SRC_MEDCALC_GUI_MEDWIDGETHELPERVECTORFIELD_HXX_ */

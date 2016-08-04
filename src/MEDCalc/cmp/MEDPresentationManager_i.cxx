@@ -200,13 +200,12 @@ MEDPresentationManager_i::getSlicesParameters(MEDPresentation::TypeID presentati
   return tmp._retn();
 }
 
-MEDCALC::VectorFieldParameters*
+MEDCALC::VectorFieldParameters
 MEDPresentationManager_i::getVectorFieldParameters(MEDPresentation::TypeID presentationID)
 {
-  MEDCALC::VectorFieldParameters* p = new MEDCALC::VectorFieldParameters();
-  _getParameters<MEDPresentationVectorField>(presentationID, *p);
-  MEDCALC::VectorFieldParameters_var tmp(p);
-  return tmp._retn();
+  MEDCALC::VectorFieldParameters p;
+  _getParameters<MEDPresentationVectorField>(presentationID, p);
+  return p;
 }
 
 MEDCALC::PointSpriteParameters*

@@ -76,15 +76,17 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const s
 
   // Python variables:
   int id = GeneratePythonId();
-  std::ostringstream oss_o, oss_d, oss_l, oss_s;
+  std::ostringstream oss_o, oss_d, oss_l, oss_s, oss_r;
   oss_o << "__obj" << id;
   oss_s << "__srcObj" << id;
   oss_d << "__disp" << id;
   oss_l << "__lut" << id;
+  oss_r << "__range" << id;
   _objVar = oss_o.str();
   _srcObjVar = oss_s.str();
   _dispVar = oss_d.str();
   _lutVar = oss_l.str();
+  _rangeVar = oss_r.str();
 }
 
 MEDPresentation::~MEDPresentation()
@@ -321,15 +323,22 @@ MEDPresentation::selectFieldComponent()
  * Needs the LUT, so to be called after selectColorMap for the first time.
  */
 void
-MEDPresentation::fixScalarBarTitle()
+MEDPresentation::scalarBarTitle()
 {
   // get selected component name:
-  std::string compoName("Magnitude");
+  std::string compoName;
   if (_selectedComponentIndex != -1)
     {
       std::ostringstream oss1;
       oss1 << MEDPresentation::PROP_COMPONENT << _selectedComponentIndex;
       compoName = getStringProperty(oss1.str());
+    }
+  else
+    {
+      if (getIntProperty(MEDPresentation::PROP_NB_COMPONENTS) == 1)
+        compoName = "";
+      else
+        compoName = "Magnitude";
     }
   std::ostringstream oss;
   oss << "pvs.GetScalarBar(" << _lutVar << ").ComponentTitle = '" << compoName << "';";
@@ -356,6 +365,8 @@ MEDPresentation::selectColorMap()
     throw KERNEL::createSalomeException("MEDPresentation::getColorMapCommand(): invalid colormap!");
   }
   pushAndExecPyLine(oss.str());
+
+  selectFieldComponent(); // somehow PV keeps the LUT parameters of the previous presentation, so better reset this.
 }
 
 void
@@ -399,7 +410,15 @@ MEDPresentation::rescaleTransferFunction()
       throw KERNEL::createSalomeException("MEDPresentation::getRescaleCommand(): invalid range!");
   }
   pushAndExecPyLine(oss.str()); oss.str("");
+  // Get min-max
+  oss << _rangeVar << " = [" << _dispVar << ".LookupTable.RGBPoints[0], " << _dispVar << ".LookupTable.RGBPoints[-4]];";
+  pushAndExecPyLine(oss.str());
+
+  // Adapt scalar bar title
+  scalarBarTitle();
 }
+
+
 
 int
 MEDPresentation::GeneratePythonId()

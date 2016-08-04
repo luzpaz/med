@@ -113,7 +113,6 @@ module MEDCALC
 
   struct VectorFieldParameters {
     long fieldHandlerId;
-    string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name - only used to color the glyphs
     ScalarBarRangeType scalarBarRange;
     ColorMapType colorMap;
   };

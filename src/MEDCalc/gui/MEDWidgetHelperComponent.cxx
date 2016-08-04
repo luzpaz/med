@@ -37,8 +37,6 @@ void MEDWidgetHelperComponent::updateWidget(bool connect)
   if (connect)
     {
       // Connect combo box changes
-      QObject::connect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
-                        _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
       QObject::connect( _paramWidget, SIGNAL(comboCompoIndexChanged(int)), this, SLOT(onComponentChanged(int)) );
     }
 }
@@ -47,7 +45,5 @@ void MEDWidgetHelperComponent::releaseWidget()
 {
   MEDWidgetHelper::releaseWidget();
 
-  QObject::disconnect( this, SIGNAL(presentationUpdateSignal(const PresentationEvent *)),
-                       _presController, SIGNAL(presentationSignal(const PresentationEvent *)) );
   QObject::disconnect( _paramWidget, SIGNAL(comboCompoIndexChanged(int)), this, SLOT(onComponentChanged(int)) );
 }

@@ -86,8 +86,8 @@ MEDPresentationPointSprite::internalGeneratePipeline()
   pushAndExecPyLine(oss.str()); oss.str("");
 
   showScalarBar();
-  rescaleTransferFunction();
   selectColorMap();
+  rescaleTransferFunction();
   resetCameraAndRender();
 }
 

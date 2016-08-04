@@ -38,6 +38,7 @@ public:
 
 protected:
   virtual void internalGeneratePipeline();
+  void autoScale();
 
 private:
   MEDCALC::VectorFieldParameters _params;
