@@ -27,7 +27,7 @@
 #include "MEDPresentationContour.hxx"
 #include "MEDPresentationSlices.hxx"
 #include "MEDPresentationVectorField.hxx"
-//#include "MEDPresentationDeflectionShape.hxx"
+#include "MEDPresentationDeflectionShape.hxx"
 #include "MEDPresentationPointSprite.hxx"
 
 #include <SALOME_KernelServices.hxx>
@@ -152,12 +152,12 @@ MEDPresentationManager_i::makeSlices(const MEDCALC::SlicesParameters& params, co
 {
   return _makePresentation<MEDPresentationSlices>(params, viewMode);
 }
-//
-//MEDPresentation::TypeID
-//MEDPresentationManager_i::makeDeflectionShape(const MEDCALC::DeflectionShapeParameters& params)
-//{
-//  return _makePresentation<MEDPresentationDeflectionShape>(params);
-//}
+
+MEDPresentation::TypeID
+MEDPresentationManager_i::makeDeflectionShape(const MEDCALC::DeflectionShapeParameters& params, const MEDCALC::ViewModeType viewMode)
+{
+  return _makePresentation<MEDPresentationDeflectionShape>(params, viewMode);
+}
 
 MEDPresentation::TypeID
 MEDPresentationManager_i::makePointSprite(const MEDCALC::PointSpriteParameters& params, const MEDCALC::ViewModeType viewMode)
@@ -217,6 +217,15 @@ MEDPresentationManager_i::getPointSpriteParameters(MEDPresentation::TypeID prese
   return tmp._retn();
 }
 
+MEDCALC::DeflectionShapeParameters
+MEDPresentationManager_i::getDeflectionShapeParameters(MEDPresentation::TypeID presentationID)
+{
+  MEDCALC::DeflectionShapeParameters p;
+  _getParameters<MEDPresentationDeflectionShape>(presentationID, p);
+  return p;
+}
+
+
 void
 MEDPresentationManager_i::updateMeshView(MEDPresentation::TypeID presentationID, const MEDCALC::MeshViewParameters& params)
 {
@@ -246,12 +255,12 @@ MEDPresentationManager_i::updateSlices(MEDPresentation::TypeID presentationID, c
 {
   return _updatePresentation<MEDPresentationSlices>(presentationID, params);
 }
-//
-//void
-//MEDPresentationManager_i::updateDeflectionShape(MEDPresentation::TypeID presentationID, const MEDCALC::DeflectionShapeParameters& params)
-//{
-//  return _updatePresentation<MEDPresentationDeflectionShape>(presentationID, params);
-//}
+
+void
+MEDPresentationManager_i::updateDeflectionShape(MEDPresentation::TypeID presentationID, const MEDCALC::DeflectionShapeParameters& params)
+{
+  return _updatePresentation<MEDPresentationDeflectionShape>(presentationID, params);
+}
 
 void
 MEDPresentationManager_i::updatePointSprite(MEDPresentation::TypeID presentationID, const MEDCALC::PointSpriteParameters& params)

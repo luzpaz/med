@@ -82,8 +82,6 @@ MEDPresentationVectorField::internalGeneratePipeline()
   pushAndExecPyLine(oss.str()); oss.str("");
   oss << _objVar << "GlyphTransform = 'Transform2';";  // not sure this is really needed?
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _objVar << ".ScaleFactor = 0.1;";
-  pushAndExecPyLine(oss.str()); oss.str("");
 
   colorBy("POINTS");
   showScalarBar();

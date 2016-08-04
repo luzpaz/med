@@ -33,7 +33,7 @@
 #include "MEDPresentationSlices.hxx"
 #include "MEDPresentationPointSprite.hxx"
 #include "MEDPresentationVectorField.hxx"
-//#include "MEDPresentationDeflectionShape.hxx"
+#include "MEDPresentationDeflectionShape.hxx"
 
 #include "MEDWidgetHelperMeshView.hxx"
 #include "MEDWidgetHelperScalarMap.hxx"
@@ -41,7 +41,7 @@
 #include "MEDWidgetHelperSlices.hxx"
 #include "MEDWidgetHelperPointSprite.hxx"
 #include "MEDWidgetHelperVectorField.hxx"
-//#include "MEDWidgetHelperDeflectionShape.hxx"
+#include "MEDWidgetHelperDeflectionShape.hxx"
 
 #include <SalomeApp_Application.h>
 #include <SalomeApp_Study.h>
@@ -484,6 +484,10 @@ PresentationController::processPresentationEvent(const PresentationEvent* event)
   QString scalarBarRange = getScalarBarRangePython();
   MEDCALC::FieldHandler* fieldHandler = event->fieldHandler;
   QStringList commands;
+
+  // [ABN] using event mechanism for all this is awkward? TODO: direct implementation in each
+  // dedicated widget helper class?
+
   if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_MESH_VIEW ) {
         commands += QString("presentation_id = medcalc.MakeMeshView(accessField(%1), viewMode=%2)").arg(fieldHandler->id).arg(viewMode);
         commands += QString("presentation_id");
@@ -513,13 +517,13 @@ PresentationController::processPresentationEvent(const PresentationEvent* event)
               .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
       commands += QString("presentation_id");
   }
+    else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE ) {
+      commands += QString("presentation_id = medcalc.MakeDeflectionShape(accessField(%1), viewMode=%2, scalarBarRange=%3, colorMap=%4)")
+          .arg(fieldHandler->id).arg(viewMode).arg(scalarBarRange).arg(colorMap);
+      commands += QString("presentation_id");
+  }
 
-  //  else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_DEFLECTION_SHAPE ) {
-  //    commands += QString("presentation_id = medcalc.MakeDeflectionShape(accessField(%1), %2)").arg(fieldHandler->id).arg(viewMode);
-  //    commands += QString("presentation_id");
 
-  // [ABN] using event mechanism for this is awkward? TODO: direct implementation in each
-  // dedicated widget helper class?
   else if ( event->eventtype == PresentationEvent::EVENT_CHANGE_COMPONENT ) {
       std::string typ = getPresTypeFromWidgetHelper(event->presentationId);
       commands += QString("params = medcalc.Get%1Parameters(%2)").arg(QString::fromStdString(typ)).arg(event->presentationId);
@@ -592,6 +596,8 @@ PresentationController::findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager
     wh = new MEDWidgetHelperVectorField(this, _presManager, presId, name, _widgetPresentationParameters);
   else if (type == MEDPresentationPointSprite::TYPE_NAME)
     wh = new MEDWidgetHelperPointSprite(this, _presManager, presId, name, _widgetPresentationParameters);
+  else if (type == MEDPresentationDeflectionShape::TYPE_NAME)
+    wh = new MEDWidgetHelperDeflectionShape(this, _presManager, presId, name, _widgetPresentationParameters);
   else
     {
       const char * msg ="findOrCreateWidgetHelper(): NOT IMPLEMENTED !!!";

@@ -106,17 +106,25 @@ def MakeSlices(proxy,
   except SALOME.SALOME_Exception as e:
     notifyGui_error("An error occured while creating the slices:\n" + e.details.text)
     raise Exception(e.details.text)
-##
-#
-#def MakeDeflectionShape(proxy,
-#                        viewMode=MEDCALC.VIEW_MODE_DEFAULT
-#                        ):
-#  params = MEDCALC.DeflectionShapeParameters(proxy.id, viewMode)
-#  presentation_id = __manager.makeDeflectionShape(params)
-#  notifyGui_addPresentation(proxy.id, presentation_id)
-#  return presentation_id
-##
-#
+
+
+def MakeDeflectionShape(proxy,
+                  viewMode=MEDCALC.VIEW_MODE_DEFAULT,
+                  scalarBarRange=MEDCALC.SCALAR_BAR_RANGE_DEFAULT,
+                  colorMap=MEDCALC.COLOR_MAP_DEFAULT
+                  ):
+  # Create the presentation instance in CORBA engine
+  # The engine in turn creates the ParaView pipeline elements
+  params = MEDCALC.DeflectionShapeParameters(proxy.id, scalarBarRange, colorMap)
+  try:
+    presentation_id = __manager.makeDeflectionShape(params, viewMode)
+    notifyGui_addPresentation(proxy.id, presentation_id)
+    return presentation_id
+  except SALOME.SALOME_Exception as e:
+    notifyGui_error("An error occured while creating the deflection shape:\n" + e.details.text)
+    raise Exception(e.details.text)
+
+
 def MakePointSprite(proxy,
                   viewMode=MEDCALC.VIEW_MODE_DEFAULT,
                   displayedComponent=MEDCALC.DISPLAY_DEFAULT,
@@ -150,7 +158,7 @@ GetContourParameters = lambda pres_id: __GetGENERICParameters("Contour", pres_id
 GetSlicesParameters = lambda pres_id: __GetGENERICParameters("Slices", pres_id)
 GetPointSpriteParameters = lambda pres_id: __GetGENERICParameters("PointSprite", pres_id)
 GetVectorFieldParameters = lambda pres_id: __GetGENERICParameters("VectorField", pres_id)
-#GetDeflectionShapeParameters = lambda pres_id: __GetGENERICParameters("DeflectionShape", pres_id)
+GetDeflectionShapeParameters = lambda pres_id: __GetGENERICParameters("DeflectionShape", pres_id)
 
 
 def __UpdateGENERIC(tag, presentation_id, params):
@@ -163,7 +171,7 @@ UpdateContour = lambda pres_id, params: __UpdateGENERIC("Contour", pres_id, para
 UpdateSlices = lambda pres_id, params: __UpdateGENERIC("Slices", pres_id, params)
 UpdateVectorField = lambda pres_id, params: __UpdateGENERIC("VectorField", pres_id, params)
 UpdatePointSprite = lambda pres_id, params: __UpdateGENERIC("PointSprite", pres_id, params)
-#UpdateDeflectionShape = lambda pres_id, params: __UpdateGENERIC("DeflectionShape", pres_id, params)
+UpdateDeflectionShape = lambda pres_id, params: __UpdateGENERIC("DeflectionShape", pres_id, params)
 
 def ComputeCellAverageSize(obj):
   """

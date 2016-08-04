@@ -44,7 +44,7 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   MEDCALC_EXPORT MEDPresentation::TypeID makeContour(const MEDCALC::ContourParameters&, const MEDCALC::ViewModeType);
   MEDCALC_EXPORT MEDPresentation::TypeID makeVectorField(const MEDCALC::VectorFieldParameters&, const MEDCALC::ViewModeType);
   MEDCALC_EXPORT MEDPresentation::TypeID makeSlices(const MEDCALC::SlicesParameters&, const MEDCALC::ViewModeType);
-//  MEDCALC_EXPORT MEDPresentation::TypeID makeDeflectionShape(const MEDCALC::DeflectionShapeParameters&, const MEDCALC::ViewModeType);
+  MEDCALC_EXPORT MEDPresentation::TypeID makeDeflectionShape(const MEDCALC::DeflectionShapeParameters&, const MEDCALC::ViewModeType);
   MEDCALC_EXPORT MEDPresentation::TypeID makePointSprite(const MEDCALC::PointSpriteParameters&, const MEDCALC::ViewModeType);
 
   MEDCALC_EXPORT void setPresentationStringProperty(MEDPresentation::TypeID presentationID, const char* propName, const char* propValue);
@@ -59,13 +59,14 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   MEDCALC_EXPORT MEDCALC::SlicesParameters*    getSlicesParameters(MEDPresentation::TypeID presentationID);
   MEDCALC_EXPORT MEDCALC::VectorFieldParameters     getVectorFieldParameters(MEDPresentation::TypeID presentationID);
   MEDCALC_EXPORT MEDCALC::PointSpriteParameters*    getPointSpriteParameters(MEDPresentation::TypeID presentationID);
+  MEDCALC_EXPORT MEDCALC::DeflectionShapeParameters     getDeflectionShapeParameters(MEDPresentation::TypeID presentationID);
 
   MEDCALC_EXPORT void updateMeshView(MEDPresentation::TypeID, const MEDCALC::MeshViewParameters&);
   MEDCALC_EXPORT void updateScalarMap(MEDPresentation::TypeID, const MEDCALC::ScalarMapParameters&);
   MEDCALC_EXPORT void updateContour(MEDPresentation::TypeID, const MEDCALC::ContourParameters&);
   MEDCALC_EXPORT void updateVectorField(MEDPresentation::TypeID, const MEDCALC::VectorFieldParameters&);
   MEDCALC_EXPORT void updateSlices(MEDPresentation::TypeID, const MEDCALC::SlicesParameters&);
-//  MEDCALC_EXPORT void updateDeflectionShape(MEDPresentation::TypeID, const MEDCALC::DeflectionShapeParameters&);
+  MEDCALC_EXPORT void updateDeflectionShape(MEDPresentation::TypeID, const MEDCALC::DeflectionShapeParameters&);
   MEDCALC_EXPORT void updatePointSprite(MEDPresentation::TypeID, const MEDCALC::PointSpriteParameters&);
 
   MEDCALC_EXPORT CORBA::Boolean removePresentation(MEDPresentation::TypeID);

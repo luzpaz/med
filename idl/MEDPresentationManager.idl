@@ -125,11 +125,13 @@ module MEDCALC
     SliceOrientationType orientation;
     long nbSlices;
   };
-//
-//  struct DeflectionShapeParameters {
-//    long fieldHandlerId;
-//  };
-//
+
+  struct DeflectionShapeParameters {
+    long fieldHandlerId;
+    ScalarBarRangeType scalarBarRange;
+    ColorMapType colorMap;
+  };
+
   struct PointSpriteParameters {
     long fieldHandlerId;
     string displayedComponent; // DISPLAY_EUCLIDEAN_NORM or any component name
@@ -147,9 +149,9 @@ module MEDCALC
     long makeScalarMap(in ScalarMapParameters params, in ViewModeType viewMode) raises (SALOME::SALOME_Exception);
     long makeContour(in ContourParameters params, in ViewModeType viewMode)     raises (SALOME::SALOME_Exception);
     long makeVectorField(in VectorFieldParameters params, in ViewModeType viewMode)  raises (SALOME::SALOME_Exception);
-    long makeSlices(in SlicesParameters params, in ViewModeType viewMode)  raises (SALOME::SALOME_Exception);
-//    long makeDeflectionShape(in DeflectionShapeParameters params, in ViewModeType viewMode);
-    long makePointSprite(in PointSpriteParameters params, in ViewModeType viewMode);
+    long makeSlices(in SlicesParameters params, in ViewModeType viewMode)            raises (SALOME::SALOME_Exception);
+    long makeDeflectionShape(in DeflectionShapeParameters params, in ViewModeType viewMode) raises (SALOME::SALOME_Exception);
+    long makePointSprite(in PointSpriteParameters params, in ViewModeType viewMode)  raises (SALOME::SALOME_Exception);
 
     void setPresentationStringProperty(in long presId, in string propName, in string propValue);
     string getPresentationStringProperty(in long presId, in string propName);
@@ -162,22 +164,23 @@ module MEDCALC
     SlicesParameters     getSlicesParameters(in long presId);
     VectorFieldParameters     getVectorFieldParameters(in long presId);
     PointSpriteParameters     getPointSpriteParameters(in long presId);
+    DeflectionShapeParameters     getDeflectionShapeParameters(in long presId);
 
-    void updateMeshView(in long presId, in MeshViewParameters params);
-    void updateScalarMap(in long presId, in ScalarMapParameters params);
-    void updateContour(in long presId, in ContourParameters params);
-    void updateVectorField(in long presId, in VectorFieldParameters params);
-    void updateSlices(in long presId, in SlicesParameters params);
-//    void updateDeflectionShape(in long presId, in DeflectionShapeParameters params);
-    void updatePointSprite(in long presId, in PointSpriteParameters params);
+    void updateMeshView(in long presId, in MeshViewParameters params)   raises (SALOME::SALOME_Exception);
+    void updateScalarMap(in long presId, in ScalarMapParameters params) raises (SALOME::SALOME_Exception);
+    void updateContour(in long presId, in ContourParameters params)     raises (SALOME::SALOME_Exception);
+    void updateVectorField(in long presId, in VectorFieldParameters params) raises (SALOME::SALOME_Exception);
+    void updateSlices(in long presId, in SlicesParameters params)       raises (SALOME::SALOME_Exception);
+    void updateDeflectionShape(in long presId, in DeflectionShapeParameters params) raises (SALOME::SALOME_Exception);
+    void updatePointSprite(in long presId, in PointSpriteParameters params)         raises (SALOME::SALOME_Exception);
 
-    boolean removePresentation(in long presId);
+    boolean removePresentation(in long presId)   raises (SALOME::SALOME_Exception);
 
     // Helper function to keep GUI sync
-    boolean activateView(in long presentationId);
+    boolean activateView(in long presentationId) raises (SALOME::SALOME_Exception);
 
     // Low level ParaVis dump
-    string getParavisDump(in long presId);
+    string getParavisDump(in long presId) raises (SALOME::SALOME_Exception);
 
 //    ViewModeType getPresentationViewMode(in long presId);
     

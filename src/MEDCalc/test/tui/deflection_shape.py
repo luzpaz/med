@@ -17,25 +17,23 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(tests.set)
+import os
+from time import sleep
 
-SET(_test_files
-    medfiles/smooth_surface_and_field.med
-    medfiles/agitateur.med
-    medfiles/deplacements.med
-)
+import medcalc
+medcalc.medconsole.setConsoleGlobals(globals())
+import MEDCALC
+from medcalc.medconsole import accessField
 
-SET(TEST_INSTALL_DIRECTORY ${SALOME_MED_INSTALL_TEST}/MEDCalc/tui)
+from medcalc_testutils import GetMEDFileDirTUI
 
-FOREACH(tfile ${TEST_NAMES})
-  INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
-          DESTINATION ${TEST_INSTALL_DIRECTORY})
-ENDFOREACH()
+datafile = os.path.join(GetMEDFileDirTUI(), "deplacements.med")
+source_id = medcalc.LoadDataSource(datafile)
 
-INSTALL(FILES CTestTestfileInstall.cmake
-  DESTINATION ${TEST_INSTALL_DIRECTORY}
-  RENAME CTestTestfile.cmake)
-
-INSTALL(FILES tests.set DESTINATION ${TEST_INSTALL_DIRECTORY})
-
-INSTALL(FILES ${_test_files} DESTINATION ${SALOME_MED_INSTALL_RES_DATA}/tests/tui/medfiles)
+presentation_id = medcalc.MakeDeflectionShape(accessField(0), viewMode=MEDCALC.VIEW_MODE_REPLACE, 
+                                          colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW,
+                                          scalarBarRange=MEDCALC.SCALAR_BAR_CURRENT_TIMESTEP
+                                          )
+sleep(1)
+medcalc.RemovePresentation(presentation_id)
+sleep(1)

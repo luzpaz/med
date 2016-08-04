@@ -17,39 +17,89 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#include "MEDPyLockWrapper.hxx"
+
 #include "MEDPresentationDeflectionShape.hxx"
+#include "MEDPresentationException.hxx"
+
+#include <SALOME_KernelServices.hxx>
+#undef LOG  // should be fixed in KERNEL - double definition
+#include <Basics_Utils.hxx>
+
+#include <sstream>
+
+const std::string MEDPresentationDeflectionShape::TYPE_NAME = "MEDPresentationDeflectionShape";
+
+MEDPresentationDeflectionShape::MEDPresentationDeflectionShape(const MEDCALC::DeflectionShapeParameters& params,
+                                                   const MEDCALC::ViewModeType viewMode) :
+    MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, params.colorMap, params.scalarBarRange), _params(params)
+{
+}
+
+void
+MEDPresentationDeflectionShape::autoScale()
+{
+  std::ostringstream oss;
+  oss << "import medcalc;";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << _objVar << ".ScaleFactor = 3.0*medcalc.ComputeCellAverageSize(__srcObj0)/(" << _rangeVar
+      << "[1]-" << _rangeVar << "[0]);";
+  pushAndExecPyLine(oss.str()); oss.str("");
+}
 
 void
 MEDPresentationDeflectionShape::internalGeneratePipeline()
 {
-//  PyGILState_STATE _gil_state = PyGILState_Ensure();
-//
-//  std::string cmd = std::string("import pvsimple as pvs;");
-//  cmd += getRenderViewCommand(_params.viewMode); // define __view1
-//
-//  cmd += std::string("__obj1 = pvs.MEDReader(FileName='") + _fileName + std::string("');");
-//  cmd += std::string("__warpByVector1 = pvs.WarpByVector(Input=__obj1);");
-//  cmd += std::string("__disp1 = pvs.Show(__warpByVector1, __view1);");
-//  cmd += std::string("pvs.ColorBy(__disp1, ('") + _fieldType + std::string("', '") + _fieldName + std::string("'));");
-//  cmd += std::string("__disp1.SetScalarBarVisibility(__view1, True);");
-//  cmd += std::string("__disp1.RescaleTransferFunctionToDataRangeOverTime();");
-//  cmd += std::string("pvs.Render();");
-//
-//  cmd += getResetCameraCommand();
-//
-//  //std::cerr << "Python command:" << std::endl;
-//  //std::cerr << cmd << std::endl;
-//  PyRun_SimpleString(cmd.c_str());
-//  // Retrieve Python object for internal storage:
-//  PyObject* obj = getPythonObjectFromMain("__warpByVector1");
-//  PyObject* disp = getPythonObjectFromMain("__disp1");
-//  pushInternal(obj, disp);
-//
-//  PyGILState_Release(_gil_state);
+  MEDPresentation::internalGeneratePipeline();
+
+  MEDPyLockWrapper lock;
+
+  setOrCreateRenderView();
+  createSource();
+
+  // Populate internal array of available components:
+  fillAvailableFieldComponents();
+  if (getIntProperty(MEDPresentation::PROP_NB_COMPONENTS) <= 1)
+    {
+      const char * msg = "Deflection shape presentation does not work for scalar field!"; // this message will appear in GUI too
+      STDLOG(msg);
+      throw KERNEL::createSalomeException(msg);
+    }
+
+  // Warp needs point data:
+  applyCellToPointIfNeeded();
+
+  std::ostringstream oss;
+  oss << _objVar << " = pvs.WarpByVector(Input=" << _srcObjVar << ");";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
+  showObject(); // to be done first so that the scale factor computation properly works
+
+  oss << _objVar << ".Vectors = ['POINTS', '" << _fieldName << "'];";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
+  colorBy("POINTS");
+  showScalarBar();
+  selectColorMap();
+  rescaleTransferFunction();
+
+  autoScale();   // to be called after transfer function so we have the range
+
+  resetCameraAndRender();
 }
 
 void
 MEDPresentationDeflectionShape::updatePipeline(const MEDCALC::DeflectionShapeParameters& params)
 {
-  // :TODO:
+  if (params.fieldHandlerId != _params.fieldHandlerId)
+    throw KERNEL::createSalomeException("Unexpected updatePipeline error! Mismatching fieldHandlerId!");
+
+  if (params.scalarBarRange != _params.scalarBarRange)
+    {
+      updateScalarBarRange<MEDPresentationDeflectionShape, MEDCALC::DeflectionShapeParameters>(params.scalarBarRange);
+      autoScale();
+      pushAndExecPyLine("pvs.Render();");
+    }
+  if (params.colorMap != _params.colorMap)
+    updateColorMap<MEDPresentationDeflectionShape, MEDCALC::DeflectionShapeParameters>(params.colorMap);
 }

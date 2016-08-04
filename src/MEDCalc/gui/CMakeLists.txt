@@ -63,6 +63,7 @@ SET(MEDCALCGUI_HEADERS
   MEDWidgetHelperSlices.hxx
   MEDWidgetHelperPointSprite.hxx
   MEDWidgetHelperVectorField.hxx
+  MEDWidgetHelperDeflectionShape.hxx
   )
  
 IF(SALOME_MED_WITH_QTTESTING)

@@ -17,31 +17,27 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef SRC_MEDCALC_CMP_MEDPRESENTATION_DEFLECTIONSHAPE_HXX_
-#define SRC_MEDCALC_CMP_MEDPRESENTATION_DEFLECTIONSHAPE_HXX_
+#ifndef SRC_MEDCALC_GUI_MEDWIDGETHELPERDEFLECTIONSHAPE_HXX_
+#define SRC_MEDCALC_GUI_MEDWIDGETHELPERDEFLECTIONSHAPE_HXX_
 
-#include "MEDCALC.hxx"
-#include "MEDPresentation.hxx"
+#include "MEDWidgetHelperComponent.hxx"
 
-class MEDCALC_EXPORT MEDPresentationDeflectionShape : public MEDPresentation
+class PresentationController;
+
+class MEDWidgetHelperDeflectionShape: public MEDWidgetHelper
 {
+  Q_OBJECT
+
 public:
-  static const std::string TYPE_NAME;
+  MEDWidgetHelperDeflectionShape(const PresentationController* presController,
+                           MEDCALC::MEDPresentationManager_ptr presManager, int presId, const std::string & presName,
+                           WidgetPresentationParameters * paramW):
+     MEDWidgetHelper(presController, presManager, presId, presName, paramW)
+  {}
+  virtual ~MEDWidgetHelperDeflectionShape() {}
 
-  MEDPresentationDeflectionShape(const MEDCALC::DeflectionShapeParameters& params, const MEDCALC::ViewModeType viewMode);
-  virtual ~MEDPresentationDeflectionShape() {}
+  virtual std::string getPythonTag() const { return "DeflectionShape"; }
 
-  void updatePipeline(const MEDCALC::DeflectionShapeParameters& params);
-
-  void getParameters(MEDCALC::DeflectionShapeParameters & params) const { params = _params; } ;
-  void setParameters(const MEDCALC::DeflectionShapeParameters & params) { _params = params; } ;
-
-protected:
-  virtual void internalGeneratePipeline();
-  void autoScale();
-
-private:
-  MEDCALC::DeflectionShapeParameters _params;
 };
 
-#endif
+#endif /* SRC_MEDCALC_GUI_MEDWIDGETHELPERDEFLECTIONSHAPE_HXX_ */
