@@ -63,6 +63,10 @@
       <source>ICO_WORKSPACE_SAVE</source>
       <translation>workspace_save.png</translation>
     </message>
+    <message>
+      <source>ICO_ICO_DELETE_PRESENTATION</source>
+      <translation>delete.png</translation>
+    </message>
     <!-- Presentation toolbar icons (default theme)-->
     <message>
       <source>ICO_PRESENTATION_MESH_VIEW_DEFAULT</source>

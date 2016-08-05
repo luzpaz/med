@@ -70,6 +70,14 @@
     <message>
       <source>TIP_DELETE_PRESENTATION</source>
       <translation>Delete selected presentation</translation>
+    </message>
+    <message>
+      <source>LAB_PARAVIS_DUMP</source>
+      <translation>Dump pipeline</translation>
+    </message>
+    <message>
+      <source>TIP_PARAVIS_DUMP</source>
+      <translation>Dump the low level Python commands of the presentation</translation>
     </message> 
     <message>
       <source>MENU_PRESENTATIONS</source>

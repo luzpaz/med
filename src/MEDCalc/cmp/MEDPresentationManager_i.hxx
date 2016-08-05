@@ -73,7 +73,7 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
   MEDCALC_EXPORT CORBA::Boolean activateView(MEDPresentation::TypeID);
   MEDCALC_EXPORT CORBA::Long getActiveViewPythonId();
 //  MEDCALC_EXPORT MEDCALC::ViewModeType getPresentationViewMode(MEDPresentation::TypeID);
-  MEDCALC_EXPORT char* getParavisDump(MEDPresentation::TypeID presentationID);
+  MEDCALC_EXPORT char * getParavisDump(MEDPresentation::TypeID presentationID);
   MEDCALC_EXPORT MEDCALC::PresentationsList* getAllPresentations();
 
  private:

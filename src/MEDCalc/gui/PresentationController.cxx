@@ -242,21 +242,21 @@ PresentationController::createActions()
 
   label   = tr("LAB_DELETE_PRESENTATION");
   tooltip = tr("TIP_DELETE_PRESENTATION");
-  icon    = tr(_getIconName("ICO_DELETE_PRESENTATION").c_str());
+  icon    = tr("ICO_DELETE_PRESENTATION");
   actionId = _salomeModule->createStandardAction(label,this, SLOT(onDeletePresentation()),icon,tooltip);
   //  _salomeModule->createTool(actionId, presentationToolbarId);
   //  _salomeModule->action(actionId)->setIconVisibleInMenu(true);
   _salomeModule->createMenu(actionId, presentationMenuId);
 
+  // Low level PARAVIS dump
+  label = tr("LAB_PARAVIS_DUMP");
+  tooltip = tr("TIP_PARAVIS_DUMP");
+  actionId = _salomeModule->createStandardAction(label,this,SLOT(onParavisDump()),"");
+  _salomeModule->createMenu(actionId, presentationMenuId);
+
   //
   // Actions for popup menu only
   //
-  // Low level PARAVIS dump
-  label = tr("LAB_PARAVIS_DUMP");
-  //icon  = tr("ICO_DATASOURCE_EXPAND_FIELD");
-  actionId = _salomeModule->createStandardAction(label,this,SLOT(onParavisDump()),"");
-  _salomeModule->addActionInPopupMenu(actionId);
-
 
 }
 
@@ -648,9 +648,9 @@ PresentationController::onParavisDump()
         continue;
 
       std::string dump(_presManager->getParavisDump(presId));
-      std::cerr << "#====== ParaVis dump =============== " << std::endl;
+      std::cerr << "#====== ParaVis dump (presentation "  << presId << ") =====" << std::endl;
       std::cerr << dump;
-      std::cerr << "#====== End of ParaVis dump ======== " << std::endl;
+      std::cerr << "#====== End of ParaVis dump =============== " << std::endl;
 
       break; // stop at the first one
   }

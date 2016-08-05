@@ -324,12 +324,12 @@ MEDPresentationManager_i::getActiveViewPythonId()
 //  }
 //}
 
-char*
+char *
 MEDPresentationManager_i::getParavisDump(MEDPresentation::TypeID presentationID)
 {
   MEDPresentation* pres = _getPresentation(presentationID);
   if (pres) {
-    return (char*) pres->paravisDump().c_str();
+    return CORBA::string_dup(pres->paravisDump().c_str());
   }
   else
     throw KERNEL::createSalomeException("getParavisDump(): presentation not found!!");
