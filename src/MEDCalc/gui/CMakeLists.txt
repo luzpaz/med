@@ -27,6 +27,10 @@ INCLUDE(UseQtExt)
 
 ADD_SUBDIRECTORY(dialogs)
 
+IF(WIN32)
+ ADD_DEFINITIONS(-DNOMINMAX)
+ENDIF(WIN32)
+
 SET(MEDCALCGUI_SOURCES 
     DatasourceController.cxx
     factory.cxx
