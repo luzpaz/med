@@ -82,9 +82,9 @@ MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepa
   // We first check that this datasource is not already registered
   long sourceid = getDatasourceId(filepath);
   if ( sourceid != LONG_UNDEFINED ) {
-    // The file is already registered under the identifier sourceid
-    LOG("WRN: The file "<<filepath<<" is already registered with id="<<ToString(sourceid));
-    return new MEDCALC::DatasourceHandler(*_datasourceHandlerMap[sourceid]);
+      // The file is already registered under the identifier sourceid
+      LOG("WRN: The file "<<filepath<<" is already registered with id="<<ToString(sourceid));
+      return new MEDCALC::DatasourceHandler(*_datasourceHandlerMap[sourceid]);
   }
 
   // Then we check that the file is readable by MEDLoader
@@ -102,90 +102,98 @@ MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepa
   vector<string> meshNames = GetMeshNames(filepath);
   int nbOfMeshes = meshNames.size();
   for (int iMesh = 0; iMesh < nbOfMeshes; iMesh++) {
-    const char * meshName = meshNames[iMesh].c_str();
-    LOG("name of mesh " << iMesh << " = " << meshName);
+      const char * meshName = meshNames[iMesh].c_str();
+      LOG("name of mesh " << iMesh << " = " << meshName);
 
-    MEDCALC::MeshHandler * meshHandler = new MEDCALC::MeshHandler();
-    meshHandler->id       = _meshLastId; _meshLastId++;
-    meshHandler->name     = meshName;
-    meshHandler->sourceid = datasourceHandler->id;
+      MEDCALC::MeshHandler * meshHandler = new MEDCALC::MeshHandler();
+      meshHandler->id       = _meshLastId; _meshLastId++;
+      meshHandler->name     = meshName;
+      meshHandler->sourceid = datasourceHandler->id;
 
-    _meshHandlerMap[meshHandler->id] = meshHandler;
+      _meshHandlerMap[meshHandler->id] = meshHandler;
 
-    // For each mesh, we can read the list of the names of the
-    // associated fields, i.e. fields whose spatial support is this
-    // mesh.
-    vector<string> fieldNames = GetAllFieldNamesOnMesh(filepath,
-                  meshName);
-    int nbOfFields = fieldNames.size();
-    for (int iField = 0; iField < nbOfFields; iField++) {
-      const char * fieldName = fieldNames[iField].c_str();
-      LOG("-- name of field " << iField << " = " << fieldName);
+      // For each mesh, we can read the list of the names of the
+      // associated fields, i.e. fields whose spatial support is this
+      // mesh.
+      vector<string> fieldNames = GetAllFieldNamesOnMesh(filepath,
+          meshName);
+      int nbOfFields = fieldNames.size();
+      for (int iField = 0; iField < nbOfFields; iField++) {
+          const char * fieldName = fieldNames[iField].c_str();
+          LOG("-- name of field " << iField << " = " << fieldName);
 
-      // A field name could identify several MEDCoupling fields, that
-      // differ by their spatial discretization on the mesh (values on
-      // cells, values on nodes, ...). This spatial discretization is
-      // specified by the TypeOfField that is an integer value in this
-      // list:
-      // 0 = ON_CELLS
-      // 1 = ON_NODES
-      // 2 = ON_GAUSS_PT
-      // 3 = ON_GAUSS_NE
+          // A field name could identify several MEDCoupling fields, that
+          // differ by their spatial discretization on the mesh (values on
+          // cells, values on nodes, ...). This spatial discretization is
+          // specified by the TypeOfField that is an integer value in this
+          // list:
+          // 0 = ON_CELLS
+          // 1 = ON_NODES
+          // 2 = ON_GAUSS_PT
+          // 3 = ON_GAUSS_NE
 
-      // As a consequence, before loading values of a field, we have
-      // to determine the types of spatial discretization defined for
-      // this field and to chooose one.
+          // As a consequence, before loading values of a field, we have
+          // to determine the types of spatial discretization defined for
+          // this field and to chooose one.
 
-      vector<TypeOfField> listOfTypes = GetTypesOfField(filepath,
-                   meshName,
-                   fieldName);
-      int nbOfTypes = listOfTypes.size();
-      for (int iType = 0; iType < nbOfTypes; iType++) {
-  LOG("---- type "<<iType<<" of field "<<iField<< " = " << listOfTypes[iType]);
+          vector<TypeOfField> listOfTypes = GetTypesOfField(filepath,
+              meshName,
+              fieldName);
+          int nbOfTypes = listOfTypes.size();
+          for (int iType = 0; iType < nbOfTypes; iType++) {
+              LOG("---- type "<<iType<<" of field "<<iField<< " = " << listOfTypes[iType]);
 
-  // Then, we can get the iterations associated to this field on
-  // this type of spatial discretization:
-  std::vector< std::pair<int,int> > fieldIterations =
-    GetFieldIterations(listOfTypes[iType],
-          filepath,
-          meshName,
-          fieldName);
+              // Then, we can get the iterations associated to this field on
+              // this type of spatial discretization:
+              std::vector< std::pair<int,int> > fieldIterations;
 
-  int nbFieldIterations = fieldIterations.size();
-  LOG("---- nb. iterations = " << nbFieldIterations);
+              if (listOfTypes[iType] == MEDCoupling::ON_CELLS || listOfTypes[iType] == MEDCoupling::ON_NODES)
+                fieldIterations = GetFieldIterations(listOfTypes[iType],
+                      filepath, meshName, fieldName);
+              else
+                {
+                  LOG("---- WARNING - field " << fieldName << " is not on CELLS or on NODES");
+                  typedef std::vector< std::pair< std::pair<int,int>, double> > TimeVec;
+                  TimeVec fieldIterTime = GetAllFieldIterations(filepath, fieldName);
+                  for (TimeVec::const_iterator it = fieldIterTime.begin(); it != fieldIterTime.end(); ++it)
+                    fieldIterations.push_back(it->first);
+                }
 
-  // We can define the timeseries of fields (fieldseries) for
-  // this type. A fieldseries is a macro object that handle the whole
-  // set of time iterations of a field.
-  MEDCALC::FieldseriesHandler * fieldseriesHandler = new MEDCALC::FieldseriesHandler();
-  fieldseriesHandler->id     = _fieldseriesLastId; _fieldseriesLastId++;
-  fieldseriesHandler->name   = fieldName;
-  fieldseriesHandler->type   = listOfTypes[iType];
-  fieldseriesHandler->meshid = meshHandler->id;
-  fieldseriesHandler->nbIter = nbFieldIterations;
-  _fieldseriesHandlerMap[fieldseriesHandler->id] = fieldseriesHandler;
+              int nbFieldIterations = fieldIterations.size();
+              LOG("---- nb. iterations = " << nbFieldIterations);
 
-  // We can then load meta-data concerning all iterations
-  for (int iterationIdx=0; iterationIdx<nbFieldIterations; iterationIdx++) {
+              // We can define the timeseries of fields (fieldseries) for
+              // this type. A fieldseries is a macro object that handle the whole
+              // set of time iterations of a field.
+              MEDCALC::FieldseriesHandler * fieldseriesHandler = new MEDCALC::FieldseriesHandler();
+              fieldseriesHandler->id     = _fieldseriesLastId; _fieldseriesLastId++;
+              fieldseriesHandler->name   = fieldName;
+              fieldseriesHandler->type   = listOfTypes[iType];
+              fieldseriesHandler->meshid = meshHandler->id;
+              fieldseriesHandler->nbIter = nbFieldIterations;
+              _fieldseriesHandlerMap[fieldseriesHandler->id] = fieldseriesHandler;
 
-    int iteration = fieldIterations[iterationIdx].first;
-    int order = fieldIterations[iterationIdx].second;
+              // We can then load meta-data concerning all iterations
+              for (int iterationIdx=0; iterationIdx<nbFieldIterations; iterationIdx++) {
 
-    const char * source = datasourceHandler->uri;
-    MEDCALC::FieldHandler * fieldHandler = newFieldHandler(fieldName,
-                     meshName,
-                     listOfTypes[iType],
-                     iteration,
-                     order,
-                     source);
+                  int iteration = fieldIterations[iterationIdx].first;
+                  int order = fieldIterations[iterationIdx].second;
 
-    fieldHandler->meshid = meshHandler->id;
-    fieldHandler->fieldseriesId = fieldseriesHandler->id;
-    _fieldHandlerMap[fieldHandler->id] = fieldHandler;
-//    LOG("=== Storing " << fieldName << " (" << fieldHandler->id << ")");
-  }
+                  const char * source = datasourceHandler->uri;
+                  MEDCALC::FieldHandler * fieldHandler = newFieldHandler(fieldName,
+                      meshName,
+                      listOfTypes[iType],
+                      iteration,
+                      order,
+                      source);
+
+                  fieldHandler->meshid = meshHandler->id;
+                  fieldHandler->fieldseriesId = fieldseriesHandler->id;
+                  _fieldHandlerMap[fieldHandler->id] = fieldHandler;
+                  //    LOG("=== Storing " << fieldName << " (" << fieldHandler->id << ")");
+              }
+          }
       }
-    }
   }
 
   return new MEDCALC::DatasourceHandler(*datasourceHandler);

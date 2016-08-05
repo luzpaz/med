@@ -28,9 +28,12 @@ from medcalc.medconsole import accessField
 from medcalc_testutils import GetMEDFileDirTUI
 
 datafile = os.path.join(GetMEDFileDirTUI(), "deplacements.med")
+#datafile = os.path.join(GetMEDFileDirTUI(), "/home/ab205030/beton_arme_30_officiel.med")
 source_id = medcalc.LoadDataSource(datafile)
 
-presentation_id = medcalc.MakeDeflectionShape(accessField(0), viewMode=MEDCALC.VIEW_MODE_REPLACE, 
+# For "beton_arme_30_officiel.med", field 7 = __DEPL__ (NODES)
+# For "deplacements", field 0 = DEP1 (NODES)
+presentation_id = medcalc.MakeDeflectionShape(accessField(7), viewMode=MEDCALC.VIEW_MODE_REPLACE, 
                                           colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW,
                                           scalarBarRange=MEDCALC.SCALAR_BAR_CURRENT_TIMESTEP
                                           )

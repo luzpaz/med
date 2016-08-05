@@ -40,8 +40,8 @@ void
 MEDPresentationVectorField::autoScale()
 {
   std::ostringstream oss;
-  oss << "import medcalc;";
-  pushAndExecPyLine(oss.str()); oss.str("");
+//  oss << "import medcalc;";
+//  pushAndExecPyLine(oss.str()); oss.str("");
   oss << _objVar << ".ScaleFactor = 2.0*medcalc.ComputeCellAverageSize(__srcObj0)/(" << _rangeVar
       << "[1]-" << _rangeVar << "[0]);";
   pushAndExecPyLine(oss.str()); oss.str("");
@@ -72,9 +72,9 @@ MEDPresentationVectorField::internalGeneratePipeline()
 
   showObject(); // to be done first so that the scale factor computation properly works
 
-  oss << _objVar << ".Scalars = ['"<< _fieldType << "', 'None'];";
+  oss << _objVar << ".Scalars = ['"<< _pvFieldType << "', 'None'];";
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _objVar << ".Vectors = ['"<< _fieldType << "', '" << _fieldName << "'];";
+  oss << _objVar << ".Vectors = ['"<< _pvFieldType << "', '" << _fieldName << "'];";
   pushAndExecPyLine(oss.str()); oss.str("");
   oss << _objVar << ".ScaleMode = 'vector';";
   pushAndExecPyLine(oss.str()); oss.str("");

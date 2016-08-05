@@ -56,7 +56,8 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const s
 
   _fileName = dataSHandler->uri;
   _fieldName = fieldHandler->fieldname;
-  _fieldType = getFieldTypeString((MEDCoupling::TypeOfField) fieldHandler->type);
+  _mcFieldType = (MEDCoupling::TypeOfField) fieldHandler->type;
+  _pvFieldType = getPVFieldTypeString(_mcFieldType);
   _meshName = meshHandler->name;
 
   if (_fileName.substr(0, 7) != std::string("file://")) {
@@ -129,7 +130,7 @@ void
 MEDPresentation::execPyLine(const std::string & lin)
 {
   MEDPyLockWrapper lock;
-  STDLOG("@@@@ MEDPresentation::execPyLine() about to exec >> " << lin);
+//  STDLOG("@@@@ MEDPresentation::execPyLine() about to exec >> " << lin);
   if(PyRun_SimpleString(lin.c_str()))
     {
       std::ostringstream oss;
@@ -209,6 +210,7 @@ MEDPresentation::getIntProperty(const std::string& propName) const
  {
    MEDPyLockWrapper lock;
    pushAndExecPyLine( "import pvsimple as pvs;");
+   pushAndExecPyLine( "import medcalc");
  }
 
 
@@ -228,7 +230,7 @@ MEDPresentation::getPythonObjectFromMain(const char* python_var) const
 }
 
 std::string
-MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldType) const
+MEDPresentation::getPVFieldTypeString(MEDCoupling::TypeOfField fieldType) const
 {
   switch(fieldType)
   {
@@ -236,8 +238,10 @@ MEDPresentation::getFieldTypeString(MEDCoupling::TypeOfField fieldType) const
       return "CELLS";
     case MEDCoupling::ON_NODES:
       return "POINTS";
+    case MEDCoupling::ON_GAUSS_PT:
+      return "POINTS"; // because internally after application of the ELGA filter, the field will appear as a POINT field
     default:
-      STDLOG("MEDPresentation::getFieldTypeString() -- Not implemented ! Gauss points?");
+      STDLOG("MEDPresentation::getPVFieldTypeString() -- Not implemented ! ELNO field?");
       return "";
   }
 }
@@ -250,14 +254,59 @@ MEDPresentation::getRenderViewVar() const
   return oss.str();
 }
 
+/*!
+ * Creates the MEDReader source in the pipeline, and potentially apply GAUSS/ELNO filters.
+ */
 void
 MEDPresentation::createSource()
 {
+  std::string typ;
+  switch(_mcFieldType) {
+    case MEDCoupling::ON_CELLS: typ = "P0"; break;
+    case MEDCoupling::ON_NODES: typ = "P1"; break;
+    case MEDCoupling::ON_GAUSS_PT: typ = "GAUSS"; break;
+    default:
+      const char * msg ="MEDPresentation::createSource(): field type not impl. yet!";
+      STDLOG(msg);
+      throw KERNEL::createSalomeException(msg);
+  }
+
   std::ostringstream oss;
   oss << _srcObjVar << " = pvs.MEDReader(FileName='" << _fileName << "');";
   pushAndExecPyLine(oss.str()); oss.str("");
+  oss << "medcalc.SelectSourceField(" << _srcObjVar << ", '" << _meshName << "', '"
+      << _fieldName << "', '" << typ << "');";
+  pushAndExecPyLine(oss.str()); oss.str("");
   oss << _srcObjVar << ".GenerateVectors = 1;";
   pushAndExecPyLine(oss.str()); oss.str("");
+
+  // Deal with GAUSS fields:
+  if(_mcFieldType == MEDCoupling::ON_GAUSS_PT)
+    {
+      std::ostringstream oss, oss2;
+      oss2 << "__srcObj" << GeneratePythonId();
+      oss << oss2.str() << " = pvs.GaussPoints(Input=" << _srcObjVar << ");";
+      pushAndExecPyLine(oss.str()); oss.str("");
+      // Now the source becomes the result of the CellDatatoPointData:
+      _srcObjVar = oss2.str();
+      oss << _srcObjVar << ".SelectSourceArray = ['CELLS', 'ELGA@0'];";
+      pushAndExecPyLine(oss.str()); oss.str("");
+    }
+  if(_mcFieldType == MEDCoupling::ON_GAUSS_NE)
+    {
+      const char * msg ="MEDPresentation::createSource(): ELNO field never tested!";
+      STDLOG(msg);
+      throw KERNEL::createSalomeException(msg);
+
+      std::ostringstream oss, oss2;
+      oss2 << "__srcObj" << GeneratePythonId();
+      oss << oss2.str() << " = pvs.ELNOMesh(Input=" << _srcObjVar << ");";
+      pushAndExecPyLine(oss.str()); oss.str("");
+      // Now the source becomes the result of the CellDatatoPointData:
+      _srcObjVar = oss2.str();
+//      oss << _srcObjVar << ".SelectSourceArray = ['CELLS', 'ELNO@0'];";
+//      pushAndExecPyLine(oss.str()); oss.str("");
+    }
 }
 
 void
@@ -462,14 +511,14 @@ MEDPresentation::fillAvailableFieldComponents()
   MEDPyLockWrapper lock;  // GIL!
   std::string typ;
 
-  if(_fieldType == "CELLS") {
+  if(_pvFieldType == "CELLS") {
       typ = "CellData";
   }
-  else if (_fieldType == "POINTS") {
+  else if (_pvFieldType == "POINTS") {
       typ = "PointData";
   }
   else {
-      std::string msg("Unsupported spatial discretisation: " + _fieldType);
+      std::string msg("Unsupported spatial discretisation: " + _pvFieldType);
       STDLOG(msg);
       throw KERNEL::createSalomeException(msg.c_str());
   }
@@ -514,90 +563,61 @@ MEDPresentation::fillAvailableFieldComponents()
 void
 MEDPresentation::applyCellToPointIfNeeded()
 {
-  std::ostringstream oss, oss2;
-  // Apply Cell data to point data:
-  oss2 << "__srcObj" << GeneratePythonId();
-  oss << oss2.str() << " = pvs.CellDatatoPointData(Input=" << _srcObjVar << ");";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  // Now the source becomes the result of the CellDatatoPointData:
-  _srcObjVar = oss2.str();
+  if (_pvFieldType == "CELLS")
+    {
+      std::ostringstream oss, oss2;
+      // Apply Cell data to point data:
+      oss2 << "__srcObj" << GeneratePythonId();
+      oss << oss2.str() << " = pvs.CellDatatoPointData(Input=" << _srcObjVar << ");";
+      pushAndExecPyLine(oss.str()); oss.str("");
+      // Now the source becomes the result of the CellDatatoPointData:
+      _srcObjVar = oss2.str();
+    }
 }
 
-/**
- * Convert a vector field into a 3D vector field:
- *  - if the vector field is already 3D, nothing to do
- *  - if it is 2D, then add a null component
- *  - otherwise (tensor field, scalar field) throw
- */
-void
-MEDPresentation::convertTo3DVectorField()
-{
-  std::ostringstream oss, oss1, oss2, oss3;
-
-  int nbCompo = getIntProperty(MEDPresentation::PROP_NB_COMPONENTS);
-  if (nbCompo < 2 || nbCompo > 3)
-    {
-      oss << "The field '" << _fieldName << "' must have 2 or 3 components for this presentation!";
-      STDLOG(oss.str());
-      throw KERNEL::createSalomeException(oss.str().c_str());
-    }
-  if (nbCompo == 3)
-    return;
-
-  // Apply calculator:
-  oss2 << "__srcObj" << GeneratePythonId();
-  oss << oss2.str() << " = pvs.Calculator(Input=" << _srcObjVar << ");";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  // Now the source becomes the result of the CellDatatoPointData:
-  _srcObjVar = oss2.str();
-  std::string typ;
-  if(_fieldType == "CELLS")
-    typ = "Cell Data";
-  else if(_fieldType == "POINTS")
-    typ = "Point Data";
-  else
-    {
-      oss3 << "Field '" << _fieldName << "' has invalid field type";
-      STDLOG(oss3.str());
-      throw KERNEL::createSalomeException(oss3.str().c_str());
-    }
-  oss << _srcObjVar << ".AttributeMode = '" <<  typ << "';";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _srcObjVar << ".ResultArrayName = '" <<  _fieldName << "_CALC';";  // will never be needed I think
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _srcObjVar << ".Function = '" <<  _fieldName << "_0*iHat + " << _fieldName << "_1*jHat + 0.0*zHat';";
-  pushAndExecPyLine(oss.str()); oss.str("");
-}
-
-//double
-//MEDPresentation::computeCellAverageSize()
+///**
+// * Convert a vector field into a 3D vector field:
+// *  - if the vector field is already 3D, nothing to do
+// *  - if it is 2D, then add a null component
+// *  - otherwise (tensor field, scalar field) throw
+// */
+//void
+//MEDPresentation::convertTo3DVectorField()
 //{
-//  std::ostringstream oss;
-//  oss << "import MEDLoader;";
-//  pushAndExecPyLine(oss.str()); oss.str("");
-//  oss << "__mesh = MEDLoader.ReadMeshFromFile('" << _fileName << "', '" << _meshName << "');";
-//  pushAndExecPyLine(oss.str()); oss.str("");
+//  std::ostringstream oss, oss1, oss2, oss3;
 //
-//  oss << "__bb = __mesh.getBoundingBox()";
-//  pushAndExecPyLine(oss.str()); oss.str("");
-//  oss << "__deltas = [x[1]-x[0] for x in __bb];";
-//  pushAndExecPyLine(oss.str()); oss.str("");
-//  oss << "__vol = reduce(lambda x,y:x*y, __deltas, 1.0);";
-//  pushAndExecPyLine(oss.str()); oss.str("");
-//  // Average cell size is the the n-th root of average volume of a cell, with n being the space dimension
-//  oss << "__cellSize = (__vol/__mesh.getNumberOfCells())**(1.0/len(__bb));";
-//  pushAndExecPyLine(oss.str()); oss.str("");
-//
-//  PyObject * pyObj = getPythonObjectFromMain("__cellSize");
-//  bool err = false;
-//  if (!pyObj || !PyFloat_Check(pyObj)) {  /* nothing to do, err handler below */}
-//  else {
-//      double ret= PyFloat_AsDouble(pyObj);
-//      if(!PyErr_Occurred())
-//        return ret;
+//  int nbCompo = getIntProperty(MEDPresentation::PROP_NB_COMPONENTS);
+//  if (nbCompo < 2 || nbCompo > 3)
+//    {
+//      oss << "The field '" << _fieldName << "' must have 2 or 3 components for this presentation!";
+//      STDLOG(oss.str());
+//      throw KERNEL::createSalomeException(oss.str().c_str());
 //    }
-//  // From here, an error for sure.
-//  const char * msg = "MEDPresentation::computeCellAverageSize(): Python error.";
-//  STDLOG(msg);
-//  throw KERNEL::createSalomeException(msg);
+//  if (nbCompo == 3)
+//    return;
+//
+//  // Apply calculator:
+//  oss2 << "__srcObj" << GeneratePythonId();
+//  oss << oss2.str() << " = pvs.Calculator(Input=" << _srcObjVar << ");";
+//  pushAndExecPyLine(oss.str()); oss.str("");
+//  // Now the source becomes the result of the CellDatatoPointData:
+//  _srcObjVar = oss2.str();
+//  std::string typ;
+//  if(_pvFieldType == "CELLS")
+//    typ = "Cell Data";
+//  else if(_pvFieldType == "POINTS")
+//    typ = "Point Data";
+//  else
+//    {
+//      oss3 << "Field '" << _fieldName << "' has invalid field type";
+//      STDLOG(oss3.str());
+//      throw KERNEL::createSalomeException(oss3.str().c_str());
+//    }
+//  oss << _srcObjVar << ".AttributeMode = '" <<  typ << "';";
+//  pushAndExecPyLine(oss.str()); oss.str("");
+//  oss << _srcObjVar << ".ResultArrayName = '" <<  _fieldName << "_CALC';";  // will never be needed I think
+//  pushAndExecPyLine(oss.str()); oss.str("");
+//  oss << _srcObjVar << ".Function = '" <<  _fieldName << "_0*iHat + " << _fieldName << "_1*jHat + 0.0*zHat';";
+//  pushAndExecPyLine(oss.str()); oss.str("");
 //}
+

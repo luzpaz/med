@@ -216,3 +216,16 @@ def GetSliceOrigins(obj, nbSlices, normal):
     origins.append(orig_j)
   return origins
 
+def SelectSourceField(obj, meshName, fieldName, discretisation):
+  """
+  Properly set the AllArrays property of a MEDReader source to point to the correct field.
+  """
+  tree = obj.GetProperty("FieldsTreeInfo")[::2]
+  it = None
+  for t in tree:
+    arr = t.split("/")
+    arr = arr[:-1] + arr[-1].split("@@][@@")
+    if arr[1] == meshName and arr[3] == fieldName and arr[4] == discretisation:
+      obj.AllArrays = [t]
+      return
+  raise Exception("Field not found")

@@ -45,7 +45,7 @@ MEDPresentationSlices::generateSlices()
   int nbSlices = getIntProperty(MEDPresentationSlices::PROP_NB_SLICES);
   std::string normal = getNormalVector();
 
-  oss << "import medcalc; __origins = medcalc.GetSliceOrigins(" << _srcObjVar << ", " << nbSlices << ", " << normal << ");";
+  oss << "__origins = medcalc.GetSliceOrigins(" << _srcObjVar << ", " << nbSlices << ", " << normal << ");";
   pushAndExecPyLine(oss.str()); oss.str("");
   pushAndExecPyLine("__objLst = [];");
   oss << "for sliceNum in range(" << nbSlices << "):\n";
@@ -66,7 +66,7 @@ MEDPresentationSlices::generateAndDisplay()
   generateSlices();
   showObject();
 
-  colorBy(_fieldType);
+  colorBy(_pvFieldType);
   showScalarBar();
   selectColorMap();
   rescaleTransferFunction();

@@ -59,7 +59,7 @@ MEDPresentationPointSprite::internalGeneratePipeline()
 
   // Compute cell average size in the mesh to have a nice scaling ratio:
   std::ostringstream oss;
-  oss << "import medcalc; __avgSize=medcalc.ComputeCellAverageSize(" << _srcObjVar << ");";
+  oss << "__avgSize = medcalc.ComputeCellAverageSize(" << _srcObjVar << ");";
   pushAndExecPyLine(oss.str()); oss.str("");
 
   colorBy("POINTS");  // like in Contour

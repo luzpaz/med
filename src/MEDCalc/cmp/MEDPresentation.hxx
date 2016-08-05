@@ -89,7 +89,6 @@ protected:
 
   virtual void internalGeneratePipeline();
   PyObject* getPythonObjectFromMain(const char* var) const;
-//  void pushPyObjects(PyObjectId obj, PyObjectId disp);
   void execPyLine(const std::string & lin);
   void pushAndExecPyLine(const std::string & lin);
 
@@ -97,9 +96,7 @@ protected:
 
   void fillAvailableFieldComponents();
   void applyCellToPointIfNeeded();
-  void convertTo3DVectorField();
-//  double computeCellAverageSize();
-  //void computeFieldRange
+//  void convertTo3DVectorField();
 
 //  virtual MEDCALC::ViewModeType getViewMode() = 0;
 
@@ -119,7 +116,7 @@ protected:
   void setParameters(const PresentationParameters& params);
 
 private:
-  std::string getFieldTypeString(MEDCoupling::TypeOfField fieldType) const;
+  std::string getPVFieldTypeString(MEDCoupling::TypeOfField fieldType) const;
 
   // The following functions are reserved to friend class MEDPresentationManager
   void generatePipeline();
@@ -131,7 +128,11 @@ protected:
   std::string _meshName;
   std::string _fileName;
   std::string _fieldName;
-  std::string _fieldType;
+
+  ///! MEDCoupling field type (ON_NODES, ON_CELLS, ON_GAUSS_PT, ON_GAUSS_NE
+  MEDCoupling::TypeOfField _mcFieldType;
+  ///! ParaView field type: "CELLS" or "POINTS"
+  std::string _pvFieldType;
 
   MEDPresentation::TypeID _fieldHandlerId;
 
@@ -154,12 +155,6 @@ protected:
   std::string _rangeVar;
 
 private:
-  ///! Pipeline elements
-//  std::vector<PyObjectId> _pipeline;
-
-  ///! Corresponding display object, if any:
-//  std::vector<PyObjectId> _display;
-
   ///! Presentation properties <key,value>
   std::map<std::string, std::string> _propertiesStr;
   std::map<std::string, int> _propertiesInt;

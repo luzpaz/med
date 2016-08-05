@@ -53,16 +53,12 @@ MEDPresentationScalarMap::internalGeneratePipeline()
   pushAndExecPyLine(_objVar + " = " + _srcObjVar);
 
   showObject();
-  colorBy(_fieldType);
+
+  colorBy(_pvFieldType);
   showScalarBar();
   selectColorMap();
   rescaleTransferFunction();
   resetCameraAndRender();
-
-  // Retrieve Python object for internal storage:
-//  PyObject* p_obj = getPythonObjectFromMain(obj.c_str());
-//  PyObject* p_disp = getPythonObjectFromMain(disp.c_str());
-//  pushPyObjects(std::make_pair(_objId, p_obj), std::make_pair(disp_id, p_disp));
 }
 
 void
