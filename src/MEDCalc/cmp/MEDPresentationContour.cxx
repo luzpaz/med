@@ -66,6 +66,12 @@ MEDPresentationContour::internalGeneratePipeline()
       STDLOG(msg);
       throw KERNEL::createSalomeException(msg);
     }
+  if (_params.nbContours < 1)
+    {
+      const char * mes = "Invalid number of contours!";
+      STDLOG(mes);
+      throw KERNEL::createSalomeException(mes);
+    }
 
   setOrCreateRenderView(); // instanciate __viewXXX
 
@@ -103,7 +109,15 @@ MEDPresentationContour::updatePipeline(const MEDCALC::ContourParameters& params)
     updateColorMap<MEDPresentationContour, MEDCALC::ContourParameters>(params.colorMap);
 
   if (params.nbContours != _params.nbContours)
-    updateNbContours(params.nbContours);
+    {
+      if (params.nbContours < 1)
+        {
+          const char * mes = "Invalid number of contours!";
+          STDLOG(mes);
+          throw KERNEL::createSalomeException(mes);
+        }
+      updateNbContours(params.nbContours);
+    }
 }
 
 void

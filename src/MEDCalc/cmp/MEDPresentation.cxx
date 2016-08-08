@@ -130,7 +130,7 @@ void
 MEDPresentation::execPyLine(const std::string & lin)
 {
   MEDPyLockWrapper lock;
-//  STDLOG("@@@@ MEDPresentation::execPyLine() about to exec >> " << lin);
+  STDLOG("@@@@ MEDPresentation::execPyLine() about to exec >> " << lin);
   if(PyRun_SimpleString(lin.c_str()))
     {
       std::ostringstream oss;

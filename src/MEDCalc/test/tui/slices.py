@@ -33,7 +33,11 @@ source_id = medcalc.LoadDataSource(datafile)
 presentation_id = medcalc.MakeSlices(accessField(0), MEDCALC.VIEW_MODE_REPLACE, 
                                      colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW,
                                      sliceOrientation=MEDCALC.SLICE_NORMAL_TO_Z,  # normal to Z to see something!
-                                     nbSlices=3) 
+                                     nbSlices=2) 
+sleep(1)
+params = medcalc.GetSlicesParameters(presentation_id)
+params.nbSlices = 4
+medcalc.UpdateSlices(presentation_id, params)
 sleep(1)
 medcalc.RemovePresentation(presentation_id)
 sleep(1)

@@ -755,6 +755,8 @@ PresentationController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
   }
   else if ( event->type == MEDCALC::EVENT_REMOVE_PRESENTATION ) {
       updateTreeViewForPresentationRemoval(event->presentationId);
+      // Hide parameter widget if necessary:
+      onPresentationSelected(-1, "", "");
   }
   else if ( event->type == MEDCALC::EVENT_MODIFY_PRESENTATION ) {
       // Update parameter widget if shown:

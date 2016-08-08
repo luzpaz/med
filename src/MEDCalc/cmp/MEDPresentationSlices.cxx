@@ -36,10 +36,15 @@ MEDPresentationSlices::MEDPresentationSlices(const MEDCALC::SlicesParameters& pa
 {
   setIntProperty(MEDPresentationSlices::PROP_NB_SLICES, params.nbSlices);
   setIntProperty(MEDPresentationSlices::PROP_SLICE_ORIENTATION, params.orientation);
+
+  int id = GeneratePythonId();
+  std::ostringstream oss;
+  oss << "__objLst" << id;
+  _sliceListVar = oss.str();
 }
 
 void
-MEDPresentationSlices::generateSlices()
+MEDPresentationSlices::setSliceParametersAndGroup()
 {
   std::ostringstream oss;
   int nbSlices = getIntProperty(MEDPresentationSlices::PROP_NB_SLICES);
@@ -47,23 +52,47 @@ MEDPresentationSlices::generateSlices()
 
   oss << "__origins = medcalc.GetSliceOrigins(" << _srcObjVar << ", " << nbSlices << ", " << normal << ");";
   pushAndExecPyLine(oss.str()); oss.str("");
-  pushAndExecPyLine("__objLst = [];");
+
   oss << "for sliceNum in range(" << nbSlices << "):\n";
-  oss << "  obj = pvs.Slice(Input=" << _srcObjVar << ")\n";
-  oss << "  obj.SliceType = 'Plane'\n";
-  oss << "  obj.SliceType.Normal = " << normal << "\n";
-  oss << "  obj.SliceType.Origin = __origins[sliceNum]\n";
-  oss << "  __objLst.append(obj)\n\n";
+  oss << "  " << _sliceListVar << "[sliceNum].SliceType.Normal = " << normal << ";\n";
+  oss << "  " << _sliceListVar << "[sliceNum].SliceType.Origin = __origins[sliceNum];\n";
   pushAndExecPyLine(oss.str()); oss.str("");
 
-  oss << _objVar << " = pvs.GroupDatasets(Input=__objLst);";
+  oss << _objVar << " = pvs.GroupDatasets(Input=" << _sliceListVar << ");";
+  pushAndExecPyLine(oss.str()); oss.str("");
+}
+
+void
+MEDPresentationSlices::deleteGroup()
+{
+  std::ostringstream oss;
+  oss << "pvs.Delete(" << _objVar << ");";
+  pushAndExecPyLine(oss.str()); oss.str("");
+}
+
+void
+MEDPresentationSlices::adaptNumberOfSlices()
+{
+  std::ostringstream oss;
+  int nbSlices = getIntProperty(MEDPresentationSlices::PROP_NB_SLICES);
+
+  oss << "for _ in range(max(len(" << _sliceListVar << ")-" << nbSlices << ", 0)):\n";
+  oss << "  pvs.Delete(" << _sliceListVar << ".pop());\n";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
+  oss << "for _ in range(" << nbSlices << "-max(len(" << _sliceListVar << "), 0)):\n";
+  oss << "  obj = pvs.Slice(Input=" << _srcObjVar << ");\n";
+  oss << "  obj.SliceType = 'Plane';\n";
+  oss << "  " << _sliceListVar << ".append(obj);\n";
   pushAndExecPyLine(oss.str()); oss.str("");
 }
 
 void
 MEDPresentationSlices::generateAndDisplay()
 {
-  generateSlices();
+  adaptNumberOfSlices();
+  setSliceParametersAndGroup();
+
   showObject();
 
   colorBy(_pvFieldType);
@@ -71,17 +100,6 @@ MEDPresentationSlices::generateAndDisplay()
   selectColorMap();
   rescaleTransferFunction();
   resetCameraAndRender();
-}
-
-
-void
-MEDPresentationSlices::clearPreviousSlices()
-{
-  std::ostringstream oss;
-
-  pushAndExecPyLine("for sliceNum, _ in enumerate(__objLst):\n  pvs.Delete(__objLst[sliceNum]);");
-  oss <<            "pvs.Delete(" << _objVar << ");";
-  pushAndExecPyLine(oss.str()); oss.str("");
 }
 
 std::string
@@ -126,15 +144,25 @@ MEDPresentationSlices::internalGeneratePipeline()
 
   MEDPyLockWrapper lock;
 
-  std::ostringstream oss_o, oss;
+  std::ostringstream oss;
 
   createSource();
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();
+  if (_params.nbSlices < 1)
+  {
+      const char * mes = "Invalid number of slices!";
+      STDLOG(mes);
+      throw KERNEL::createSalomeException(mes);
+  }
+
   setOrCreateRenderView(); // instanciate __viewXXX
 
-  // Now create the initial number of slices
+  // Now create the initial slices list
+  oss << _sliceListVar << " = [];";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
   generateAndDisplay();
 }
 
@@ -154,7 +182,15 @@ MEDPresentationSlices::updatePipeline(const MEDCALC::SlicesParameters& params)
   if (params.orientation != _params.orientation)
     updateOrientation(params.orientation);
   if (params.nbSlices != _params.nbSlices)
-    updateNbSlices(params.nbSlices);
+    {
+      if (params.nbSlices < 1)
+      {
+          const char * mes = "Invalid number of slices!";
+          STDLOG(mes);
+          throw KERNEL::createSalomeException(mes);
+      }
+      updateNbSlices(params.nbSlices);
+    }
 }
 
 void
@@ -168,7 +204,7 @@ MEDPresentationSlices::updateNbSlices(const int nbSlices)
   // Update the pipeline:
   {
     MEDPyLockWrapper lock;
-    clearPreviousSlices();
+    deleteGroup();
     generateAndDisplay();
   }
 }
@@ -185,7 +221,7 @@ MEDPresentationSlices::updateOrientation(const MEDCALC::SliceOrientationType ori
   {
     MEDPyLockWrapper lock;
 
-    clearPreviousSlices();
+    deleteGroup();
     generateAndDisplay();
   }
 }

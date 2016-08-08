@@ -42,7 +42,7 @@ MEDPresentationVectorField::autoScale()
   std::ostringstream oss;
 //  oss << "import medcalc;";
 //  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _objVar << ".ScaleFactor = 2.0*medcalc.ComputeCellAverageSize(__srcObj0)/(" << _rangeVar
+  oss << _objVar << ".ScaleFactor = 2.0*medcalc.ComputeCellAverageSize(" << _srcObjVar << ")/(" << _rangeVar
       << "[1]-" << _rangeVar << "[0]);";
   pushAndExecPyLine(oss.str()); oss.str("");
 }
