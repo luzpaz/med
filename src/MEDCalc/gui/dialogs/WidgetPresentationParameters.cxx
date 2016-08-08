@@ -90,10 +90,9 @@ WidgetPresentationParameters::toggleCommonFieldWidget(bool show)
 void
 WidgetPresentationParameters::toggleWidget(bool show)
 {
+  toggleCommonFieldWidget(true);
   if (!show)
     {
-      toggleCommonFieldWidget(true);
-
       _blockSig = true;
       _ui.widgetDynamic->hide();
       setPresName(tr("LAB_DEFAULT_DYN_TITLE").toStdString());

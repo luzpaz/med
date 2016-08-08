@@ -240,6 +240,8 @@ MEDPresentation::getPVFieldTypeString(MEDCoupling::TypeOfField fieldType) const
       return "POINTS";
     case MEDCoupling::ON_GAUSS_PT:
       return "POINTS"; // because internally after application of the ELGA filter, the field will appear as a POINT field
+    case MEDCoupling::ON_GAUSS_NE:
+      return "POINTS"; // because internally after application of the ELNO mesh filter, the field will appear as a POINT field
     default:
       STDLOG("MEDPresentation::getPVFieldTypeString() -- Not implemented ! ELNO field?");
       return "";
@@ -265,6 +267,7 @@ MEDPresentation::createSource()
     case MEDCoupling::ON_CELLS: typ = "P0"; break;
     case MEDCoupling::ON_NODES: typ = "P1"; break;
     case MEDCoupling::ON_GAUSS_PT: typ = "GAUSS"; break;
+    case MEDCoupling::ON_GAUSS_NE: typ = "GSSNE"; break;
     default:
       const char * msg ="MEDPresentation::createSource(): field type not impl. yet!";
       STDLOG(msg);
@@ -294,18 +297,12 @@ MEDPresentation::createSource()
     }
   if(_mcFieldType == MEDCoupling::ON_GAUSS_NE)
     {
-      const char * msg ="MEDPresentation::createSource(): ELNO field never tested!";
-      STDLOG(msg);
-      throw KERNEL::createSalomeException(msg);
-
       std::ostringstream oss, oss2;
       oss2 << "__srcObj" << GeneratePythonId();
       oss << oss2.str() << " = pvs.ELNOMesh(Input=" << _srcObjVar << ");";
       pushAndExecPyLine(oss.str()); oss.str("");
       // Now the source becomes the result of the CellDatatoPointData:
       _srcObjVar = oss2.str();
-//      oss << _srcObjVar << ".SelectSourceArray = ['CELLS', 'ELNO@0'];";
-//      pushAndExecPyLine(oss.str()); oss.str("");
     }
 }
 
