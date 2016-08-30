@@ -295,7 +295,17 @@ MEDPresentationManager_i::activateView(MEDPresentation::TypeID presentationID)
   }
   MEDPresentation* presentation = (*citr).second;
 
-  presentation->activateView();
+  if (!presentation->activateView())
+    {
+      // The view has been recreated - transfer all presentations that were in the deleted view to this new one
+      int viewId = presentation->getPyViewID();
+      std::map<MEDPresentation::TypeID, MEDPresentation*>::iterator citr = _presentations.begin();
+      for (; citr != _presentations.end(); ++citr)
+        {
+          if(citr->second->getPyViewID() == viewId)
+            citr->second->recreateViewSetup();
+        }
+    }
   _activeViewPythonId = presentation->getPyViewID();
   STDLOG("Activated view " << _activeViewPythonId);
   return true;
@@ -345,4 +355,14 @@ MEDPresentationManager_i::getAllPresentations()
   for (i = 0, it = _presentations.begin(); it != _presentations.end(); ++it, ++i)
     (*presList)[i] = it->first;
   return presList;
+}
+
+void
+MEDPresentationManager_i::cleanUp()
+{
+  _activeViewPythonId = -1;
+  std::map<MEDPresentation::TypeID, MEDPresentation*>::iterator it;
+  for (it = _presentations.begin(); it != _presentations.end(); ++it)
+    delete(it->second);
+  _presentations.clear();
 }

@@ -75,8 +75,8 @@ public:
 
   // -----------------------------------------------------------
   // Mesh management
-  MEDCALC_EXPORT MEDCALC::MeshHandlerList * getMeshList(CORBA::Long datasourceId);
-  MEDCALC_EXPORT MEDCALC::MeshHandler * getMesh(CORBA::Long meshId);
+  MEDCALC_EXPORT MEDCALC::MeshHandlerList * getMeshHandlerList(CORBA::Long datasourceId);
+  MEDCALC_EXPORT MEDCALC::MeshHandler * getMeshHandler(CORBA::Long meshId);
 
   // -----------------------------------------------------------
   // Field management
@@ -106,6 +106,8 @@ public:
   MEDCALC_EXPORT char * getEventListenerIOR();
 
   MEDCALC_EXPORT void serverlog();
+
+  MEDCALC_EXPORT void cleanUp();
 
   //
   // ===========================================================

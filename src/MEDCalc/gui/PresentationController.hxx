@@ -76,12 +76,12 @@ protected slots:
   void onPresentationSelected(int presId, const QString& presType, const QString& presName);
 
   void processWorkspaceEvent(const MEDCALC::MedEvent*);
-  void processPresentationEvent(const PresentationEvent* event);
+  void processPresentationEvent(const PresentationEvent*);
 
 private:
   void visualize(PresentationEvent::EventType);
-  void updateTreeViewWithNewPresentation(long, long);
-  void updateTreeViewForPresentationRemoval(long);
+  void updateTreeViewWithNewPresentation(long dataId, long presentationId);
+  void updateTreeViewForPresentationRemoval(long presId);
   std::string _getIconName(const std::string&);
   MEDWidgetHelper * findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager_ptr presManager,
                                              int presId, const std::string& type, const std::string& name);
@@ -93,6 +93,8 @@ private:
   QString getScalarBarRangePython() const;
   QString getMeshModePython(const int mode) const;
   QString getSliceOrientationPython(const int orient) const;
+
+  void _dealWithReplaceMode();
 
 private:
   MEDModule* _salomeModule;

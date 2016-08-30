@@ -93,13 +93,7 @@ MEDPresentationSlices::generateAndDisplay()
   adaptNumberOfSlices();
   setSliceParametersAndGroup();
 
-  showObject();
-
-  colorBy(_pvFieldType);
-  showScalarBar();
-  selectColorMap();
-  rescaleTransferFunction();
-  resetCameraAndRender();
+  recreateViewSetup();
 }
 
 std::string

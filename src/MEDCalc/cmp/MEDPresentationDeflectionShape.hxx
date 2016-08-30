@@ -31,6 +31,8 @@ public:
   MEDPresentationDeflectionShape(const MEDCALC::DeflectionShapeParameters& params, const MEDCALC::ViewModeType viewMode);
   virtual ~MEDPresentationDeflectionShape() {}
 
+  virtual void initFieldMeshInfos();
+
   void updatePipeline(const MEDCALC::DeflectionShapeParameters& params);
 
   void getParameters(MEDCALC::DeflectionShapeParameters & params) const { params = _params; } ;

@@ -96,7 +96,11 @@ MEDModule::init()
   if ( CORBA::is_nil( _MED_engine ) ) {
     Engines::EngineComponent_var comp =
       SalomeApp_Application::lcc()->FindOrLoad_Component( "FactoryServer", "MED" );
+    if (CORBA::is_nil( comp ))
+        STDLOG("Could not FindOrLoad_Component MED");
     _MED_engine = MED_ORB::MED_Gen::_narrow( comp );
+    if (CORBA::is_nil( _MED_engine ))
+        STDLOG("Could not narrow MED engine");
   }
 }
 
@@ -127,6 +131,10 @@ MEDModule::initialize( CAM_Application* app )
   // The following initializes the GUI widget and associated actions
   this->createModuleWidgets();
   this->createModuleActions();
+
+  // Now that the workspace controller is created, ParaView core application has normally been started,
+  // and hidden GUI elements have been created.  We can fire the VCR toolbar activation:
+  initToolbars();
 }
 
 QString
@@ -214,6 +222,12 @@ MEDModule::activateModule( SUIT_Study* theStudy )
 bool
 MEDModule::deactivateModule( SUIT_Study* theStudy )
 {
+ // Clean up engine:
+  STDLOG("MEDModule::deactivateModule(): cleaning up engine side.");
+  _MED_engine->cleanUp();
+  MEDFactoryClient::getFactory()->getPresentationManager()->cleanUp();
+  MEDFactoryClient::getFactory()->getDataManager()->cleanUp();
+
   _workspaceController->showDockWidgets(false);
   _presentationController->showDockWidgets(false);
   //this->unsetDockLayout();
@@ -269,11 +283,6 @@ MEDModule::createModuleWidgets() {
 
   connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent*)),
     _presentationController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent*)));
-
-
-  // Now that the workspace controller is created, ParaView core application has normally been started,
-  // and hidden GUI elements have been created.  We can fire the VCR toolbar activation:
-  initToolbars();
 }
 
 void
@@ -379,8 +388,12 @@ MEDModule::addActionInPopupMenu(int actionId,const QString& menus,const QString&
 //}
 
 
+/**
+ * Returns presentation name, type and ID from the currently selected presentation in the object
+ * browser.
+ */
 bool
-MEDModule::itemClickGeneric(const QModelIndex & index, std::string & name, std::string & type, int & fieldId, int & presId) const
+MEDModule::itemClickGeneric(std::string & name, std::string & type, int & presId) const
 {
   DataObjectList dol = getApp()->objectBrowser()->getSelected();
   if (dol.isEmpty())
@@ -409,9 +422,9 @@ MEDModule::itemClickGeneric(const QModelIndex & index, std::string & name, std::
       || ! attrParam->GetBool(IS_PRESENTATION)) { // Not a presentation
       return false;
   }
-  if (!attrParam->IsSet(FIELD_ID, PT_INTEGER))
-    return false;
-  fieldId = attrParam->GetInt(FIELD_ID);
+//  if (!attrParam->IsSet(FIELD_ID, PT_INTEGER))
+//    return false;
+//  fieldId = attrParam->GetInt(FIELD_ID);
   if (!attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
       return false;
   presId = attrParam->GetInt(PRESENTATION_ID);
@@ -424,9 +437,9 @@ MEDModule::itemClickGeneric(const QModelIndex & index, std::string & name, std::
 void
 MEDModule::onClick(const QModelIndex & index)
 {
-  int fieldId, presId;
+  int presId;
   std::string name, type;
-  if (!itemClickGeneric(index, name, type, fieldId, presId))
+  if (!itemClickGeneric(name, type, presId))
     {
       // Not a presentation - clear widget:
       emit presentationSelected(-1, QString(""), QString(""));
@@ -446,26 +459,20 @@ MEDModule::onClick(const QModelIndex & index)
 void
 MEDModule::onDblClick(const QModelIndex& index)
 {
-  int fieldId, presId;
+  int presId;
   std::string name, type;
-  if (!itemClickGeneric(index, name, type, fieldId, presId))
+  if (!itemClickGeneric(name, type, presId))
     return;
 
-  STDLOG("Presentation edition: NOT IMPLEMENTED YET");
-  STDLOG("  Presentation infos:");
+//  STDLOG("Presentation double click");
+//  STDLOG("  Presentation infos:");
 //  STDLOG("    - Component:         " + item->componentDataType().toStdString());
 //  STDLOG("    - Item entry:        " + item->entry().toStdString());
 //  STDLOG("    - Item name:         " + item->name().toStdString());
-  std::ostringstream oss;
-  oss << fieldId;
-  STDLOG("    - Field id:          " + oss.str());
-  STDLOG("    - Presentation name: " + name);
-
-  // :TODO:
-  // get edited values from a popup widget
-  // get presentation
-  // call presentation edit function
-
+//  std::ostringstream oss;
+//  oss << fieldId;
+//  STDLOG("    - Field id:          " + oss.str());
+//  STDLOG("    - Presentation name: " + name);
 }
 
 void

@@ -124,8 +124,8 @@ module MEDCALC
     // Mesh data management
     //==========================================================
 
-    MeshHandler     getMesh(in long meshId) raises (SALOME::SALOME_Exception);
-    MeshHandlerList getMeshList(in long datasourceId);
+    MeshHandler     getMeshHandler(in long meshId) raises (SALOME::SALOME_Exception);
+    MeshHandlerList getMeshHandlerList(in long datasourceId);
 
     //==========================================================
     // Field data management
@@ -168,6 +168,8 @@ module MEDCALC
 
     // Print out server data
     void serverlog();
+
+    void cleanUp() raises (SALOME::SALOME_Exception);
   };
 };
 

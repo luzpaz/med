@@ -20,6 +20,11 @@
 #include "ProcessingController.hxx"
 #include <MEDCalcConstants.hxx>
 
+#include <SALOMEDS_SObject.hxx>
+#include <SALOMEDS_Study.hxx>
+#include CORBA_CLIENT_HEADER(SALOMEDS)
+#include CORBA_CLIENT_HEADER(SALOMEDS_Attributes)
+
 #include "MEDFactoryClient.hxx"
 #include "MEDModule.hxx"
 #include "Basics_Utils.hxx"
@@ -53,7 +58,7 @@ ProcessingController::createActions()
   STDLOG("Creating ProcessingController actions");
 
   int processingToolbarId = _salomeModule->createTool("Processing", "ProcessingToolbar");
-  int processingMenuId = _salomeModule->createMenu(tr("MENU_PROCESSING"), -1, 1);
+  int processingMenuId = _salomeModule->createMenu(tr("MENU_PROCESSING"), -1, -1, 12);
 
   // Change underlying mesh (note that this action creates a new field in
   // the workspace that corresponds to a copy of the selected field
@@ -86,8 +91,17 @@ ProcessingController::OnChangeUnderlyingMesh()
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() > 0 ) {
     SALOMEDS::SObject_var soField = listOfSObject->at(0);
-    //int fieldId = _studyEditor->getParameterInt(soField,FIELD_SERIES_ID);
-    int fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);
+    std::string name(_studyEditor->getName(soField));
+    if (soField->_is_nil() || name == "MEDCalc")
+      return;
+    SALOMEDS::GenericAttribute_var anAttr;
+    SALOMEDS::AttributeParameter_var aParam;
+    if ( soField->FindAttribute(anAttr,"AttributeParameter") ) {
+      aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
+      if (! aParam->IsSet(FIELD_SERIES_ID, PT_INTEGER))
+        return;
+    }
+    int fieldId = aParam->GetInt(FIELD_SERIES_ID);
     // _GBO_ : the dialog should not be modal, so that we can choose a
     // mesh in the browser. Then we have to emit a signal from the
     // dialog.accept, connected to a slot of the DatasourceControler
@@ -142,7 +156,17 @@ ProcessingController::OnInterpolateField()
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() > 0 ) {
     SALOMEDS::SObject_var soField = listOfSObject->at(0);
-    int fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);
+    std::string name(_studyEditor->getName(soField));
+    if (soField->_is_nil() || name == "MEDCalc")
+      return;
+    SALOMEDS::GenericAttribute_var anAttr;
+    SALOMEDS::AttributeParameter_var aParam;
+    if ( soField->FindAttribute(anAttr,"AttributeParameter") ) {
+      aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
+      if (! aParam->IsSet(FIELD_SERIES_ID, PT_INTEGER))
+        return;
+    }
+    int fieldId = aParam->GetInt(FIELD_SERIES_ID);
     // _GBO_ : the dialog should not be modal, so that we can choose a
     // mesh in the browser. Then we have to emit a signal from the
     // dialog.accept, connected to a slot of the DatasourceControler

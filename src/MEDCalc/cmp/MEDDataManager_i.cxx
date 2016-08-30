@@ -52,10 +52,29 @@ MEDDataManager_i::MEDDataManager_i()
   _meshLastId = 0;
   _fieldseriesLastId = 0;
 }
+
 MEDDataManager_i::~MEDDataManager_i()
 {
   LOG("Deleting MEDDataManager_i instance");
 }
+
+void MEDDataManager_i::cleanUp()
+{
+  _fieldLastId = 0;
+  _sourceLastId = 0;
+  _meshLastId = 0;
+  _fieldseriesLastId = 0;
+
+  // [ABN] Is it the proper way?
+  _datasourceHandlerMap.clear();
+  _meshHandlerMap.clear();
+  _fieldseriesHandlerMap.clear();
+  _fieldHandlerMap.clear();
+  _fieldDoubleMap.clear();
+  _meshMap.clear();
+  _fieldPersistencyMap.clear();
+}
+
 
 std::string MEDDataManager_i::file_to_source(const char * filepath)
 {
@@ -236,7 +255,7 @@ MEDDataManager_i::getDatasourceHandlerFromID(CORBA::Long sourceid)
   return NULL;
 }
 
-MEDCALC::MeshHandler * MEDDataManager_i::getMesh(CORBA::Long meshId) {
+MEDCALC::MeshHandler * MEDDataManager_i::getMeshHandler(CORBA::Long meshId) {
   if ( _meshHandlerMap.count(meshId) == 0 ) {
     std::string message =
       std::string("The mesh of id=") + ToString(meshId) +
@@ -253,7 +272,7 @@ MEDCALC::MeshHandler * MEDDataManager_i::getMesh(CORBA::Long meshId) {
  * specified datasource. It corresponds to the list ofmeshes defined
  * in the datasource.
  */
-MEDCALC::MeshHandlerList * MEDDataManager_i::getMeshList(CORBA::Long datasourceId) {
+MEDCALC::MeshHandlerList * MEDDataManager_i::getMeshHandlerList(CORBA::Long datasourceId) {
 
   // We initiate a list with the maximum lentgh
   MEDCALC::MeshHandlerList_var meshHandlerList = new MEDCALC::MeshHandlerList();

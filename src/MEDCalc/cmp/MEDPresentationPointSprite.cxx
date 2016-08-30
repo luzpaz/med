@@ -37,6 +37,22 @@ MEDPresentationPointSprite::MEDPresentationPointSprite(const MEDCALC::PointSprit
 }
 
 void
+MEDPresentationPointSprite::initFieldMeshInfos()
+{
+  MEDPresentation::initFieldMeshInfos();
+  _colorByType = "POINTS";
+}
+
+void
+MEDPresentationPointSprite::scaleBallRadius()
+{
+  std::ostringstream oss;
+  oss << _dispVar << ".RadiusVectorComponent = " << _selectedComponentIndex << ";";
+  pushAndExecPyLine(oss.str()); oss.str("");
+}
+
+
+void
 MEDPresentationPointSprite::internalGeneratePipeline()
 {
   MEDPresentation::internalGeneratePipeline();
@@ -62,7 +78,7 @@ MEDPresentationPointSprite::internalGeneratePipeline()
   oss << "__avgSize = medcalc.ComputeCellAverageSize(" << _srcObjVar << ");";
   pushAndExecPyLine(oss.str()); oss.str("");
 
-  colorBy("POINTS");  // like in Contour
+  colorBy();    // see initFieldInfo() - necessarily POINTS like in Contour
 
   // Set point sprite:
   oss << _dispVar << ".SetRepresentationType('Point Sprite');";
@@ -74,8 +90,7 @@ MEDPresentationPointSprite::internalGeneratePipeline()
   oss << _dispVar << ".RadiusMode = 'Scalar';";
   pushAndExecPyLine(oss.str()); oss.str("");
 
-  oss << _dispVar << ".RadiusVectorComponent = " << _selectedComponentIndex << ";";
-  pushAndExecPyLine(oss.str()); oss.str("");
+  scaleBallRadius();
   oss << _dispVar << ".RadiusIsProportional = 0 ;";
   pushAndExecPyLine(oss.str()); oss.str("");
   oss << _dispVar << ".RadiusTransferFunctionEnabled = 1 ;";
@@ -98,7 +113,11 @@ MEDPresentationPointSprite::updatePipeline(const MEDCALC::PointSpriteParameters&
     throw KERNEL::createSalomeException("Unexpected updatePipeline error! Mismatching fieldHandlerId!");
 
   if (std::string(params.displayedComponent) != std::string(_params.displayedComponent))
-    updateComponent<MEDPresentationPointSprite, MEDCALC::PointSpriteParameters>(std::string(params.displayedComponent));
+    {
+      updateComponent<MEDPresentationPointSprite, MEDCALC::PointSpriteParameters>(std::string(params.displayedComponent));
+      scaleBallRadius();
+      pushAndExecPyLine("pvs.Render();");
+    }
   if (params.scalarBarRange != _params.scalarBarRange)
     updateScalarBarRange<MEDPresentationPointSprite, MEDCALC::PointSpriteParameters>(params.scalarBarRange);
   if (params.colorMap != _params.colorMap)

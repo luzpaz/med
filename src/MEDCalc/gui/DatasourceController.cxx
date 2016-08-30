@@ -230,10 +230,19 @@ void DatasourceController::OnExpandField()
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   for (int i=0; i<listOfSObject->size(); i++) {
     SALOMEDS::SObject_var soFieldseries = listOfSObject->at(i);
+    std::string name(_studyEditor->getName(soFieldseries));
+    if (soFieldseries->_is_nil() || name == "MEDCalc")
+      return;
 
     // First retrieve the fieldseries id associated to this study object
-    long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,FIELD_SERIES_ID);
-    //long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,FIELD_ID);
+    SALOMEDS::GenericAttribute_var anAttr;
+    SALOMEDS::AttributeParameter_var aParam;
+    if ( soFieldseries->FindAttribute(anAttr,"AttributeParameter") ) {
+      aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
+      if (! aParam->IsSet(FIELD_SERIES_ID, PT_INTEGER))
+        return;
+    }
+    long fieldseriesId = aParam->GetInt(FIELD_SERIES_ID);
     STDLOG("Expand the field timeseries "<<fieldseriesId);
 
     // If fieldseriesId equals -1, then it means that it is not a
@@ -279,8 +288,17 @@ void DatasourceController::OnUseInWorkspace() {
     // <<<
 
     SALOMEDS::SObject_var soField = listOfSObject->at(0);
-
-    bool isInWorkspace = _studyEditor->getParameterBool(soField,IS_IN_WORKSPACE);
+    std::string name(_studyEditor->getName(soField));
+    if (soField->_is_nil() || name == "MEDCalc")
+      return;
+    SALOMEDS::GenericAttribute_var anAttr;
+    SALOMEDS::AttributeParameter_var aParam;
+    if ( soField->FindAttribute(anAttr,"AttributeParameter") ) {
+      aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
+      if (! aParam->IsSet(IS_IN_WORKSPACE, PT_BOOLEAN))
+        return;
+    }
+    bool isInWorkspace = aParam->GetBool(IS_IN_WORKSPACE);
     if ( isInWorkspace ) {
       QMessageBox::warning(_salomeModule->getApp()->desktop(),
          tr("Operation not allowed"),
@@ -288,7 +306,9 @@ void DatasourceController::OnUseInWorkspace() {
       return;
     }
 
-    int fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);
+    if (! aParam->IsSet(FIELD_ID, PT_INTEGER))
+      return;
+    int fieldId = aParam->GetInt(FIELD_ID);
 
     // If fieldId equals -1, then it means that it is not a field
     // managed by the MED module, and we stop this function process.
@@ -338,10 +358,20 @@ void DatasourceController::OnUseInWorkspace() {
     // each item, we just import the whole set of items.
     for (int i=0; i<listOfSObject->size(); i++) {
       SALOMEDS::SObject_var soField = listOfSObject->at(i);
-
-      bool isInWorkspace = _studyEditor->getParameterBool(soField,IS_IN_WORKSPACE);
+      if (soField->_is_nil())
+        continue;
+      SALOMEDS::GenericAttribute_var anAttr;
+      SALOMEDS::AttributeParameter_var aParam;
+      if ( soField->FindAttribute(anAttr,"AttributeParameter") ) {
+        aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
+        if (! aParam->IsSet(IS_IN_WORKSPACE, PT_BOOLEAN))
+          return;
+      }
+      bool isInWorkspace = aParam->GetBool(IS_IN_WORKSPACE);
       if ( !isInWorkspace ) {
-        int fieldId = _studyEditor->getParameterInt(soField,FIELD_ID);
+        if (! aParam->IsSet(FIELD_ID, PT_INTEGER))
+          continue;
+        int fieldId = aParam->GetInt(FIELD_ID);
         MEDCALC::FieldHandler* fieldHandler =
           MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
         DatasourceEvent* event = new DatasourceEvent();

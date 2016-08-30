@@ -37,6 +37,13 @@ MEDPresentationDeflectionShape::MEDPresentationDeflectionShape(const MEDCALC::De
 }
 
 void
+MEDPresentationDeflectionShape::initFieldMeshInfos()
+{
+  MEDPresentation::initFieldMeshInfos();
+  _colorByType = "POINTS";
+}
+
+void
 MEDPresentationDeflectionShape::autoScale()
 {
   std::ostringstream oss;
@@ -54,17 +61,19 @@ MEDPresentationDeflectionShape::internalGeneratePipeline()
 
   MEDPyLockWrapper lock;
 
-  setOrCreateRenderView();
   createSource();
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();
-  if (getIntProperty(MEDPresentation::PROP_NB_COMPONENTS) <= 1)
+  int nbCompo = getIntProperty(MEDPresentation::PROP_NB_COMPONENTS);
+  if (nbCompo <= 1)
     {
       const char * msg = "Deflection shape presentation does not work for scalar field!"; // this message will appear in GUI too
       STDLOG(msg);
       throw KERNEL::createSalomeException(msg);
     }
+
+  setOrCreateRenderView(); // needs to be after the exception above otherwise previous elements in the view will be hidden.
 
   // Warp needs point data:
   applyCellToPointIfNeeded();
@@ -75,10 +84,11 @@ MEDPresentationDeflectionShape::internalGeneratePipeline()
 
   showObject(); // to be done first so that the scale factor computation properly works
 
-  oss << _objVar << ".Vectors = ['POINTS', '" << _fieldName << "'];";
+  std::string fieldName = nbCompo <= 2 ? _fieldName + "_Vector" : _fieldName;
+  oss << _objVar << ".Vectors = ['POINTS', '" << fieldName << "'];";
   pushAndExecPyLine(oss.str()); oss.str("");
 
-  colorBy("POINTS");
+  colorBy();    // see initFieldInfo() - necessarily POINTS
   showScalarBar();
   selectColorMap();
   rescaleTransferFunction();

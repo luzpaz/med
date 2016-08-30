@@ -32,6 +32,8 @@ public:
   MEDPresentationContour(const MEDCALC::ContourParameters& params, const MEDCALC::ViewModeType viewMode);
   virtual ~MEDPresentationContour() {}
 
+  virtual void initFieldMeshInfos();
+
   void updatePipeline(const MEDCALC::ContourParameters& params);
 
   void getParameters(MEDCALC::ContourParameters & params) const { params = _params; } ;

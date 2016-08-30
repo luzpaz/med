@@ -84,14 +84,18 @@ module MEDCALC
 //  const long SCALAR_BAR_RANGE_VAL_MAX_DEFAULT = -1;
   const string DISPLAY_DEFAULT = DISPLAY_EUCLIDEAN_NORM;
   const SliceOrientationType SLICE_ORIENTATION_DEFAULT = SLICE_NORMAL_TO_X;
+
   const long NB_CONTOURS_DEFAULT = 10;
   const long NB_SLICES_DEFAULT = 1;
+
+  const long NB_CONTOURS_MAX = 50;
+  const long NB_SLICES_MAX = 20;
 
   /* Structs */
 
   // Just showing the mesh 
   struct MeshViewParameters {
-    long fieldHandlerId;   // TODO should be a meshHandlerId really ...
+    long meshHandlerId;
     MeshModeType mode;
   };
 
@@ -185,6 +189,8 @@ module MEDCALC
 //    ViewModeType getPresentationViewMode(in long presId);
     
     PresentationsList getAllPresentations();
+
+    void cleanUp()   raises (SALOME::SALOME_Exception);
   };
 };
 

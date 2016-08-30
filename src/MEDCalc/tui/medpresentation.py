@@ -23,15 +23,15 @@ from medcalc.medevents import notifyGui_addPresentation, notifyGui_removePresent
 
 __manager = medcalc.medcorba.factory.getPresentationManager()
 
-def MakeMeshView(proxy,
+def MakeMeshView(meshID,
                  viewMode=MEDCALC.VIEW_MODE_DEFAULT,
                  meshMode=MEDCALC.MESH_MODE_DEFAULT):
   # Create the presentation instance in CORBA engine
   # The engine in turn creates the ParaView pipeline elements
-  params = MEDCALC.MeshViewParameters(proxy.id, meshMode)
+  params = MEDCALC.MeshViewParameters(meshID, meshMode)
   try:
     presentation_id = __manager.makeMeshView(params, viewMode)
-    notifyGui_addPresentation(proxy.id, presentation_id)
+    notifyGui_addPresentation(meshID, presentation_id)
     return presentation_id
   except SALOME.SALOME_Exception as e:
     notifyGui_error("An error occured while creating the mesh view:\n" + e.details.text)
@@ -180,8 +180,12 @@ def ComputeCellAverageSize(obj):
   bb, nCells = obj.GetDataInformation().GetBounds(), obj.GetDataInformation().GetNumberOfCells()
   bb = zip(bb[::2], bb[1::2])
   deltas = [x[1]-x[0] for x in bb]
+  ## Filter out null dimensions:
+  avgDelta = sum(deltas) / 3.0
+  deltas = [d for d in deltas if abs(d) > 1.0e-12*avgDelta]
+  ##
   vol = reduce(lambda x,y:x*y, deltas, 1.0) 
-  cellSize = (vol/nCells)**(1.0/3.0)  # necessarily 3D in ParaView
+  cellSize = (vol/nCells)**(1.0/float(len(deltas)))
   return cellSize
 
 def GetDomainCenter(obj):
@@ -219,7 +223,10 @@ def GetSliceOrigins(obj, nbSlices, normal):
 def SelectSourceField(obj, meshName, fieldName, discretisation):
   """
   Properly set the AllArrays property of a MEDReader source to point to the correct field.
+  Setting the fieldName to void string is allowed (meaning we work on the mesh only).
   """
+  if fieldName == "":
+    return
   tree = obj.GetProperty("FieldsTreeInfo")[::2]
   it = None
   for t in tree:

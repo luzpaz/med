@@ -37,6 +37,13 @@ MEDPresentationVectorField::MEDPresentationVectorField(const MEDCALC::VectorFiel
 }
 
 void
+MEDPresentationVectorField::initFieldMeshInfos()
+{
+  MEDPresentation::initFieldMeshInfos();
+  _colorByType = "POINTS";
+}
+
+void
 MEDPresentationVectorField::autoScale()
 {
   std::ostringstream oss;
@@ -54,17 +61,19 @@ MEDPresentationVectorField::internalGeneratePipeline()
 
   MEDPyLockWrapper lock;
 
-  setOrCreateRenderView();
   createSource();
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();
-  if (getIntProperty(MEDPresentation::PROP_NB_COMPONENTS) <= 1)
+  int nbCompo = getIntProperty(MEDPresentation::PROP_NB_COMPONENTS);
+  if (nbCompo <= 1)
     {
       const char * msg = "Vector field presentation does not work for scalar field!"; // this message will appear in GUI too
       STDLOG(msg);
       throw KERNEL::createSalomeException(msg);
     }
+
+  setOrCreateRenderView();  // instanciate __viewXXX, needs to be after the exception above otherwise previous elements in the view will be hidden.
 
   std::ostringstream oss;
   oss << _objVar << " = pvs.Glyph(Input=" << _srcObjVar << ", GlyphType='Arrow');";
@@ -74,7 +83,10 @@ MEDPresentationVectorField::internalGeneratePipeline()
 
   oss << _objVar << ".Scalars = ['"<< _pvFieldType << "', 'None'];";
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _objVar << ".Vectors = ['"<< _pvFieldType << "', '" << _fieldName << "'];";
+
+  std::string fieldName = nbCompo <= 2 ? _fieldName + "_Vector" : _fieldName;
+  oss << _objVar << ".Vectors = ['"<< _pvFieldType << "', '" << fieldName << "'];";
+
   pushAndExecPyLine(oss.str()); oss.str("");
   oss << _objVar << ".ScaleMode = 'vector';";
   pushAndExecPyLine(oss.str()); oss.str("");
@@ -83,7 +95,7 @@ MEDPresentationVectorField::internalGeneratePipeline()
   oss << _objVar << "GlyphTransform = 'Transform2';";  // not sure this is really needed?
   pushAndExecPyLine(oss.str()); oss.str("");
 
-  colorBy("POINTS");
+  colorBy();    // see initFieldInfo() - necessarily POINTS
   showScalarBar();
   selectColorMap();
   rescaleTransferFunction();

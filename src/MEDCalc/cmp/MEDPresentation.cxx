@@ -36,37 +36,20 @@ const std::string MEDPresentation::PROP_COMPONENT = "component_";
 const std::string MEDPresentation::PROP_COLOR_MAP = "colorMap";
 const std::string MEDPresentation::PROP_SCALAR_BAR_RANGE = "scalarBarRange";
 
-MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name,
+MEDPresentation::MEDPresentation(MEDPresentation::TypeID handlerId, const std::string& name,
                                  const MEDCALC::ViewModeType viewMode,
                                  const MEDCALC::ColorMapType colorMap,
                                  const MEDCALC::ScalarBarRangeType sbRange)
-    : _fieldHandlerId(fieldHandlerId), _propertiesStr(),
-      //_pipeline(0), _display(0)
+    : _handlerId(handlerId), _propertiesStr(),
+      _mcFieldType(MEDCoupling::ON_CELLS),
+      _pvFieldType(""), _meshName(""), _fieldName(""), _fileName(""),
       _selectedComponentIndex(-1),
       _viewMode(viewMode),
       _colorMap(colorMap),
       _sbRange(sbRange),
-      _renderViewPyId(-1),  // will be set by getRenderViewCommand()
+      _renderViewPyId(-1),  // will be set by MEDPresentationManager_i::_makePresentation()
       _globalDict(0)
 {
-  MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
-  MEDCALC::FieldHandler* fieldHandler = dataManager->getFieldHandler(fieldHandlerId);
-  MEDCALC::MeshHandler* meshHandler = dataManager->getMesh(fieldHandler->meshid);
-  MEDCALC::DatasourceHandler* dataSHandler = dataManager->getDatasourceHandlerFromID(meshHandler->sourceid);
-
-  _fileName = dataSHandler->uri;
-  _fieldName = fieldHandler->fieldname;
-  _mcFieldType = (MEDCoupling::TypeOfField) fieldHandler->type;
-  _pvFieldType = getPVFieldTypeString(_mcFieldType);
-  _meshName = meshHandler->name;
-
-  if (_fileName.substr(0, 7) != std::string("file://")) {
-    const char* msg = "MEDPresentation(): Data source is not a file! Can not proceed.";
-    STDLOG(msg);
-    throw MEDPresentationException(msg);
-  }
-  _fileName = _fileName.substr(7, _fileName.size());
-
   setStringProperty(MEDPresentation::PROP_NAME, name);
 
   setIntProperty(MEDPresentation::PROP_NB_COMPONENTS, 0);
@@ -90,17 +73,51 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const s
   _rangeVar = oss_r.str();
 }
 
+/**
+ * For most of the presentations the field name etc is required.
+ * For the MEDPresentationMeshView however, the handler ID is a mesh handler ID, not a field, and the
+ * treatment is specific.
+ */
+void
+MEDPresentation::initFieldMeshInfos()
+{
+  MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
+  MEDCALC::FieldHandler* fieldHandler = dataManager->getFieldHandler(_handlerId);
+  MEDCALC::MeshHandler* meshHandler = dataManager->getMeshHandler(fieldHandler->meshid);
+  MEDCALC::DatasourceHandler* dataSHandler = dataManager->getDatasourceHandlerFromID(meshHandler->sourceid);
+
+  extractFileName(std::string(dataSHandler->uri));
+
+  _fieldName = fieldHandler->fieldname;
+  _mcFieldType = (MEDCoupling::TypeOfField) fieldHandler->type;
+  _pvFieldType = getPVFieldTypeString(_mcFieldType);
+  _colorByType = _pvFieldType;  // by default the same; overriden in DeflectionShape, VectorField, PointSprite and Contour
+  _meshName = meshHandler->name;
+}
+
+void
+MEDPresentation::extractFileName(const std::string& name)
+{
+  _fileName = name;
+  if (_fileName.substr(0, 7) != std::string("file://")) {
+    const char* msg = "MEDPresentation(): Data source is not a file! Can not proceed.";
+    STDLOG(msg);
+    throw MEDPresentationException(msg);
+  }
+  _fileName = _fileName.substr(7, _fileName.size());
+}
+
 MEDPresentation::~MEDPresentation()
 {
   STDLOG("~MEDPresentation(): clear display");
   {
     MEDPyLockWrapper lock;
-    std::ostringstream oss_v, oss;
-    oss_v << "__view" << _renderViewPyId;
-    oss << "pvs.Hide(" << _objVar <<  ", view=" << oss_v.str() << ");";
-    oss << "pvs.Render();";
+    std::ostringstream oss;
 
-    PyRun_SimpleString(oss.str().c_str());
+    oss << "pvs.Hide(" << _objVar <<  ", view=" << getRenderViewVar() << ");";
+    execPyLine(oss.str());
+    execPyLine(getRenderViewVar() + ".ResetCamera();");
+    execPyLine("pvs.Render();");
   }
 }
 
@@ -280,8 +297,13 @@ MEDPresentation::createSource()
   oss << "medcalc.SelectSourceField(" << _srcObjVar << ", '" << _meshName << "', '"
       << _fieldName << "', '" << typ << "');";
   pushAndExecPyLine(oss.str()); oss.str("");
+  // Generate complete vector fields: fields with 2 components will copied into <name>_vector and
+  // have a third null component added.
   oss << _srcObjVar << ".GenerateVectors = 1;";
   pushAndExecPyLine(oss.str()); oss.str("");
+
+  // Make sure this is set so we stick to time steps:
+  pushAndExecPyLine("pvs.GetAnimationScene().PlayMode = 'Snap To TimeSteps'");
 
   // Deal with GAUSS fields:
   if(_mcFieldType == MEDCoupling::ON_GAUSS_PT)
@@ -316,7 +338,7 @@ MEDPresentation::setOrCreateRenderView()
   pushAndExecPyLine(oss2.str()); oss2.str("");
   if (_viewMode == MEDCALC::VIEW_MODE_OVERLAP) {
       // this might potentially re-assign to an existing view variable, but this is OK, we
-      // normally reassign exaclty the same RenderView object.
+      // normally reassign exactly the same RenderView object.
       oss2 << view << " = pvs.GetActiveViewOrCreate('RenderView');";
       pushAndExecPyLine(oss2.str()); oss2.str("");
   } else if (_viewMode == MEDCALC::VIEW_MODE_REPLACE) {
@@ -432,10 +454,10 @@ MEDPresentation::showScalarBar()
 }
 
 void
-MEDPresentation::colorBy(const std::string & fieldType)
+MEDPresentation::colorBy()
 {
   std::ostringstream oss;
-  oss << "pvs.ColorBy(" << _dispVar << ", ('" << fieldType << "', '" << _fieldName << "'));";
+  oss << "pvs.ColorBy(" << _dispVar << ", ('" << _colorByType << "', '" << _fieldName << "'));";
   pushAndExecPyLine(oss.str());
 }
 
@@ -473,13 +495,46 @@ MEDPresentation::GeneratePythonId()
   return INIT_ID++;
 }
 
-void
+bool
 MEDPresentation::activateView()
 {
   MEDPyLockWrapper lock;
-  pushAndExecPyLine("pvs.SetActiveView(" + getRenderViewVar() + ");");
+
+  execPyLine("__alive = " + getRenderViewVar() + " in pvs.GetRenderViews()");
+  PyObject * obj = getPythonObjectFromMain("__alive");
+  bool alive = true;
+  if (obj && PyBool_Check(obj))
+    alive = (obj == Py_True);
+
+  if (alive)
+    // The view is still there,just activate it:
+    pushAndExecPyLine("pvs.SetActiveView(" + getRenderViewVar() + ");");
+  else
+    {
+      // The view disappeared, recreate it in a new layout. The transfer of the objects is to be done by the caller.
+      std::ostringstream oss;
+      oss <<  "pvs.servermanager.misc.ViewLayout(registrationGroup='layouts');";
+      pushAndExecPyLine(oss.str()); oss.str("");
+      oss << getRenderViewVar() << " = pvs.CreateView('RenderView');";
+      pushAndExecPyLine(oss.str()); oss.str("");
+    }
+  return alive;
 }
 
+/**!
+ * Called when the view has been recreated (because the user closed it).
+ * All the objects and set up are re-shown in the new view (which is stored in the same Python variable).
+ */
+void
+MEDPresentation::recreateViewSetup()
+{
+  showObject();
+  colorBy();
+  showScalarBar();
+  selectColorMap();
+  rescaleTransferFunction();
+  resetCameraAndRender();
+}
 
 std::string
 MEDPresentation::paravisDump() const

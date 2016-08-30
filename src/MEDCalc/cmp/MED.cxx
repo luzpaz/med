@@ -50,7 +50,8 @@ MED::MED(CORBA::ORB_ptr orb,
          const char* instanceName,
          const char* interfaceName)
   : Engines_Component_i(orb, poa, contId, instanceName, interfaceName),
-    _fieldSeriesEntries()
+    _fieldSeriesEntries(),
+    _meshEntries()
 {
   _thisObj = this;
   _id = _poa->activate_object(_thisObj); // register and activate this servant object
@@ -109,11 +110,12 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
 
       // We can add the meshes as children of the datasource
       MEDCALC::MeshHandlerList* meshHandlerList =
-        MEDFactoryClient::getDataManager()->getMeshList(datasourceHandler.id);
+        MEDFactoryClient::getDataManager()->getMeshHandlerList(datasourceHandler.id);
 
       for(CORBA::ULong iMesh=0; iMesh<meshHandlerList->length(); iMesh++) {
         MEDCALC::MeshHandler meshHandler = (*meshHandlerList)[iMesh];
         SALOMEDS::SObject_var soMesh = studyBuilder->NewObject(soDatasource);
+        _meshEntries[meshHandler.id] = soMesh->GetID();
         soMesh->SetAttrString("AttributeName", meshHandler.name);
         soMesh->SetAttrString("AttributePixMap", "ICO_DATASOURCE_MESH");
         anAttr = studyBuilder->FindOrCreateAttribute(soMesh, "AttributeParameter");
@@ -157,7 +159,7 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
 }
 
 MED_ORB::status
-MED::registerPresentation(SALOMEDS::Study_ptr study,
+MED::registerPresentationField(SALOMEDS::Study_ptr study,
                           CORBA::Long fieldId,
                           const char* name,
                           const char* type,
@@ -170,12 +172,12 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
   MEDCALC::FieldHandler_var fldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
   int fieldSeriesId = fldHandler->fieldseriesId;
   if (fieldSeriesId < 0){
-      std::cerr << "MED::registerPresentation(): Error getting field handler\n";
+      std::cerr << "MED::registerPresentationField(): Error getting field handler\n";
       return MED_ORB::OP_ERROR ;
     }
 
   if (_fieldSeriesEntries.find(fieldSeriesId) == _fieldSeriesEntries.end()) {
-    std::cerr << "MED::registerPresentation(): Field series not found\n";
+    std::cerr << "MED::registerPresentationField(): Field series not found\n";
     return MED_ORB::OP_ERROR ;
   }
   std::string entry = _fieldSeriesEntries[fieldSeriesId];
@@ -183,7 +185,7 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
   SALOMEDS::SObject_ptr soFieldseries = sobject._retn();
 
   if (soFieldseries->IsNull()) {
-    std::cerr << "MED::registerPresentation(): Entry not found\n";
+    std::cerr << "MED::registerPresentationField(): Entry not found\n";
     return MED_ORB::OP_ERROR;
   }
 
@@ -206,6 +208,57 @@ MED::registerPresentation(SALOMEDS::Study_ptr study,
 
   return MED_ORB::OP_OK;
 }
+
+MED_ORB::status
+MED::registerPresentationMesh(SALOMEDS::Study_ptr study,
+                          CORBA::Long meshId,
+                          const char* name,
+                          const char* type,
+                          const char* ico,
+                          CORBA::Long presentationId)
+{
+  // set exception handler to catch unexpected CORBA exceptions
+  Unexpect aCatch(SALOME_SalomeException);
+
+  MEDCALC::MeshHandler_var meshHandler = MEDFactoryClient::getDataManager()->getMeshHandler(meshId);
+  if (meshHandler->id < 0){
+      std::cerr << "MED::registerPresentationMesh(): Error getting mesh handler\n";
+      return MED_ORB::OP_ERROR ;
+    }
+
+  if (_meshEntries.find(meshHandler->id) == _meshEntries.end()) {
+    std::cerr << "MED::registerPresentationMesh(): mesh not found\n";
+    return MED_ORB::OP_ERROR ;
+  }
+  std::string entry = _meshEntries[meshHandler->id];
+  SALOMEDS::SObject_var sobject = study->FindObjectID(entry.c_str());
+  SALOMEDS::SObject_ptr soMesh = sobject._retn();
+
+  if (soMesh->IsNull()) {
+    std::cerr << "MED::registerPresentationMesh(): Entry not found\n";
+    return MED_ORB::OP_ERROR;
+  }
+
+  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+  SALOMEDS::SObject_var soPresentation = studyBuilder->NewObject(soMesh);
+  useCaseBuilder->AppendTo(soPresentation->GetFather(), soPresentation);
+
+  soPresentation->SetAttrString("AttributeName", name);
+  soPresentation->SetAttrString("AttributePixMap", ico);
+
+  SALOMEDS::GenericAttribute_var anAttr;
+  SALOMEDS::AttributeParameter_var aParam;
+  anAttr = studyBuilder->FindOrCreateAttribute(soPresentation, "AttributeParameter");
+  aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
+  aParam->SetInt(MESH_ID, meshId);
+  aParam->SetBool(IS_PRESENTATION, true);
+  aParam->SetInt(PRESENTATION_ID, presentationId);
+  aParam->SetString(PRESENTATION_TYPE, type);
+
+  return MED_ORB::OP_OK;
+}
+
 
 MED_ORB::status
 MED::unregisterPresentation(SALOMEDS::Study_ptr study,
@@ -271,9 +324,8 @@ MED::getStudyPresentations(SALOMEDS::Study_ptr study)
   return presList;
 }
 
-
-MED_ORB::PresentationsList*
-MED::getSiblingPresentations(SALOMEDS::Study_ptr study, CORBA::Long presentationId)
+char*
+MED::getStudyPresentationEntry(SALOMEDS::Study_ptr study, int presentationId)
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
@@ -286,39 +338,22 @@ MED::getSiblingPresentations(SALOMEDS::Study_ptr study, CORBA::Long presentation
   SALOMEDS::GenericAttribute_var anAttribute;
   SALOMEDS::SComponent_var father = study->FindComponent("MED");
   SALOMEDS::ChildIterator_var it = study->NewChildIterator(father);
-  for (it->InitEx(true); it->More(); it->Next()) {
-    SALOMEDS::SObject_var child(it->Value());
+  for (it->InitEx(true); it->More(); it->Next())
+    {
+      SALOMEDS::SObject_var child(it->Value());
+      if (child->FindAttribute(anAttribute, "AttributeParameter"))
+        {
+          SALOMEDS::AttributeParameter_var attrParam = SALOMEDS::AttributeParameter::_narrow(anAttribute);
+          if (!attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN) || !attrParam->GetBool(IS_PRESENTATION) || !attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
+            continue;
 
-    if (child->FindAttribute(anAttribute, "AttributeParameter")) {
-      SALOMEDS::AttributeParameter_var attrParam = SALOMEDS::AttributeParameter::_narrow(anAttribute);
-      if (!attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN) || !attrParam->GetBool(IS_PRESENTATION) || !attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
-        continue;
-
-      if (presentationId == attrParam->GetInt(PRESENTATION_ID)) {
-        // get siblings
-        SALOMEDS::ChildIterator_var siblItr = study->NewChildIterator(child->GetFather());
-        for (siblItr->InitEx(true); siblItr->More(); siblItr->Next()) {
-          SALOMEDS::SObject_var sibl(siblItr->Value());
-
-          if (sibl->FindAttribute(anAttribute, "AttributeParameter")) {
-            SALOMEDS::AttributeParameter_var attrParam = SALOMEDS::AttributeParameter::_narrow(anAttribute);
-            if (!attrParam->IsSet(IS_PRESENTATION, PT_BOOLEAN) || !attrParam->GetBool(IS_PRESENTATION) || !attrParam->IsSet(PRESENTATION_ID, PT_INTEGER))
-              continue;
-
-            if (attrParam->GetInt(PRESENTATION_ID) != presentationId) {
-              CORBA::ULong size = presList->length();
-              presList->length(size+1);
-              (*presList)[size] = attrParam->GetInt(PRESENTATION_ID);
-            }
-          }
+          if (attrParam->GetInt(PRESENTATION_ID) == presentationId)
+            return CORBA::string_dup(child->GetID());
         }
-        return presList;
-      }
     }
-  }
-
-  return presList;
+  return CORBA::string_dup("");
 }
+
 
 Engines::TMPFile*
 MED::DumpPython(CORBA::Object_ptr theStudy,
@@ -326,8 +361,6 @@ MED::DumpPython(CORBA::Object_ptr theStudy,
                 CORBA::Boolean isMultiFile,
                 CORBA::Boolean& isValidScript)
 {
-  std::cout << "In MED::DumpPython\n";
-
   SALOMEDS::Study_var aStudy = SALOMEDS::Study::_narrow(theStudy);
   if(CORBA::is_nil(aStudy)) {
     std::cerr << "Error: Cannot find the study\n";
@@ -431,6 +464,12 @@ MED::getObjectInfo(CORBA::Long studyId, const char* entry)
   oss << "Is in workspace: " << isInWorkspace << std::endl;
 
   return CORBA::string_dup(oss.str().c_str());
+}
+
+void MED::cleanUp()
+{
+  _fieldSeriesEntries.clear();
+  _meshEntries.clear();
 }
 
 extern "C"

@@ -84,7 +84,7 @@ private slots:
   void onComboCompoIndexChanged(int);
   void onComboOrientIndexChanged(int);
   void onComboMeshIndexChanged(int);
-  void onSpinBoxValueChanged(int);
+  void onSpinBoxEditingFinished();
 
 private:
   Ui_WidgetPresentationParameters _ui; // instance of the class defined in ui_WidgetPresentationParameters.h

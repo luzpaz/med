@@ -37,6 +37,13 @@ MEDPresentationContour::MEDPresentationContour(const MEDCALC::ContourParameters&
 }
 
 void
+MEDPresentationContour::initFieldMeshInfos()
+{
+  MEDPresentation::initFieldMeshInfos();
+  _colorByType = "POINTS";
+}
+
+void
 MEDPresentationContour::setNumberContours()
 {
   std::ostringstream oss;
@@ -73,7 +80,7 @@ MEDPresentationContour::internalGeneratePipeline()
       throw KERNEL::createSalomeException(mes);
     }
 
-  setOrCreateRenderView(); // instanciate __viewXXX
+  setOrCreateRenderView(); // instanciate __viewXXX, needs to be after the exception above otherwise previous elements in the view will be hidden.
 
   // Contour needs point data:
   applyCellToPointIfNeeded();
@@ -90,7 +97,7 @@ MEDPresentationContour::internalGeneratePipeline()
   // Set number of contours
   setNumberContours();
 
-  colorBy("POINTS");    // necessarily POINTS because of the conversion above
+  colorBy();    // see initFieldInfo() - necessarily POINTS because of the conversion above
   showScalarBar();
   selectColorMap();
   rescaleTransferFunction();

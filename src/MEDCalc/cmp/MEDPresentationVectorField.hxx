@@ -31,6 +31,8 @@ public:
   MEDPresentationVectorField(const MEDCALC::VectorFieldParameters& params, const MEDCALC::ViewModeType viewMode);
   virtual ~MEDPresentationVectorField() {}
 
+  virtual void initFieldMeshInfos();
+
   void updatePipeline(const MEDCALC::VectorFieldParameters& params);
 
   void getParameters(MEDCALC::VectorFieldParameters & params) const { params = _params; } ;

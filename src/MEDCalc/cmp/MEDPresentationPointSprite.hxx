@@ -31,6 +31,8 @@ public:
   MEDPresentationPointSprite(const MEDCALC::PointSpriteParameters& params, const MEDCALC::ViewModeType viewMode);
   virtual ~MEDPresentationPointSprite() {}
 
+  virtual void initFieldMeshInfos();
+
   void updatePipeline(const MEDCALC::PointSpriteParameters& params);
 
   void getParameters(MEDCALC::PointSpriteParameters & params) const { params = _params; } ;
@@ -38,6 +40,7 @@ public:
 
 protected:
   virtual void internalGeneratePipeline();
+  void scaleBallRadius();
 
 private:
   MEDCALC::PointSpriteParameters _params;

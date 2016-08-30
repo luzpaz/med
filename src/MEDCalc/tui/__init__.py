@@ -35,8 +35,7 @@ import medevents
 from fieldproxy import newFieldProxy, FieldProxy
 
 # Input/Output
-from medio import LoadDataSource
-from medio import LoadImageAsDataSource
+from medio import LoadDataSource, LoadImageAsDataSource, GetFirstMeshFromDataSource
 
 # Presentations
 from medpresentation import MakeMeshView
@@ -72,4 +71,3 @@ import medconsole
 # Playing test scenarii
 from medtest import PlayQtTestingScenario
 from medtest import RequestSALOMETermination
-

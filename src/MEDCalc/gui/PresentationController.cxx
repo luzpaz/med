@@ -47,6 +47,9 @@
 #include <SalomeApp_Study.h>
 #include <SalomeApp_DataObject.h>
 
+#include <SALOME_ListIO.hxx>
+#include <LightApp_SelectionMgr.h>
+
 #include <SALOMEDS_SObject.hxx>
 #include <SALOMEDS_Study.hxx>
 
@@ -107,19 +110,20 @@ PresentationController::~PresentationController()
     delete((*it).second);
 }
 
-/**
- * [ABN] Created this probably because I don't know the right way to deal with non existent
- * attributes in an object from the study ...
- */
 int
 PresentationController::getIntParamFromStudyEditor(SALOMEDS::SObject_var obj, const char * name)
 {
-  int theInt = -1;
-  try {
-      theInt = _studyEditor->getParameterInt(obj,name);
+  if (obj->_is_nil())
+    return -1;
+
+  SALOMEDS::GenericAttribute_var anAttr;
+  SALOMEDS::AttributeParameter_var aParam;
+  if ( obj->FindAttribute(anAttr,"AttributeParameter") ) {
+    aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
+    if (aParam->IsSet(name, PT_INTEGER))
+      return aParam->GetInt(name);
   }
-  catch(...)  {  }
-  return theInt;
+  return -1;
 }
 
 std::string
@@ -178,7 +182,7 @@ PresentationController::createActions()
 
   // Presentations
   int presentationToolbarId = _salomeModule->createTool("Presentations", "PresentationToolbar");
-  int presentationMenuId = _salomeModule->createMenu(tr("MENU_PRESENTATIONS"), -1, 1);
+  int presentationMenuId = _salomeModule->createMenu(tr("MENU_PRESENTATIONS"), -1, -1, 10);
 
   label   = tr("LAB_PRESENTATION_MESH_VIEW");
   tooltip = tr("TIP_PRESENTATION_MESH_VIEW");
@@ -305,34 +309,54 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
   // visualisation using the tui command (so that the user can see how
   // to make a view of an object from the tui console).
   for (int i=0; i<listOfSObject->size(); i++) {
-      SALOMEDS::SObject_var soField = listOfSObject->at(i);
-      int fieldId = getIntParamFromStudyEditor(soField, FIELD_ID);
-      if (fieldId < 0)  // is it a field serie ?
+      SALOMEDS::SObject_var soObj = listOfSObject->at(i);
+      std::string name(_studyEditor->getName(soObj));
+      if (soObj->_is_nil() || name == "MEDCalc")
+        return;
+
+      int fieldId = getIntParamFromStudyEditor(soObj, FIELD_ID);
+      int meshId = getIntParamFromStudyEditor(soObj, MESH_ID);
+      MEDCALC::FieldHandler* fieldHandler = 0;
+      MEDCALC::MeshHandler* meshHandler = 0;
+
+      // is it a mesh?
+      if (meshId >= 0)
         {
-          int fieldSeriesId = getIntParamFromStudyEditor(soField, FIELD_SERIES_ID);
-          // If fieldId and fieldSeriesId equals -1, then it means that it is not a field
-          // managed by the MED module, and we stop this function process.
-          if ( fieldSeriesId < 0)
+          if (eventType != PresentationEvent::EVENT_VIEW_OBJECT_MESH_VIEW)
             continue;
-          MEDCALC::FieldHandlerList* fieldHandlerList = MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldSeriesId);
-          if (fieldHandlerList->length() < 0)
-            continue;
-          // For a field series, get the first real field entry:
-          MEDCALC::FieldHandler fieldHandler = (*fieldHandlerList)[0];
-          fieldId = fieldHandler.id;
+          meshHandler = MEDFactoryClient::getDataManager()->getMeshHandler(meshId);
+        }
+      else
+        {
+          if (fieldId < 0)  // is it a field serie ?
+            {
+              int fieldSeriesId = getIntParamFromStudyEditor(soObj, FIELD_SERIES_ID);
+              // If fieldId and fieldSeriesId equals -1, then it means that it is not a field
+              // managed by the MED module, and we stop this function process.
+              if ( fieldSeriesId < 0)
+                  continue;
+
+              MEDCALC::FieldHandlerList* fieldHandlerList = MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldSeriesId);
+              if (fieldHandlerList->length() < 0)
+                continue;
+              // For a field series, get the first real field entry:
+              MEDCALC::FieldHandler fieldHandler = (*fieldHandlerList)[0];
+              fieldId = fieldHandler.id;
+            }
+          fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
         }
 
-      MEDCALC::FieldHandler* fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
-      if (! fieldHandler) {
+      if ((!fieldHandler) && (!meshHandler)) {
           QMessageBox::warning(_salomeModule->getApp()->desktop(),
                                tr("Operation not allowed"),
-                               tr("No field is defined"));
+                               tr("No field (or mesh) is defined"));
           return;
       }
 
       PresentationEvent* event = new PresentationEvent();
       event->eventtype = eventType;
       event->fieldHandler = fieldHandler;
+      event->meshHandler = meshHandler;
       emit presentationSignal(event); // --> processPresentationEvent()
   }
 }
@@ -391,6 +415,9 @@ PresentationController::onDeletePresentation()
   // For each object, emit a signal to the workspace to request pres deletion
   for (int i=0; i<listOfSObject->size(); i++) {
       SALOMEDS::SObject_var soPres = listOfSObject->at(i);
+      std::string name(_studyEditor->getName(soPres));
+      if (soPres->_is_nil() || name == "MEDCalc")
+        return;
       int presId = getIntParamFromStudyEditor(soPres,PRESENTATION_ID);
       // If fieldId equals -1, then it means that it is not a field
       // managed by the MED module, and we stop this function process.
@@ -489,8 +516,10 @@ PresentationController::processPresentationEvent(const PresentationEvent* event)
   // dedicated widget helper class?
 
   if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_MESH_VIEW ) {
-        commands += QString("presentation_id = medcalc.MakeMeshView(accessField(%1), viewMode=%2)").arg(fieldHandler->id).arg(viewMode);
-        commands += QString("presentation_id");
+      // Do we request mesh view from a field or from a mesh only?
+      int meshId = event->meshHandler ? event->meshHandler->id : event->fieldHandler->meshid;
+      commands += QString("presentation_id = medcalc.MakeMeshView(%1, viewMode=%2)").arg(meshId).arg(viewMode);
+      commands += QString("presentation_id");
     }
   else if ( event->eventtype == PresentationEvent::EVENT_VIEW_OBJECT_SCALAR_MAP ) {
       commands += QString("presentation_id = medcalc.MakeScalarMap(accessField(%1), viewMode=%2, scalarBarRange=%3, colorMap=%4)")
@@ -602,6 +631,7 @@ PresentationController::findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager
     {
       const char * msg ="findOrCreateWidgetHelper(): NOT IMPLEMENTED !!!";
       STDLOG(msg);
+      return wh;
     }
   _presHelperMap[presId] = wh;
   return wh;
@@ -621,6 +651,8 @@ PresentationController::onPresentationSelected(int presId, const QString& presTy
     }
   else
     {
+      if(_currentWidgetHelper)
+        _currentWidgetHelper->releaseWidget();
       // Activate corresponding ParaView render view
       _presManager->activateView(presId);
       // Update widgets parameters
@@ -641,6 +673,9 @@ PresentationController::onParavisDump()
   // For the first object only, request the dump
   for (int i=0; i<listOfSObject->size(); i++) {
       SALOMEDS::SObject_var soPres = listOfSObject->at(i);
+      std::string name(_studyEditor->getName(soPres));
+      if (soPres->_is_nil() || name == "MEDCalc")
+        return;
       int presId = getIntParamFromStudyEditor(soPres,PRESENTATION_ID);
       // If fieldId equals -1, then it means that it is not a field
       // managed by the MED module, and we stop this function process.
@@ -657,7 +692,7 @@ PresentationController::onParavisDump()
 }
 
 void
-PresentationController::updateTreeViewWithNewPresentation(long fieldId, long presentationId)
+PresentationController::updateTreeViewWithNewPresentation(long dataId, long presentationId)
 {
   if (presentationId < 0) {
       std::cerr << "Unknown presentation\n";
@@ -678,37 +713,36 @@ PresentationController::updateTreeViewWithNewPresentation(long fieldId, long pre
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
   _PTR(Study) studyDS = study->studyDS();
 
-  _salomeModule->engine()->registerPresentation(_CAST(Study, studyDS)->GetStudy(), fieldId,
-      oss.str().c_str(), type.c_str(),ico.c_str(), presentationId);
-
-
-  //  MEDCALC::ViewModeType viewMode = MEDFactoryClient::getPresentationManager()->getPresentationViewMode(presentationId);
-  //
-  //  // Remove sibling presentations if view mode is set to REPLACE
-  //  if (viewMode == MEDCALC::VIEW_MODE_REPLACE) {
-  //    MED_ORB::PresentationsList* presList = _salomeModule->engine()->getSiblingPresentations(_CAST(Study, studyDS)->GetStudy(), presentationId);
-  //    CORBA::ULong size = presList->length();
-  //
-  //    std::stringstream sstm;
-  //    sstm << "Removing sibling presentation(s): ";
-  //    for (int i = 0; i < size; ++i)
-  //      sstm << (*presList)[i] << "  ";
-  //    STDLOG(sstm.str());
-  //
-  //    for (int i = 0; i < size; ++i) {
-  //      PresentationEvent* event = new PresentationEvent();
-  //      event->eventtype = PresentationEvent::EVENT_DELETE_PRESENTATION;
-  //      XmedDataObject* dataObject = new XmedDataObject();
-  //      dataObject->setPresentationId((*presList)[i]);
-  //      event->objectdata = dataObject;
-  //      emit presentationSignal(event); // --> WorkspaceController::processPresentationEvent
-  //    }
-  //
-  //    delete presList;
-  //  }
+  // Mesh views are always registered at the mesh level:
+  if (type == MEDPresentationMeshView::TYPE_NAME)
+    {
+      _salomeModule->engine()->registerPresentationMesh(_CAST(Study, studyDS)->GetStudy(), dataId,
+          oss.str().c_str(), type.c_str(),ico.c_str(), presentationId);
+    }
+  else
+    _salomeModule->engine()->registerPresentationField(_CAST(Study, studyDS)->GetStudy(), dataId,
+            oss.str().c_str(), type.c_str(),ico.c_str(), presentationId);
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);
+
+  // auto-select new presentation
+  std::string entry = _salomeModule->engine()->getStudyPresentationEntry(_CAST(Study, studyDS)->GetStudy(), presentationId);
+  SALOME_ListIO selectedObjects;
+  LightApp_Study* lightStudy = dynamic_cast<LightApp_Study*>( _salomeModule->application()->activeStudy() );
+  QString component = lightStudy->componentDataType( entry.c_str() );
+  selectedObjects.Append( new SALOME_InteractiveObject( (const char*)entry.c_str(),
+                                                        (const char*)component.toLatin1(),
+                                                        ""/*refobj->Name().c_str()*/ ) );
+  //QStringList selectedObjects;
+  //selectedObjects << QString(entry.c_str());
+  LightApp_SelectionMgr* aSelectionMgr = _salomeModule->getApp()->selectionMgr();
+  aSelectionMgr->setSelectedObjects(selectedObjects, false);
+
+  // emit onPresentationSelected
+  int presId = -1;
+  _salomeModule->itemClickGeneric(name, type, presId);
+  onPresentationSelected(presId, QString::fromStdString(type), QString::fromStdString(name));
 }
 
 void
@@ -729,29 +763,42 @@ PresentationController::updateTreeViewForPresentationRemoval(long presentationId
 }
 
 void
+PresentationController::_dealWithReplaceMode()
+{
+  // Deal with replace mode: presentations with invalid IDs have to be removed:
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
+  _PTR(Study) studyDS = study->studyDS();
+
+  MEDCALC::PresentationsList * lstManager = _presManager->getAllPresentations();
+  MED_ORB::PresentationsList * lstModule = _salomeModule->engine()->getStudyPresentations(_CAST(Study, studyDS)->GetStudy());
+  // The IDs not in the intersection needs deletion:
+  CORBA::Long * last = lstManager->get_buffer() + lstManager->length();
+  for (unsigned i = 0; i < lstModule->length(); i++) {
+    CORBA::Long * ptr = std::find(lstManager->get_buffer(), last, (*lstModule)[i]);
+    if (ptr == last) {
+      STDLOG("Removing pres " << (*lstModule)[i] << " from OB.");
+      // Presentation in module but not in manager anymore: to be deleted from OB:
+      updateTreeViewForPresentationRemoval((*lstModule)[i]);
+    }
+  }
+}
+
+void
 PresentationController::processWorkspaceEvent(const MEDCALC::MedEvent* event)
 {
   if ( event->type == MEDCALC::EVENT_ADD_PRESENTATION ) {
-    updateTreeViewWithNewPresentation(event->dataId, event->presentationId);
-    // Deal with replace mode: presentations with invalid IDs have to be removed:
-    SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
-    _PTR(Study) studyDS = study->studyDS();
-
-    MEDCALC::PresentationsList * lstManager = _presManager->getAllPresentations();
-    MED_ORB::PresentationsList * lstModule = _salomeModule->engine()->getStudyPresentations(_CAST(Study, studyDS)->GetStudy());
-    // The IDs not in the intersection needs deletion:
-    CORBA::Long * last = lstManager->get_buffer() + lstManager->length();
-    for (unsigned i = 0; i < lstModule->length(); i++)
-      {
-        CORBA::Long * ptr = std::find(lstManager->get_buffer(), last, (*lstModule)[i]);
-        if (ptr == last)
-          {
-            STDLOG("Removing pres " << (*lstModule)[i] << " from OB.");
-          // Presentation in module but not in manager anymore: to be deleted from OB:
-          updateTreeViewForPresentationRemoval((*lstModule)[i]);
-          onPresentationSelected(-1, "", ""); // make sure param widget is hidden
-          }
-      }
+    if (event->dataId == -1) {
+      // A file has been loaded, and we want to create a default presentation (MeshView) for it
+      QString viewMode = getViewModePython();
+      QStringList commands;
+      commands += QString("presentation_id = medcalc.MakeMeshView(medcalc.GetFirstMeshFromDataSource(source_id), viewMode=%1)").arg(viewMode);
+      commands += QString("presentation_id");
+      _consoleDriver->exec(commands);
+    }
+    else {
+      updateTreeViewWithNewPresentation(event->dataId, event->presentationId);
+      _dealWithReplaceMode();
+    }
   }
   else if ( event->type == MEDCALC::EVENT_REMOVE_PRESENTATION ) {
       updateTreeViewForPresentationRemoval(event->presentationId);
@@ -770,4 +817,3 @@ PresentationController::showDockWidgets(bool isVisible)
 {
   _dockWidget->setVisible(isVisible);
 }
-

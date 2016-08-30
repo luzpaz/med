@@ -18,6 +18,7 @@
 //
 
 #include "MEDPresentationMeshView.hxx"
+#include "MEDFactoryClient.hxx"
 
 #include <SALOME_KernelServices.hxx>
 #undef LOG  // should be fixed in KERNEL - double definition
@@ -31,11 +32,23 @@ const std::string MEDPresentationMeshView::PROP_MESH_MODE = "meshMode";
 MEDPresentationMeshView::MEDPresentationMeshView(const MEDCALC::MeshViewParameters& params,
                                                const MEDCALC::ViewModeType viewMode) :
         // Cheating a bit here - a mesh view doesn't need a color map or a range:
-        MEDPresentation(params.fieldHandlerId, TYPE_NAME, viewMode, MEDCALC::COLOR_MAP_DEFAULT,
+        MEDPresentation(params.meshHandlerId, TYPE_NAME, viewMode, MEDCALC::COLOR_MAP_DEFAULT,
                         MEDCALC::SCALAR_BAR_RANGE_DEFAULT),
         _params(params)
 {
   setIntProperty(MEDPresentationMeshView::PROP_MESH_MODE, params.mode);
+}
+
+void
+MEDPresentationMeshView::initFieldMeshInfos()
+{
+  MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
+  MEDCALC::MeshHandler* meshHandler = dataManager->getMeshHandler(_handlerId);
+  MEDCALC::DatasourceHandler* dataSHandler = dataManager->getDatasourceHandlerFromID(meshHandler->sourceid);
+
+  extractFileName(std::string(dataSHandler->uri));
+
+  _meshName = meshHandler->name;
 }
 
 void
@@ -76,6 +89,12 @@ MEDPresentationMeshView::internalGeneratePipeline()
   oss << _objVar << " = " << _srcObjVar << ";";
   pushAndExecPyLine(oss.str()); oss.str("");
 
+  recreateViewSetup();
+}
+
+void
+MEDPresentationMeshView::recreateViewSetup()
+{
   showObject();
   representationType();
   resetCameraAndRender();
@@ -84,8 +103,8 @@ MEDPresentationMeshView::internalGeneratePipeline()
 void
 MEDPresentationMeshView::updatePipeline(const MEDCALC::MeshViewParameters& params)
 {
-  if (params.fieldHandlerId != _params.fieldHandlerId)
-    throw KERNEL::createSalomeException("Unexpected updatePipeline error! Mismatching fieldHandlerId!");
+  if (params.meshHandlerId != _params.meshHandlerId)
+    throw KERNEL::createSalomeException("Unexpected updatePipeline error! Mismatching meshHandlerId!");
 
   if (params.mode != _params.mode)
     updateMeshMode(params.mode);

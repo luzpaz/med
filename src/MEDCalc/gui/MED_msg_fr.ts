@@ -1,533 +1,625 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
-  <context>
+<TS version="2.0" language="fr">
+<context>
     <name>PresentationController</name>
     <message>
-      <source>TITLE_PRESENTATION_PARAMETERS</source>
-      <translation>Paramètres de presentation</translation>
+        <source>TITLE_PRESENTATION_PARAMETERS</source>
+        <translation>Paramètres de presentation</translation>
     </message>
     <message>
-      <source>LAB_PRESENTATION_SCALAR_MAP</source>
-      <translation>Carte scalaire</translation>
+        <source>LAB_PRESENTATION_MESH_VIEW</source>
+        <translation>Maillage</translation>
     </message>
     <message>
-      <source>TIP_PRESENTATION_SCALAR_MAP</source>
-      <translation>Carte scalaire</translation>
+        <source>TIP_PRESENTATION_MESH_VIEW</source>
+        <translation>Maillage</translation>
     </message>
     <message>
-      <source>LAB_PRESENTATION_CONTOUR</source>
-      <translation>Contour</translation>
+        <source>LAB_PRESENTATION_SCALAR_MAP</source>
+        <translation>Carte scalaire</translation>
     </message>
     <message>
-      <source>TIP_PRESENTATION_CONTOUR</source>
-      <translation>Contour</translation>
+        <source>TIP_PRESENTATION_SCALAR_MAP</source>
+        <translation>Carte scalaire</translation>
     </message>
     <message>
-      <source>LAB_PRESENTATION_VECTOR_FIELD</source>
-      <translation>Champ de vecteurs</translation>
+        <source>LAB_PRESENTATION_CONTOUR</source>
+        <translation>Contour</translation>
     </message>
     <message>
-      <source>TIP_PRESENTATION_VECTOR_FIELD</source>
-      <translation>Champ de vecteurs</translation>
+        <source>TIP_PRESENTATION_CONTOUR</source>
+        <translation>Contour</translation>
     </message>
     <message>
-      <source>LAB_PRESENTATION_SLICES</source>
-      <translation>Coupes</translation>
+        <source>LAB_PRESENTATION_VECTOR_FIELD</source>
+        <translation>Champ de vecteurs</translation>
     </message>
     <message>
-      <source>TIP_PRESENTATION_SLICES</source>
-      <translation>Coupes</translation>
+        <source>TIP_PRESENTATION_VECTOR_FIELD</source>
+        <translation>Champ de vecteurs</translation>
     </message>
     <message>
-      <source>LAB_PRESENTATION_DEFLECTION_SHAPE</source>
-      <translation>Déformée</translation>
+        <source>LAB_PRESENTATION_SLICES</source>
+        <translation>Coupes</translation>
     </message>
     <message>
-      <source>TIP_PRESENTATION_DEFLECTION_SHAPE</source>
-      <translation>Déformée</translation>
+        <source>TIP_PRESENTATION_SLICES</source>
+        <translation>Coupes</translation>
     </message>
     <message>
-      <source>LAB_PRESENTATION_POINT_SPRITE</source>
-      <translation>Point sprite</translation>
+        <source>LAB_PRESENTATION_DEFLECTION_SHAPE</source>
+        <translation>Déformée</translation>
     </message>
     <message>
-      <source>TIP_PRESENTATION_POINT_SPRITE</source>
-      <translation>Point sprite</translation>
+        <source>TIP_PRESENTATION_DEFLECTION_SHAPE</source>
+        <translation>Déformée</translation>
     </message>
     <message>
-      <source>MENU_PRESENTATIONS</source>
-      <translation>Présentations</translation>
+        <source>LAB_PRESENTATION_POINT_SPRITE</source>
+        <translation>Point sprite</translation>
     </message>
     <message>
-      <source>MEDPresentationScalarMap</source>
-      <translation>Carte scalaire</translation>
+        <source>TIP_PRESENTATION_POINT_SPRITE</source>
+        <translation>Point sprite</translation>
     </message>
     <message>
-      <source>MEDPresentationContour</source>
-      <translation>Contour</translation>
+        <source>LAB_DELETE_PRESENTATION</source>
+        <translation>Supprimer</translation>
     </message>
     <message>
-      <source>MEDPresentationVectorField</source>
-      <translation>Champ de vecteurs</translation>
+        <source>TIP_DELETE_PRESENTATION</source>
+        <translation>Supprime la présentation sélectionnée</translation>
     </message>
     <message>
-      <source>MEDPresentationSlices</source>
-      <translation>Coupes</translation>
+        <source>LAB_PARAVIS_DUMP</source>
+        <translation>Trace du pipeline</translation>
     </message>
     <message>
-      <source>MEDPresentationDeflectionShape</source>
-      <translation>Déformée</translation>
+        <source>TIP_PARAVIS_DUMP</source>
+        <translation>Affiche les commandes Python bas niveau de la présentation</translation>
     </message>
     <message>
-      <source>MEDPresentationPointSprite</source>
-      <translation>Point sprite</translation>
+        <source>MENU_PRESENTATIONS</source>
+        <translation>Présentations</translation>
     </message>
-  </context>
-  <context>
+    <message>
+        <source>MEDPresentationMeshView</source>
+        <translation>Maillage</translation>
+    </message>
+    <message>
+        <source>MEDPresentationScalarMap</source>
+        <translation>Carte scalaire</translation>
+    </message>
+    <message>
+        <source>MEDPresentationContour</source>
+        <translation>Contour</translation>
+    </message>
+    <message>
+        <source>MEDPresentationVectorField</source>
+        <translation>Champ de vecteurs</translation>
+    </message>
+    <message>
+        <source>MEDPresentationSlices</source>
+        <translation>Coupes</translation>
+    </message>
+    <message>
+        <source>MEDPresentationDeflectionShape</source>
+        <translation>Déformée</translation>
+    </message>
+    <message>
+        <source>MEDPresentationPointSprite</source>
+        <translation>Point sprite</translation>
+    </message>
+</context>
+<context>
     <name>ProcessingController</name>
     <message>
-      <source>MENU_PROCESSING</source>
-      <translation>Traitement</translation>
+        <source>MENU_PROCESSING</source>
+        <translation>Traitement</translation>
     </message>
     <message>
-      <source>LAB_PROCESSING_CHANGE_MESH</source>
-      <translation>Changer le maillage sous-jacent</translation>
+        <source>LAB_PROCESSING_CHANGE_MESH</source>
+        <translation>Changer le maillage sous-jacent</translation>
     </message>
     <message>
-      <source>LAB_PROCESSING_INTERPOLATE_FIELD</source>
-      <translation>Interpoler le champ</translation>
+        <source>LAB_PROCESSING_INTERPOLATE_FIELD</source>
+        <translation>Interpoler le champ</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>DatasourceController</name>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="45"/>
-      <source>LAB_ADD_DATA_SOURCE</source>
-      <translation>Importer des données MED</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="45"/>
+        <source>LAB_ADD_DATA_SOURCE</source>
+        <translation>Importer des données MED</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="46"/>
-      <source>TIP_ADD_DATA_SOURCE</source>
-      <translation>Ajouter des données par import de fichiers MED</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="46"/>
+        <source>TIP_ADD_DATA_SOURCE</source>
+        <translation>Ajouter des données par import de fichiers MED</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="52"/>
-      <source>LAB_ADD_IMAGE_SOURCE</source>
-      <translation>Ajouter une image</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="52"/>
+        <source>LAB_ADD_IMAGE_SOURCE</source>
+        <translation>Ajouter une image</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="53"/>
-      <source>TIP_ADD_IMAGE_SOURCE</source>
-      <translation>Ajouter des données par import d'un fichier image</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="53"/>
+        <source>TIP_ADD_IMAGE_SOURCE</source>
+        <translation>Ajouter des données par import d&apos;un fichier image</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="62"/>
-      <source>LAB_EXPAND_FIELD</source>
-      <translation>Étendre les series temporelles du champ</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="62"/>
+        <source>LAB_EXPAND_FIELD</source>
+        <translation>Étendre les series temporelles du champ</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="75"/>
-      <source>LAB_USE_IN_WORKSPACE</source>
-      <translation>Utiliser dans l'espace de travail</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="75"/>
+        <source>LAB_USE_IN_WORKSPACE</source>
+        <translation>Utiliser dans l&apos;espace de travail</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="157"/>
-      <source>IMPORT_MED_FIELDS</source>
-      <translation>Importer des champs (format MED)</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="157"/>
+        <source>IMPORT_MED_FIELDS</source>
+        <translation>Importer des champs (format MED)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="191"/>
-      <source>OPERATION_FAILED</source>
-      <translation>L'opération a échoué</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="191"/>
+        <source>OPERATION_FAILED</source>
+        <translation>L&apos;opération a échoué</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="192"/>
-      <source>CREATION_FAILED</source>
-      <translation>La création des données MED à partir d'un fichier image a échoué</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="192"/>
+        <source>CREATION_FAILED</source>
+        <translation>La création des données MED à partir d&apos;un fichier image a échoué</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="283"/>
-      <source>OPERATION_NOT_ALLOWED</source>
-      <translation>Opération non autorisée</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="283"/>
+        <source>OPERATION_NOT_ALLOWED</source>
+        <translation>Opération non autorisée</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="284"/>
-      <source>FIELD_ALREADY_DEFINED</source>
-      <translation>Ce champ est déjà défini dans l'espace de travail</translation>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="284"/>
+        <source>FIELD_ALREADY_DEFINED</source>
+        <translation>Ce champ est déjà défini dans l&apos;espace de travail</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>WidgetPresentationParameters</name>
     <message>
-      <source>LAB_DISP_COMP</source>
-      <translation>Composante affichée :</translation>
+        <source>LAB_DEFAULT_DYN_TITLE</source>
+        <translation>Paramètres par défaut</translation>
+    </message>    
+    <message>
+        <source>LAB_DISP_COMP</source>
+        <translation>Composante affichée :</translation>
     </message>
     <message>
-      <source>LAB_EUCLIDEAN_NORM</source>
-      <translation>Norme euclidienne</translation>
+        <source>LAB_EUCLIDEAN_NORM</source>
+        <translation>Norme euclidienne</translation>
     </message>
     <message>
-      <source>LAB_SCALARBAR</source>
-      <translation>Echelle de valeurs :</translation>
+        <source>LAB_SCALARBAR</source>
+        <translation>Echelle de valeurs :</translation>
     </message>
     <message>
-      <source>LAB_RANGE</source>
-      <translation>Intervalle :</translation>
+        <source>LAB_RANGE</source>
+        <translation>Intervalle :</translation>
     </message>
     <message>
-      <source>LAB_ALL_TIMESTEPS</source>
-      <translation>Tous les pas de temps</translation>
+        <source>LAB_ALL_TIMESTEPS</source>
+        <translation>Tous les pas de temps</translation>
     </message>
     <message>
-      <source>LAB_CURRENT_TIMESTEP</source>
-      <translation>Pas de temps courant</translation>
+        <source>LAB_CURRENT_TIMESTEP</source>
+        <translation>Pas de temps courant</translation>
     </message>
     <message>
-      <source>LAB_USER_RANGE</source>
-      <translation>Personnalisé :</translation>
+        <source>LAB_USER_RANGE</source>
+        <translation>Personnalisé :</translation>
     </message>
     <message>
-      <source>LAB_TIMESTEP</source>
-      <translation>Pas de temps :</translation>
+        <source>LAB_TIMESTEP</source>
+        <translation>Pas de temps :</translation>
     </message>
     <message>
-      <source>LAB_MIN_VALUE</source>
-      <translation>Valeur min :</translation>
+        <source>LAB_MIN_VALUE</source>
+        <translation>Valeur min :</translation>
     </message>
     <message>
-      <source>LAB_MAX_VALUE</source>
-      <translation>Valeur max :</translation>
+        <source>LAB_MAX_VALUE</source>
+        <translation>Valeur max :</translation>
     </message>
     <message>
-      <source>LAB_COLOR_MAP</source>
-      <translation>Table de couleurs :</translation>
+        <source>LAB_COLOR_MAP</source>
+        <translation>Table de couleurs :</translation>
     </message>
     <message>
-      <source>LAB_BLUE_TO_RED</source>
-      <translation>Arc-en-ciel bleu vers rouge</translation>
+        <source>LAB_MESH_WIREFRAME</source>
+        <translation>Fil de fer</translation>
     </message>
     <message>
-      <source>LAB_COOL_TO_WARM</source>
-      <translation>Froid vers chaud</translation>
+        <source>LAB_MESH_SURFACE</source>
+        <translation>Surface</translation>
     </message>
-  </context>
-  <context>
+    <message>
+        <source>LAB_MESH_SURF_EDGES</source>
+        <translation>Surface Avec Arrêtes</translation>
+    </message>
+    <message>
+        <source>LAB_DISP_MESH_MODE</source>
+        <translation>Affichage du maillage:</translation>
+    </message>
+    <message>
+        <source>LAB_NB_CONTOURS</source>
+        <translation>Nombre de contours (max. %1) :</translation>
+    </message>
+    <message>
+        <source>LAB_NB_SLICES</source>
+        <translation>Nombres de coupes (max. %1) :</translation>
+    </message>
+    <message>
+        <source>LAB_SPINBOX_TOOLTIP</source>
+        <translation>Taper &apos;Entrée&apos; pour appliquer</translation>
+    </message>    
+    <message>
+        <source>LAB_SLICE_ORIENT</source>
+        <translation>Orientation des coupes:</translation>
+    </message>
+    <message>
+        <source>LAB_SLICE_NORMAL_TO_X</source>
+        <translation>Normale à X</translation>
+    </message>
+    <message>
+        <source>LAB_SLICE_NORMAL_TO_Y</source>
+        <translation>Normale à Y</translation>
+    </message>
+    <message>
+        <source>LAB_SLICE_NORMAL_TO_Z</source>
+        <translation>Normale à Z</translation>
+    </message>
+    <message>
+        <source>LAB_SLICE_NORMAL_TO_XY</source>
+        <translation>Normale à XY</translation>
+    </message>
+    <message>
+        <source>LAB_SLICE_NORMAL_TO_XZ</source>
+        <translation>Normale à XZ</translation>
+    </message>
+    <message>
+        <source>LAB_SLICE_NORMAL_TO_YZ</source>
+        <translation>Normale à YZ</translation>
+    </message>
+    <message>
+        <source>LAB_SLICE_NORMAL_TO_XYZ</source>
+        <translation>Normale à XYZ</translation>
+    </message>    
+    <message>
+        <source>LAB_BLUE_TO_RED</source>
+        <translation>Arc-en-ciel bleu vers rouge</translation>
+    </message>
+    <message>
+        <source>LAB_COOL_TO_WARM</source>
+        <translation>Froid vers chaud</translation>
+    </message>
+</context>
+<context>
     <name>DlgAlias</name>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="14"/>
-      <source>SELECT_AN_ALIAS_FOR_THE_FIELD</source>
-      <translation>Selectionner un alias pour ce champ</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="14"/>
+        <source>SELECT_AN_ALIAS_FOR_THE_FIELD</source>
+        <translation>Selectionner un alias pour ce champ</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="401"/>
-      <source>DEFINE_AN_ALIAS</source>
-      <translation>Vous pouvez définir un alias pour manipuler le champs dans la console:</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="401"/>
+        <source>DEFINE_AN_ALIAS</source>
+        <translation>Vous pouvez définir un alias pour manipuler le champs dans la console:</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="419"/>
-      <source>ALIAS</source>
-      <translation>Alias</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="419"/>
+        <source>ALIAS</source>
+        <translation>Alias</translation>
     </message>
     <message utf8="true">
-      <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="436"/>
-      <source>MSG_OPERATION_DEFINES_VARIABLE</source>
-      <translation>(cette opération définit une variable nommée &lt;alias&gt; dans la console texte. Tapez &quot;&lt;alias&gt;.help()&quot; pour voir les fonctions disponibles, ou simplement &quot;doc&quot;)</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="436"/>
+        <source>MSG_OPERATION_DEFINES_VARIABLE</source>
+        <translation>(cette opération définit une variable nommée &lt;alias&gt; dans la console texte. Tapez &quot;&lt;alias&gt;.help()&quot; pour voir les fonctions disponibles, ou simplement &quot;doc&quot;)</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>DlgChangeUnderlyingMesh</name>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="14"/>
-      <source>FORM</source>
-      <translation>Formulaire</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="14"/>
+        <source>FORM</source>
+        <translation>Formulaire</translation>
     </message>
     <message utf8="true">
-      <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="403"/>
-      <source>MESH_GT</source>
-      <translation>Maillage -&gt;</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="403"/>
+        <source>MESH_GT</source>
+        <translation>Maillage -&gt;</translation>
     </message>
     <message utf8="true">
-      <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="420"/>
-      <source>MSG_EXPLORER</source>
-      <translation>(L'explorateur fournit une vue des données MED (maillage et champs) référencées dans l'espace des données)</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="420"/>
+        <source>MSG_EXPLORER</source>
+        <translation>(L&apos;explorateur fournit une vue des données MED (maillage et champs) référencées dans l&apos;espace des données)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.cxx" line="35"/>
-      <source>DATA_VERIFICATION</source>
-      <translation>Vérification des données</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.cxx" line="35"/>
+        <source>DATA_VERIFICATION</source>
+        <translation>Vérification des données</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.cxx" line="36"/>
-      <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="391"/>
-      <source>SELECT_MESH</source>
-      <translation>Vous devez sélectionner un maillage dans l'explorateur et cliquer sur le bouton Maillage</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.cxx" line="36"/>
+        <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="391"/>
+        <source>SELECT_MESH</source>
+        <translation>Vous devez sélectionner un maillage dans l&apos;explorateur et cliquer sur le bouton Maillage</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>DlgInterpolateField</name>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="391"/>
-      <source>SELECT_MESH</source>
-      <translation>Vous devez sélectionner un maillage dans l'explorateur et cliquer sur le bouton Maillage</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="391"/>
+        <source>SELECT_MESH</source>
+        <translation>Vous devez sélectionner un maillage dans l&apos;explorateur et cliquer sur le bouton Maillage</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="406"/>
-      <source>TARGET_MESH_GT</source>
-      <translation>Maillage cible -&gt;</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="406"/>
+        <source>TARGET_MESH_GT</source>
+        <translation>Maillage cible -&gt;</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="423"/>
-      <source>MSG_EXPLORER</source>
-      <translation>(L'explorateur fournit une vue des données MED (maillage et champs) référencées dans l'espace des données)</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="423"/>
+        <source>MSG_EXPLORER</source>
+        <translation>(L&apos;explorateur fournit une vue des données MED (maillage et champs) référencées dans l&apos;espace des données)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="450"/>
-      <source>LABEL_PRECISION</source>
-      <translation>Précision de l'interpolateur</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="450"/>
+        <source>LABEL_PRECISION</source>
+        <translation>Précision de l&apos;interpolateur</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="493"/>
-      <source>LABEL_INTERSECTION_TYPE</source>
-      <translation>Type d'intersection</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="493"/>
+        <source>LABEL_INTERSECTION_TYPE</source>
+        <translation>Type d&apos;intersection</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="520"/>
-      <source>LABEL_METHOD</source>
-      <translation>Méthode d'interpolation</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="520"/>
+        <source>LABEL_METHOD</source>
+        <translation>Méthode d&apos;interpolation</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="547"/>
-      <source>LABEL_DEFAULT_VALUE</source>
-      <translation>Valeur par défaut du champ résultant</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="547"/>
+        <source>LABEL_DEFAULT_VALUE</source>
+        <translation>Valeur par défaut du champ résultant</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="581"/>
-      <source>LABEL_REVERSE</source>
-      <translation>Interpolation inverse ?</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="581"/>
+        <source>LABEL_REVERSE</source>
+        <translation>Interpolation inverse ?</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="612"/>
-      <source>LABEL_NATURE</source>
-      <translation>Nature du champ</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="612"/>
+        <source>LABEL_NATURE</source>
+        <translation>Nature du champ</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>DlgImageToMed</name>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.ui" line="14"/>
-      <source>FORM</source>
-      <translation>Formulaire</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.ui" line="14"/>
+        <source>FORM</source>
+        <translation>Formulaire</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.ui" line="28"/>
-      <source>IMAGE_FILE</source>
-      <translation>Fichier image :</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.ui" line="28"/>
+        <source>IMAGE_FILE</source>
+        <translation>Fichier image :</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.ui" line="35"/>
-      <source>MED_FILE</source>
-      <translation>Fichier MED :</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.ui" line="35"/>
+        <source>MED_FILE</source>
+        <translation>Fichier MED :</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="64"/>
-      <source>SELECT_IMAGE_FILE</source>
-      <translation>Selectionner un fichier image</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="64"/>
+        <source>SELECT_IMAGE_FILE</source>
+        <translation>Selectionner un fichier image</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="79"/>
-      <source>SPECIFY_MED_FILE</source>
-      <translation>Spécifier un fichier MED</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="79"/>
+        <source>SPECIFY_MED_FILE</source>
+        <translation>Spécifier un fichier MED</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.ui" line="82"/>
-      <source>LOAD_AUTOMATICALLY</source>
-      <translation>Charger automatiquement</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.ui" line="82"/>
+        <source>LOAD_AUTOMATICALLY</source>
+        <translation>Charger automatiquement</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>DlgUseInWorkspace</name>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgUseInWorkspace.ui" line="13"/>
-      <source>FORM</source>
-      <translation>Formulaire</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgUseInWorkspace.ui" line="13"/>
+        <source>FORM</source>
+        <translation>Formulaire</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgUseInWorkspace.ui" line="49"/>
-      <source>PRESSURE</source>
-      <translation>Pression :</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgUseInWorkspace.ui" line="49"/>
+        <source>PRESSURE</source>
+        <translation>Pression :</translation>
     </message>
     <message utf8="true">
-      <location filename="MEDCALC/gui/dialogs/DlgUseInWorkspace.ui" line="56"/>
-      <source>TEMPERATURE</source>
-      <translation>Température :</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgUseInWorkspace.ui" line="56"/>
+        <source>TEMPERATURE</source>
+        <translation>Température :</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>GenericDialog</name>
     <message>
-      <location filename="MEDCALC/gui/dialogs/GenericDialog.ui" line="13"/>
-      <source>DIALOG</source>
-      <translation>Dialogue</translation>
+        <location filename="MEDCALC/gui/dialogs/GenericDialog.ui" line="13"/>
+        <source>DIALOG</source>
+        <translation>Dialogue</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>MEDModule</name>
     <message>
-      <location filename="MEDCALC/gui/MEDModule.cxx" line="68"/>
-      <location filename="MEDCALC/gui/MEDModule.cxx" line="157"/>
-      <source>IMPORT_FROM_FILE</source>
-      <translation>Importer depuis un fichier</translation>
+        <location filename="MEDCALC/gui/MEDModule.cxx" line="68"/>
+        <location filename="MEDCALC/gui/MEDModule.cxx" line="157"/>
+        <source>IMPORT_FROM_FILE</source>
+        <translation>Importer depuis un fichier</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/MEDModule.cxx" line="69"/>
-      <source>IMPORT_MED_FILE</source>
-      <translation>Importer un fichier MED</translation>
+        <location filename="MEDCALC/gui/MEDModule.cxx" line="69"/>
+        <source>IMPORT_MED_FILE</source>
+        <translation>Importer un fichier MED</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/MEDModule.cxx" line="72"/>
-      <source>MEN_FILE</source>
-      <translation>&amp;Fichier</translation>
+        <location filename="MEDCALC/gui/MEDModule.cxx" line="72"/>
+        <source>MEN_FILE</source>
+        <translation>&amp;Fichier</translation>
     </message>
     <message>
-      <source>PREF_TAB_GENERAL</source>
-      <translation>Général</translation>
+        <source>PREF_TAB_GENERAL</source>
+        <translation>Général</translation>
     </message>
     <message>
-      <source>PREF_THEME_GROUP</source>
-      <translation>Thème</translation>
+        <source>PREF_THEME_GROUP</source>
+        <translation>Thème</translation>
     </message>
     <message>
-      <source>PREF_ICONS</source>
-      <translation>Icones</translation>
+        <source>PREF_ICONS</source>
+        <translation>Icones</translation>
     </message>
     <message>
-      <source>PREF_ICON_THEME_MODERN</source>
-      <translation>Moderne</translation>
+        <source>PREF_ICON_THEME_MODERN</source>
+        <translation>Moderne</translation>
     </message>
     <message>
-      <source>PREF_ICON_THEME_CLASSIC</source>
-      <translation>Classique</translation>
+        <source>PREF_ICON_THEME_CLASSIC</source>
+        <translation>Classique</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>WorkspaceController</name>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="66"/>
-      <source>VISUALIZE_SCALAR_MAP</source>
-      <translation>Visualiser (carte scalaire)</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="66"/>
+        <source>VISUALIZE_SCALAR_MAP</source>
+        <translation>Visualiser (carte scalaire)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="67"/>
-      <source>USE_IN_CONSOLE</source>
-      <translation>Utiliser (dans la console)</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="67"/>
+        <source>USE_IN_CONSOLE</source>
+        <translation>Utiliser (dans la console)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="68"/>
-      <source>EXPORT_TO_PARAVIS</source>
-      <translation>Exporter (vers PARAVIS)</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="68"/>
+        <source>EXPORT_TO_PARAVIS</source>
+        <translation>Exporter (vers PARAVIS)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="69"/>
-      <source>SAVE_AS_MED</source>
-      <translation>Sauvegarder (dans un fichier MED)</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="69"/>
+        <source>SAVE_AS_MED</source>
+        <translation>Sauvegarder (dans un fichier MED)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="70"/>
-      <source>REMOVE_FROM_WORKSPACE</source>
-      <translation>Supprimer (de l'espace de travail)</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="70"/>
+        <source>REMOVE_FROM_WORKSPACE</source>
+        <translation>Supprimer (de l&apos;espace de travail)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="91"/>
-      <source>LAB_SAVE_WORKSPACE</source>
-      <translation>Sauvegarder l'espace de travail</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="91"/>
+        <source>LAB_SAVE_WORKSPACE</source>
+        <translation>Sauvegarder l&apos;espace de travail</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="92"/>
-      <source>TIP_SAVE_WORKSPACE</source>
-      <translation>Sauvegarder l'espace de travail (champs et maillages) dans un fichier MED</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="92"/>
+        <source>TIP_SAVE_WORKSPACE</source>
+        <translation>Sauvegarder l&apos;espace de travail (champs et maillages) dans un fichier MED</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="97"/>
-      <source>LAB_CLEAN_WORKSPACE</source>
-      <translation>Nettoyer l'espace de travail</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="97"/>
+        <source>LAB_CLEAN_WORKSPACE</source>
+        <translation>Nettoyer l&apos;espace de travail</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="98"/>
-      <source>TIP_CLEAN_WORKSPACE</source>
-      <translation>Effacer toute les données de l'espace de travail</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="98"/>
+        <source>TIP_CLEAN_WORKSPACE</source>
+        <translation>Effacer toute les données de l&apos;espace de travail</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="271"/>
-      <source>SAVE_SELECTED_FIELDS</source>
-      <translation>Sauvegarder les champs sélectionnés</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="271"/>
+        <source>SAVE_SELECTED_FIELDS</source>
+        <translation>Sauvegarder les champs sélectionnés</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="425"/>
-      <source>SAVE_WORKSPACE_DATA</source>
-      <translation>Sauvegarder les données de l'espace de travail</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="425"/>
+        <source>SAVE_WORKSPACE_DATA</source>
+        <translation>Sauvegarder les données de l&apos;espace de travail</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="439"/>
-      <source>NOT_IMPLEMENTED_YET</source>
-      <translation>Non implémenté</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="439"/>
+        <source>NOT_IMPLEMENTED_YET</source>
+        <translation>Non implémenté</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="440"/>
-      <source>FUNCTION_NOT_IMPLEMENTED</source>
-      <translation>Cette function n'est pas encore implémentée</translation>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="440"/>
+        <source>FUNCTION_NOT_IMPLEMENTED</source>
+        <translation>Cette function n&apos;est pas encore implémentée</translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>@default</name>
     <message>
-      <location filename="MEDCALC/gui/MEDModule.cxx" line="151"/>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="152"/>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="75"/>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="267"/>
-      <location filename="MEDCALC/gui/WorkspaceController.cxx" line="420"/>
-      <source>FILE_FILTER_MED</source>
-      <translation>Fichiers MED (*.med)</translation>
+        <location filename="MEDCALC/gui/MEDModule.cxx" line="151"/>
+        <location filename="MEDCALC/gui/DatasourceController.cxx" line="152"/>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="75"/>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="267"/>
+        <location filename="MEDCALC/gui/WorkspaceController.cxx" line="420"/>
+        <source>FILE_FILTER_MED</source>
+        <translation>Fichiers MED (*.med)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="57"/>
-      <source>FILE_FILTER_PNG</source>
-      <translation>Image PNG (*.png)</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="57"/>
+        <source>FILE_FILTER_PNG</source>
+        <translation>Image PNG (*.png)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="58"/>
-      <source>FILE_FILTER_JPG</source>
-      <translation>Image JPG (*.jpg)</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="58"/>
+        <source>FILE_FILTER_JPG</source>
+        <translation>Image JPG (*.jpg)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="59"/>
-      <source>FILE_FILTER_PGM</source>
-      <translation>Image PGM (*.jpg)</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="59"/>
+        <source>FILE_FILTER_PGM</source>
+        <translation>Image PGM (*.jpg)</translation>
     </message>
     <message>
-      <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="60"/>
-      <source>FILE_FILTER_ALL</source>
-      <translation>Tous les fichiers (*.*)</translation>
+        <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="60"/>
+        <source>FILE_FILTER_ALL</source>
+        <translation>Tous les fichiers (*.*)</translation>
     </message>
     <message>
-      <source>LAB_VIEW_MODE</source>
-      <translation>Mode de rendu :</translation>
+        <source>LAB_VIEW_MODE</source>
+        <translation>Mode de rendu :</translation>
     </message>
     <message>
-      <source>LAB_VIEW_MODE_REPLACE</source>
-      <translation>Remplacer</translation>
+        <source>LAB_VIEW_MODE_REPLACE</source>
+        <translation>Remplacer</translation>
     </message>
     <message>
-      <source>LAB_VIEW_MODE_OVERLAP</source>
-      <translation>Superposer</translation>
+        <source>LAB_VIEW_MODE_OVERLAP</source>
+        <translation>Superposer</translation>
     </message>
     <message>
-      <source>LAB_VIEW_MODE_NEW_LAYOUT</source>
-      <translation>Nouvel onglet</translation>
+        <source>LAB_VIEW_MODE_NEW_LAYOUT</source>
+        <translation>Nouvel onglet</translation>
     </message>
     <message>
-      <source>LAB_VIEW_MODE_SPLIT_VIEW</source>
-      <translation>Scinder</translation>
+        <source>LAB_VIEW_MODE_SPLIT_VIEW</source>
+        <translation>Scinder</translation>
     </message>
-  </context>
+</context>
 </TS>

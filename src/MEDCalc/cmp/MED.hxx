@@ -55,22 +55,33 @@ public:
   MED_ORB::status addDatasourceToStudy(SALOMEDS::Study_ptr study,
                                        const MEDCALC::DatasourceHandler& datasourceHandler);
 
-  MED_ORB::status registerPresentation(SALOMEDS::Study_ptr study,
+  MED_ORB::status registerPresentationField(SALOMEDS::Study_ptr study,
                                        CORBA::Long fieldId,
                                        const char* name,
                                        const char* type,
                                        const char* ico,
                                        CORBA::Long presentationId);
 
+  MED_ORB::status registerPresentationMesh(SALOMEDS::Study_ptr study,
+                                         CORBA::Long meshId,
+                                         const char* name,
+                                         const char* type,
+                                         const char* ico,
+                                         CORBA::Long presentationId);
+
   MED_ORB::status unregisterPresentation(SALOMEDS::Study_ptr study,
                                          CORBA::Long presentationId);
 
-  // Caller owns the returned list, and is responsible for the list deletion.
-  MED_ORB::PresentationsList* getSiblingPresentations(SALOMEDS::Study_ptr study,
-                                                      CORBA::Long presentationId);
+//  // Caller owns the returned list, and is responsible for the list deletion.
+//  MED_ORB::PresentationsList* getSiblingPresentations(SALOMEDS::Study_ptr study,
+//                                                      CORBA::Long presentationId);
 
   // Get all presentations registered in the study
   MED_ORB::PresentationsList* getStudyPresentations(SALOMEDS::Study_ptr study);
+
+  char* getStudyPresentationEntry(SALOMEDS::Study_ptr study, int presentationId);
+
+  void cleanUp();
 
   /*! Dump the study as a Python file */
   virtual Engines::TMPFile* DumpPython(CORBA::Object_ptr theStudy,
@@ -84,6 +95,7 @@ public:
 
  private:
   std::map<long, std::string> _fieldSeriesEntries;
+  std::map<long, std::string> _meshEntries;
 };
 
 extern "C"

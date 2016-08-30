@@ -20,6 +20,11 @@
 #include "DlgInterpolateField.hxx"
 #include <MEDCalcConstants.hxx>
 
+#include <SALOMEDS_SObject.hxx>
+#include <SALOMEDS_Study.hxx>
+#include CORBA_CLIENT_HEADER(SALOMEDS)
+#include CORBA_CLIENT_HEADER(SALOMEDS_Attributes)
+
 #include <QString>
 #include <QMessageBox>
 #include <QDoubleValidator>
@@ -113,9 +118,17 @@ void DlgInterpolateField::OnSelectMesh() {
   SALOME_StudyEditor::SObjectList * listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() > 0 ) {
     SALOMEDS::SObject_var soMesh = listOfSObject->at(0);
-    // _GBO_ TODO: we should test here if it is a mesh (attribute in
-    // the sobject)
-    _meshId = _studyEditor->getParameterInt(soMesh,MESH_ID);
+    std::string name(_studyEditor->getName(soMesh));
+    if (soMesh->_is_nil() || name == "MEDCalc")
+      return;
+    SALOMEDS::GenericAttribute_var anAttr;
+    SALOMEDS::AttributeParameter_var aParam;
+    if ( soMesh->FindAttribute(anAttr,"AttributeParameter") ) {
+      aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
+      if (! aParam->IsSet(MESH_ID, PT_INTEGER))
+        return;
+    }
+    _meshId = aParam->GetInt(MESH_ID);
     const char * meshname = _studyEditor->getName(soMesh);
     this->ui.txtMesh->setText(QString(meshname));
   }

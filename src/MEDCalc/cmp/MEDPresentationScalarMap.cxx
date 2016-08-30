@@ -54,7 +54,7 @@ MEDPresentationScalarMap::internalGeneratePipeline()
 
   showObject();
 
-  colorBy(_pvFieldType);
+  colorBy();
   showScalarBar();
   selectColorMap();
   rescaleTransferFunction();

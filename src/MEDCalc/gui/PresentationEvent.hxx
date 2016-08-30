@@ -29,6 +29,7 @@ typedef struct {
 
   EventType eventtype;
   MEDCALC::FieldHandler * fieldHandler;
+  MEDCALC::MeshHandler * meshHandler;
   int presentationId;
   int anInteger;                // multi-purpose variable
   //int anInteger2;             // multi-purpose variable

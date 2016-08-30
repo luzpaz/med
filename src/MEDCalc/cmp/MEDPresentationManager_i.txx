@@ -32,8 +32,7 @@ MEDPresentationManager_i::_makePresentation(const PresentationParameters params,
   std::vector<int> to_del;
   if (viewMode == MEDCALC::VIEW_MODE_REPLACE)
     {
-      // Remove all presentations from this view:
-      STDLOG("About to remove all presentations from view " << activeViewId);
+      // Prepare all presentations to be removed from this view:
       std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator it;
       for (it = _presentations.begin(); it != _presentations.end(); ++it)
         {
@@ -49,6 +48,7 @@ MEDPresentationManager_i::_makePresentation(const PresentationParameters params,
   STDLOG("Generated presentation ID: " << newID);
   try {
     presentation = new PresentationType(params, viewMode);  // on stack or on heap?? heap for now
+    presentation->initFieldMeshInfos();
     // In replace or overlap mode we force the display in the active view:
     if(activeViewId != -1 && (viewMode == MEDCALC::VIEW_MODE_REPLACE || viewMode == MEDCALC::VIEW_MODE_OVERLAP))
       presentation->setPyViewID(activeViewId);
@@ -65,6 +65,7 @@ MEDPresentationManager_i::_makePresentation(const PresentationParameters params,
   presentation->generatePipeline();
 
   // If generatePipeline didn't throw, we can actually remove presentations to be deleted:
+  STDLOG("About to remove all presentations from view " << activeViewId);
   for (std::vector<int>::const_iterator it2 = to_del.begin(); it2 != to_del.end(); ++it2)
     removePresentation(*it2);
 

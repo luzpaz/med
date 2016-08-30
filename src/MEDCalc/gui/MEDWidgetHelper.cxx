@@ -64,7 +64,9 @@ void MEDWidgetHelper::updateWidget(bool connect)
   loadParametersFromEngine();
 
   // Set properly color map and scalar bar range
+  STDLOG("MEDWidgetHelper::udpateWidget() colorMap is " << _colorMap);
   _paramWidget->setColorMap(_colorMap);
+  STDLOG("MEDWidgetHelper::udpateWidget() scalarBarRange is " << _scalarBarRange);
   _paramWidget->setScalarBarRange(_scalarBarRange);
 
   if (connect)

@@ -40,6 +40,8 @@ class MEDCALC_EXPORT MEDPresentation
 public:
   typedef ::CORBA::Long TypeID;
 
+  virtual void initFieldMeshInfos();
+
   virtual ~MEDPresentation();
 
   static const std::string PROP_NAME;                 // name of the presentation
@@ -55,7 +57,10 @@ public:
   virtual void setIntProperty(const std::string& propName, const int propValue);
   int getIntProperty(const std::string& propName) const;
 
-  void activateView();  // non const because generates a Python trace
+  // returns True if the view was still alive, False if it must have been recreated
+  // because the user closed it.
+  bool activateView();
+  virtual void recreateViewSetup();
 
   void dumpIntProperties() const;
   void dumpStringProperties() const;
@@ -69,7 +74,7 @@ protected:
   typedef std::pair<int, PyObject *> PyObjectId;
   static int GeneratePythonId();
 
-  MEDPresentation(MEDPresentation::TypeID fieldHandlerId, const std::string& name,
+  MEDPresentation(MEDPresentation::TypeID handlerId, const std::string& name,
                   const MEDCALC::ViewModeType viewMode,
                   const MEDCALC::ColorMapType colorMap,
                   const MEDCALC::ScalarBarRangeType sbRange);
@@ -80,7 +85,7 @@ protected:
   void createSource();
   void selectFieldComponent();
   void showObject();
-  void colorBy(const std::string & fieldType);
+  void colorBy();
   void showScalarBar();
   void rescaleTransferFunction();
   void selectColorMap();
@@ -92,13 +97,12 @@ protected:
   void execPyLine(const std::string & lin);
   void pushAndExecPyLine(const std::string & lin);
 
-  MEDPresentation::TypeID getID() const { return _fieldHandlerId; }
+  MEDPresentation::TypeID getID() const { return _handlerId; }
 
   void fillAvailableFieldComponents();
   void applyCellToPointIfNeeded();
+  void extractFileName(const std::string& name);
 //  void convertTo3DVectorField();
-
-//  virtual MEDCALC::ViewModeType getViewMode() = 0;
 
   template<typename PresentationType, typename PresentationParameters>
   void updateComponent(const std::string& newCompo);
@@ -133,8 +137,10 @@ protected:
   MEDCoupling::TypeOfField _mcFieldType;
   ///! ParaView field type: "CELLS" or "POINTS"
   std::string _pvFieldType;
+  ///! ParaView field type: "CELLS" or "POINTS" used in the ColorBy method. Not necessarily equal to _pvFieldType.
+  std::string _colorByType;
 
-  MEDPresentation::TypeID _fieldHandlerId;
+  MEDPresentation::TypeID _handlerId;  // either a field or a mesh id (a field ID though, most of the time)
 
   int _selectedComponentIndex;
   MEDCALC::ViewModeType _viewMode;

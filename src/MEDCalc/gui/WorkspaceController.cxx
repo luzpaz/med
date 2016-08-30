@@ -527,6 +527,12 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent* event) {
     commands += QString("source_id = medcalc.LoadDataSource('%1')").arg(event->objectalias);
     commands += QString("source_id");
     _consoleDriver->exec(commands);
+
+    // Create a default presentation when loading a file
+    MEDCALC::MedEvent* evt = new MEDCALC::MedEvent();
+    evt->type = MEDCALC::EVENT_ADD_PRESENTATION;
+    evt->dataId = -1;
+    emit workspaceSignal(evt); // forward to PresentationController
   }
   else if ( event->eventtype == DatasourceEvent::EVENT_ADD_IMAGE_AS_DATASOURCE ) {
     QStringList commands;

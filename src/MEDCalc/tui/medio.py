@@ -39,3 +39,10 @@ def LoadImageAsDataSource(filename):
   builder.image2med(filename, medfilename)
   return LoadDataSource(medfilename)
 #
+
+def GetFirstMeshFromDataSource(datasource_id):
+  dataManager = medcalc.medcorba.factory.getDataManager()
+  handlerLst = dataManager.getMeshHandlerList(datasource_id)
+  if not len(handlerLst):
+    return -1
+  return handlerLst[0].id

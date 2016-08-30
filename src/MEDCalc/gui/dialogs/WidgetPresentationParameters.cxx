@@ -38,8 +38,8 @@ WidgetPresentationParameters::WidgetPresentationParameters(QWidget* parent)
                    this,                       SLOT(onComboColorMapIndexChanged(int)) );
   QObject::connect(_ui.comboBoxSliceOrient,       SIGNAL(activated(int)),
                    this,                       SLOT(onComboOrientIndexChanged(int)) );
-  QObject::connect(_ui.spinBox,                SIGNAL(valueChanged(int)),
-                     this,                     SLOT(onSpinBoxValueChanged(int)) );
+  QObject::connect(_ui.spinBox,                SIGNAL(editingFinished()),
+                     this,                     SLOT(onSpinBoxEditingFinished()) );
 }
 
 void
@@ -74,9 +74,9 @@ WidgetPresentationParameters::onComboScalarBarRangeIndexChanged(int idx)
 }
 
 void
-WidgetPresentationParameters::onSpinBoxValueChanged(int val)
+WidgetPresentationParameters::onSpinBoxEditingFinished()
 {
-  if (!_blockSig) emit spinBoxValueChanged(val);
+  if (!_blockSig) emit spinBoxValueChanged(_ui.spinBox->value());
 }
 
 void
@@ -125,7 +125,8 @@ WidgetPresentationParameters::isShown() const
 string
 WidgetPresentationParameters::getComponent() const
 {
-  if (_ui.comboBoxCompo->currentIndex() == 0) // Euclidean norm
+  if (_ui.comboBoxCompo->count() > 1 && _ui.comboBoxCompo->count() <= 3)
+    if (_ui.comboBoxCompo->currentIndex() == 0) // Euclidean norm
       return "";
 
   return _ui.comboBoxCompo->currentText().toStdString();
@@ -141,10 +142,15 @@ WidgetPresentationParameters::setComponents(vector<string> compos, int selecInde
   _ui.comboBoxCompo->show();
 
   _ui.comboBoxCompo->clear();
-  _ui.comboBoxCompo->addItem(tr("LAB_EUCLIDEAN_NORM"));
+  bool vectorField = (compos.size() > 1 && compos.size() <= 3);
+  if (vectorField)
+    _ui.comboBoxCompo->addItem(tr("LAB_EUCLIDEAN_NORM"));
   for(vector<string>::const_iterator it = compos.begin(); it != compos.end(); ++it)
     _ui.comboBoxCompo->addItem(QString::fromStdString(*it));
-  _ui.comboBoxCompo->setCurrentIndex(selecIndex);
+  if (!vectorField)
+    _ui.comboBoxCompo->setCurrentIndex(std::max(0, selecIndex-1));
+  else
+    _ui.comboBoxCompo->setCurrentIndex(selecIndex);
 
   _blockSig = false;
 }
@@ -161,9 +167,11 @@ WidgetPresentationParameters::setNbContour(int nbContour)
     }
 
   // Show the widget:
-  _ui.labelSpinBox->setText(tr("LAB_NB_CONTOURS"));
+  _ui.labelSpinBox->setText(tr("LAB_NB_CONTOURS").arg(MEDCALC::NB_CONTOURS_MAX));
+
   _ui.labelSpinBox->show();
   _ui.spinBox->show();
+  _ui.spinBox->setRange(1, MEDCALC::NB_CONTOURS_MAX);
   _ui.spinBox->setValue(nbContour);
 
   _blockSig = false;
@@ -181,9 +189,10 @@ WidgetPresentationParameters::setNbSlices(int nbSlices)
     }
 
   // Show the widget:
-  _ui.labelSpinBox->setText(tr("LAB_NB_SLICES"));
+  _ui.labelSpinBox->setText(tr("LAB_NB_SLICES").arg(MEDCALC::NB_SLICES_MAX));
   _ui.labelSpinBox->show();
   _ui.spinBox->show();
+  _ui.spinBox->setRange(1, MEDCALC::NB_SLICES_MAX);
   _ui.spinBox->setValue(nbSlices);
 
   _blockSig = false;

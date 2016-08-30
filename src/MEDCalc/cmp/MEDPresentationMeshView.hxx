@@ -30,12 +30,15 @@ public:
   static const std::string PROP_MESH_MODE;
 
   MEDPresentationMeshView(const MEDCALC::MeshViewParameters& params, const MEDCALC::ViewModeType viewMode);
+  virtual void initFieldMeshInfos();
   virtual ~MEDPresentationMeshView() {}
 
   void updatePipeline(const MEDCALC::MeshViewParameters& params);
 
   void getParameters(MEDCALC::MeshViewParameters & params) const { params = _params; } ;
   void setParameters(const MEDCALC::MeshViewParameters & params) { _params = params; } ;
+
+  virtual void recreateViewSetup();
 
 protected:
   void updateMeshMode(const MEDCALC::MeshModeType mode);

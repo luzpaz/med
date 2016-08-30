@@ -30,7 +30,7 @@ from medcalc_testutils import GetMEDFileDirTUI
 datafile = os.path.join(GetMEDFileDirTUI(), "smooth_surface_and_field.med")
 source_id = medcalc.LoadDataSource(datafile)
 
-presentation_id = medcalc.MakeMeshView(accessField(0), MEDCALC.VIEW_MODE_REPLACE)
+presentation_id = medcalc.MakeMeshView(0, MEDCALC.VIEW_MODE_REPLACE)  # here the ID of the mesh directly
 sleep(1)
 medcalc.RemovePresentation(presentation_id)
 sleep(1)

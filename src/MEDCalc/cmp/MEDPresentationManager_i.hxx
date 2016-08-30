@@ -75,6 +75,7 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
 //  MEDCALC_EXPORT MEDCALC::ViewModeType getPresentationViewMode(MEDPresentation::TypeID);
   MEDCALC_EXPORT char * getParavisDump(MEDPresentation::TypeID presentationID);
   MEDCALC_EXPORT MEDCALC::PresentationsList* getAllPresentations();
+  MEDCALC_EXPORT void cleanUp();
 
  private:
   MEDPresentationManager_i();

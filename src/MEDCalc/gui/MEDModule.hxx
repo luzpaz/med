@@ -87,6 +87,8 @@ public:
   inline SALOME_AppStudyEditor* getStudyEditor() { return _studyEditor; }
   void requestSALOMETermination() const;
 
+  bool itemClickGeneric(std::string & name, std::string & type, int & presId) const;
+
 signals:
   void presentationSelected(int presId, const QString& presType, const QString& presName);
 
@@ -101,9 +103,6 @@ private:
   void createModuleActions();
   void initToolbars();
 
-  bool itemClickGeneric(const QModelIndex & index, std::string & name,
-                        std::string & type, int & fieldId, int & presId) const;
-
   static void init();
 
 private:
@@ -117,9 +116,6 @@ private:
   PVViewer_GUIElements*   _pvGuiElements;
 
   static MED_ORB::MED_Gen_var _MED_engine;
-
-  // GUI needs to talk directly to the pres manager to activate a view, get some params, etc ...:
-  static MEDCALC::MEDPresentationManager_ptr _presManager;
 
 #ifdef MED_HAS_QTTESTING
   TestController * _testController;

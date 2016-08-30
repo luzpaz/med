@@ -43,7 +43,7 @@ module MED_ORB
                                 in MEDCALC::DatasourceHandler datasourceHandler)
       raises (SALOME::SALOME_Exception);
 
-    status registerPresentation(in SALOMEDS::Study study,
+    status registerPresentationField(in SALOMEDS::Study study,
                                 in long fieldId,
                                 in string name,
                                 in string type,
@@ -51,17 +51,31 @@ module MED_ORB
                                 in long presentationId)
       raises (SALOME::SALOME_Exception);
 
+    status registerPresentationMesh(in SALOMEDS::Study study,
+                                    in long meshId,
+                                    in string name,
+                                    in string type,
+                                    in string ico,
+                                    in long presentationId)
+          raises (SALOME::SALOME_Exception);
+
     status unregisterPresentation(in SALOMEDS::Study study,
                                   in long presentationId)
       raises (SALOME::SALOME_Exception);
 
-    PresentationsList getSiblingPresentations(in SALOMEDS::Study study,
-                                              in long presentationId)
-      raises (SALOME::SALOME_Exception);
+//    PresentationsList getSiblingPresentations(in SALOMEDS::Study study,
+//                                              in long presentationId)
+//      raises (SALOME::SALOME_Exception);
 
     // Get all presentations in study:
     PresentationsList getStudyPresentations(in SALOMEDS::Study study)
       raises (SALOME::SALOME_Exception);
+
+    string getStudyPresentationEntry(in SALOMEDS::Study study,
+                                                in long presentationId)
+      raises (SALOME::SALOME_Exception);
+
+    void cleanUp();
   };
 };
 
