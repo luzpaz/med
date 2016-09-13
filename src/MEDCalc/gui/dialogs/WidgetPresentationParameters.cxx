@@ -17,6 +17,10 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#ifdef WIN32
+#define NOMINMAX
+#endif
+
 #include "WidgetPresentationParameters.hxx"
 #include <Basics_Utils.hxx>
 

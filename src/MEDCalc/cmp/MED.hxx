@@ -79,7 +79,7 @@ public:
   // Get all presentations registered in the study
   MED_ORB::PresentationsList* getStudyPresentations(SALOMEDS::Study_ptr study);
 
-  char* getStudyPresentationEntry(SALOMEDS::Study_ptr study, int presentationId);
+  char* getStudyPresentationEntry(SALOMEDS::Study_ptr study, CORBA::Long presentationId);
 
   void cleanUp();
 

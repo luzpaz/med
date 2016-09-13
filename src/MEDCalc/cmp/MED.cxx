@@ -325,7 +325,7 @@ MED::getStudyPresentations(SALOMEDS::Study_ptr study)
 }
 
 char*
-MED::getStudyPresentationEntry(SALOMEDS::Study_ptr study, int presentationId)
+MED::getStudyPresentationEntry(SALOMEDS::Study_ptr study, CORBA::Long presentationId)
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
