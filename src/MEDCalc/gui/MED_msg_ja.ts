@@ -2,76 +2,306 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ja" sourcelanguage="en">
   <context>
+    <name>PresentationController</name>
+    <message>
+      <source>TITLE_PRESENTATION_PARAMETERS</source>
+      <translation>表現パラメータ</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_MESH_VIEW</source>
+      <translation>メッシュ</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_MESH_VIEW</source>
+      <translation>メッシュ</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_SCALAR_MAP</source>
+      <translation>スカラーマップ</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_SCALAR_MAP</source>
+      <translation>スカラーマップ</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_CONTOUR</source>
+      <translation>コンター</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_CONTOUR</source>
+      <translation>コンター</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_VECTOR_FIELD</source>
+      <translation>ベクトル場</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_VECTOR_FIELD</source>
+      <translation>ベクトル場</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_SLICES</source>
+      <translation>スライス</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_SLICES</source>
+      <translation>スライス</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_DEFLECTION_SHAPE</source>
+      <translation>偏差形状</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_DEFLECTION_SHAPE</source>
+      <translation>偏差形状</translation>
+    </message>
+    <message>
+      <source>LAB_PRESENTATION_POINT_SPRITE</source>
+      <translation>点スプライト描画</translation>
+    </message>
+    <message>
+      <source>TIP_PRESENTATION_POINT_SPRITE</source>
+      <translation>点スプライト</translation>
+    </message>
+    <message>
+      <source>LAB_DELETE_PRESENTATION</source>
+      <translation>プレゼンテーションの削除</translation>
+    </message>
+    <message>
+      <source>TIP_DELETE_PRESENTATION</source>
+      <translation>選択されたプレゼンテーションの削除</translation>
+    </message>
+    <message>
+      <source>LAB_PARAVIS_DUMP</source>
+      <translation>パイプラインの保存</translation>
+    </message>
+    <message>
+      <source>TIP_PARAVIS_DUMP</source>
+      <translation>プレゼンテーションの低レベルPythonコマンドをダンプ</translation>
+    </message>
+    <message>
+      <source>MENU_PRESENTATIONS</source>
+      <translation>プレゼンテーション</translation>
+    </message>
+    <message>
+      <source>MEDPresentationMeshView</source>
+      <translation>メッシュビュー</translation>
+    </message>
+    <message>
+      <source>MEDPresentationScalarMap</source>
+      <translation>スカラーマップ</translation>
+    </message>
+    <message>
+      <source>MEDPresentationContour</source>
+      <translation>コンター</translation>
+    </message>
+    <message>
+      <source>MEDPresentationVectorField</source>
+      <translation>ベクトル場</translation>
+    </message>
+    <message>
+      <source>MEDPresentationSlices</source>
+      <translation>スライス</translation>
+    </message>
+    <message>
+      <source>MEDPresentationDeflectionShape</source>
+      <translation>偏差形状</translation>
+    </message>
+    <message>
+      <source>MEDPresentationPointSprite</source>
+      <translation>点スプライト描画</translation>
+    </message>
+  </context>
+  <context>
+    <name>ProcessingController</name>
+    <message>
+      <source>MENU_PROCESSING</source>
+      <translation>処理中</translation>
+    </message>
+    <message>
+      <source>LAB_PROCESSING_CHANGE_MESH</source>
+      <translation>基本要素の変更</translation>
+    </message>
+    <message>
+      <source>LAB_PROCESSING_INTERPOLATE_FIELD</source>
+      <translation>場の補間</translation>
+    </message>
+  </context>
+  <context>
     <name>DatasourceController</name>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="45"/>
       <source>LAB_ADD_DATA_SOURCE</source>
-      <translation>データのインポート MED</translation>
+      <translation>データソースの追加</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="46"/>
       <source>TIP_ADD_DATA_SOURCE</source>
-      <translation>MED のファイルをインポートしたデータを追加します。</translation>
+      <translation>（medデータを供給する）ファイルデータソースの追加</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="52"/>
       <source>LAB_ADD_IMAGE_SOURCE</source>
-      <translation>画像を追加します。</translation>
+      <translation>イメージソースの追加</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="53"/>
       <source>TIP_ADD_IMAGE_SOURCE</source>
-      <translation>イメージ ファイルのインポートを使用してデータを追加します。</translation>
+      <translation>イメージファイルからデータソースの作成</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="62"/>
       <source>LAB_EXPAND_FIELD</source>
-      <translation>拡張フィールドの時系列</translation>
-    </message>
-    <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="69"/>
-      <source>LAB_VISUALIZE</source>
-      <translation>ビュー</translation>
+      <translation>場の時系列を拡張</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="75"/>
       <source>LAB_USE_IN_WORKSPACE</source>
-      <translation>ワークスペースを使用します。</translation>
-    </message>
-    <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="83"/>
-      <source>LAB_CHANGE_MESH</source>
-      <translation>基になるメッシュを変更します。</translation>
-    </message>
-    <message>
-      <location filename="MEDCALC/gui/DatasourceController.cxx" line="113"/>
-      <source>LAB_INTERPOLATE_FIELD</source>
-      <translation>挿入フィールド</translation>
+      <translation>ワークスペースの使用</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="157"/>
       <source>IMPORT_MED_FIELDS</source>
-      <translation>（MED のサイズ） フィールドをインポートします。</translation>
+      <translation>MEDフィールドのインポート</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="191"/>
       <source>OPERATION_FAILED</source>
-      <translation>操作が失敗しました</translation>
+      <translation>操作に失敗しました。</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="192"/>
       <source>CREATION_FAILED</source>
-      <translation>イメージ ファイルの作成からの医学データに失敗しました</translation>
+      <translation>イメージファイルからMEDデータの作成に失敗しました。</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="283"/>
       <source>OPERATION_NOT_ALLOWED</source>
-      <translation>許可されていない操作</translation>
+      <translation>許可されていない操作です。</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/DatasourceController.cxx" line="284"/>
       <source>FIELD_ALREADY_DEFINED</source>
-      <translation>このフィールドは、ワークスペースで既に定義されて</translation>
+      <translation>この場はワークスペース内で既に定義されています。</translation>
+    </message>
+  </context>
+  <context>
+    <name>WidgetPresentationParameters</name>
+    <message>
+      <source>LAB_DEFAULT_DYN_TITLE</source>
+      <translation>デフォルトパラメータ</translation>
+    </message>
+    <message>
+      <source>LAB_DISP_COMP</source>
+      <translation>表示されたコンポーネント:</translation>
+    </message>
+    <message>
+      <source>LAB_EUCLIDEAN_NORM</source>
+      <translation>ユークリッド幾何学基準</translation>
+    </message>
+    <message>
+      <source>LAB_SCALARBAR</source>
+      <translation>スカラバー:</translation>
+    </message>
+    <message>
+      <source>LAB_RANGE</source>
+      <translation>範囲:</translation>
+    </message>
+    <message>
+      <source>LAB_ALL_TIMESTEPS</source>
+      <translation>すべてのタイムステップ</translation>
+    </message>
+    <message>
+      <source>LAB_CURRENT_TIMESTEP</source>
+      <translation>現在のタイムステップ</translation>
+    </message>
+    <message>
+      <source>LAB_USER_RANGE</source>
+      <translation>ユーザ指定</translation>
+    </message>
+    <message>
+      <source>LAB_TIMESTEP</source>
+      <translation>タイムステップ:</translation>
+    </message>
+    <message>
+      <source>LAB_MIN_VALUE</source>
+      <translation>最小値:</translation>
+    </message>
+    <message>
+      <source>LAB_MAX_VALUE</source>
+      <translation>最大値:</translation>
+    </message>
+    <message>
+      <source>LAB_COLOR_MAP</source>
+      <translation>カラーマップ:</translation>
+    </message>
+    <message>
+      <source>LAB_MESH_WIREFRAME</source>
+      <translation>ワイヤフレーム</translation>
+    </message>
+    <message>
+      <source>LAB_MESH_SURFACE</source>
+      <translation>表面</translation>
+    </message>
+    <message>
+      <source>LAB_MESH_SURF_EDGES</source>
+      <translation>エッジを持った表面</translation>
+    </message>
+    <message>
+      <source>LAB_DISP_MESH_MODE</source>
+      <translation>メッシュ表示:</translation>
+    </message>
+    <message>
+      <source>LAB_NB_CONTOURS</source>
+      <translation>コンタ数 (max. %1):</translation>
+    </message>
+    <message>
+      <source>LAB_NB_SLICES</source>
+      <translation>スライス数 (max. %1):</translation>
+    </message>
+    <message>
+      <source>LAB_SPINBOX_TOOLTIP</source>
+      <translation>Enterキーを押して適用</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_ORIENT</source>
+      <translation>スライス方向:</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_X</source>
+      <translation>Xと垂直</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_Y</source>
+      <translation>Yと垂直</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_Z</source>
+      <translation>Zと垂直</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_XY</source>
+      <translation>XYと垂直</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_XZ</source>
+      <translation>XZと垂直</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_YZ</source>
+      <translation>YZと垂直</translation>
+    </message>
+    <message>
+      <source>LAB_SLICE_NORMAL_TO_XYZ</source>
+      <translation>XYZと垂直</translation>
+    </message>
+    <message>
+      <source>LAB_BLUE_TO_RED</source>
+      <translation>青-赤 グラデーション</translation>
+    </message>
+    <message>
+      <source>LAB_COOL_TO_WARM</source>
+      <translation>冷却から温め</translation>
     </message>
   </context>
   <context>
@@ -79,12 +309,12 @@
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="14"/>
       <source>SELECT_AN_ALIAS_FOR_THE_FIELD</source>
-      <translation>このフィールドのエイリアスを選択します</translation>
+      <translation>場のエイリアスを選択</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="401"/>
       <source>DEFINE_AN_ALIAS</source>
-      <translation>コンソールでフィールドを操作するエイリアスを設定できます。</translation>
+      <translation>コンソールでの場の操作に対するエイリアスを定義することができる:</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="419"/>
@@ -94,7 +324,7 @@
     <message utf8="true">
       <location filename="MEDCALC/gui/dialogs/DlgAlias.ui" line="436"/>
       <source>MSG_OPERATION_DEFINES_VARIABLE</source>
-      <translation>(この操作はテキスト コンソールに&lt;alias&gt;という名前の変数を定義します。型 '&lt;alias&gt;. help()"利用可能な機能または単に「doc」参照する)&lt;/alias&gt; &lt;/alias&gt;</translation>
+      <translation>(この操作はテキスト コンソールに&lt;alias&gt;という名前の変数を定義します。 "&lt;alias&gt;. help()"と入力すると機能、または単純な「doc」を見ることがきます)</translation>
     </message>
   </context>
   <context>
@@ -107,12 +337,12 @@
     <message utf8="true">
       <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="403"/>
       <source>MESH_GT</source>
-      <translation>-&gt; メッシュします。</translation>
+      <translation>メッシュ -&gt;</translation>
     </message>
     <message utf8="true">
       <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="420"/>
       <source>MSG_EXPLORER</source>
-      <translation>(エクスプ ローラー データ空間で参照される MED (メッシュとフィールド) のデータのビューを提供します)</translation>
+      <translation>エクスプローラによってデータスペース内で参照されたMEDデータソース（メッシュおよび場）上に表示します。</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.cxx" line="35"/>
@@ -123,7 +353,7 @@
       <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.cxx" line="36"/>
       <location filename="MEDCALC/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="391"/>
       <source>SELECT_MESH</source>
-      <translation>エクスプ ローラーでメッシュを選択し、メッシュをクリックする必要があります。</translation>
+      <translation>エクスプローラ内のメッシュを選択し、メッシュボタンをクリックする必要があります。</translation>
     </message>
   </context>
   <context>
@@ -136,12 +366,12 @@
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="406"/>
       <source>TARGET_MESH_GT</source>
-      <translation>Target mesh -&gt;</translation>
+      <translation>ターゲットのメッシュ -&gt;</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="423"/>
       <source>MSG_EXPLORER</source>
-      <translation>エクスプローラによってデータスペース内で参照されたMEDデータソース（メッシュおよびフィールド）上に表示します。</translation>
+      <translation>エクスプローラによってデータスペース内で参照されたMEDデータソース（メッシュおよび場）上に表示します。</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgInterpolateField.ui" line="450"/>
@@ -194,17 +424,17 @@
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="64"/>
       <source>SELECT_IMAGE_FILE</source>
-      <translation>イメージ ファイルを選択します。</translation>
+      <translation>イメージ ファイルの選択</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="79"/>
       <source>SPECIFY_MED_FILE</source>
-      <translation>MED ファイルを指定します。</translation>
+      <translation>MED ファイルの指定</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgImageToMed.ui" line="82"/>
       <source>LOAD_AUTOMATICALLY</source>
-      <translation>自動的に読み込む</translation>
+      <translation>自動読み込み</translation>
     </message>
   </context>
   <context>
@@ -239,7 +469,7 @@
       <location filename="MEDCALC/gui/MEDModule.cxx" line="68"/>
       <location filename="MEDCALC/gui/MEDModule.cxx" line="157"/>
       <source>IMPORT_FROM_FILE</source>
-      <translation>ファイルからのインポートします。</translation>
+      <translation>ファイルからのインポート</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/MEDModule.cxx" line="69"/>
@@ -251,68 +481,88 @@
       <source>MEN_FILE</source>
       <translation>ファイル(&amp;F)</translation>
     </message>
+    <message>
+      <source>PREF_TAB_GENERAL</source>
+      <translation>一般的な</translation>
+    </message>
+    <message>
+      <source>PREF_THEME_GROUP</source>
+      <translation>テーマ</translation>
+    </message>
+    <message>
+      <source>PREF_ICONS</source>
+      <translation>アイコン</translation>
+    </message>
+    <message>
+      <source>PREF_ICON_THEME_MODERN</source>
+      <translation>モダン</translation>
+    </message>
+    <message>
+      <source>PREF_ICON_THEME_CLASSIC</source>
+      <translation>クラシック</translation>
+    </message>
   </context>
   <context>
     <name>WorkspaceController</name>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="66"/>
       <source>VISUALIZE_SCALAR_MAP</source>
-      <translation>ビュー （マップ スカラー）</translation>
+      <translation>視覚化 (スカラーマップ)</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="67"/>
       <source>USE_IN_CONSOLE</source>
-      <translation>(コンソール) を使用してください。</translation>
+      <translation>使用 (コンソルにおいて)</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="68"/>
       <source>EXPORT_TO_PARAVIS</source>
-      <translation>エクスポート (にそこに)</translation>
+      <translation>書き出し (PARAVISへ)</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="69"/>
       <source>SAVE_AS_MED</source>
-      <translation>(MED ファイル) に保存します。</translation>
+      <translation>保存 (MED ファイルとして)</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="70"/>
       <source>REMOVE_FROM_WORKSPACE</source>
-      <translation>(ワークスペース) の削除します。</translation>
+      <translation>削除 (ワークスペースから)</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="91"/>
       <source>LAB_SAVE_WORKSPACE</source>
-      <translation>ワークスペースを保存します。</translation>
+      <translation>ワークスペースの表示</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="92"/>
       <source>TIP_SAVE_WORKSPACE</source>
-      <translation>MED ファイル (フィールドおよびメッシュ) ワークスペースを保存します。</translation>
+      <translation>ワークスペースの保存 (メッシュと場) MED ファイル内</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="97"/>
       <source>LAB_CLEAN_WORKSPACE</source>
-      <translation>作業領域をきれいに</translation>
+      <translation>ワークスペースのクリーニグ</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="98"/>
       <source>TIP_CLEAN_WORKSPACE</source>
-      <translation>ワークスペースからすべてのデータを消去します。</translation>
+      <translation>ワークスペース内の全データのクリーニング</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="271"/>
       <source>SAVE_SELECTED_FIELDS</source>
-      <translation>選択したフィールドを保存します。</translation>
+      <translation>選択場の保存</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="425"/>
       <source>SAVE_WORKSPACE_DATA</source>
-      <translation>ワークスペースからデータを保存します。</translation>
+      <translation>ワークスペースデータの保存</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="439"/>
       <source>NOT_IMPLEMENTED_YET</source>
-      <translation>実装されていません</translation>
+      <translation>未実装</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="440"/>
@@ -329,27 +579,47 @@
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="267"/>
       <location filename="MEDCALC/gui/WorkspaceController.cxx" line="420"/>
       <source>FILE_FILTER_MED</source>
-      <translation>音楽配信マック ＆ ファイル (* .med)</translation>
+      <translation>MED ファイル (*.med)</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="57"/>
       <source>FILE_FILTER_PNG</source>
-      <translation>イメージ PNG (*.png)</translation>
+      <translation>PNG 画像 (*.png)</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="58"/>
       <source>FILE_FILTER_JPG</source>
-      <translation>画像 JPG (*.jpg)</translation>
+      <translation>JPG 画像 (*.jpg)</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="59"/>
       <source>FILE_FILTER_PGM</source>
-      <translation>イメージ PGM (*.jpg)</translation>
+      <translation>PGM 画像 (*.jpg)</translation>
     </message>
     <message>
       <location filename="MEDCALC/gui/dialogs/DlgImageToMed.cxx" line="60"/>
       <source>FILE_FILTER_ALL</source>
-      <translation>すべてのファイル (*. *)</translation>
+      <translation>全ファイル (*.*)</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE</source>
+      <translation>ビューモード:</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_REPLACE</source>
+      <translation>置き換え</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_OVERLAP</source>
+      <translation>オーバーラップ</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_NEW_LAYOUT</source>
+      <translation>新レイアウト</translation>
+    </message>
+    <message>
+      <source>LAB_VIEW_MODE_SPLIT_VIEW</source>
+      <translation>分割</translation>
     </message>
   </context>
 </TS>

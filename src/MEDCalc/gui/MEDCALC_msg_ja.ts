@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>TLT_MY_NEW_ITEM</source>
-      <translation>&#x79C1;&#x30E1;&#x30CB;&#x30E5;&#x30FC;&#x9805;&#x76EE;</translation>
+      <translation>&#x30DE;&#x30A4;&#x30E1;&#x30CB;&#x30E5;&#x30FC;&#x30A2;&#x30A4;&#x30C6;&#x30E0;</translation>
     </message>
     <message>
       <source>TLT_LOAD_DXF</source>
@@ -25,19 +25,19 @@
     </message>
     <message>
       <source>TLT_GET_BANNER</source>
-      <translation>XMED &#x306E;&#x30D0;&#x30CA;&#x30FC;&#x3092;&#x53D6;&#x5F97;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>XMED &#x30D0;&#x30CA;&#x30FC;&#x306E;&#x53D6;&#x5F97;</translation>
     </message>
     <message>
       <source>STS_MY_NEW_ITEM</source>
-      <translation>&#x79C1;&#x306E;&#x30E1;&#x30CB;&#x30E5;&#x30FC;&#x3092;&#x547C;&#x3073;&#x51FA;&#x3059;</translation>
+      <translation>&#x30DE;&#x30A4;&#x30E1;&#x30CB;&#x30E5;&#x30FC;&#x30A2;&#x30A4;&#x30C6;&#x30E0;&#x547C;&#x3073;&#x51FA;&#x3057;</translation>
     </message>
     <message>
       <source>MEN_FILE_XMED</source>
-      <translation>&#x3053;&#x3093;&#x306B;&#x3061;&#x306F;</translation>
+      <translation>Xmed</translation>
     </message>
     <message>
       <source>MEN_GET_BANNER</source>
-      <translation>&#x30D0;&#x30CA;&#x30FC;&#x3092;&#x53D6;&#x5F97;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>&#x30D0;&#x30CA;&#x30FC;&#x53D6;&#x5F97;</translation>
     </message>
     <message>
       <source>MEN_FILE</source>
@@ -45,43 +45,43 @@
     </message>
     <message>
       <source>STS_GET_BANNER</source>
-      <translation>XMED &#x306E;&#x30D0;&#x30CA;&#x30FC;&#x3092;&#x53D6;&#x5F97;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>XMED &#x30D0;&#x30CA;&#x30FC;&#x53D6;&#x5F97;</translation>
     </message>
     <message>
       <source>TLT_BUILDER1</source>
-      <translation>&#x57FA;&#x672C;&#x30D9;&#x30AF;&#x30C8;&#x30EB; Vx, Vy, Vz &#x3092;&#x4F5C;&#x6210;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>&#x57FA;&#x672C;&#x30D9;&#x30AF;&#x30C8;&#x30EB; Vx, Vy, Vz &#x4F5C;&#x6210;</translation>
     </message>
     <message>
       <source>TLT_BUILDER2</source>
-      <translation>&#x63A5;&#x7D9A;&#x30A8;&#x30C3;&#x30B8; (&#x5186;&#x5F27;&#x3068;&#x30E9;&#x30A4;&#x30F3;) &#x3092;&#x4F5C;&#x6210;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>&#x63A5;&#x7D9A;&#x30A8;&#x30C3;&#x30B8; (&#x5186;&#x5F27;&#x3068;&#x30E9;&#x30A4;&#x30F3;) &#x306E;&#x4F5C;&#x6210;</translation>
     </message>
     <message>
       <source>TLT_BUILDER3</source>
-      <translation>Python &#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x3092;&#x30ED;&#x30FC;&#x30C9;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>Python &#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x306E;&#x30ED;&#x30FC;&#x30C9;</translation>
     </message>
     <message>
       <source>STS_BUILDER1</source>
-      <translation>&#x57FA;&#x672C;&#x30D9;&#x30AF;&#x30C8;&#x30EB; Vx, Vy, Vz &#x3092;&#x4F5C;&#x6210;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>&#x57FA;&#x672C;&#x30D9;&#x30AF;&#x30C8;&#x30EB; Vx, Vy, Vz &#x306E;&#x4F5C;&#x6210;</translation>
     </message>
     <message>
       <source>STS_BUILDER2</source>
-      <translation>&#x63A5;&#x7D9A;&#x30A8;&#x30C3;&#x30B8; (&#x5186;&#x5F27;&#x3068;&#x30E9;&#x30A4;&#x30F3;) &#x3092;&#x4F5C;&#x6210;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>&#x63A5;&#x7D9A;&#x30A8;&#x30C3;&#x30B8; (&#x5186;&#x5F27;&#x3068;&#x30E9;&#x30A4;&#x30F3;) &#x306E;&#x4F5C;&#x6210;</translation>
     </message>
     <message>
       <source>STS_BUILDER3</source>
-      <translation>Python &#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x3092;&#x30ED;&#x30FC;&#x30C9;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>Python &#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x306E;&#x30ED;&#x30FC;&#x30C9;</translation>
     </message>
     <message>
       <source>MEN_BUILDER1</source>
-      <translation>&#x57FA;&#x672C;&#x30D9;&#x30AF;&#x30C8;&#x30EB; Vx, Vy, Vz &#x3092;&#x4F5C;&#x6210;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>&#x57FA;&#x672C;&#x30D9;&#x30AF;&#x30C8;&#x30EB; Vx, Vy, Vz &#x306E;&#x4F5C;&#x6210;</translation>
     </message>
     <message>
       <source>MEN_BUILDER2</source>
-      <translation>&#x63A5;&#x7D9A;&#x30A8;&#x30C3;&#x30B8; (&#x5186;&#x5F27;&#x3068;&#x30E9;&#x30A4;&#x30F3;) &#x3092;&#x4F5C;&#x6210;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>&#x63A5;&#x7D9A;&#x30A8;&#x30C3;&#x30B8; (&#x5186;&#x5F27;&#x3068;&#x30E9;&#x30A4;&#x30F3;) &#x306E;&#x4F5C;&#x6210;</translation>
     </message>
     <message>
       <source>MEN_BUILDER3</source>
-      <translation>Python &#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x3092;&#x30ED;&#x30FC;&#x30C9;&#x3057;&#x307E;&#x3059;&#x3002;</translation>
+      <translation>Python &#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x306E;&#x30ED;&#x30FC;&#x30C9;</translation>
     </message>
     <message>
       <source>MEN_XMED</source>
@@ -89,7 +89,7 @@
     </message>
     <message>
       <source>MEN_MY_NEW_ITEM</source>
-      <translation>&#x79C1;&#x30E1;&#x30CB;&#x30E5;&#x30FC;&#x9805;&#x76EE;</translation>
+      <translation>&#x30DE;&#x30A4;&#x30E1;&#x30CB;&#x30E5;&#x30FC;&#x30A2;&#x30A4;&#x30C6;&#x30E0;</translation>
     </message>
   </context>
   <context>
