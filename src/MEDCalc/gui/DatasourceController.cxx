@@ -223,9 +223,6 @@ void DatasourceController::OnAddImagesource()
 
 void DatasourceController::OnExpandField()
 {
-  // We need a studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
-
   // Get the selected objects in the study (SObject)
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   for (int i=0; i<listOfSObject->size(); i++) {
@@ -271,9 +268,6 @@ void DatasourceController::OnExpandField()
 }
 
 void DatasourceController::OnUseInWorkspace() {
-  // We need a studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
-
   // Get the selected objects in the study (SObject)
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() == 1 ) {

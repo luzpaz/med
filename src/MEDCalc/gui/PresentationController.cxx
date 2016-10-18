@@ -299,9 +299,6 @@ PresentationController::getSelectedScalarBarRange() const
 void
 PresentationController::visualize(PresentationEvent::EventType eventType)
 {
-  // We need a _studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
-
   // Get the selected objects in the study (SObject)
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
 
@@ -406,9 +403,6 @@ PresentationController::onVisualizePointSprite()
 void
 PresentationController::onDeletePresentation()
 {
-  // We need a _studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
-
   // Get the selected objects in the study (SObject)
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
 
@@ -664,9 +658,6 @@ PresentationController::onPresentationSelected(int presId, const QString& presTy
 void
 PresentationController::onParavisDump()
 {
-  // We need a _studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
-
   // Get the selected objects in the study (SObject)
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
 

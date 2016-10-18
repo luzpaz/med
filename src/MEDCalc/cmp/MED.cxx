@@ -399,12 +399,11 @@ MED::hasObjectInfo()
 }
 
 char*
-MED::getObjectInfo(CORBA::Long studyId, const char* entry)
+MED::getObjectInfo(const char* entry)
 {
   SALOME_LifeCycleCORBA lcc;
-  CORBA::Object_var aSMObject = lcc.namingService()->Resolve( "/myStudyManager" );
-  SALOMEDS::StudyManager_var aStudyManager = SALOMEDS::StudyManager::_narrow( aSMObject );
-  SALOMEDS::Study_var aStudy = aStudyManager->GetStudyByID( studyId );
+  CORBA::Object_var aStudyObject = lcc.namingService()->Resolve("/Study");
+  SALOMEDS::Study_var aStudy = SALOMEDS::Study::_narrow( aStudyObject );
   SALOMEDS::SObject_var aSObj = aStudy->FindObjectID( entry );
   SALOMEDS::SObject_var aResultSObj;
   if (aSObj->ReferencedObject(aResultSObj))

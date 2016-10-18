@@ -91,7 +91,7 @@ public:
 
   // For tooltips
   virtual CORBA::Boolean hasObjectInfo();
-  virtual char* getObjectInfo(CORBA::Long studyId, const char* entry);
+  virtual char* getObjectInfo(const char* entry);
 
  private:
   std::map<long, std::string> _fieldSeriesEntries;
