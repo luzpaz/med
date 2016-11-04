@@ -612,6 +612,9 @@ def MEDCouplingDataArrayIntImod(self,*args):
 def MEDCouplingDataArrayIntIpow(self,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.DataArrayInt____ipow___(self, self, *args)
+def MEDCouplingDataArrayBytenew(cls,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayByte____new___(cls,args)
 def MEDCouplingDataArrayDoubleTupleIadd(self,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.DataArrayDoubleTuple____iadd___(self, self, *args)
