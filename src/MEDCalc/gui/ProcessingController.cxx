@@ -115,30 +115,16 @@ ProcessingController::OnChangeUnderlyingMesh()
 void
 ProcessingController::OnChangeUnderlyingMeshInputValidated()
 {
+  STDLOG("Change Underlying Mesh");
   int meshId = _dlgChangeUnderlyingMesh->getMeshId();
   STDLOG("meshId = " << ToString(meshId));
   int fieldId = _dlgChangeUnderlyingMesh->getFieldId();
-  MEDCALC::FieldHandler* fieldHandler =
-    MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
 
-  // We don't modify the original field but create first a duplicate
-  MEDCALC::FieldHandler* duplicate = MEDFactoryClient::getCalculator()->dup(*fieldHandler);
-  MEDFactoryClient::getDataManager()->changeUnderlyingMesh(duplicate->id, meshId);
-
-  // Request once more the duplicate to update the meta-data on this
-  // client side
-  duplicate = MEDFactoryClient::getDataManager()->getFieldHandler(duplicate->id);
-
-  // >>>
-  // WARN: the following is a temporary code for test purpose
-  // Automatically add in ws
   ProcessingEvent* event = new ProcessingEvent();
-  event->eventtype = ProcessingEvent::EVENT_IMPORT_OBJECT;
-  XmedDataObject* dataObject = new XmedDataObject();
-  dataObject->setFieldHandler(*duplicate);
-  event->objectdata = dataObject;
-  emit processingSignal(event);
-  // Note that this signal is processed by the WorkspaceController
+  event->eventtype = ProcessingEvent::EVENT_CHANGE_UNDERLYING_MESH;
+  event->fieldId = fieldId;
+  event->meshId = meshId;
+  emit processingSignal(event); // --> WorkspaceController::processProcessingEvent()
 
   // Tag the item to prevent double import
   //_studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
@@ -180,6 +166,7 @@ ProcessingController::OnInterpolateField()
 void
 ProcessingController::OnInterpolateFieldInputValidated()
 {
+  STDLOG("Interpolate Field");
   MEDCALC::InterpolationParameters params;
   params.precision = _dlgInterpolateField->getPrecision();
   STDLOG("precision = " << params.precision);
@@ -197,37 +184,13 @@ ProcessingController::OnInterpolateFieldInputValidated()
   int meshId = _dlgInterpolateField->getMeshId();
   STDLOG("meshId = " << ToString(meshId));
   int fieldId = _dlgInterpolateField->getFieldId();
-  MEDCALC::FieldHandler* fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
 
-  // We don't modify the original field but create first a duplicate
-  // MEDCALC::FieldHandler* duplicate = MEDFactoryClient::getCalculator()->dup(*fieldHandler);
-  //MEDFactoryClient::getDataManager()->changeUnderlyingMesh(duplicate->id, meshId);
-  MEDCALC::FieldHandler* result = NULL;
-  try {
-    result = MEDFactoryClient::getDataManager()->interpolateField(fieldId, meshId, params);
-  }
-  catch(...) {
-    STDLOG("Unable to process field interpolation; please check interpolation parameters");
-    QMessageBox::critical(_salomeModule->getApp()->desktop(),
-                          tr("Operation failed"),
-                          tr("Unable to process field interpolation; please check interpolation parameters"));
-    return;
-  }
-
-  // Request once more the duplicate to update the meta-data on this
-  // client side
-  // duplicate = MEDFactoryClient::getDataManager()->getFieldHandler(duplicate->id);
-
-  // >>>
-  // WARN: the following is a temporary code for test purpose
-  // Automatically add in ws
   ProcessingEvent* event = new ProcessingEvent();
-  event->eventtype = ProcessingEvent::EVENT_IMPORT_OBJECT;
-  XmedDataObject* dataObject = new XmedDataObject();
-  dataObject->setFieldHandler(*result);
-  event->objectdata = dataObject;
-  emit processingSignal(event);
-  // Note that this signal is processed by the WorkspaceController
+  event->eventtype = ProcessingEvent::EVENT_INTERPOLATE_FIELD;
+  event->fieldId = fieldId;
+  event->meshId = meshId;
+  event->interpParams = params;
+  emit processingSignal(event); // --> WorkspaceController::processProcessingEvent()
 
   // // Tag the item to prevent double import
   // //_studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);

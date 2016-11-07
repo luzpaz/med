@@ -317,6 +317,20 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
   else if ( event->type == MEDCALC::EVENT_MODIFY_PRESENTATION ) {
       emit workspaceSignal(event); // forward to PresentationController
   }
+  else if ( event->type == MEDCALC::EVENT_CHANGE_UNDERLYING_MESH
+            || event->type == MEDCALC::EVENT_INTERPOLATE_FIELD ) {
+    int fieldId = event->dataId;
+    MEDCALC::FieldHandler* fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
+    XmedDataObject* dataObject = new XmedDataObject();
+    dataObject->setFieldHandler(*fieldHandler);
+    std::cout << "IMPORT object in workspace: " << dataObject->toString() << std::endl;
+    STDLOG("IMPORT object in workspace:\n"<<dataObject->toString());
+    // _GBO_ QUESTION: tag automatically the object as a peristant object ??
+    // We first add the data object to the internal data model
+    dataModel->addDataObject(dataObject);
+    // Then we request the tree view to consider this new object
+    this->getDataTreeModel()->addData(dataObject);
+  }
   else if ( event->type == MEDCALC::EVENT_PLAY_TEST ) {
     emit workspaceSignal(event); // forward to TestController
   }
@@ -554,23 +568,25 @@ WorkspaceController::processProcessingEvent(const ProcessingEvent* event)
     return;
   }
 
-  // >>>
-  // __GBO__ To know what to do we should test the type, because the
-  // object could be a mesh, a timeseries or a single field. We test
-  // here the case of a single field. Moreover, there could have
-  // options such that "change the underlying mesh".
-  // <<<
+  int fieldId = event->fieldId;
+  int meshId = event->meshId;
 
-  XmedDataObject* dataObject = event->objectdata;
+  if ( event->eventtype == ProcessingEvent::EVENT_CHANGE_UNDERLYING_MESH ) {
+    QStringList commands;
+    commands += QString("result_id = medcalc.ChangeUnderlyingMesh(fieldId=%1,meshId=%2)").arg(fieldId).arg(meshId);
+    commands += QString("result_id");
+    _consoleDriver->exec(commands);
+  }
+  else if ( event->eventtype == ProcessingEvent::EVENT_INTERPOLATE_FIELD ) {
+    MEDCALC::InterpolationParameters params = event->interpParams;
+    QString method = QString(params.method);
+    QString nature = QString(params.nature);
+    QString intersectionType = QString(params.intersectionType);
 
-  if ( event->eventtype == ProcessingEvent::EVENT_IMPORT_OBJECT ) {
-    std::cout << "IMPORT object in workspace: " << dataObject->toString() << std::endl;
-    STDLOG("IMPORT object in workspace:\n"<<dataObject->toString());
-    // _GBO_ QUESTION: tag automatically the object as a peristant object ??
-    // We first add the data object to the internal data model
-    dataModel->addDataObject(dataObject);
-    // Then we request the tree view to consider this new object
-    this->getDataTreeModel()->addData(dataObject);
+    QStringList commands;
+    commands += QString("result_id = medcalc.InterpolateField(fieldId=%1,meshId=%2,precision=%3,defaultValue=%4,reverse=%5,method='%6',nature='%7',intersectionType='%8')").arg(fieldId).arg(meshId).arg(params.precision).arg(params.defaultValue).arg(params.reverse).arg(method).arg(nature).arg(intersectionType);
+    commands += QString("result_id");
+    _consoleDriver->exec(commands);
   }
 }
 

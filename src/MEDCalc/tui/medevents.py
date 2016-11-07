@@ -118,14 +118,20 @@ def notifyGui_addPresentation(fieldId, presId):
 def notifyGui_removePresentation(presId):
   __notifyGui(MEDCALC.EVENT_REMOVE_PRESENTATION, presentationId=presId)
 #
+def notifyGui_modifyPresentation(presId):
+  __notifyGui(MEDCALC.EVENT_MODIFY_PRESENTATION, presentationId=presId)
+
 def notifyGui_playQtTestingScenario(filename):
   __notifyGui(MEDCALC.EVENT_PLAY_TEST, filename=filename)
 #
 def notifyGui_termination():
   __notifyGui(MEDCALC.EVENT_QUIT_SALOME)
-  
+
 def notifyGui_error(msg):
   __notifyGui(MEDCALC.EVENT_ERROR, msg=msg)
-  
-def notifyGui_modifyPresentation(presId):
-  __notifyGui(MEDCALC.EVENT_MODIFY_PRESENTATION, presentationId=presId)
+
+def notifyGui_changeUnderlyingMesh(fieldId):
+  __notifyGui(MEDCALC.EVENT_CHANGE_UNDERLYING_MESH, dataId=fieldId)
+
+def notifyGui_interpolateField(fieldId):
+  __notifyGui(MEDCALC.EVENT_INTERPOLATE_FIELD, dataId=fieldId)

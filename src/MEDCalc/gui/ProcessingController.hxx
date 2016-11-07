@@ -37,11 +37,13 @@
 typedef struct {
   enum EventType {
     EVENT_IMPORT_OBJECT,
-    EVENT_PROCESS_INTERPOLATE_FIELD,
-    EVENT_PROCESS_CHANGE_UNDERLYING_MESH
+    EVENT_INTERPOLATE_FIELD,
+    EVENT_CHANGE_UNDERLYING_MESH
   };
   int eventtype;
-  XmedDataObject* objectdata;
+  int fieldId;
+  int meshId;
+  MEDCALC::InterpolationParameters interpParams;
 } ProcessingEvent;
 
 class MEDModule;

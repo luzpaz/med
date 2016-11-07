@@ -65,6 +65,10 @@ from medpresentation import UpdateDeflectionShape
 
 from medpresentation import ComputeCellAverageSize, GetDomainCenter, GetSliceOrigins, SelectSourceField
 
+# Processing
+from medprocessing import ChangeUnderlyingMesh
+from medprocessing import InterpolateField
+
 # Console commands
 import medconsole
 

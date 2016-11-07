@@ -26,6 +26,7 @@ SET(PYFILES_TO_INSTALL
   medimages.py
   medio.py
   medpresentation.py
+  medprocessing.py
   medtest.py
   )
 
