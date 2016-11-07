@@ -59,6 +59,7 @@ MEDPresentationScalarMap::internalGeneratePipeline()
   selectColorMap();
   rescaleTransferFunction();
   resetCameraAndRender();
+  pushAndExecPyLine(_dispVar+".SetRepresentationType('Surface')");
 }
 
 void
