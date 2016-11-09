@@ -46,3 +46,15 @@ def GetFirstMeshFromDataSource(datasource_id):
   if not len(handlerLst):
     return -1
   return handlerLst[0].id
+#
+
+def GetFirstFieldFromMesh(mesh_id):
+  dataManager = medcalc.medcorba.factory.getDataManager()
+  series = dataManager.getFieldseriesListOnMesh(mesh_id)
+  if not len(series):
+    return -1
+  fields = dataManager.getFieldListInFieldseries(series[0].id)
+  if not len(fields):
+    return -1
+  return fields[0].id
+#

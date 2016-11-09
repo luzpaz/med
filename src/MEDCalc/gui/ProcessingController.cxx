@@ -90,18 +90,28 @@ ProcessingController::OnChangeUnderlyingMesh()
   // item must be selected.
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() > 0 ) {
-    SALOMEDS::SObject_var soField = listOfSObject->at(0);
-    std::string name(_studyEditor->getName(soField));
-    if (soField->_is_nil() || name == "MEDCalc")
+    SALOMEDS::SObject_var soObj = listOfSObject->at(0);
+    std::string name(_studyEditor->getName(soObj));
+    if (soObj->_is_nil() || name == "MEDCalc")
       return;
-    SALOMEDS::GenericAttribute_var anAttr;
-    SALOMEDS::AttributeParameter_var aParam;
-    if ( soField->FindAttribute(anAttr,"AttributeParameter") ) {
-      aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-      if (! aParam->IsSet(FIELD_SERIES_ID, PT_INTEGER))
+
+    int fieldId = _salomeModule->getIntParamFromStudyEditor(soObj, FIELD_ID);
+    if (fieldId < 0) { // is it a field series?
+      int fieldSeriesId = _salomeModule->getIntParamFromStudyEditor(soObj, FIELD_SERIES_ID);
+      // If fieldId and fieldSeriesId equals -1, then it means that it is not a field
+      // managed by the MED module, and we stop this function process.
+      if ( fieldSeriesId < 0)
+        return;
+      MEDCALC::FieldHandlerList* fieldHandlerList = MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldSeriesId);
+      if (fieldHandlerList->length() < 0)
+        return;
+      // For a field series, get the first real field entry:
+      MEDCALC::FieldHandler fieldHandler = (*fieldHandlerList)[0];
+      fieldId = fieldHandler.id;
+      if (fieldId < 0)
         return;
     }
-    int fieldId = aParam->GetInt(FIELD_SERIES_ID);
+
     // _GBO_ : the dialog should not be modal, so that we can choose a
     // mesh in the browser. Then we have to emit a signal from the
     // dialog.accept, connected to a slot of the DatasourceControler
@@ -141,18 +151,28 @@ ProcessingController::OnInterpolateField()
   // item must be selected.
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() > 0 ) {
-    SALOMEDS::SObject_var soField = listOfSObject->at(0);
-    std::string name(_studyEditor->getName(soField));
-    if (soField->_is_nil() || name == "MEDCalc")
+    SALOMEDS::SObject_var soObj = listOfSObject->at(0);
+    std::string name(_studyEditor->getName(soObj));
+    if (soObj->_is_nil() || name == "MEDCalc")
       return;
-    SALOMEDS::GenericAttribute_var anAttr;
-    SALOMEDS::AttributeParameter_var aParam;
-    if ( soField->FindAttribute(anAttr,"AttributeParameter") ) {
-      aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-      if (! aParam->IsSet(FIELD_SERIES_ID, PT_INTEGER))
+
+    int fieldId = _salomeModule->getIntParamFromStudyEditor(soObj, FIELD_ID);
+    if (fieldId < 0) { // is it a field series?
+      int fieldSeriesId = _salomeModule->getIntParamFromStudyEditor(soObj, FIELD_SERIES_ID);
+      // If fieldId and fieldSeriesId equals -1, then it means that it is not a field
+      // managed by the MED module, and we stop this function process.
+      if ( fieldSeriesId < 0)
+        return;
+      MEDCALC::FieldHandlerList* fieldHandlerList = MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldSeriesId);
+      if (fieldHandlerList->length() < 0)
+        return;
+      // For a field series, get the first real field entry:
+      MEDCALC::FieldHandler fieldHandler = (*fieldHandlerList)[0];
+      fieldId = fieldHandler.id;
+      if (fieldId < 0)
         return;
     }
-    int fieldId = aParam->GetInt(FIELD_SERIES_ID);
+
     // _GBO_ : the dialog should not be modal, so that we can choose a
     // mesh in the browser. Then we have to emit a signal from the
     // dialog.accept, connected to a slot of the DatasourceControler

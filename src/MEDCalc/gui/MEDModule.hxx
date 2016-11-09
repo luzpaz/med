@@ -87,7 +87,9 @@ public:
   inline SALOME_AppStudyEditor* getStudyEditor() { return _studyEditor; }
   void requestSALOMETermination() const;
 
-  bool itemClickGeneric(std::string & name, std::string & type, int & presId) const;
+  bool itemClickGeneric(std::string& name, std::string& type, int& presId) const;
+
+  int getIntParamFromStudyEditor(SALOMEDS::SObject_var obj, const char* name);
 
 signals:
   void presentationSelected(int presId, const QString& presType, const QString& presName);

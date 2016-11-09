@@ -110,22 +110,6 @@ PresentationController::~PresentationController()
     delete((*it).second);
 }
 
-int
-PresentationController::getIntParamFromStudyEditor(SALOMEDS::SObject_var obj, const char * name)
-{
-  if (obj->_is_nil())
-    return -1;
-
-  SALOMEDS::GenericAttribute_var anAttr;
-  SALOMEDS::AttributeParameter_var aParam;
-  if ( obj->FindAttribute(anAttr,"AttributeParameter") ) {
-    aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
-    if (aParam->IsSet(name, PT_INTEGER))
-      return aParam->GetInt(name);
-  }
-  return -1;
-}
-
 std::string
 PresentationController::_getIconName(const std::string& name)
 {
@@ -314,8 +298,8 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
       if (soObj->_is_nil() || name == "MEDCalc")
         return;
 
-      int fieldId = getIntParamFromStudyEditor(soObj, FIELD_ID);
-      int meshId = getIntParamFromStudyEditor(soObj, MESH_ID);
+      int fieldId = _salomeModule->getIntParamFromStudyEditor(soObj, FIELD_ID);
+      int meshId = _salomeModule->getIntParamFromStudyEditor(soObj, MESH_ID);
       MEDCALC::FieldHandler* fieldHandler = 0;
       MEDCALC::MeshHandler* meshHandler = 0;
 
@@ -328,9 +312,9 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
         }
       else
         {
-          if (fieldId < 0)  // is it a field serie ?
+          if (fieldId < 0)  // is it a field series?
             {
-              int fieldSeriesId = getIntParamFromStudyEditor(soObj, FIELD_SERIES_ID);
+              int fieldSeriesId = _salomeModule->getIntParamFromStudyEditor(soObj, FIELD_SERIES_ID);
               // If fieldId and fieldSeriesId equals -1, then it means that it is not a field
               // managed by the MED module, and we stop this function process.
               if ( fieldSeriesId < 0)
@@ -418,7 +402,7 @@ PresentationController::onDeletePresentation()
       std::string name(_studyEditor->getName(soPres));
       if (soPres->_is_nil() || name == "MEDCalc")
         return;
-      int presId = getIntParamFromStudyEditor(soPres,PRESENTATION_ID);
+      int presId = _salomeModule->getIntParamFromStudyEditor(soPres,PRESENTATION_ID);
       // If fieldId equals -1, then it means that it is not a field
       // managed by the MED module, and we stop this function process.
       if ( presId < 0 )
@@ -676,7 +660,7 @@ PresentationController::onParavisDump()
       std::string name(_studyEditor->getName(soPres));
       if (soPres->_is_nil() || name == "MEDCalc")
         return;
-      int presId = getIntParamFromStudyEditor(soPres,PRESENTATION_ID);
+      int presId = _salomeModule->getIntParamFromStudyEditor(soPres,PRESENTATION_ID);
       // If fieldId equals -1, then it means that it is not a field
       // managed by the MED module, and we stop this function process.
       if ( presId < 0 )

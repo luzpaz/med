@@ -35,7 +35,10 @@ import medevents
 from fieldproxy import newFieldProxy, FieldProxy
 
 # Input/Output
-from medio import LoadDataSource, LoadImageAsDataSource, GetFirstMeshFromDataSource
+from medio import LoadDataSource
+from medio import LoadImageAsDataSource
+from medio import GetFirstMeshFromDataSource
+from medio import GetFirstFieldFromMesh
 
 # Presentations
 from medpresentation import MakeMeshView

@@ -487,3 +487,19 @@ MEDModule::requestSALOMETermination() const
 //{
 //  return _eventLoopStarted;
 //}
+
+int
+MEDModule::getIntParamFromStudyEditor(SALOMEDS::SObject_var obj, const char* name)
+{
+  if (obj->_is_nil())
+    return -1;
+
+  SALOMEDS::GenericAttribute_var anAttr;
+  SALOMEDS::AttributeParameter_var aParam;
+  if ( obj->FindAttribute(anAttr,"AttributeParameter") ) {
+    aParam = SALOMEDS::AttributeParameter::_narrow(anAttr);
+    if (aParam->IsSet(name, PT_INTEGER))
+      return aParam->GetInt(name);
+  }
+  return -1;
+}

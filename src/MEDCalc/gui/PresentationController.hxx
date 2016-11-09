@@ -86,8 +86,6 @@ private:
   MEDWidgetHelper * findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager_ptr presManager,
                                              int presId, const std::string& type, const std::string& name);
 
-  int getIntParamFromStudyEditor(SALOMEDS::SObject_var obj, const char * name);
-
   QString getViewModePython() const;
   QString getColorMapPython() const;
   QString getScalarBarRangePython() const;

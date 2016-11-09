@@ -38,6 +38,10 @@
 #include <QTimer>
 #include <QMessageBox>
 
+#include "MEDLoader.hxx"
+using namespace MEDCoupling;
+#include "MEDDataManager_i.hxx"
+
 /*!
  * This class defines a DockWidget plugged in the SALOME application,
  * and containing a tree view for rendering a hierarchical data
@@ -330,6 +334,22 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
     dataModel->addDataObject(dataObject);
     // Then we request the tree view to consider this new object
     this->getDataTreeModel()->addData(dataObject);
+
+    // Workaround to visualize the result
+    MEDCouplingFieldDouble* fieldDouble = MEDDataManager_i::getInstance()->getFieldDouble(fieldHandler);
+    std::string filename = std::tmpnam(nullptr);
+    WriteField(filename.c_str(), fieldDouble, true);
+
+    QStringList commands;
+    commands += QString("source_id = medcalc.LoadDataSource('%1')").arg(filename.c_str());
+    commands += QString("source_id");
+    commands += QString("mesh_id = medcalc.GetFirstMeshFromDataSource(source_id)");
+    commands += QString("mesh_id");
+    commands += QString("field_id = medcalc.GetFirstFieldFromMesh(mesh_id)");
+    commands += QString("field_id");
+    commands += QString("presentation_id = medcalc.MakeScalarMap(accessField(field_id), viewMode=MEDCALC.VIEW_MODE_NEW_LAYOUT)");
+    commands += QString("presentation_id");
+    _consoleDriver->exec(commands);
   }
   else if ( event->type == MEDCALC::EVENT_PLAY_TEST ) {
     emit workspaceSignal(event); // forward to TestController
