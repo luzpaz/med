@@ -94,6 +94,10 @@ MEDPresentationContour::internalGeneratePipeline()
   oss << _objVar << ".ContourBy = ['POINTS', '" << _fieldName << "'];";
   pushAndExecPyLine(oss.str()); oss.str("");
 
+  // Colorize contour
+  oss << _objVar << ".ComputeScalars = 1;";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
   // Set number of contours
   setNumberContours();
 
