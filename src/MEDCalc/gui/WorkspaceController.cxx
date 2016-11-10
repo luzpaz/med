@@ -337,7 +337,7 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
 
     // Workaround to visualize the result
     MEDCouplingFieldDouble* fieldDouble = MEDDataManager_i::getInstance()->getFieldDouble(fieldHandler);
-    std::string filename = std::tmpnam(nullptr);
+    std::string filename = std::tmpnam(NULL);
     WriteField(filename.c_str(), fieldDouble, true);
 
     QStringList commands;
