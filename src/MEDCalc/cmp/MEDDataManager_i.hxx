@@ -115,10 +115,10 @@ public:
   // ===========================================================
   //
   static long LONG_UNDEFINED;
-  static MEDDataManager_i * getInstance();
-  MEDCouplingFieldDouble *  getFieldDouble(const MEDCALC::FieldHandler * fieldHandler);
-  MEDCALC::FieldHandler *     addField(MEDCouplingFieldDouble * fieldDouble,
-                                       long meshHandlerId=LONG_UNDEFINED);
+  MEDCALC_EXPORT static MEDDataManager_i * getInstance();
+  MEDCALC_EXPORT MEDCouplingFieldDouble *  getFieldDouble(const MEDCALC::FieldHandler * fieldHandler);
+  MEDCALC_EXPORT MEDCALC::FieldHandler *     addField(MEDCouplingFieldDouble * fieldDouble,
+		                                       long meshHandlerId=LONG_UNDEFINED);
 
 private:
   MEDDataManager_i();
