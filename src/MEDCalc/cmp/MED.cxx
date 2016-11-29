@@ -356,11 +356,12 @@ MED::getStudyPresentationEntry(SALOMEDS::Study_ptr study, CORBA::Long presentati
 
 
 Engines::TMPFile*
-MED::DumpPython(CORBA::Object_ptr theStudy,
-                CORBA::Boolean isPublished,
+MED::DumpPython(CORBA::Boolean isPublished,
                 CORBA::Boolean isMultiFile,
                 CORBA::Boolean& isValidScript)
 {
+  SALOME_LifeCycleCORBA lcc;
+  CORBA::Object_var theStudy = lcc.namingService()->Resolve("/Study");
   SALOMEDS::Study_var aStudy = SALOMEDS::Study::_narrow(theStudy);
   if(CORBA::is_nil(aStudy)) {
     std::cerr << "Error: Cannot find the study\n";
