@@ -20,16 +20,6 @@
 #ifndef _MED_HXX_
 #define _MED_HXX_
 
-#ifdef WIN32
-# if defined MEDENGINE_EXPORTS || defined MEDEngine_EXPORTS
-#  define MEDENGINE_EXPORT __declspec( dllexport )
-# else
-#  define MEDENGINE_EXPORT __declspec( dllimport )
-# endif
-#else
-# define MEDENGINE_EXPORT
-#endif
-
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(MED_Gen)
 #include CORBA_SERVER_HEADER(MEDDataManager)
@@ -40,7 +30,9 @@
 #include <map>
 #include <string>
 
-class MEDENGINE_EXPORT MED :
+#include "MEDCALC.hxx"
+
+class MEDCALC_EXPORT MED :
   public POA_MED_ORB::MED_Gen,
   public Engines_Component_i
 {
@@ -99,7 +91,7 @@ public:
 };
 
 extern "C"
-MEDENGINE_EXPORT
+MEDCALC_EXPORT
 PortableServer::ObjectId* MEDEngine_factory( CORBA::ORB_ptr orb,
                                              PortableServer::POA_ptr poa,
                                              PortableServer::ObjectId* contId,

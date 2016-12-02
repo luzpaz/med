@@ -31,7 +31,7 @@ class MEDCommandsHistoryManager_i
     public SALOME::GenericObj_i
 {
  public:
-  static MEDCommandsHistoryManager_i* getInstance();
+  MEDCALC_EXPORT static MEDCommandsHistoryManager_i* getInstance();
 
   MEDCALC_EXPORT void addCommand(const char* command);
   MEDCALC_EXPORT MEDCALC::CommandsList* getCommandsHistory();
