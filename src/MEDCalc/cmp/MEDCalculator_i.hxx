@@ -56,7 +56,7 @@ public:
   // Other public functions (non available via CORBA)
   // ===========================================================
   //
-  static MEDCalculator_i * getInstance();
+  MEDCALC_EXPORT static MEDCalculator_i * getInstance();
 
 private:
   MEDCalculator_i();

@@ -37,7 +37,7 @@ class MEDPresentationManager_i: public POA_MEDCALC::MEDPresentationManager,
 {
  public:
 
-  static MEDPresentationManager_i* getInstance();
+  MEDCALC_EXPORT static MEDPresentationManager_i* getInstance();
 
   MEDCALC_EXPORT MEDPresentation::TypeID makeMeshView(const MEDCALC::MeshViewParameters&, const MEDCALC::ViewModeType);
   MEDCALC_EXPORT MEDPresentation::TypeID makeScalarMap(const MEDCALC::ScalarMapParameters&, const MEDCALC::ViewModeType);

@@ -21,7 +21,7 @@
 #define __MEDCALC_HXX__
 
 #ifdef WIN32
-# if defined MEDFactoryEngine_EXPORTS || defined MEDEngine_EXPORTS
+# if defined MEDFactoryEngine_EXPORTS || defined MEDEngine_EXPORTS || defined MEDEngineCommon_EXPORTS
 #    define MEDCALC_EXPORT __declspec( dllexport )
 #  else
 #    define MEDCALC_EXPORT __declspec( dllimport )
