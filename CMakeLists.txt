@@ -248,7 +248,7 @@ IF(SALOME_USE_MPI)
 ENDIF()
 
 LIST(APPEND _${PROJECT_NAME}_exposed_targets
-    medcouplingcorba medcouplingclient medcalculator MEDFactoryEngine)
+    medcouplingcorba medcouplingclient medcalculator MEDEngineCommon MEDFactoryEngine MEDEngine)
 IF(SALOME_MED_ENABLE_PYTHON)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets medcalculatorspython)
 ENDIF()
