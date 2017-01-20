@@ -25,6 +25,7 @@
 #include "MEDFactoryClient.hxx"
 #include CORBA_CLIENT_HEADER(MED_Gen)
 #include CORBA_CLIENT_HEADER(MEDCommandsHistoryManager)
+#include <iostream>
 
 XmedConsoleDriver::XmedConsoleDriver(MEDModule* salomeModule)
 {
