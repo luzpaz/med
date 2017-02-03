@@ -701,24 +701,19 @@ PresentationController::updateTreeViewWithNewPresentation(long dataId, long pres
   name = tr(name.c_str()).toStdString();
   oss << name << " (" << presentationId << ")";
 
-  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
-  _PTR(Study) studyDS = study->studyDS();
-
   // Mesh views are always registered at the mesh level:
   if (type == MEDPresentationMeshView::TYPE_NAME)
     {
-      _salomeModule->engine()->registerPresentationMesh(_CAST(Study, studyDS)->GetStudy(), dataId,
-          oss.str().c_str(), type.c_str(),ico.c_str(), presentationId);
+      _salomeModule->engine()->registerPresentationMesh(dataId, oss.str().c_str(), type.c_str(),ico.c_str(), presentationId);
     }
   else
-    _salomeModule->engine()->registerPresentationField(_CAST(Study, studyDS)->GetStudy(), dataId,
-            oss.str().c_str(), type.c_str(),ico.c_str(), presentationId);
+    _salomeModule->engine()->registerPresentationField(dataId, oss.str().c_str(), type.c_str(),ico.c_str(), presentationId);
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);
 
   // auto-select new presentation
-  std::string entry = _salomeModule->engine()->getStudyPresentationEntry(_CAST(Study, studyDS)->GetStudy(), presentationId);
+  std::string entry = _salomeModule->engine()->getStudyPresentationEntry(presentationId);
   SALOME_ListIO selectedObjects;
   LightApp_Study* lightStudy = dynamic_cast<LightApp_Study*>( _salomeModule->application()->activeStudy() );
   QString component = lightStudy->componentDataType( entry.c_str() );
@@ -744,10 +739,7 @@ PresentationController::updateTreeViewForPresentationRemoval(long presentationId
       return;
   }
 
-  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
-  _PTR(Study) studyDS = study->studyDS();
-
-  _salomeModule->engine()->unregisterPresentation(_CAST(Study, studyDS)->GetStudy(), presentationId);
+  _salomeModule->engine()->unregisterPresentation(presentationId);
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);
@@ -757,11 +749,9 @@ void
 PresentationController::_dealWithReplaceMode()
 {
   // Deal with replace mode: presentations with invalid IDs have to be removed:
-  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
-  _PTR(Study) studyDS = study->studyDS();
 
   MEDCALC::PresentationsList * lstManager = _presManager->getAllPresentations();
-  MED_ORB::PresentationsList * lstModule = _salomeModule->engine()->getStudyPresentations(_CAST(Study, studyDS)->GetStudy());
+  MED_ORB::PresentationsList * lstModule = _salomeModule->engine()->getStudyPresentations();
   // The IDs not in the intersection needs deletion:
   CORBA::Long * last = lstManager->get_buffer() + lstManager->length();
   for (unsigned i = 0; i < lstModule->length(); i++) {

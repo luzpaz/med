@@ -138,10 +138,7 @@ DatasourceController::updateTreeViewWithNewDatasource(const MEDCALC::DatasourceH
     return;
   }
 
-  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
-  _PTR(Study) studyDS = study->studyDS();
-
-  _salomeModule->engine()->addDatasourceToStudy(_CAST(Study, studyDS)->GetStudy(), *datasourceHandler);
+  _salomeModule->engine()->addDatasourceToStudy(*datasourceHandler);
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);

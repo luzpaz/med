@@ -39,40 +39,34 @@ module MED_ORB
   interface
   MED_Gen : Engines::EngineComponent
   {
-    status addDatasourceToStudy(in SALOMEDS::Study study,
-                                in MEDCALC::DatasourceHandler datasourceHandler)
+    status addDatasourceToStudy(in MEDCALC::DatasourceHandler datasourceHandler)
       raises (SALOME::SALOME_Exception);
 
-    status registerPresentationField(in SALOMEDS::Study study,
-                                in long fieldId,
-                                in string name,
-                                in string type,
-                                in string ico,
-                                in long presentationId)
+    status registerPresentationField(in long fieldId,
+                                     in string name,
+                                     in string type,
+                                     in string ico,
+                                     in long presentationId)
       raises (SALOME::SALOME_Exception);
 
-    status registerPresentationMesh(in SALOMEDS::Study study,
-                                    in long meshId,
+    status registerPresentationMesh(in long meshId,
                                     in string name,
                                     in string type,
                                     in string ico,
                                     in long presentationId)
           raises (SALOME::SALOME_Exception);
 
-    status unregisterPresentation(in SALOMEDS::Study study,
-                                  in long presentationId)
+    status unregisterPresentation(in long presentationId)
       raises (SALOME::SALOME_Exception);
 
-//    PresentationsList getSiblingPresentations(in SALOMEDS::Study study,
-//                                              in long presentationId)
+//    PresentationsList getSiblingPresentations(in long presentationId)
 //      raises (SALOME::SALOME_Exception);
 
     // Get all presentations in study:
-    PresentationsList getStudyPresentations(in SALOMEDS::Study study)
+    PresentationsList getStudyPresentations()
       raises (SALOME::SALOME_Exception);
 
-    string getStudyPresentationEntry(in SALOMEDS::Study study,
-                                                in long presentationId)
+    string getStudyPresentationEntry(in long presentationId)
       raises (SALOME::SALOME_Exception);
 
     void cleanUp();

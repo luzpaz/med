@@ -29,6 +29,7 @@
 #include <SALOME_LifeCycleCORBA.hxx>
 #include <SALOME_NamingService.hxx>
 #include <SALOME_KernelServices.hxx>
+#include <SALOMEDSImpl_AttributeParameter.hxx>
 
 #include <string>
 #include <sstream>
@@ -63,27 +64,27 @@ MED::~MED()
 }
 
 MED_ORB::status
-MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
-                          const MEDCALC::DatasourceHandler& datasourceHandler)
+MED::addDatasourceToStudy(const MEDCALC::DatasourceHandler& datasourceHandler)
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
 
+  SALOMEDS::Study_var aStudy = KERNEL::getStudyServant();
   // check if reference to study is valid
-  if (!CORBA::is_nil(study)) {
+  if (!CORBA::is_nil(aStudy)) {
     // get full object path
     std::string fullName = CORBA::string_dup(datasourceHandler.name);
     // check if the object with the same name is already registered in the study
-    SALOMEDS::SObject_var sobj = study->FindObjectByPath(fullName.c_str());
+    SALOMEDS::SObject_var sobj = aStudy->FindObjectByPath(fullName.c_str());
     if (CORBA::is_nil(sobj)) {
       // object is not registered yet -> register
       SALOMEDS::GenericAttribute_var anAttr;
       SALOMEDS::AttributeParameter_var aParam;
-      SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
-      SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+      SALOMEDS::StudyBuilder_var studyBuilder = aStudy->NewBuilder();
+      SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
 
       // find MED component; create it if not found
-      SALOMEDS::SComponent_var father = study->FindComponent("MED");
+      SALOMEDS::SComponent_var father = aStudy->FindComponent("MED");
       if (CORBA::is_nil(father)) {
         // create component
         father = studyBuilder->NewComponent("MED");
@@ -159,12 +160,11 @@ MED::addDatasourceToStudy(SALOMEDS::Study_ptr study,
 }
 
 MED_ORB::status
-MED::registerPresentationField(SALOMEDS::Study_ptr study,
-                          CORBA::Long fieldId,
-                          const char* name,
-                          const char* type,
-                          const char* ico,
-                          CORBA::Long presentationId)
+MED::registerPresentationField(CORBA::Long fieldId,
+                               const char* name,
+                               const char* type,
+                               const char* ico,
+                               CORBA::Long presentationId)
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
@@ -181,7 +181,8 @@ MED::registerPresentationField(SALOMEDS::Study_ptr study,
     return MED_ORB::OP_ERROR ;
   }
   std::string entry = _fieldSeriesEntries[fieldSeriesId];
-  SALOMEDS::SObject_var sobject = study->FindObjectID(entry.c_str());
+  SALOMEDS::Study_var aStudy = KERNEL::getStudyServant();
+  SALOMEDS::SObject_var sobject = aStudy->FindObjectID(entry.c_str());
   SALOMEDS::SObject_ptr soFieldseries = sobject._retn();
 
   if (soFieldseries->IsNull()) {
@@ -189,8 +190,8 @@ MED::registerPresentationField(SALOMEDS::Study_ptr study,
     return MED_ORB::OP_ERROR;
   }
 
-  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
-  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+  SALOMEDS::StudyBuilder_var studyBuilder = aStudy->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
   SALOMEDS::SObject_var soPresentation = studyBuilder->NewObject(soFieldseries);
   useCaseBuilder->AppendTo(soPresentation->GetFather(), soPresentation);
 
@@ -210,12 +211,11 @@ MED::registerPresentationField(SALOMEDS::Study_ptr study,
 }
 
 MED_ORB::status
-MED::registerPresentationMesh(SALOMEDS::Study_ptr study,
-                          CORBA::Long meshId,
-                          const char* name,
-                          const char* type,
-                          const char* ico,
-                          CORBA::Long presentationId)
+MED::registerPresentationMesh(CORBA::Long meshId,
+                              const char* name,
+                              const char* type,
+                              const char* ico,
+                              CORBA::Long presentationId)
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
@@ -231,7 +231,8 @@ MED::registerPresentationMesh(SALOMEDS::Study_ptr study,
     return MED_ORB::OP_ERROR ;
   }
   std::string entry = _meshEntries[meshHandler->id];
-  SALOMEDS::SObject_var sobject = study->FindObjectID(entry.c_str());
+  SALOMEDS::Study_var aStudy = KERNEL::getStudyServant();
+  SALOMEDS::SObject_var sobject = aStudy->FindObjectID(entry.c_str());
   SALOMEDS::SObject_ptr soMesh = sobject._retn();
 
   if (soMesh->IsNull()) {
@@ -239,8 +240,8 @@ MED::registerPresentationMesh(SALOMEDS::Study_ptr study,
     return MED_ORB::OP_ERROR;
   }
 
-  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
-  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+  SALOMEDS::StudyBuilder_var studyBuilder = aStudy->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
   SALOMEDS::SObject_var soPresentation = studyBuilder->NewObject(soMesh);
   useCaseBuilder->AppendTo(soPresentation->GetFather(), soPresentation);
 
@@ -261,18 +262,18 @@ MED::registerPresentationMesh(SALOMEDS::Study_ptr study,
 
 
 MED_ORB::status
-MED::unregisterPresentation(SALOMEDS::Study_ptr study,
-                            CORBA::Long presentationId)
+MED::unregisterPresentation(CORBA::Long presentationId)
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
 
-  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
-  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+  SALOMEDS::Study_var aStudy = KERNEL::getStudyServant();
+  SALOMEDS::StudyBuilder_var studyBuilder = aStudy->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
 
   SALOMEDS::GenericAttribute_var anAttribute;
-  SALOMEDS::SComponent_var father = study->FindComponent("MED");
-  SALOMEDS::ChildIterator_var it = study->NewChildIterator(father);
+  SALOMEDS::SComponent_var father = aStudy->FindComponent("MED");
+  SALOMEDS::ChildIterator_var it = aStudy->NewChildIterator(father);
   for (it->InitEx(true); it->More(); it->Next()) {
     SALOMEDS::SObject_var child(it->Value());
 
@@ -294,19 +295,20 @@ MED::unregisterPresentation(SALOMEDS::Study_ptr study,
 }
 
 MED_ORB::PresentationsList*
-MED::getStudyPresentations(SALOMEDS::Study_ptr study)
+MED::getStudyPresentations()
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
 
   MED_ORB::PresentationsList* presList = new MED_ORB::PresentationsList;
 
-  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
-  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+  SALOMEDS::Study_var aStudy = KERNEL::getStudyServant();
+  SALOMEDS::StudyBuilder_var studyBuilder = aStudy->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
 
   SALOMEDS::GenericAttribute_var anAttribute;
-  SALOMEDS::SComponent_var father = study->FindComponent("MED");
-  SALOMEDS::ChildIterator_var it = study->NewChildIterator(father);
+  SALOMEDS::SComponent_var father = aStudy->FindComponent("MED");
+  SALOMEDS::ChildIterator_var it = aStudy->NewChildIterator(father);
   for (it->InitEx(true); it->More(); it->Next())
     {
       SALOMEDS::SObject_var child(it->Value());
@@ -325,19 +327,20 @@ MED::getStudyPresentations(SALOMEDS::Study_ptr study)
 }
 
 char*
-MED::getStudyPresentationEntry(SALOMEDS::Study_ptr study, CORBA::Long presentationId)
+MED::getStudyPresentationEntry(CORBA::Long presentationId)
 {
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
 
   MED_ORB::PresentationsList* presList = new MED_ORB::PresentationsList;
 
-  SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();
-  SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();
+  SALOMEDS::Study_var aStudy = KERNEL::getStudyServant();
+  SALOMEDS::StudyBuilder_var studyBuilder = aStudy->NewBuilder();
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
 
   SALOMEDS::GenericAttribute_var anAttribute;
-  SALOMEDS::SComponent_var father = study->FindComponent("MED");
-  SALOMEDS::ChildIterator_var it = study->NewChildIterator(father);
+  SALOMEDS::SComponent_var father = aStudy->FindComponent("MED");
+  SALOMEDS::ChildIterator_var it = aStudy->NewChildIterator(father);
   for (it->InitEx(true); it->More(); it->Next())
     {
       SALOMEDS::SObject_var child(it->Value());
@@ -360,15 +363,7 @@ MED::DumpPython(CORBA::Boolean isPublished,
                 CORBA::Boolean isMultiFile,
                 CORBA::Boolean& isValidScript)
 {
-  SALOME_LifeCycleCORBA lcc;
-  CORBA::Object_var theStudy = lcc.namingService()->Resolve("/Study");
-  SALOMEDS::Study_var aStudy = SALOMEDS::Study::_narrow(theStudy);
-  if(CORBA::is_nil(aStudy)) {
-    std::cerr << "Error: Cannot find the study\n";
-    return new Engines::TMPFile(0);
-  }
-
-  SALOMEDS::SObject_var aSO = aStudy->FindComponent("MED");
+  SALOMEDS::SObject_var aSO = KERNEL::getStudyServant()->FindComponent("MED");
   if(CORBA::is_nil(aSO)) {
     std::cerr << "Error: Cannot find component MED\n";
     return new Engines::TMPFile(0);
@@ -402,10 +397,7 @@ MED::hasObjectInfo()
 char*
 MED::getObjectInfo(const char* entry)
 {
-  SALOME_LifeCycleCORBA lcc;
-  CORBA::Object_var aStudyObject = lcc.namingService()->Resolve("/Study");
-  SALOMEDS::Study_var aStudy = SALOMEDS::Study::_narrow( aStudyObject );
-  SALOMEDS::SObject_var aSObj = aStudy->FindObjectID( entry );
+  SALOMEDS::SObject_var aSObj = KERNEL::getStudyServant()->FindObjectID( entry );
   SALOMEDS::SObject_var aResultSObj;
   if (aSObj->ReferencedObject(aResultSObj))
     aSObj = aResultSObj;
