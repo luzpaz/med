@@ -84,7 +84,7 @@ module MEDCALC
   };
   typedef sequence<FieldseriesHandler> FieldseriesHandlerList;
 
-  // The FieldHandler structure is a lightweigth data structure that
+  // The FieldHandler structure is a lightweight data structure that
   // represents a single field (as understood in MEDCoupling model).
   struct FieldHandler {
     long   id;
@@ -135,7 +135,7 @@ module MEDCALC
 
     FieldHandler     getFieldHandler(in long fieldHandlerId);
     FieldHandlerList getFieldHandlerList();
-    // __GBO__ Maybe it could be usefull to define a getFieldHandlerList with a datasourceId in argument
+    // __GBO__ Maybe it could be useful to define a getFieldHandlerList with a datasourceId in argument
     string           getFieldRepresentation(in long fieldHandlerId);
 
     // Persistency management

@@ -72,7 +72,7 @@ for meshName in meshNames:
 # MEDCoupling field? Or a tree that you cross using attribute and
 # whose leaves are the MEDCoupling fields?
 # R: I think that the default structure should be a simple list that
-# store objects whith properties that corresponds to the metadata (and
+# store objects with properties that corresponds to the metadata (and
 # if loaded the MEDCouplingField or Mesh). Then for specific request,
 # a BTree could be create to organize the search (for example if we
 # request all the fields for a given iteration step, then we should

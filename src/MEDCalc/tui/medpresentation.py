@@ -34,7 +34,7 @@ def MakeMeshView(meshID,
     notifyGui_addPresentation(meshID, presentation_id)
     return presentation_id
   except SALOME.SALOME_Exception as e:
-    notifyGui_error("An error occured while creating the mesh view:\n" + e.details.text)
+    notifyGui_error("An error occurred while creating the mesh view:\n" + e.details.text)
     raise Exception(e.details.text)
 
 
@@ -52,7 +52,7 @@ def MakeScalarMap(proxy,
     notifyGui_addPresentation(proxy.id, presentation_id)
     return presentation_id
   except SALOME.SALOME_Exception as e:
-    notifyGui_error("An error occured while creating the scalar map:\n" + e.details.text)
+    notifyGui_error("An error occurred while creating the scalar map:\n" + e.details.text)
     raise Exception(e.details.text)
 
 def MakeContour(proxy,
@@ -67,7 +67,7 @@ def MakeContour(proxy,
     notifyGui_addPresentation(proxy.id, presentation_id)
     return presentation_id
   except SALOME.SALOME_Exception as e:
-    notifyGui_error("An error occured while creating the contour:\n" + e.details.text)
+    notifyGui_error("An error occurred while creating the contour:\n" + e.details.text)
     raise Exception(e.details.text)
 
 #
@@ -85,7 +85,7 @@ def MakeVectorField(proxy,
     notifyGui_addPresentation(proxy.id, presentation_id)
     return presentation_id
   except SALOME.SALOME_Exception as e:
-    notifyGui_error("An error occured while creating the vector field:\n" + e.details.text)
+    notifyGui_error("An error occurred while creating the vector field:\n" + e.details.text)
     raise Exception(e.details.text)
 
 def MakeSlices(proxy,
@@ -104,7 +104,7 @@ def MakeSlices(proxy,
     notifyGui_addPresentation(proxy.id, presentation_id)
     return presentation_id
   except SALOME.SALOME_Exception as e:
-    notifyGui_error("An error occured while creating the slices:\n" + e.details.text)
+    notifyGui_error("An error occurred while creating the slices:\n" + e.details.text)
     raise Exception(e.details.text)
 
 
@@ -121,7 +121,7 @@ def MakeDeflectionShape(proxy,
     notifyGui_addPresentation(proxy.id, presentation_id)
     return presentation_id
   except SALOME.SALOME_Exception as e:
-    notifyGui_error("An error occured while creating the deflection shape:\n" + e.details.text)
+    notifyGui_error("An error occurred while creating the deflection shape:\n" + e.details.text)
     raise Exception(e.details.text)
 
 
@@ -139,7 +139,7 @@ def MakePointSprite(proxy,
     notifyGui_addPresentation(proxy.id, presentation_id)
     return presentation_id
   except SALOME.SALOME_Exception as e:
-    notifyGui_error("An error occured while creating the point sprite:\n" + e.details.text)
+    notifyGui_error("An error occurred while creating the point sprite:\n" + e.details.text)
     raise Exception(e.details.text)
 
 def RemovePresentation(presentation_id):

@@ -75,7 +75,7 @@ const std::string& MEDCalculatorBrowserMesh::getName() const
   return _name;
 }
 
-//  Return if the mesh name is equal to input or not, usefull for std::find for example
+//  Return if the mesh name is equal to input or not, useful for std::find for example
 bool MEDCalculatorBrowserMesh::operator==(const std::string& nm)
 {
   return _name==nm;

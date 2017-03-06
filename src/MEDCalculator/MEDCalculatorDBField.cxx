@@ -249,7 +249,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator+(const MEDCalculatorDBF
           return ret;
         }
       else
-        throw INTERP_KERNEL::Exception("FieldReal::operator+ : unrecognized type of parameter recieved !");
+        throw INTERP_KERNEL::Exception("FieldReal::operator+ : unrecognized type of parameter received !");
     }
 }
 
@@ -299,7 +299,7 @@ bool MEDCalculatorDBFieldReal::isEqual(const MEDCalculatorDBField& other, double
           return ret;
         }
       else
-        throw INTERP_KERNEL::Exception("FieldReal::isEqual : unrecognized type of parameter recieved !");
+        throw INTERP_KERNEL::Exception("FieldReal::isEqual : unrecognized type of parameter received !");
     }
 }
 
@@ -346,7 +346,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator-(const MEDCalculatorDBF
           return ret;
         }
       else
-        throw INTERP_KERNEL::Exception("FieldReal::operator- : unrecognized type of parameter recieved !");
+        throw INTERP_KERNEL::Exception("FieldReal::operator- : unrecognized type of parameter received !");
     }
 }
 
@@ -396,7 +396,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator*(const MEDCalculatorDBF
           return ret;
         }
       else
-        throw INTERP_KERNEL::Exception("FieldReal::operator* : unrecognized type of parameter recieved !");
+        throw INTERP_KERNEL::Exception("FieldReal::operator* : unrecognized type of parameter received !");
     }
 }
 
@@ -446,7 +446,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::operator/(const MEDCalculatorDBF
           return ret;
         }
       else
-        throw INTERP_KERNEL::Exception("FieldReal::operator/ : unrecognized type of parameter recieved !");
+        throw INTERP_KERNEL::Exception("FieldReal::operator/ : unrecognized type of parameter received !");
     }
 }
 
@@ -806,7 +806,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator+(const MEDCalculatorDBFi
           return ret;
         }
       else
-        throw INTERP_KERNEL::Exception("FieldCst::operator+ : unrecognized type of parameter recieved !");
+        throw INTERP_KERNEL::Exception("FieldCst::operator+ : unrecognized type of parameter received !");
     }
 }
 
@@ -831,7 +831,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator-(const MEDCalculatorDBFi
           return ret;
         }
       else
-        throw INTERP_KERNEL::Exception("FieldCst::operator- : unrecognized type of parameter recieved !");
+        throw INTERP_KERNEL::Exception("FieldCst::operator- : unrecognized type of parameter received !");
     }
 }
 
@@ -856,7 +856,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator*(const MEDCalculatorDBFi
           return ret;
         }
       else
-        throw INTERP_KERNEL::Exception("FieldCst::operator* : unrecognized type of parameter recieved !");
+        throw INTERP_KERNEL::Exception("FieldCst::operator* : unrecognized type of parameter received !");
     }
 }
 
@@ -881,7 +881,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldCst::operator/(const MEDCalculatorDBFi
           return ret;
         }
       else
-        throw INTERP_KERNEL::Exception("FieldCst::operator/ : unrecognized type of parameter recieved !");
+        throw INTERP_KERNEL::Exception("FieldCst::operator/ : unrecognized type of parameter received !");
     }
 }
 
@@ -901,6 +901,6 @@ bool MEDCalculatorDBFieldCst::isEqual(const MEDCalculatorDBField& other, double 
           return ret;
         }
       else
-        throw INTERP_KERNEL::Exception("FieldCst::isEqual : unrecognized type of parameter recieved !");
+        throw INTERP_KERNEL::Exception("FieldCst::isEqual : unrecognized type of parameter received !");
     }
 }

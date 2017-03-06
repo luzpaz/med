@@ -22,13 +22,13 @@ import medcalc
 dataManager = medcalc.medcorba.factory.getDataManager()
 
 # IMPORTANT NOTE:
-# the pyConsoleGlobals variable should hold the globals() dictionnary of
+# the pyConsoleGlobals variable should hold the globals() dictionary of
 # the python console context
 pyConsoleGlobals = None
 
 #-----
 # This function is to be called from the working python console to
-# specify the globals() dictionnary (used in fieldtools for stat analysis)
+# specify the globals() dictionary (used in fieldtools for stat analysis)
 #
 # >>> medcalc.setConsoleGlobals(globals())
 #

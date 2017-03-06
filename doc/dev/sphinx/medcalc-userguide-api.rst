@@ -44,7 +44,7 @@ install only the MEDMEM library from the source files embedded in the
 SALOME MED module. Keep in mind that the MEDMEM library is designed to
 be a self-consistent library with very few third party softwares (only
 med-file, glibc and mpi typically). In particular, it is strictly
-independant from the SALOME framework even if it distributed with
+independent from the SALOME framework even if it distributed with
 SALOME for convenience reasons.
 
 Components of the MEDMEM library
@@ -292,7 +292,7 @@ does not provide such data structures.
 We suggest to work with a simple list concept to store the metadata
 for each mesh entry and each field entry. Note that a mesh entry is
 characterized by the mesh name only, while a field entry is
-charaterized by the following attributes:
+characterized by the following attributes:
 
 * :tt:`fieldName`: the name of the field
 * :tt:`meshName`: the name of the mesh that supports the field
@@ -300,7 +300,7 @@ charaterized by the following attributes:
 * :tt:`iteration`: a couple of integers :tt:`(iter,order)` that
   characterizes the step in a serie (timeseries or spectrum).
 
-By default, we suggest to work with a simple map concept (dictionnary in a
+By default, we suggest to work with a simple map concept (dictionary in a
 python context, map in a C++ context) to register the meshes and
 fields loaded from the med file for each metadata entry.
 
@@ -309,7 +309,7 @@ you may dispatch the data in a tree structure that fit your specific
 case, for performance reasons. For example, the following code
 illustrates how to dispatch the metadata in a tree data structure
 where leaves are the physical data (field objects). We first have to
-define a tree structure (basic definition in htis simple case, but it
+define a tree structure (basic definition in this simple case, but it
 works fine):
 
 .. include:: ../../tut/medloader/manage.py

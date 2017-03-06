@@ -91,7 +91,7 @@ MEDPresentation::initFieldMeshInfos()
   _fieldName = fieldHandler->fieldname;
   _mcFieldType = (MEDCoupling::TypeOfField) fieldHandler->type;
   _pvFieldType = getPVFieldTypeString(_mcFieldType);
-  _colorByType = _pvFieldType;  // by default the same; overriden in DeflectionShape, VectorField, PointSprite and Contour
+  _colorByType = _pvFieldType;  // by default the same; overridden in DeflectionShape, VectorField, PointSprite and Contour
   _meshName = meshHandler->name;
 }
 

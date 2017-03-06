@@ -107,7 +107,7 @@ WidgetPresentationParameters::toggleWidget(bool show)
   else
     {
       _ui.widgetDynamic->show();
-      // It is the WidgetHelper responsability to re-show the widgets it needs
+      // It is the WidgetHelper responsibility to re-show the widgets it needs
       _ui.labelCompo->hide();
       _ui.comboBoxCompo->hide();
       _ui.labelMeshMode->hide();

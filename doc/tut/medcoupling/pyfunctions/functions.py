@@ -104,7 +104,7 @@ class FuncStiffExp(Function):
 
 class FuncCosinus(Function):
     def __init__(self,nbPeriods):
-        # The pulsation w must be choosen so that w*xmax=n*2pi where
+        # The pulsation w must be chosen so that w*xmax=n*2pi where
         # xmax=1 and n is an integer that corresponds to the number of
         # oscilations on the xrange [0,xmax].
         w=nbPeriods*2*pi

@@ -95,7 +95,7 @@ void MEDCouplingMeshClient::fillMeshFromCorbaData(MEDCouplingMesh *meshCpp, SALO
 {
   meshPtr->Register();
   //1st call to getTinyInfo to get tiny array of key integers value
-  //to corectly resize local copy of distant instance adressed by 'meshPtr'
+  //to corectly resize local copy of distant instance addressed by 'meshPtr'
   //1st value of returned array is the type of instance. Thanks to
   //CORBA and its type-check no use of this value is necessary.
   SALOME_TYPES::ListOfDouble *tinyD;

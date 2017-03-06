@@ -36,7 +36,7 @@ def ChangeUnderlyingMesh(fieldId, meshId):
     notifyGui_changeUnderlyingMesh(duplicate.id)
     return duplicate.id
   except SALOME.SALOME_Exception as e:
-    notifyGui_error("An error occured while changing underlying mesh:\n" + e.details.text)
+    notifyGui_error("An error occurred while changing underlying mesh:\n" + e.details.text)
     raise Exception(e.details.text)
 #
 
@@ -57,6 +57,6 @@ def InterpolateField(fieldId,
     notifyGui_interpolateField(fieldHandler.id)
     return fieldHandler.id
   except SALOME.SALOME_Exception as e:
-    notifyGui_error("An error occured while interpolating field:\n" + e.details.text)
+    notifyGui_error("An error occurred while interpolating field:\n" + e.details.text)
     raise Exception(e.details.text)
 #

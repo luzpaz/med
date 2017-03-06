@@ -452,7 +452,7 @@ void MEDDataManager_i::saveFields(const char * filepath,
  * function savePersistentFields is called.
  */
 void MEDDataManager_i::markAsPersistent(CORBA::Long fieldHandlerId, bool persistent) {
-  LOG("mark as persistant : id="<<fieldHandlerId);
+  LOG("mark as persistent : id="<<fieldHandlerId);
   _fieldPersistencyMap[fieldHandlerId] = persistent;
 }
 

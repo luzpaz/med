@@ -30,7 +30,7 @@ AC_DEFUN([MED_CHECK_SIZEOF_MEDINT], [
      test "x$ac_cv_sizeof_int" = "x4" || AC_MSG_ERROR([Size of C type int expected to be four bytes])
      DEFINED_F77INT64=""
   else
-     AC_MSG_ERROR([Size of Fortran type integer is neither four nor eigth bytes])
+     AC_MSG_ERROR([Size of Fortran type integer is neither four nor eight bytes])
   fi
   AC_SUBST(DEFINED_F77INT64)
 ])

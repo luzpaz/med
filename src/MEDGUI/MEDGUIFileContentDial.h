@@ -55,7 +55,7 @@ class MEDGUIFileContentDial : public QDialog
 public slots:
   void openFile();//  Create a new MedGUI_LiteStruct from a file and add content to QTreeWidgets
   void meshesStateChange(QTreeWidgetItem*, int);//  Change the select statement of one or more meshes, the item represents a mesh or a file
-  void fieldsStateChange(QTreeWidgetItem*, int);//  Change tje select statement of one or more fields, the item represents a mesh or a field or a step
+  void fieldsStateChange(QTreeWidgetItem*, int);//  Change the select statement of one or more fields, the item represents a mesh or a field or a step
   void fieldsStateChanges();
   void sendSelectionToDB();
   void unselectAll();//  Unselec all fields and meshes

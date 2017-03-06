@@ -63,7 +63,7 @@ import MEDLoader as ML
 def createMesh(meshname, sizeX, sizeY):
     """
     Creating a cartesian mesh with a grid of the size of the image.
-    sizeX and sizeY should be respectively the width and heigth of the
+    sizeX and sizeY should be respectively the width and height of the
     image.
     """
     # >>>
@@ -131,7 +131,7 @@ def image2med():
     img=Image.open("images/avatar.png")
     #img=Image.open("images/irm.png")
     imgbw=ImageOps.grayscale(img)
-    # We keep only the grayscale. Maybe, it could be usefull to get
+    # We keep only the grayscale. Maybe, it could be useful to get
     # the RGB scales each on one component of the field.
     
     width,height=imgbw.size

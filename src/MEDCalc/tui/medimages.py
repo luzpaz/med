@@ -34,7 +34,7 @@ class FieldBuilder:
         # Load the image file in a numpy array using PIL.
         img=Image.open(imageFilepath)
         imgbw=ImageOps.grayscale(img)
-        # WARN: We keep only the grayscale. Maybe, it could be usefull
+        # WARN: We keep only the grayscale. Maybe, it could be useful
         # to get the RGB scales each on one component of the field.
 
         # Creating a cartesian mesh with a grid of the size of the image
@@ -53,7 +53,7 @@ class FieldBuilder:
     def createMesh(self, meshname, sizeX, sizeY):
         """
         Creating a cartesian mesh with a grid of the size of the image.
-        sizeX and sizeY should be respectively the width and heigth of the
+        sizeX and sizeY should be respectively the width and height of the
         image.
         """
         # >>>

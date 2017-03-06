@@ -295,7 +295,7 @@ bool SPythonParser::isElementInParenthesisMatching(const std::string& s, std::st
       return true;
     }
   std::size_t pos5=s.find_first_not_of(NUMBERS,pos4,10);
-  if(pos5==pos4)//an another caracter found after : !
+  if(pos5==pos4)//an another character found after : !
     return false;
   std::string elt2;
   if(pos5==std::string::npos)
@@ -309,7 +309,7 @@ bool SPythonParser::isElementInParenthesisMatching(const std::string& s, std::st
   ret << elt2;
   result=ret.str();
   std::size_t pos6=s.find_first_not_of(' ',pos5);
-  if(pos6==pos5)//an another caracter found after 2nd elt !
+  if(pos6==pos5)//an another character found after 2nd elt !
     return false;
   return pos6==std::string::npos;
 }

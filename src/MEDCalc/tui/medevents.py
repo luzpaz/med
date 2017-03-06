@@ -56,7 +56,7 @@ def eventListenerIsRunning():
   # Try to define the event listener
   connectEventListener()
   if __eventListener is None:
-    # it definitly does not work
+    # it definitely does not work
     medcalc.wrn("the GUI is not loaded yet and will not be notified of the modification")
     return False
 

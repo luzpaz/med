@@ -55,7 +55,7 @@ bool MEDCalculatorBrowserStep::operator==(bool sel)
 //  str method
 //  Construct a std::string to print this time step, using std::cout for example
 //  Put x or o for selected or not
-//  Add time step id value ( tiem value )
+//  Add time step id value ( time value )
 //  Return a std::string
 std::string MEDCalculatorBrowserStep::str()
 {
