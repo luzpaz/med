@@ -95,7 +95,10 @@ MEDCalculatorDBSliceField::~MEDCalculatorDBSliceField()
 MEDCouplingFieldDouble *MEDCalculatorDBSliceField::getField(TypeOfField type, const std::string& fname, const std::string& mname, const std::string& fieldName) const
 {
   if(!_field)
-    _field=ReadField(type,fname.c_str(),mname.c_str(),0,fieldName.c_str(),_iteration,_order);
+    {
+      MCAuto<MEDCouplingFieldDouble> tmp(ReadField(type,fname.c_str(),mname.c_str(),0,fieldName.c_str(),_iteration,_order));
+      _field=tmp.retn();
+    }
   return _field;
 }
 

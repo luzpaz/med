@@ -60,7 +60,7 @@ MEDCalculatorBrowserField::MEDCalculatorBrowserField(const char *fname, const ch
   if(types.empty())
     throw INTERP_KERNEL::Exception("MEDCalculatorBrowserField::MEDCalculatorBrowserField : the file is not loadable using MED File 3 API ! Problably presence of field on edges faces...");
   _type=types[0];//To improve
-  MEDCouplingFieldDouble *tmpf=0;
+  MCAuto<MEDCouplingFieldDouble> tmpf;
   try
     {
       tmpf=ReadField(_type,fname,meshNames[0].c_str(),0,fieldName,dtits[0].first.first,dtits[0].first.second);
@@ -80,7 +80,6 @@ MEDCalculatorBrowserField::MEDCalculatorBrowserField(const char *fname, const ch
         c="-noname-";
       _components.push_back(c);
     }
-  tmpf->decrRef();
   _corresponding_meshes=GetMeshNamesOnField(fname,fieldName);
 }
 

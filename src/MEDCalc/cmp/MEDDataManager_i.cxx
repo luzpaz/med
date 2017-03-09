@@ -641,7 +641,7 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDCALC::FieldHa
   LOG("getFieldDouble: field "<<fieldHandler->fieldname<<" loaded from file "<<filepath);
   TypeOfField type = (TypeOfField)fieldHandler->type;
   int meshDimRelToMax = 0;
-  MEDCouplingFieldDouble * myField = ReadField(type,
+  MCAuto<MEDCouplingFieldDouble> myField = ReadField(type,
                 filepath,
                 meshName,
                 meshDimRelToMax,
@@ -649,7 +649,7 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDCALC::FieldHa
                 fieldHandler->iteration,
                 fieldHandler->order);
   myField->setMesh(myMesh);
-  _fieldDoubleMap[fieldHandler->id] = myField;
+  _fieldDoubleMap[fieldHandler->id] = myField.retn();
   return myField;
 }
 
