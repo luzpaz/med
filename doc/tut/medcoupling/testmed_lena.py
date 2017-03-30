@@ -45,10 +45,10 @@ image = pilutil.imread("images/avatar.png",True)
 #im=Image.open("images/lena.png")
 #image=pilutil.fromimage(im,True)
 #image=numpy.asarray(im)
-#print image
+# print(image)
 
 dim  = len(image.shape)
-print "Image space dimension = %d"%dim
+print("Image space dimension = %d"%dim)
 sizeX = image.shape[1]
 sizeY = image.shape[0]
 
@@ -60,7 +60,7 @@ sizeY = image.shape[0]
 # double as required by the MEDCoupling field specification.
 import numpy
 imageDataNArray       = image.reshape(1,sizeX*sizeY)[0]
-print imageDataNArray
+print(imageDataNArray)
 
 imageDataNArrayDouble = numpy.array(imageDataNArray, dtype='float64')
 imageDataArrayDouble  = list(imageDataNArrayDouble)
@@ -95,7 +95,7 @@ coordsY=MC.DataArrayDouble.New()
 coordsY.setValues(arrY,nbNodesY,1)
 
 cmesh.setCoords(coordsX,coordsY)
-print "Imagem mesh dimension: %d"%cmesh.getSpaceDimension()
+print("Imagem mesh dimension: %d"%cmesh.getSpaceDimension())
 
 # WARN: In the current state of development of MEDLoader, only
 # unstructured meshes are supported for writting function in med

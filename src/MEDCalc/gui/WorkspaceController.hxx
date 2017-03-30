@@ -22,8 +22,8 @@
 #ifndef _WORKSPACE_CONTROLLER_HXX
 #define _WORKSPACE_CONTROLLER_HXX
 
-#include "TreeGuiManager.hxx"
 #include "MEDEventListener_i.hxx"
+#include "TreeGuiManager.hxx"
 #include "XmedConsoleDriver.hxx"
 #include "DatasourceController.hxx"
 #include "PresentationController.hxx"

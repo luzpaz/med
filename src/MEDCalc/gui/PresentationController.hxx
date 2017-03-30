@@ -20,10 +20,11 @@
 #ifndef PRESENTATION_CONTROLLER_HXX
 #define PRESENTATION_CONTROLLER_HXX
 
+#include "MEDEventListener_i.hxx"
+
 #include <QObject>
 #include "MEDCALCGUI.hxx"
 
-#include "MEDEventListener_i.hxx"
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(MEDPresentationManager)
 #include CORBA_CLIENT_HEADER(MEDDataManager)

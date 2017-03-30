@@ -65,4 +65,4 @@ fieldOnNodes.setMesh(msource)
 x=0.5
 y=0.5
 fieldValue = fieldOnNodes.getValueOn([x,y])
-print fieldValue
+print(fieldValue)

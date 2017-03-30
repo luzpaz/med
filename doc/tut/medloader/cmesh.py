@@ -32,7 +32,7 @@ itOrder=0
 # Load as an unstructured mesh
 meshDimRelToMax = 0 # 0 = no restriction
 umesh = MEDLoader.ReadUMeshFromFile(filepath,meshName,meshDimRelToMax)
-print "umesh is structured: %s"%umesh.isStructured()
+print("umesh is structured: %s"%umesh.isStructured())
 
 # Load as a structured mesh explicitly
 # _T2A
@@ -41,17 +41,17 @@ medfile = MEDFileCMesh.New(filepath,meshName)
 cmesh = medfile.getMesh()
 # Note that the getMesh method is a short way to the method:
 #cmesh = medfile.getGenMeshAtLevel(0,False)
-print "cmesh is structured: %s"%cmesh.isStructured()
+print("cmesh is structured: %s"%cmesh.isStructured())
 # _T2B
 
 # Load and let MEDLoader decide what is nature of the mesh
 # _T1A
 from MEDLoader import MEDFileMesh
 medfile = MEDFileMesh.New(filepath,meshName)
-print medfile.advancedRepr()
+print(medfile.advancedRepr())
 meshDimRelToMax = 0 # 0 = no restriction
 mesh = medfile.getGenMeshAtLevel(meshDimRelToMax)
-print "mesh is structured: %s"%mesh.isStructured()
+print("mesh is structured: %s"%mesh.isStructured())
 # _T1B
 
 
@@ -65,7 +65,7 @@ medfile.write(outputfilepath,mode)
 # test to reload the mesh
 medfile = MEDFileCMesh.New(outputfilepath,meshName)
 cmesh = medfile.getMesh()
-print "cmesh is structured: %s"%cmesh.isStructured()
+print("cmesh is structured: %s"%cmesh.isStructured())
 
 # Q: Is it possible to know if a mesh is structured or unstructured
 # without loading the mesh.

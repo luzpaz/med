@@ -30,10 +30,10 @@ def lagrange(points):
     tmp = scipy.poly1d([0])
     result=scipy.poly1d([0])
     
-    for i in points.keys():
+    for i in points:
         numerator=scipy.poly1d([1])
         denom = 1.0
-        for j in points.keys():
+        for j in points:
             if (i != j):
                 tmp = scipy.poly1d([1,-j])
                 numerator = numerator * tmp
@@ -60,8 +60,7 @@ def points_usingarray(arrX,arrY):
 def sortdict(points):
     # Sort this dictionary by keys and returns 2 lists, the list of X
     # and the list of Y, the whole ordered by X
-    keys = points.keys()
-    keys.sort()
+    keys = sorted(list(points.keys()))
     return keys, [points[key] for key in keys]
 
 import pylab
@@ -72,7 +71,7 @@ def plot(function, start=0., stop=1., step=0.01):
     """
     arrX=numpy.arange(start, stop, step, dtype='float64')
     # function is a callable
-    arrY=map(function,arrX)
+    arrY=list(map(function,arrX))
     pylab.plot(arrX, arrY)
     pylab.show()
 
@@ -82,13 +81,13 @@ def plot(function, start=0., stop=1., step=0.01):
 def TEST_lagrange_01():
     input = {0.:5, 0.2:10, 0.9:10, 0.6:21, 1:8} 
     polynom = lagrange(input)
-    print polynom 
+    print(polynom) 
     plot(function=polynom, start=0., stop=1., step=0.001)
 
 def TEST_lagrange_02():
     input = {0.:0., 0.5:1., 1.:0.} 
     polynom = lagrange(input)
-    print polynom 
+    print(polynom) 
     plot(function=polynom, start=0., stop=1., step=0.001)
 
 # ---
@@ -98,7 +97,7 @@ def TEST_lagrange_usingarrays_01():
     arrY = [5, 10, 10, 21, 8]
     input = points_usingarray(arrX,arrY)
     polynom = lagrange(input)
-    print polynom 
+    print(polynom) 
     plot(function=polynom, start=0., stop=1., step=0.001)
 
 # Another example using numpy
@@ -108,7 +107,7 @@ def TEST_lagrange_usingarrays_02():
     arrY[3]=2
     input = points_usingarray(arrX,arrY)
     polynom = lagrange(input)
-    print polynom 
+    print(polynom) 
     plot(function=polynom, start=0., stop=1., step=0.001)
 
 # ---
@@ -121,7 +120,7 @@ def TEST_lagrange_usingfunction_01():
     arrY=numpy.cos(10*arrX)
     input = points_usingarray(arrX,arrY)
     polynom = lagrange(input)
-    print polynom
+    print(polynom)
     plot(function=polynom, start=0., stop=1., step=0.001)
 
 # General method
@@ -137,7 +136,7 @@ def TEST_lagrange_usingfunction_01():
     arrX=numpy.arange(start=0., stop=1., step=0.1, dtype='float64')
     input = points_usingfunction(arrX,chapeau)
     polynom = lagrange(input)
-    print polynom
+    print(polynom)
     plot(function=polynom, start=0., stop=1., step=0.001)
 
 

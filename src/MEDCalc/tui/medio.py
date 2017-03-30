@@ -34,7 +34,7 @@ def LoadImageAsDataSource(filename):
   medfilename = temp.name
   temp.close()
 
-  from medimages import FieldBuilder
+  from .medimages import FieldBuilder
   builder = FieldBuilder()
   builder.image2med(filename, medfilename)
   return LoadDataSource(medfilename)

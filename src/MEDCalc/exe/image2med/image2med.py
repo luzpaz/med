@@ -30,11 +30,11 @@ parser.add_option("-m", "--medfile", dest="medfile", default=None,
 
 import sys, os
 if options.imagefile is None:
-    print "The image file must be specified"
+    print("The image file must be specified")
     sys.exit()
 imagefile = options.imagefile
 if not os.path.exists(imagefile):
-    print "The image file %s does not exists"%imagefile
+    print("The image file %s does not exists"%imagefile)
     sys.exit()
 
 if options.medfile is None:
@@ -43,7 +43,7 @@ if options.medfile is None:
 else:
     medfile = options.medfile
 
-print "Convert image file %s to a med field saved in %s"%(imagefile,medfile)
+print("Convert image file %s to a med field saved in %s"%(imagefile,medfile))
 from xmedimages import FieldBuilder
 builder = FieldBuilder()    
 builder.image2med(imagefile,medfile)

@@ -47,7 +47,7 @@ def _typeOfFieldLabel(typeOfField):
   # 3 = ON_GAUSS_NE
   try:
     return __mapTypeOfFieldLabel[typeOfField]
-  except IndexError, e:
+  except IndexError as e:
     return "UNKNOWN"
 #
 
@@ -88,7 +88,7 @@ class FieldProxy:
     """
     self.__fieldHandler = fieldHandler
     self.__restriction  = None
-    print self.__repr__()
+    print(self.__repr__())
   #
   def __getattr__(self, name ):
     """
@@ -105,7 +105,7 @@ class FieldProxy:
     handler. Only some attributes are writable. The list is
     specified in the PROXY_ATTRIBUTES_MAP table.
     """
-    if name in PROXY_ATTRIBUTES_MAP.keys():
+    if name in list(PROXY_ATTRIBUTES_MAP.keys()):
       if PROXY_ATTRIBUTES_MAP[name] is not None:
         medcalc.wrn("The modification of this attribute can't be done that way")
         msg="Use f.update(%s=\"%s\") instead to ensure synchronisation of data."
@@ -135,7 +135,7 @@ class FieldProxy:
   #
   def __str__(self):
     """
-    This is what is displayed when you type 'print myField'. Note
+    This is what is displayed when you type 'print(myField)'. Note
     that this function prints the values of the field and then you
     must be aware that a huge amount of data could be
     displayed. Moreover, it means that this operation triggers the
@@ -170,7 +170,7 @@ class FieldProxy:
         offset = operande
         medcalc.inf("Application of the offset %s to %s" % (offset, self.fieldname))
         rfieldHandler = calculator.lin(self.__fieldHandler, factor, offset)
-    except SALOME.SALOME_Exception, ex:
+    except SALOME.SALOME_Exception as ex:
       medcalc.err(ex.details.text)
       return None
 
@@ -207,7 +207,7 @@ class FieldProxy:
         offset = -operande
         medcalc.inf("Application of the offset %s to %s" % (offset, self.fieldname))
         rfieldHandler = calculator.lin(self.__fieldHandler, factor, offset)
-    except SALOME.SALOME_Exception, ex:
+    except SALOME.SALOME_Exception as ex:
       medcalc.err(ex.details.text)
       return None
 
@@ -233,7 +233,7 @@ class FieldProxy:
     medcalc.inf("Linear transformation %s%s*%s" % (offset, factor, self.fieldname))
     try:
       rfieldHandler = calculator.lin(self.__fieldHandler, factor, offset)
-    except SALOME.SALOME_Exception, ex:
+    except SALOME.SALOME_Exception as ex:
       medcalc.err(ex.details.text)
       return None
 
@@ -257,7 +257,7 @@ class FieldProxy:
         offset = 0
         medcalc.inf("Scaling %s by factor %s" % (self.fieldname, factor))
         rfieldHandler = calculator.lin(self.__fieldHandler, factor, offset)
-    except SALOME.SALOME_Exception, ex:
+    except SALOME.SALOME_Exception as ex:
       medcalc.err(ex.details.text)
       return None
 
@@ -288,7 +288,7 @@ class FieldProxy:
         offset = 0
         medcalc.inf("Scaling %s by factor 1/%s" % (self.fieldname, operande))
         rfieldHandler = calculator.lin(self.__fieldHandler, factor, offset)
-    except SALOME.SALOME_Exception, ex:
+    except SALOME.SALOME_Exception as ex:
       medcalc.err(ex.details.text)
       return None
 
@@ -304,7 +304,7 @@ class FieldProxy:
     nbResComp = MEDCALC.NBCOMP_DEFAULT
     try:
       rfieldHandler = calculator.fct(self.__fieldHandler,function,nbResComp)
-    except SALOME.SALOME_Exception, ex:
+    except SALOME.SALOME_Exception as ex:
       medcalc.err(ex.details.text)
       return None
 
@@ -337,7 +337,7 @@ class FieldProxy:
     medcalc.inf("Duplication of %s"%self.fieldname)
     try:
       rfieldHandler = calculator.dup(self.__fieldHandler)
-    except SALOME.SALOME_Exception, ex:
+    except SALOME.SALOME_Exception as ex:
       medcalc.err(ex.details.text)
       return None
 
@@ -356,7 +356,7 @@ class FieldProxy:
       rfieldHandler = calculator.fct(self.__fieldHandler,
                                      function,
                                      MEDCALC.NBCOMP_DEFAULT)
-    except SALOME.SALOME_Exception, ex:
+    except SALOME.SALOME_Exception as ex:
       medcalc.err(ex.details.text)
       return None
 
@@ -403,7 +403,7 @@ class FieldProxy:
     notifyGui_updateField(self.id)
 
     # Print for visual control
-    print self.__repr__()
+    print(self.__repr__())
   #
 #
 
@@ -414,8 +414,8 @@ class FieldProxy:
 #
 
 def TEST_typeOfFieldLabel():
-  print typeOfFieldLabel(0)
-  print typeOfFieldLabel(5)
+  print(typeOfFieldLabel(0))
+  print(typeOfFieldLabel(5))
 #
 
 # ===================================================================

@@ -42,7 +42,7 @@ def createGridMesh(meshName, nbCellsX, nbCellsY):
     cartesian mesh as a grid with nbCellsX segments in the X direction
     and nbCellsY in the Y direction (nb. cells = nbCellsX * nbCellsY)
     """
-    print "Creating grid mesh of size %sx%s"%(nbCellsX, nbCellsY)
+    print("Creating grid mesh of size %sx%s"%(nbCellsX, nbCellsY))
     cmesh=MC.MEDCouplingCMesh.New();
 
     # Create X coordinates
@@ -70,7 +70,7 @@ def unstructuredMesh(cartesianMesh):
     Convert the cartesian mesh in unstructured mesh for the need of
     write function of MEDLoader
     """
-    print "Creating unstructured mesh from %s"%(cartesianMesh.getName())
+    print("Creating unstructured mesh from %s"%(cartesianMesh.getName()))
     umesh=cartesianMesh.buildUnstructured();
     umesh.setName(cartesianMesh.getName())
     return umesh
@@ -120,7 +120,7 @@ def createField(fieldName,gridMesh,
     nodes. In any case, it must be consistent with the dimensions of
     the numpy 2D array.
     """
-    print "Creating field %s with iteration=%s"%(fieldName,iteration)
+    print("Creating field %s with iteration=%s"%(fieldName,iteration))
 
     # The sizes are deduced from the numpy array. Note that if
     # typeOfField is ON_CELLS, then the size should correspond to the
@@ -207,7 +207,7 @@ def createTestFieldOnNodes():
 # A function can be a simple python function ...
 def f1(x,y):
     z = 10*x
-    print "x=%s\ny=%s\nz=%s"%(x,y,z)
+    print("x=%s\ny=%s\nz=%s"%(x,y,z))
     return z
 
 # ... but also a more sophisticated callable object, for example to
@@ -220,7 +220,7 @@ class Function(object):
 
     def function(self, x,y):
         z = self.param*x
-        print "x=%s\ny=%s\nz=%s"%(x,y,z)
+        print("x=%s\ny=%s\nz=%s"%(x,y,z))
         return z
 
     def __call__(self, x,y):

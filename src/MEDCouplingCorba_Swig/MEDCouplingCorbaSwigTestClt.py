@@ -29,11 +29,11 @@ f=file(MEDCouplingCorbaSwigTest.FileIOR1,"r")
 ior=f.read()
 f=MEDCouplingCorbaSwigTest.testField()
 fCorbaIOR=orb.string_to_object(ior)
-print fCorbaIOR
+print(fCorbaIOR)
 
 for i in range(50):
     fCpy=MEDCouplingFieldDoubleClient.New(fCorbaIOR)
-    print fCpy.isEqual(f,1e-12,1e-12)
+    print(fCpy.isEqual(f,1e-12,1e-12))
     pass
 fCorbaIOR.UnRegister()
 
@@ -43,7 +43,7 @@ m=MEDCouplingCorbaSwigTest.testMesh()
 mCorbaIOR=orb.string_to_object(ior)
 for i in range(50):
     mCpy=MEDCouplingUMeshClient.New(mCorbaIOR)
-    print mCpy.isEqual(m,1e-12)
+    print(mCpy.isEqual(m,1e-12))
     pass
 mCorbaIOR.UnRegister()
 

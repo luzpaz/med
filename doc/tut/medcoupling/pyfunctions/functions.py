@@ -31,7 +31,7 @@ class Function:
         # The argument can be a scalar or a list, we have to check
         # that first.
         if isIterable(x):
-            y = map(self,x)
+            y = list(map(self,x))
         else:
             y = self.function(x, **self.kwargs)
         return y
@@ -44,7 +44,7 @@ def isIterable(x):
     try:
         len(x)
         return True
-    except TypeError, e:
+    except TypeError as e:
         return False
 
 #
@@ -140,7 +140,7 @@ class FuncPorte(Function):
             y=1
         return y
         
-import lagrange
+from . import lagrange
 class FuncLagrange(Function):
     def __init__(self,points):
         """
@@ -172,12 +172,12 @@ def TEST_Function():
     x=2
     y_ref = 3.*x+7.
     y_res = f(x)
-    print y_ref
-    print y_res
+    print(y_ref)
+    print(y_res)
     if y_ref != y_res:
-        print "ERR"
+        print("ERR")
     else:
-        print "OK"
+        print("OK")
 
 def TEST_Function_withIterable():
     f=MyFunction(a=3.,b=1.)
@@ -186,42 +186,42 @@ def TEST_Function_withIterable():
     arrY = f(arrX)
 
     arrY_ref = [1., 4., 7., 10.]
-    print "arrY res =%s"%arrY
-    print "arrY ref =%s"%arrY_ref
+    print("arrY res =%s"%arrY)
+    print("arrY ref =%s"%arrY_ref)
     
 def TEST_FuncConique():
     f=FuncConique(xlimit=0.3)
-    from plotter import plot
+    from .plotter import plot
     plot(f)
 
 def TEST_FuncChapeau():
     f=FuncChapeau(xlimit=0.3)
-    from plotter import plot
+    from .plotter import plot
     plot(f)
 
 def TEST_FuncStiffExp():
     f=FuncStiffExp(xlimit=0.3,stiffness=20.)
-    from plotter import plot
+    from .plotter import plot
     plot(f)
 
 def TEST_FuncCosinus():
     f=FuncCosinus(nbPeriods=20)
-    from plotter import plot
+    from .plotter import plot
     plot(f, step=0.001)
 
 def TEST_FuncStiffPulse():
     f=FuncStiffPulse(xlimit=0.3,stiffness=50,nbPeriods=15)
-    from plotter import plot
+    from .plotter import plot
     plot(f, step=0.001)
 
 def TEST_FuncHeaviside():
     f=FuncHeaviside(xlimit=0.3)
-    from plotter import plot
+    from .plotter import plot
     plot(f)
 
 def TEST_FuncPorte():
     f=FuncPorte(xinf=0.3,xsup=0.4)
-    from plotter import plot
+    from .plotter import plot
     plot(f)
 
 def TEST_customize_01():
@@ -233,7 +233,7 @@ def TEST_customize_01():
         y=5*f(x)+2
         return y
     
-    from plotter import plot
+    from .plotter import plot
     plot(myfunc, step=0.001)
 
 def TEST_customize_02():
@@ -245,13 +245,13 @@ def TEST_customize_02():
         y=1-f(x)
         return y
     
-    from plotter import plot
+    from .plotter import plot
     plot(myfunc)
 
 def TEST_FuncLagrange():
     points = {0.:5, 0.2:10, 0.9:10, 0.6:21, 1:8} 
     f=FuncLagrange(points)
-    from plotter import plot
+    from .plotter import plot
     plot(f)
 
 if __name__ == "__main__":
