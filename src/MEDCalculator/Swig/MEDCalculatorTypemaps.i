@@ -20,6 +20,14 @@
 
 #include <limits>
 
+#if PY_VERSION_HEX < 0x03050000
+static char*
+Py_EncodeLocale(const wchar_t *text, size_t *error_pos)
+{
+   return _Py_wchar2char(text, error_pos);
+}
+#endif
+
 static PyObject* convertMEDCalculatorDBField(MEDCoupling::MEDCalculatorDBField *f, int owner)
 {
   PyObject *ret=0;
@@ -40,7 +48,7 @@ void convertPyObjToRS(PyObject *o, MEDCoupling::MEDCalculatorDBRangeSelection& r
     }
   if(PyString_Check(o))
     {
-      char *s=PyString_AsString(o);
+      char *s=Py_EncodeLocale(PyUnicode_AS_UNICODE(o), NULL);
       rs=s;
       return ;
     }
