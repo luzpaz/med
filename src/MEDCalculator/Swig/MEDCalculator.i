@@ -439,6 +439,7 @@ def ParaMEDMEMMEDFileUMeshnew(cls,*args):
 %include "MEDCouplingFinalize.i"
 
 %pythoncode %{
+MEDCalculatorDBFieldReal.__rtruediv__ = MEDCalculatorDBFieldReal.__rdiv__
 MEDFileUMesh.__new__=classmethod(ParaMEDMEMMEDFileUMeshnew)
 del ParaMEDMEMMEDFileUMeshnew
 %}
