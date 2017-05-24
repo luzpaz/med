@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#  -*- coding: iso-8859-1 -*-
+#!/usr/bin/env python3
 # Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -20,28 +19,28 @@
 #
 # Author : Guillaume Boulant (EDF) 
 
-from optparse import OptionParser
-parser = OptionParser()
-parser.add_option("-i", "--imagefile", dest="imagefile",
+from argparse import ArgumentParser
+parser = ArgumentParser()
+parser.add_agument("-i", "--imagefile", dest="imagefile",
                   help="image file to convert", metavar="FILE")
-parser.add_option("-m", "--medfile", dest="medfile", default=None,
+parser.add_agument("-m", "--medfile", dest="medfile", default=None,
                   help="output med file", metavar="FILE")
-(options, args) = parser.parse_args()
+args = parser.parse_args()
 
 import sys, os
-if options.imagefile is None:
+if args.imagefile is None:
     print("The image file must be specified")
     sys.exit()
-imagefile = options.imagefile
+imagefile = args.imagefile
 if not os.path.exists(imagefile):
     print("The image file %s does not exists"%imagefile)
     sys.exit()
 
-if options.medfile is None:
+if args.medfile is None:
     basename = os.path.basename(imagefile)
     medfile = basename[0:len(basename)-3] + "med"
 else:
-    medfile = options.medfile
+    medfile = args.medfile
 
 print("Convert image file %s to a med field saved in %s"%(imagefile,medfile))
 from xmedimages import FieldBuilder

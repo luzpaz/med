@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (C) 2012-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -60,7 +60,7 @@ def points_usingarray(arrX,arrY):
 def sortdict(points):
     # Sort this dictionary by keys and returns 2 lists, the list of X
     # and the list of Y, the whole ordered by X
-    keys = sorted(list(points.keys()))
+    keys = sorted(points.keys())
     return keys, [points[key] for key in keys]
 
 import pylab

@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#  -*- coding: iso-8859-1 -*-
+#!/usr/bin/env python3
 # Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -24,6 +23,8 @@
 # as a field in a med file.
 # (gboulant - 27/06/2011)
 
+import os
+
 import MEDCoupling as MC
 import MEDLoader as ML
 
@@ -37,7 +38,8 @@ import scipy, numpy
 #image = scipy.lena()
 # We could either read a real image using the PIL python package.
 from scipy.misc import pilutil
-image = pilutil.imread("images/avatar.png",True)
+CURDIR = os.path.dirname(__file__)
+image = pilutil.imread(os.path.join(CURDIR, "images", "avatar.png"),True)
 
 
 #from PIL import Image

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (C) 2012-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -81,14 +81,14 @@ for meshName in meshNames:
 print(list(fieldTree.keys()))
 
 # _T3A
-for meshName in list(fieldTree.keys()):
+for meshName in fieldTree:
     print("%s"%meshName)
-    for fieldName in list(fieldTree[meshName].keys()):
+    for fieldName in fieldTree[meshName]:
         print("  %s"%fieldName)
-        for fieldType in list(fieldTree[meshName][fieldName].keys()):
+        for fieldType in fieldTree[meshName][fieldName]:
             print("    %s"%fieldType)
-            for itNumber in list(fieldTree[meshName][fieldName][fieldType].keys()):
-                for itOrder in list(fieldTree[meshName][fieldName][fieldType][itNumber].keys()):
+            for itNumber in fieldTree[meshName][fieldName][fieldType]:
+                for itOrder in fieldTree[meshName][fieldName][fieldType][itNumber]:
                     print("      (%s,%s)"%(itNumber,itOrder))
                     print(fieldTree[meshName][fieldName][fieldType][itNumber][itOrder])
 # _T3B

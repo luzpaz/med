@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#  -*- coding: iso-8859-1 -*-
+#!/usr/bin/env python3
 # Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -212,7 +211,7 @@ def f1(x,y):
 
 # ... but also a more sophisticated callable object, for example to
 # defines some parameters
-class Function(object):
+class Function:
     def __init__(self, sizeX, sizeY, param):
         self.sizeX = sizeX
         self.sizeY = sizeY
