@@ -28,6 +28,7 @@
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
 #include "MEDCouplingCorba.hxx"
 #include "DataArrayServant.hxx"
+#include "MCType.hxx"
 
 namespace MEDCoupling
 {
