@@ -22,6 +22,7 @@
 #define __MEDCALCULATORDBSLICEFIELD_HXX__
 
 #include "MedCalculatorDefines.hxx"
+#include "MCType.hxx"
 #include "MEDCouplingRefCountObject.hxx"
 
 #include "InterpKernelException.hxx"

@@ -27,6 +27,7 @@
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
 #include "MEDCouplingClient.hxx"
+#include "MCType.hxx"
 
 namespace MEDCoupling
 {
