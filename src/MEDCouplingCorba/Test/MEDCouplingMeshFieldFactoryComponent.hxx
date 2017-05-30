@@ -21,7 +21,6 @@
 #ifndef __MEDCOUPLINGCORBAFIELDFACTORYCOMPONENT_HXX__
 #define __MEDCOUPLINGCORBAFIELDFACTORYCOMPONENT_HXX__
 
-#include "MCType.hxx"
 #include <string>
 
 namespace MEDCoupling

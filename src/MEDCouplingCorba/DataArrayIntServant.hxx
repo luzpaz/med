@@ -26,7 +26,6 @@
 #define NOMINMAX
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MCType.hxx"
 #include "MEDCouplingCorba.hxx"
 #include "DataArrayServant.hxx"
 
