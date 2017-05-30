@@ -291,7 +291,7 @@ Le passage des arguments par référence est une facilité d'écriture
 pour éviter de passer un pointeur tout en évitant la récopie des
 données de la variable.
 
-.. _xmed-medmem_corbainterface:
+.. _xmed-medmem_corbainterface-fr:
 
 L'interface CORBA SALOME_MED
 ============================

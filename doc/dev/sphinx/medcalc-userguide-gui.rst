@@ -310,7 +310,7 @@ Results in:
           difference ``f3-f4``, then producing a scalar map preview using the
           function ``view``::
 
-    >>> view(f3-f4)
+          >>> view(f3-f4)
 
 Finally the field data can be displayed using the command``print``::
 
@@ -571,13 +571,13 @@ Using the textual interface (TUI)
 
 All operations driven through GUI can be done (more or less easily) using TUI.
 The field manipulation module can even be used exclusively in textual mode.
-..
- For this run the command::
+
+For this run the command:
 
  $ <path/to/appli>/medop.sh
-..
- This command opens a command console ``medop>``. A med file can be loaded and
- manipulated, for example to create fields from file data.
+
+This command opens a command console ``medop>``. A med file can be loaded and
+manipulated, for example to create fields from file data.
 
 Whatever textual or graphical mode is used, a typical workflow in console
 looks like the following instructions::

@@ -26,7 +26,7 @@ Mise en place de l'espace de développement
 ==========================================
 
 Gestion de configuration du composant MEDCalc
--------------------------------------------
+---------------------------------------------
 
 Le composant logiciel MEDCalc est un package du module SALOME MED,
 hébergé dans l'espace source au niveau du sous-répertoire
@@ -34,7 +34,7 @@ hébergé dans l'espace source au niveau du sous-répertoire
 module SALOME MED.
 
 Organisation des sources du composant MEDCalc
--------------------------------------------
+---------------------------------------------
 
 Le répertoire source `src/MEDCalc` distingue les sous-répertoires
 suivants:
@@ -49,13 +49,13 @@ suivants:
   MEDCalc framework
 
 Construction du composant MEDCalc
--------------------------------
+---------------------------------
 
 Intégré à la construction du module MED. Le composant MEDCalc dépend de
 MEDCoupling et MEDLoader uniquement.
 
 Exécution des tests unitaires du composant MEDCalc
-------------------------------------------------
+--------------------------------------------------
 
 Les tests unitaires peuvent être exécutés au moyen de scripts python
 lancés depuis une session shell SALOME. Dans un nouveau shell, taper::

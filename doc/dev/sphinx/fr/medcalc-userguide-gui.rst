@@ -222,7 +222,7 @@ champs sauvegardés.
 .. BUG: plantage à l'utilsation dans XMED d'un fichier rechargé
 .. (invalid mesh on field)
 
-.. _xmed.userguide.exemple3:
+.. _xmed.userguide.exemple3-fr:
 
 Exemple 3: Appliquer une opération mathématique sur des champs
 --------------------------------------------------------------
@@ -340,7 +340,7 @@ puis retour::
 Elle peut également être utilisée comme argument des commandes de
 gestion disponibles dans l'interface textuelle (dont la liste
 détaillée est décrite à la section :ref:`Documentation de l'interface
-textuelle<xmed.userguide.tui>`). Par exemple, la fonction ``view``
+textuelle<xmed.userguide.tui-fr>`). Par exemple, la fonction ``view``
 permet d'afficher la carte scalaire du champ dans le viewer::
 
  >>> view(f3)
@@ -400,9 +400,9 @@ différents, par exemple lorsqu'ils sont chargés de fichiers med
 différents. Pour traiter ce cas de figure, la bibliothèque MEDCoupling
 prévoit une fonction de "Changement du maillage support", dont
 l'utilisation au niveau du module de manipulation de champs est
-illustrée dans :ref:`l'exemple 4<xmed.userguide.exemple4>` ci-après.
+illustrée dans :ref:`l'exemple 4<xmed.userguide.exemple4-fr>` ci-après.
 
-.. _xmed.userguide.exemple4:
+.. _xmed.userguide.exemple4-fr:
 
 Exemple 4: Comparer des champs issues de différentes sources
 ------------------------------------------------------------
@@ -431,7 +431,7 @@ géométriquement identiques.
 Or, les fonctions de manipulation de champs ne permettent pas les
 opérations sur des champs dont les maillages supports sont différents
 (voir la remarque à la fin de :ref:`l'exemple
-3<xmed.userguide.exemple3>`).
+3<xmed.userguide.exemple3-fr>`).
 
 Pour résoudre ce cas de figure, le module de manipulation de champs
 met à disposition la fonction "Change underlying mesh" qui permet de
@@ -479,7 +479,7 @@ En définitif, si ``f1`` désigne le champ issu du datasource
 ``parametric_01.med`` et ``f2`` le champ issu du datasource
 ``parametric_02.med`` par la procédure décrite ci-dessus, alors la
 comparaison des deux grandeurs peut être faite comme pour le cas de
-:ref:`l'exemple 3<xmed.userguide.exemple3>`::
+:ref:`l'exemple 3<xmed.userguide.exemple3-fr>`::
 
  >>> r=f1-f2
  >>> view(r)
@@ -653,7 +653,7 @@ carte de champ:
    chargeant le fichier généré dans le module PARAVIS pour
    visualisation.
 
-.. _xmed.userguide.tui:
+.. _xmed.userguide.tui-fr:
 
 Utilisation de l'interface textuelle du module MED (TUI)
 ========================================================
