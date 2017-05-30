@@ -21,6 +21,7 @@
 #ifndef __MEDCALCULATORDBSLICEFIELD_HXX__
 #define __MEDCALCULATORDBSLICEFIELD_HXX__
 
+#include "MCType.hxx"
 #include "MedCalculatorDefines.hxx"
 #include "MEDCouplingRefCountObject.hxx"
 
