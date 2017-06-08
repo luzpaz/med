@@ -138,10 +138,7 @@ DatasourceController::updateTreeViewWithNewDatasource(const MEDCALC::DatasourceH
     return;
   }
 
-  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(_salomeModule->application()->activeStudy());
-  _PTR(Study) studyDS = study->studyDS();
-
-  _salomeModule->engine()->addDatasourceToStudy(_CAST(Study, studyDS)->GetStudy(), *datasourceHandler);
+  _salomeModule->engine()->addDatasourceToStudy(*datasourceHandler);
 
   // update Object browser
   _salomeModule->getApp()->updateObjectBrowser(true);
@@ -223,9 +220,6 @@ void DatasourceController::OnAddImagesource()
 
 void DatasourceController::OnExpandField()
 {
-  // We need a studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
-
   // Get the selected objects in the study (SObject)
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   for (int i=0; i<listOfSObject->size(); i++) {
@@ -271,9 +265,6 @@ void DatasourceController::OnExpandField()
 }
 
 void DatasourceController::OnUseInWorkspace() {
-  // We need a studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
-
   // Get the selected objects in the study (SObject)
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() == 1 ) {

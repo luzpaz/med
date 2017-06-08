@@ -561,7 +561,6 @@ donnée du servant ``SALOME_MED::FIELD`` qui lui est associé
    import VISU
 
    visuComp = salome.lcc.FindOrLoadComponent("FactoryServer", "VISU")
-   visuComp.SetCurrentStudy(salome.myStudy)
 
    # Then we can import the specified field in the VISU module. This
    # creates an study entry in the VISU folder.

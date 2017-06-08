@@ -478,7 +478,6 @@ les exemples précédents):
    # Get the VISU component
    import VISU
    visuComp = salome.lcc.FindOrLoadComponent("FactoryServer", "VISU")
-   visuComp.SetCurrentStudy(salome.myStudy)
 
    # Get the sobject associated to the med object named "Med"
    aSObject = salome.myStudy.FindObject("Med")
