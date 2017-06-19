@@ -94,7 +94,7 @@ MEDPresentationManager_i::getPresentationStringProperty(MEDPresentation::TypeID 
 {
   MEDPresentation* pres = _getPresentation(presentationID);
   if (pres) {
-    return (char*) pres->getStringProperty(propName).c_str();
+    return CORBA::string_dup(pres->getStringProperty(propName).c_str());
   }
   else
     throw KERNEL::createSalomeException("getPresentationStringProperty(): presentation not found!!");
