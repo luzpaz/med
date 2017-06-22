@@ -193,12 +193,14 @@ bool SPythonInterpreter::isSPythonExpression(const std::string& s)
     return false;
   if(w.find("del ")!=std::string::npos)
     return false;
-  const char PRINT[]="print ";
+  const char PRINT[]="print(";
+  const char ENDPRINT[]=")";
   bool isPrint=w.find(PRINT)!=std::string::npos;
+  isPrint &= w.find(ENDPRINT)!=std::string::npos;
   if(isPrint)
     {
       std::size_t p=w.find(PRINT);
-      w=w.substr(p+sizeof(PRINT)-1);
+      w=w.substr(p+sizeof(PRINT)-sizeof(ENDPRINT)-1);
     }
   std::string result;
   if(!isSPythonExpressionLev1(w,result))

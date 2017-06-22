@@ -78,7 +78,7 @@ class MEDCouplingCorbaServBasicsTest:
         targetMesh.setName("MyMesh3D");
         targetMesh.setDescription("build3DMesh");
         targetMesh.allocateCells(12);
-        for i in xrange(8):
+        for i in range(8):
             targetMesh.insertNextCell(NORM_HEXA8,8,targetConn[8*i:8*(i+1)]);
             pass
         targetMesh.finishInsertingCells();
@@ -353,7 +353,7 @@ class MEDCouplingCorbaServBasicsTest:
         f.setGaussLocalizationOnType(NORM_QUAD4,_refCoo2,_gsCoo1,_wg1);
         array=DataArrayDouble.New();
         ptr=18*2*[None]
-        for i in xrange(18*2):
+        for i in range(18*2):
             ptr[i]=float(i+1);
             pass
         array.setValues(ptr,18,2);
@@ -376,7 +376,7 @@ class MEDCouplingCorbaServBasicsTest:
         f.setDescription("MyDescriptionNE");
         array=DataArrayDouble.New();
         ptr=18*2*[None]
-        for i in xrange(18*2):
+        for i in range(18*2):
             ptr[i]=float(i+7)
         array.setValues(ptr,18,2);
         array.setInfoOnComponent(0,"Power [MW]");

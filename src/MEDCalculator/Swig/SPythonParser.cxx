@@ -31,6 +31,14 @@ const char SPythonPredParser::FIELD_TYPE_STR[]="MEDCalculatorDBField";
 
 const char SPythonParser::NUMBERS[]="0123456789";
 
+#if PY_VERSION_HEX < 0x03050000
+static char*
+Py_EncodeLocale(const wchar_t *text, size_t *error_pos)
+{
+	return _Py_wchar2char(text, error_pos);
+}
+#endif
+
 SPythonParser::SPythonParser():_type(EMPTY_TYPE)
 {
 }
@@ -451,7 +459,7 @@ TypeOfEntity SPythonPredParser::getTypeOfVar(const std::string& var, PyObject *g
   oss << TMPVAR << "=type(" << var << ").__name__";
   PyRun_String(oss.str().c_str(),Py_single_input,glob,loc);
   PyObject *p=PyDict_GetItemString(glob,TMPVAR);
-  const char *type=PyString_AS_STRING(p);
+  const char *type=Py_EncodeLocale(PyUnicode_AS_UNICODE(p), NULL);
   std::string typecpp=std::string(type);
   if(typecpp=="function")
     return FUNC_TYPE;

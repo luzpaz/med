@@ -469,7 +469,7 @@ void WorkspaceController::_exportItemList(QStringList itemNameIdList) {
     .arg(fieldHandler->type)
     .arg(fieldHandler->iteration);
   */
-  commands += "print 'Not implemented yet'";
+  commands += "print('Not implemented yet')";
   _consoleDriver->exec(commands);
 
 }
@@ -508,7 +508,7 @@ void WorkspaceController::_viewItemList(QStringList itemNameIdList) {
   // generate the scalar map on this field.
   QStringList commands;
   //commands+=QString("view(accessField(%1))").arg(fieldHandler->id);
-  commands += "print 'Not implemented yet'";
+  commands += "print('Not implemented yet')";
   _consoleDriver->exec(commands);
 }
 

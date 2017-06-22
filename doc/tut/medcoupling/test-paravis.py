@@ -36,7 +36,7 @@ def createALocalMesh():
     targetMesh.setName("MyMesh3D");
     targetMesh.setDescription("build3DMesh");
     targetMesh.allocateCells(12);
-    for i in xrange(8):
+    for i in range(8):
         targetMesh.insertNextCell(NORM_HEXA8,8,targetConn[8*i:8*(i+1)]);
         pass
     targetMesh.finishInsertingCells();
@@ -62,7 +62,7 @@ def createALocalField2():
     field=MEDCouplingFieldDouble.New(ON_NODES,ONE_TIME)
     field.setMesh(m)
     da=DataArrayDouble.New()
-    da.setValues([float(3*i) for i in xrange(27)],27,1)
+    da.setValues([float(3*i) for i in range(27)],27,1)
     field.setArray(da)
     field.setName("vitooNode")
     field.setTime(4.7,9,14)
@@ -73,7 +73,7 @@ def createALocalMultiField3():
     m=createALocalMesh()
     nbOfFields=100
     fs=nbOfFields*[None]
-    for i in xrange(nbOfFields):
+    for i in range(nbOfFields):
         fs[i]=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME)
         fs[i].setMesh(m)
         da=DataArrayDouble.New()
@@ -106,7 +106,7 @@ def createALocalField5():
     field.setMesh(m)
     da=DataArrayDouble.New()
     field.setTime(14.5,0,0)
-    da.setValues([float(7*i) for i in xrange(24)],24,1)
+    da.setValues([float(7*i) for i in range(24)],24,1)
     field.setName("MeshOnCMesh");
     field.setArray(da)
     return field;
@@ -132,28 +132,28 @@ paraviz=naming_service.Resolve("/Containers/%s/FactoryServer/PARAVIS_inst_1"%(co
 
 meshCorba=MEDCouplingUMeshServant._this(createALocalMesh())
 ior=orb.object_to_string(meshCorba)
-print "mesh : ",ior
+print("mesh : ",ior)
 
 f1=MEDCouplingFieldDoubleServant._this(createALocalField1())
 ior2=orb.object_to_string(f1)
-print "Field on cell ",ior2
+print("Field on cell ",ior2)
 
 f2=MEDCouplingFieldDoubleServant._this(createALocalField2())
 ior3=orb.object_to_string(f2)
-print "Field on node ",ior3
+print("Field on node ",ior3)
 
 fs3=MEDCouplingFieldOverTimeServant._this(createALocalMultiField3())
 fs3.Register()
 ior4=orb.object_to_string(fs3)
-print "Fields over time ",ior4
+print("Fields over time ",ior4)
 
 m2=MEDCouplingCMeshServant._this(createALocalCMesh4())
 ior5=orb.object_to_string(m2)
-print "CMesh 2 : ",ior5
+print("CMesh 2 : ",ior5)
 
 f5=MEDCouplingFieldDoubleServant._this(createALocalField5())
 ior6=orb.object_to_string(f5)
-print "Field on cell CMesh ",ior6
+print("Field on cell CMesh ",ior6)
 
 script="""
 src1 = ParaMEDCorbaPluginSource()

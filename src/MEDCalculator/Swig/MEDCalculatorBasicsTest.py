@@ -57,12 +57,12 @@ class MEDCalculatorBasicsTest(unittest.TestCase):
         Power=MEDCalculatorDBFieldReal(f)
         v=Power.getValues()
         self.assertEqual(10,len(v));
-        for i in xrange(10):
+        for i in range(10):
             v1=v[i]
             self.assertEqual(35,len(v1))
             l=0
-            for j in xrange(5):
-                for k in xrange(7):
+            for j in range(5):
+                for k in range(7):
                     self.assertAlmostEqual((i+1)*100.+(j+1)*10.+k+1,v1[l],12);
                     l+=1
                     pass
@@ -71,12 +71,12 @@ class MEDCalculatorBasicsTest(unittest.TestCase):
         p1=Power[2:4,:,:]
         v=p1.getValues()
         self.assertEqual(2,len(v));
-        for i in xrange(2):
+        for i in range(2):
             v1=v[i]
             self.assertEqual(35,len(v1))
             l=0
-            for j in xrange(5):
-                for k in xrange(7):
+            for j in range(5):
+                for k in range(7):
                     self.assertAlmostEqual((i+3)*100.+(j+1)*10.+k+1,v1[l],12);
                     l+=1
                     pass
@@ -85,12 +85,12 @@ class MEDCalculatorBasicsTest(unittest.TestCase):
         p2=Power[3:7,:,2:5]
         v=p2.getValues()
         self.assertEqual(4,len(v));
-        for i in xrange(4):
+        for i in range(4):
             v1=v[i]
             self.assertEqual(15,len(v1))
             l=0
-            for j in xrange(5):
-                for k in xrange(3):
+            for j in range(5):
+                for k in range(3):
                     self.assertAlmostEqual((i+4)*100.+(j+1)*10.+k+3,v1[l],12);
                     l+=1
                     pass
@@ -101,11 +101,11 @@ class MEDCalculatorBasicsTest(unittest.TestCase):
         v=p3.getValues()
         self.assertEqual(4,len(v));
         expected=[[162192.0, 178952.0, 196112.0, 213672.0, 231632.0], [347792.0, 368552.0, 389712.0, 411272.0, 433232.0], [573392.0, 598152.0, 623312.0, 648872.0, 674832.0], [838992.0, 867752.0, 896912.0, 926472.0, 956432.0]]
-        for i in xrange(4):
+        for i in range(4):
             v1=v[i]
             self.assertEqual(5,len(v1))
             l=0
-            for j in xrange(5):
+            for j in range(5):
                 self.assertAlmostEqual(expected[i][j],v1[l],8);
                 l+=1
                 pass
@@ -114,12 +114,12 @@ class MEDCalculatorBasicsTest(unittest.TestCase):
         Power[:,:,2:4]=7.
         v=Power.getValues()
         self.assertEqual(10,len(v));
-        for i in xrange(10):
+        for i in range(10):
             v1=v[i]
             self.assertEqual(35,len(v1))
             l=0
-            for j in xrange(5):
-                for k in xrange(2):
+            for j in range(5):
+                for k in range(2):
                     self.assertAlmostEqual((i+1)*100.+(j+1)*10.+k+1,v1[l],12);
                     l+=1
                     pass
@@ -127,7 +127,7 @@ class MEDCalculatorBasicsTest(unittest.TestCase):
                 l+=1
                 self.assertAlmostEqual(7.,v1[l],12);
                 l+=1
-                for k in xrange(3):
+                for k in range(3):
                     self.assertAlmostEqual((i+1)*100.+(j+1)*10.+k+5,v1[l],12);
                     l+=1
                     pass
@@ -136,12 +136,12 @@ class MEDCalculatorBasicsTest(unittest.TestCase):
         Power[1:5,:,3]=p3
         v=Power[1:5,:,:].getValues()
         self.assertEqual(4,len(v));
-        for i in xrange(4):
+        for i in range(4):
             v1=v[i]
             self.assertEqual(35,len(v1))
             l=0
-            for j in xrange(5):
-                for k in xrange(2):
+            for j in range(5):
+                for k in range(2):
                     self.assertAlmostEqual((i+2)*100.+(j+1)*10.+k+1,v1[l],12);
                     l+=1
                     pass
@@ -149,7 +149,7 @@ class MEDCalculatorBasicsTest(unittest.TestCase):
                 l+=1
                 self.assertAlmostEqual(expected[i][j],v1[l],8);
                 l+=1
-                for k in xrange(3):
+                for k in range(3):
                     self.assertAlmostEqual((i+2)*100.+(j+1)*10.+k+5,v1[l],12);
                     l+=1
                     pass

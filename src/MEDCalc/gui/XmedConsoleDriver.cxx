@@ -18,9 +18,9 @@
 //
 // Author : Guillaume Boulant (EDF)
 
+#include "MEDModule.hxx"
 #include "XmedConsoleDriver.hxx"
 #include "Utils_SALOME_Exception.hxx"
-#include "MEDModule.hxx"
 #include "MEDCommandsHistoryManager_i.hxx"
 #include "MEDFactoryClient.hxx"
 #include CORBA_CLIENT_HEADER(MED_Gen)

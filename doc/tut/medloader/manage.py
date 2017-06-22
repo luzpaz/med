@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (C) 2012-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -78,17 +78,17 @@ for meshName in meshNames:
 # request all the fields for a given iteration step, then we should
 # use the iteration step as a first classifaction switch of the tree
 
-print fieldTree.keys()
+print(list(fieldTree.keys()))
 
 # _T3A
-for meshName in fieldTree.keys():
-    print "%s"%meshName
-    for fieldName in fieldTree[meshName].keys():
-        print "  %s"%fieldName
-        for fieldType in fieldTree[meshName][fieldName].keys():
-            print "    %s"%fieldType
-            for itNumber in fieldTree[meshName][fieldName][fieldType].keys():
-                for itOrder in fieldTree[meshName][fieldName][fieldType][itNumber].keys():
-                    print "      (%s,%s)"%(itNumber,itOrder)
-                    print fieldTree[meshName][fieldName][fieldType][itNumber][itOrder]
+for meshName in fieldTree:
+    print("%s"%meshName)
+    for fieldName in fieldTree[meshName]:
+        print("  %s"%fieldName)
+        for fieldType in fieldTree[meshName][fieldName]:
+            print("    %s"%fieldType)
+            for itNumber in fieldTree[meshName][fieldName][fieldType]:
+                for itOrder in fieldTree[meshName][fieldName][fieldType][itNumber]:
+                    print("      (%s,%s)"%(itNumber,itOrder))
+                    print(fieldTree[meshName][fieldName][fieldType][itNumber][itOrder])
 # _T3B

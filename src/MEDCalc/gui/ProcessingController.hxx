@@ -20,6 +20,7 @@
 #ifndef PROCESSING_CONTROLLER_HXX
 #define PROCESSING_CONTROLLER_HXX
 
+#include <Python.h>
 #include "MEDCALCGUI.hxx"
 
 #include "MEDEventListener_i.hxx"

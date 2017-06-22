@@ -22,6 +22,7 @@
 #ifndef _MED_EVENTLISTENER_I_HXX_
 #define _MED_EVENTLISTENER_I_HXX_
 
+#include <Python.h>
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(MEDEventListener)
 #include "SALOME_GenericObj_i.hh"
