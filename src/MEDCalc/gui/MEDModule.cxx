@@ -62,6 +62,7 @@ MEDModule::MEDModule() :
   _datasourceController(0), _workspaceController(0), _presentationController(0),
   _processingController(0), _pvGuiElements(0)
 {
+  STDLOG("MEDModule::MEDModule()");
   // Note also that we can't use the getApp() function here because
   // the initialize(...) function has not been called yet.
 
@@ -122,8 +123,12 @@ MEDModule::init()
 void
 MEDModule::initialize( CAM_Application* app )
 {
+  STDLOG("MEDModule::initialize()");
   // call the parent implementation
   SalomeApp_Module::initialize( app );
+
+  if (! getApp()->objectBrowser())
+    getApp()->getWindow(SalomeApp_Application::WT_ObjectBrowser);
 
   getApp()->objectBrowser()->setAutoOpenLevel(5);
 
@@ -160,6 +165,7 @@ MEDModule::iconName() const
 void
 MEDModule::windows( QMap<int, int>& theMap ) const
 {
+  STDLOG("MEDModule::windows()");
   // want Object browser, in the left area
   theMap.insert( SalomeApp_Application::WT_ObjectBrowser,
                  Qt::LeftDockWidgetArea );
@@ -199,6 +205,7 @@ MEDModule::createPreferences()
 bool
 MEDModule::activateModule( SUIT_Study* theStudy )
 {
+  STDLOG("MEDModule::activateModule()");
   if ( CORBA::is_nil( _MED_engine ) )
     return false;
 
@@ -228,6 +235,7 @@ MEDModule::activateModule( SUIT_Study* theStudy )
 bool
 MEDModule::deactivateModule( SUIT_Study* theStudy )
 {
+  STDLOG("MEDModule::deactivateModule()");
   _workspaceController->showDockWidgets(false);
   _presentationController->showDockWidgets(false);
   //this->unsetDockLayout();
