@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2016  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2017  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -61,6 +61,7 @@ MEDPresentationManager_i::_makePresentation(const PresentationParameters params,
     return -1;
   }
 
+  STDLOG("Add new presentation " << newID);
   _presentations.insert( std::pair<MEDPresentation::TypeID, MEDPresentation *>(newID, presentation) );
   presentation->generatePipeline();
 
@@ -78,6 +79,7 @@ template<typename PresentationType, typename PresentationParameters>
 void
 MEDPresentationManager_i::_updatePresentation(MEDPresentation::TypeID presentationID, const PresentationParameters params)
 {
+  STDLOG("Update presentation " << presentationID);
   MEDPresentation* presentation = _getPresentation(presentationID);
   if (!presentation) {
     std::cerr << "_updatePresentation(): presentation not found!!" << std::endl;

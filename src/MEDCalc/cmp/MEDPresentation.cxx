@@ -116,8 +116,11 @@ MEDPresentation::~MEDPresentation()
 
     oss << "pvs.Hide(" << _objVar <<  ", view=" << getRenderViewVar() << ");";
     execPyLine(oss.str());
-    execPyLine(getRenderViewVar() + ".ResetCamera();");
-    execPyLine("pvs.Render();");
+    // :TRICKY: The two following lines raise an exception when closing MED module
+    //          after sequence: MED - load file - PARAVIS - MED - close SALOME
+    //          (see Mantis #23461)
+    //execPyLine(getRenderViewVar() + ".ResetCamera();");
+    //execPyLine("pvs.Render();");
   }
 }
 
@@ -672,4 +675,3 @@ MEDPresentation::applyCellToPointIfNeeded()
 //  oss << _srcObjVar << ".Function = '" <<  _fieldName << "_0*iHat + " << _fieldName << "_1*jHat + 0.0*zHat';";
 //  pushAndExecPyLine(oss.str()); oss.str("");
 //}
-

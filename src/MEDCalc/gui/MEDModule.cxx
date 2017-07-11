@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2016  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2017  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -70,6 +70,12 @@ MEDModule::MEDModule() :
 
 MEDModule::~MEDModule()
 {
+  // Clean up engine:
+  STDLOG("MEDModule::~MEDModule(): cleaning up engine side.");
+  _MED_engine->cleanUp();
+  MEDFactoryClient::getFactory()->getPresentationManager()->cleanUp();
+  MEDFactoryClient::getFactory()->getDataManager()->cleanUp();
+
   if (_studyEditor)
     delete _studyEditor;
   if (_datasourceController)
@@ -222,12 +228,6 @@ MEDModule::activateModule( SUIT_Study* theStudy )
 bool
 MEDModule::deactivateModule( SUIT_Study* theStudy )
 {
- // Clean up engine:
-  STDLOG("MEDModule::deactivateModule(): cleaning up engine side.");
-  _MED_engine->cleanUp();
-  MEDFactoryClient::getFactory()->getPresentationManager()->cleanUp();
-  MEDFactoryClient::getFactory()->getDataManager()->cleanUp();
-
   _workspaceController->showDockWidgets(false);
   _presentationController->showDockWidgets(false);
   //this->unsetDockLayout();
