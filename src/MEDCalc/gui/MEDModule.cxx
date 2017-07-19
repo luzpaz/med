@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2016  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2017  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -62,6 +62,7 @@ MEDModule::MEDModule() :
   _datasourceController(0), _workspaceController(0), _presentationController(0),
   _processingController(0), _pvGuiElements(0)
 {
+  STDLOG("MEDModule::MEDModule()");
   // Note also that we can't use the getApp() function here because
   // the initialize(...) function has not been called yet.
 
@@ -70,6 +71,12 @@ MEDModule::MEDModule() :
 
 MEDModule::~MEDModule()
 {
+  // Clean up engine:
+  STDLOG("MEDModule::~MEDModule(): cleaning up engine side.");
+  _MED_engine->cleanUp();
+  MEDFactoryClient::getFactory()->getPresentationManager()->cleanUp();
+  MEDFactoryClient::getFactory()->getDataManager()->cleanUp();
+
   if (_studyEditor)
     delete _studyEditor;
   if (_datasourceController)
@@ -116,8 +123,12 @@ MEDModule::init()
 void
 MEDModule::initialize( CAM_Application* app )
 {
+  STDLOG("MEDModule::initialize()");
   // call the parent implementation
   SalomeApp_Module::initialize( app );
+
+  if (! getApp()->objectBrowser())
+    getApp()->getWindow(SalomeApp_Application::WT_ObjectBrowser);
 
   getApp()->objectBrowser()->setAutoOpenLevel(5);
 
@@ -154,6 +165,7 @@ MEDModule::iconName() const
 void
 MEDModule::windows( QMap<int, int>& theMap ) const
 {
+  STDLOG("MEDModule::windows()");
   // want Object browser, in the left area
   theMap.insert( SalomeApp_Application::WT_ObjectBrowser,
                  Qt::LeftDockWidgetArea );
@@ -193,6 +205,7 @@ MEDModule::createPreferences()
 bool
 MEDModule::activateModule( SUIT_Study* theStudy )
 {
+  STDLOG("MEDModule::activateModule()");
   if ( CORBA::is_nil( _MED_engine ) )
     return false;
 
@@ -222,12 +235,7 @@ MEDModule::activateModule( SUIT_Study* theStudy )
 bool
 MEDModule::deactivateModule( SUIT_Study* theStudy )
 {
- // Clean up engine:
-  STDLOG("MEDModule::deactivateModule(): cleaning up engine side.");
-  _MED_engine->cleanUp();
-  MEDFactoryClient::getFactory()->getPresentationManager()->cleanUp();
-  MEDFactoryClient::getFactory()->getDataManager()->cleanUp();
-
+  STDLOG("MEDModule::deactivateModule()");
   _workspaceController->showDockWidgets(false);
   _presentationController->showDockWidgets(false);
   //this->unsetDockLayout();

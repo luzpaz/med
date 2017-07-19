@@ -1,4 +1,4 @@
-// Copyright (C) 2011-2016  CEA/DEN, EDF R&D
+// Copyright (C) 2011-2017  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -73,6 +73,7 @@ MEDPresentationManager_i::GenerateID()
 MEDPresentation*
 MEDPresentationManager_i::_getPresentation(MEDPresentation::TypeID presentationID) const
 {
+  STDLOG("Get presentation " << presentationID);
   std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator citr = _presentations.find(presentationID);
   if (citr == _presentations.end())
     return NULL;
@@ -271,6 +272,7 @@ MEDPresentationManager_i::updatePointSprite(MEDPresentation::TypeID presentation
 CORBA::Boolean
 MEDPresentationManager_i::removePresentation(MEDPresentation::TypeID presentationID)
 {
+  STDLOG("Remove presentation " << presentationID);
   std::map<MEDPresentation::TypeID, MEDPresentation*>::const_iterator citr = _presentations.find(presentationID);
   if (citr == _presentations.end()) {
     std::cerr << "removePresentation(): presentation not found!!" << std::endl;
@@ -360,6 +362,7 @@ MEDPresentationManager_i::getAllPresentations()
 void
 MEDPresentationManager_i::cleanUp()
 {
+  STDLOG("Cleanup");
   _activeViewPythonId = -1;
   std::map<MEDPresentation::TypeID, MEDPresentation*>::iterator it;
   for (it = _presentations.begin(); it != _presentations.end(); ++it)

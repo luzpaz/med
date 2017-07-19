@@ -583,6 +583,12 @@ def MEDCouplingDataArrayDoubleIdiv(self,*args):
 def MEDCouplingDataArrayDoubleIpow(self,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.DataArrayDouble____ipow___(self, self, *args)
+def MEDCouplingFieldIntnew(cls,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.MEDCouplingFieldInt____new___(cls,args)
+def MEDCouplingFieldFloatnew(cls,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.MEDCouplingFieldFloat____new___(cls,args)
 def MEDCouplingFieldDoublenew(cls,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.MEDCouplingFieldDouble____new___(cls,args)
@@ -625,6 +631,21 @@ def MEDCouplingDataArrayIntIpow(self,*args):
 def MEDCouplingDataArrayBytenew(cls,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.DataArrayByte____new___(cls,args)
+def MEDCouplingDataArrayFloatnew(cls,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayFloat____new___(cls,args)
+def MEDCouplingDataArrayFloatIadd(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayFloat____iadd___(self, self, *args)
+def MEDCouplingDataArrayFloatIsub(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayFloat____isub___(self, self, *args)
+def MEDCouplingDataArrayFloatImul(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayFloat____imul___(self, self, *args)
+def MEDCouplingDataArrayFloatIdiv(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayFloat____idiv___(self, self, *args)
 def MEDCouplingDataArrayDoubleTupleIadd(self,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.DataArrayDoubleTuple____iadd___(self, self, *args)
