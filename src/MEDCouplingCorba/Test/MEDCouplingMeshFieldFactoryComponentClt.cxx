@@ -473,7 +473,7 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldTemplateCell
   CORBA::release(fieldPtr);
   //
   MEDCoupling::MEDCouplingFieldTemplate *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldTemplateCellOn2D();
-  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12));
   refField->decrRef();
   fieldCpp->decrRef();
 }
@@ -486,7 +486,7 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldTemplateNode
   CORBA::release(fieldPtr);
   //
   MEDCoupling::MEDCouplingFieldTemplate *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldTemplateNodeOn2D();
-  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12));
   refField->decrRef();
   fieldCpp->decrRef();
 }
@@ -499,7 +499,7 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldTemplateGaus
   CORBA::release(fieldPtr);
   //
   MEDCoupling::MEDCouplingFieldTemplate *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussPtOn2D();
-  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12));
   refField->decrRef();
   fieldCpp->decrRef();
 }
@@ -512,7 +512,7 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldTemplateGaus
   CORBA::release(fieldPtr);
   //
   MEDCoupling::MEDCouplingFieldTemplate *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussNEOn2D();
-  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12));
   refField->decrRef();
   fieldCpp->decrRef();
 }
