@@ -315,9 +315,6 @@ namespace MEDCoupling
 }
 
 %pythoncode %{
-def MEDCouplingDataArrayDoublenew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.DataArrayDouble____new___(cls,args)
 def MEDCouplingDataArrayDoubleIadd(self,*args):
     import _MEDCalculator
     return _MEDCalculator.DataArrayDouble____iadd___(self, self, *args)
@@ -345,9 +342,6 @@ def MEDCouplingDataArrayDoubleTupleImul(self,*args):
 def MEDCouplingDataArrayDoubleTupleIdiv(self,*args):
     import _MEDCalculator
     return _MEDCalculator.DataArrayDoubleTuple____idiv___(self, self, *args)
-def MEDCouplingFieldDoublenew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.MEDCouplingFieldDouble____new___(cls,args)
 def MEDCouplingFieldDoubleIadd(self,*args):
     import _MEDCalculator
     return _MEDCalculator.MEDCouplingFieldDouble____iadd___(self, self, *args)
@@ -363,12 +357,6 @@ def MEDCouplingFieldDoubleIdiv(self,*args):
 def MEDCouplingFieldDoubleIpow(self,*args):
     import _MEDCalculator
     return _MEDCalculator.MEDCouplingFieldDouble____ipow___(self, self, *args)
-def MEDCouplingDataArrayBytenew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.DataArrayByte____new___(cls,args)
-def MEDCouplingDataArrayIntnew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.DataArrayInt____new___(cls,args)
 def MEDCouplingDataArrayIntIadd(self,*args):
     import _MEDCalculator
     return _MEDCalculator.DataArrayInt____iadd___(self, self, *args)
@@ -408,38 +396,13 @@ def ParaMEDMEMDenseMatrixIadd(self,*args):
 def ParaMEDMEMDenseMatrixIsub(self,*args):
     import _MEDCalculator
     return _MEDCalculator.DenseMatrix____isub___(self, self, *args)
-def MEDCouplingUMeshnew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.MEDCouplingUMesh____new___(cls,args)
-def MEDCoupling1DGTUMeshnew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.MEDCoupling1DGTUMesh____new___(cls,args)
-def MEDCoupling1SGTUMeshnew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.MEDCoupling1SGTUMesh____new___(cls,args)
-def MEDCouplingCurveLinearMeshnew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.MEDCouplingCurveLinearMesh____new___(cls,args)
-def MEDCouplingCMeshnew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.MEDCouplingCMesh____new___(cls,args)
-def MEDCouplingIMeshnew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.MEDCouplingIMesh____new___(cls,args)
-def MEDCouplingExtrudedMeshnew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.MEDCouplingMappedExtrudedMesh____new___(cls,args)
-%}
-
-%pythoncode %{
-def ParaMEDMEMMEDFileUMeshnew(cls,*args):
-    import _MEDCalculator
-    return _MEDCalculator.MEDFileUMesh____new___(cls,args)
 %}
 
 %include "MEDCouplingFinalize.i"
 
 %pythoncode %{
-MEDFileUMesh.__new__=classmethod(ParaMEDMEMMEDFileUMeshnew)
-del ParaMEDMEMMEDFileUMeshnew
+def MEDCouplingMEDFileUMeshReduce(self):
+  return MEDCouplingStdReduceFunct,(MEDFileUMesh,((),(self.__getstate__()),))
+MEDFileUMesh.__reduce__=MEDCouplingMEDFileUMeshReduce
+del MEDCouplingMEDFileUMeshReduce
 %}

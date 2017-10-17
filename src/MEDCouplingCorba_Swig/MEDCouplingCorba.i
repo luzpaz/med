@@ -315,9 +315,6 @@ namespace MEDCoupling
 }
 
 %pythoncode %{
-def MEDCouplingDataArrayDoublenew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.DataArrayDouble____new___(cls,args)
 def MEDCouplingDataArrayDoubleIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDouble____iadd___(self, self, *args)
@@ -333,15 +330,6 @@ def MEDCouplingDataArrayDoubleIdiv(self,*args):
 def MEDCouplingDataArrayDoubleIpow(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDouble____ipow___(self, self, *args)
-def MEDCouplingFieldIntnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCouplingFieldInt____new___(cls,args)
-def MEDCouplingFieldFloatnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCouplingFieldFloat____new___(cls,args)
-def MEDCouplingFieldDoublenew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCouplingFieldDouble____new___(cls,args)
 def MEDCouplingFieldDoubleIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingFieldDouble____iadd___(self, self, *args)
@@ -357,9 +345,6 @@ def MEDCouplingFieldDoubleIdiv(self,*args):
 def MEDCouplingFieldDoubleIpow(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingFieldDouble____ipow___(self, self, *args)
-def MEDCouplingDataArrayIntnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.DataArrayInt____new___(cls,args)
 def MEDCouplingDataArrayIntIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____iadd___(self, self, *args)
@@ -378,12 +363,6 @@ def MEDCouplingDataArrayIntImod(self,*args):
 def MEDCouplingDataArrayIntIpow(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____ipow___(self, self, *args)
-def MEDCouplingDataArrayBytenew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.DataArrayByte____new___(cls,args)
-def MEDCouplingDataArrayFloatnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.DataArrayFloat____new___(cls,args)
 def MEDCouplingDataArrayFloatIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayFloat____iadd___(self, self, *args)
@@ -429,27 +408,6 @@ def ParaMEDMEMDenseMatrixIadd(self,*args):
 def ParaMEDMEMDenseMatrixIsub(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DenseMatrix____isub___(self, self, *args)
-def MEDCouplingUMeshnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCouplingUMesh____new___(cls,args)
-def MEDCoupling1DGTUMeshnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCoupling1DGTUMesh____new___(cls,args)
-def MEDCoupling1SGTUMeshnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCoupling1SGTUMesh____new___(cls,args)
-def MEDCouplingCurveLinearMeshnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCouplingCurveLinearMesh____new___(cls,args)
-def MEDCouplingCMeshnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCouplingCMesh____new___(cls,args)
-def MEDCouplingIMeshnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCouplingIMesh____new___(cls,args)
-def MEDCouplingExtrudedMeshnew(cls,*args):
-    import _MEDCouplingCorba
-    return _MEDCouplingCorba.MEDCouplingMappedExtrudedMesh____new___(cls,args)
 %}
 
 %include "MEDCouplingFinalize.i"
