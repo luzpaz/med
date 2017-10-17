@@ -50,7 +50,7 @@ signals:
   void presentationUpdateSignal(const PresentationEvent *);
 
 protected:
-  // Only child classes to be instanciated:
+  // Only child classes to be instantiated:
   MEDWidgetHelper(const PresentationController* presController,
                   MEDCALC::MEDPresentationManager_ptr presManager, int presId, const std::string & presName,
                   WidgetPresentationParameters * paramWidget);

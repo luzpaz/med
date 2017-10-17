@@ -230,8 +230,8 @@ void WorkspaceController::_importFieldIntoConsole(MEDCALC::FieldHandler* fieldHa
     effectiveAlias = new QString(alias);
   }
 
-  // We can propose to the user to specify some additionnal
-  // informations concerning what must be imported.
+  // We can propose to the user to specify some additional
+  // information concerning what must be imported.
   //
   // In this version, we just ask the alias the field will be
   // manipulated with. The default alias is the field name. This alias

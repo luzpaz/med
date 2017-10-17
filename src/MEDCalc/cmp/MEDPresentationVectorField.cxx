@@ -73,7 +73,7 @@ MEDPresentationVectorField::internalGeneratePipeline()
       throw KERNEL::createSalomeException(msg);
     }
 
-  setOrCreateRenderView();  // instanciate __viewXXX, needs to be after the exception above otherwise previous elements in the view will be hidden.
+  setOrCreateRenderView();  // instantiate __viewXXX, needs to be after the exception above otherwise previous elements in the view will be hidden.
 
   std::ostringstream oss;
   oss << _objVar << " = pvs.Glyph(Input=" << _srcObjVar << ", GlyphType='Arrow');";

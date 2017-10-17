@@ -145,7 +145,7 @@ namespace SALOME_TEST
     MEDCoupling::MEDCouplingUMesh *targetMesh=MEDCoupling::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(0);
     targetMesh->allocateCells(8);
-    targetMesh->setName("Wonderfull 0D mesh");
+    targetMesh->setName("Wonderful 0D mesh");
     targetMesh->setDescription("build0DMesh");
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_POINT1,1,targetConn);
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_POINT1,1,targetConn+1);
@@ -171,7 +171,7 @@ namespace SALOME_TEST
 
   MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::buildM1DMesh()
   {
-    MEDCoupling::MEDCouplingUMesh *meshM1D=MEDCoupling::MEDCouplingUMesh::New("wonderfull -1 D mesh",-1);
+    MEDCoupling::MEDCouplingUMesh *meshM1D=MEDCoupling::MEDCouplingUMesh::New("wonderful -1 D mesh",-1);
     meshM1D->setDescription("buildM1DMesh");
     meshM1D->checkConsistencyLight();
     return meshM1D;

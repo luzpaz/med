@@ -115,7 +115,7 @@ class MEDCouplingCorbaServBasicsTest:
         targetMesh=MEDCouplingUMesh.New();
         targetMesh.setMeshDimension(0);
         targetMesh.allocateCells(8);
-        targetMesh.setName("Wonderfull 0D mesh");
+        targetMesh.setName("Wonderful 0D mesh");
         targetMesh.setDescription("build0DMesh");
         targetConn=[]
         targetMesh.insertNextCell(NORM_POINT1,1,[0]);
@@ -137,7 +137,7 @@ class MEDCouplingCorbaServBasicsTest:
         return targetMesh;
 
     def buildM1DMesh(self):
-        meshM1D=MEDCouplingUMesh.New("wonderfull -1 D mesh",-1);
+        meshM1D=MEDCouplingUMesh.New("wonderful -1 D mesh",-1);
         meshM1D.setDescription("buildM1DMesh");
         meshM1D.checkConsistencyLight();
         return meshM1D;

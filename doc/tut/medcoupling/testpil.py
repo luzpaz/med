@@ -37,7 +37,7 @@ def image2matrix():
     # Get a grayscale version
     imgbw=ImageOps.grayscale(img)
     
-    # Save the image (optionnal)
+    # Save the image (optional)
     imgbw.save(fp="testsbw.pgm")
     
     # Get the data

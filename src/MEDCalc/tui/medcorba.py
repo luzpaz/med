@@ -47,6 +47,6 @@ factory = salome.lcc.FindOrLoadComponent(containerType,factoryComponentName)
 # The factory is not the main CORBA component of the SALOME module MED
 # (i.e. the engine associated to the active study), but the CORBA
 # entry point for MED fields operations (i.e. a CORBA component
-# reachable throught the LifeCycleCORBA). This entry point is used to
+# reachable through the LifeCycleCORBA). This entry point is used to
 # get the other SALOME CORBA components required for MED field
 # operations, in particular the dataManager and the calculator

@@ -93,7 +93,7 @@ std::string MEDDataManager_i::source_to_file(const char * source)
 /*!
  * This function loads the meta-data from the specified med file and
  * returns the associated datasource handler. The data source handler
- * is a key to retrieve all informations concerning the data (meshes,
+ * is a key to retrieve all information concerning the data (meshes,
  * fields).
  */
 MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepath) {
@@ -620,7 +620,7 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDCALC::FieldHa
   // one case where we can arrive here with no previous call to
   // loadDataSource: for example the field handler list can be obtained
   // from a call to addFieldsFromFile instead of loadDataSource (see
-  // for exemple the getFieldRepresentation service of the
+  // for example the getFieldRepresentation service of the
   // dataManager, that comes here and then calls getUMesh where we
   // need a map initialized only in loadDataSource) <<<<
   long meshid = fieldHandler->meshid;
