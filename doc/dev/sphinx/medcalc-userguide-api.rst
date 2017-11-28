@@ -42,7 +42,7 @@ installed together with this module by the installation process of
 SALOME. Nevertheless, it is possible for low-weight deployment to
 install only the MEDMEM library from the source files embedded in the
 SALOME MED module. Keep in mind that the MEDMEM library is designed to
-be a self-consistent library with very few third party softwares (only
+be a self-consistent library with very few third party software (only
 med-file, glibc and mpi typically). In particular, it is strictly
 independent from the SALOME framework even if it distributed with
 SALOME for convenience reasons.

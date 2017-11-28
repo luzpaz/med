@@ -318,7 +318,7 @@ void MEDGUIFileContentDial::fieldsStateChange(QTreeWidgetItem* qtwi, int col)
     }
 }
 
-//  Show the selection on standart output using std::cout and str methods from MEDGUILiteStruct
+//  Show the selection on standard output using std::cout and str methods from MEDGUILiteStruct
 void MEDGUIFileContentDial::sendSelectionToDB()
 {
   std::vector<ParaMEDMEM::MEDCalculatorBrowserLiteStruct> lt2send2db;
@@ -438,7 +438,7 @@ void MEDGUIFileContentDial::selStepsPopup(bool checkable)
 
 }
 
-//  Methode to set all elements of a MEDGUILiteStruct to (un)selected according to a string (such as "all", "none", ...)
+//  Method to set all elements of a MEDGUILiteStruct to (un)selected according to a string (such as "all", "none", ...)
 //  3 cases :
 //  - you want to select all time steps of all fields, the selection is made directly
 //  - you want to unselect all time steps of all fields, the unselection is made directly
@@ -478,7 +478,7 @@ void MEDGUIFileContentDial::selFromFile(QTreeWidgetItem* qtwi, QString sel)
   }
 }
 
-//  Methode to set all elements of a MEDGUIField to (un)selected according to a string (such as "all", "none", ...)
+//  Method to set all elements of a MEDGUIField to (un)selected according to a string (such as "all", "none", ...)
 //  If empty string, no change are made
 //  Else :
 //   First get the file and field id
@@ -585,7 +585,7 @@ void MEDGUIFileContentDial::selFromField(QTreeWidgetItem* qtwi, QString sel)
   }
 }
 
-//  Methode to set all elements of a MEDGUIField when selection is made from a MEDGUIStep to (un)selected according to a string (such as "all", "none", ...)
+//  Method to set all elements of a MEDGUIField when selection is made from a MEDGUIStep to (un)selected according to a string (such as "all", "none", ...)
 //  Calling it on a step is the same as calling it from is father (the corresponding field)
 void MEDGUIFileContentDial::selFromStep(QTreeWidgetItem* qtwi,QString sel)
 {
