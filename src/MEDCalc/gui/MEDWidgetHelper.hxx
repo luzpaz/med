@@ -30,7 +30,7 @@ class WidgetPresentationParameters;
 class PresentationController;
 
 /*!
- * The widget helper hierarchy is in charge of seting up the WidgetPresentationParameters
+ * The widget helper hierarchy is in charge of setting up the WidgetPresentationParameters
  * to display the Qt widgets relevant to the underlying presentation on the component side.
  */
 class MEDWidgetHelper : public QObject

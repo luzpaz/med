@@ -67,7 +67,7 @@ for meshName in meshNames:
         #
         # As a consequence, before loading values of a field, we have
         # to determine the types of spatial discretization defined for
-        # this field and to chooose one.
+        # this field and to choose one.
 
         listOfTypes = MEDLoader.GetTypesOfField(filepath,meshName,fieldName)
         for typeOfDiscretization in listOfTypes:
