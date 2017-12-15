@@ -31,11 +31,10 @@
     <parameter name="version"       value="@SALOMEMED_VERSION@"/>
   </section>
   <section name="med_help" >
-    <parameter name="sub_menu"          value="%1 module"/>
-    <parameter name="User's Guide"      value="%MED_ROOT_DIR%/share/doc/salome/dev/MED/index.html"/>
-    <parameter name="MEDCoupling/User's Guide" value="%MEDCOUPLING_ROOT_DIR%/share/doc/index.html"/>
-    <parameter name="MEDCoupling/Tutorial" value="%MEDCOUPLING_ROOT_DIR%/share/doc/tutorial/index.html"/>
-    <parameter name="MEDFile/User Manual" value="%MEDFILE_ROOT_DIR%/share/doc/html.dox/index.html"/>
+    <parameter name="User's Guide/MED module/User's Guide"      value="%MED_ROOT_DIR%/share/doc/salome/dev/MED/index.html"/>    
+    <parameter name="User's Guide/MED module/MEDCoupling/User's Guide" value="%MEDCOUPLING_ROOT_DIR%/share/doc/index.html"/>
+    <parameter name="User's Guide/MED module/MEDCoupling/Tutorial" value="%MEDCOUPLING_ROOT_DIR%/share/doc/tutorial/index.html"/>
+    <parameter name="User's Guide/MED module/MEDFile/User Manual" value="%MEDFILE_ROOT_DIR%/share/doc/html.dox/index.html"/>
   </section>
   <section name="resources">
     <!-- Module resources -->
