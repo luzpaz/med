@@ -130,7 +130,7 @@ Questions:
 
 * mapper sur une image
 
-Improvments:
+Improvements:
 
 * MEDLoader::Write should raise an exception if the filepath is not writable
 * MEDDataManager: développer une classe chapeau sur MEDCoupling et

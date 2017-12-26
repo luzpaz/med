@@ -38,7 +38,7 @@ namespace MEDCoupling
   public :
     MEDCalculatorBrowserLiteStruct();
     ~MEDCalculatorBrowserLiteStruct();
-    MEDCalculatorBrowserLiteStruct(const char *);//  Constructor with a complet file name (with path) and simplified file name as parameters
+    MEDCalculatorBrowserLiteStruct(const char *);//  Constructor with a complete file name (with path) and simplified file name as parameters
     bool operator==(const std::string&);//  Equal to string operator, compare simplified name to input
     std::string str();//  Return a std::string corresponding to x/o (selected or not) File filename \n meshes \n fields
     void setSelected(bool);//  Set selection to input bool

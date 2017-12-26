@@ -39,7 +39,7 @@ def connectEventListener():
   except SALOME.SALOME_Exception as e:
     medcalc.wrn("The event listener is not running yet")
     msg ="When you'll have loaded the MED GUI, "
-    msg+="call explicitely \"medcalc.medevents.connectEventListener()\" "
+    msg+="call explicitly \"medcalc.medevents.connectEventListener()\" "
     msg+="to connect the GUI event listener"
     medcalc.inf(msg)
     __eventListener = None

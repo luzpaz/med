@@ -44,7 +44,7 @@ MEDCalculatorBrowserLiteStruct::~MEDCalculatorBrowserLiteStruct()
 //  Constructor with parameters :
 //  - f, full file name with path
 //  - n, file name (file.med)
-//  Read the med file to get meshes and fields informations
+//  Read the med file to get meshes and fields information
 //  Fill meshes vector with meshes names
 //  Fill fields vector creating using field constructor with MED and fieldname parameters
 MEDCalculatorBrowserLiteStruct::MEDCalculatorBrowserLiteStruct(const char *f) : _file(f), _any_selection(false)

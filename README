@@ -31,7 +31,7 @@ should be done for the get/set field classes methods:
   parameter;
 - the getValueI (resp. setValueI) should be replaced by getRow(int )
   (resp. setRow(int ,T*) if the field is in full interlacing mode (using the
-  method getInterlacingType() of the classe FIELD_). If the field is stored in
+  method getInterlacingType() of the class FIELD_). If the field is stored in
   no interlacing mode getValueIJ (resp. setValueIJ) should be replaced by
   getColumn(int ) (resp. setColumn(int ,T*)).
 

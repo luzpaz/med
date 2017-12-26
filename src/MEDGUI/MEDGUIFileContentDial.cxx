@@ -49,7 +49,7 @@
 //  Connect buttons to actions, close statement is already connect in the .ui file
 //  Set QTreeWidgets parameters : header labels, selection mode
 //  Connect QTreeWidget itemClicked signal to meshes and fieldsStateChange
-//  Put mouse tracking on, so this class received mouse positions informations when mouse is above treewidget
+//  Put mouse tracking on, so this class received mouse positions information when mouse is above treewidget
 //  Add contextual menu to treewidget's items with the call to selectCompoPopup and selStepPopup
 //  Connect those actions to corresponding signals
 MEDGUIFileContentDial::MEDGUIFileContentDial(MEDGUIDataBaseDockWidget* db, QWidget* parent):
@@ -119,7 +119,7 @@ void MEDGUIFileContentDial::changeEvent(QEvent *e)
 //  Then, after checking if the name already exist
 //  - if yes, try to add "_#" where # begin at 2
 //  - if not, continue
-//  Create a new MEDGUILiteStruct with the complet file name and the simplified file name as parameters
+//  Create a new MEDGUILiteStruct with the complete file name and the simplified file name as parameters
 //  Add items to the two QTreeWidget get information from the new MEDGUILiteStruct
 void MEDGUIFileContentDial::openFile()
 {
@@ -318,7 +318,7 @@ void MEDGUIFileContentDial::fieldsStateChange(QTreeWidgetItem* qtwi, int col)
     }
 }
 
-//  Show the selection on standart output using std::cout and str methods from MEDGUILiteStruct
+//  Show the selection on standard output using std::cout and str methods from MEDGUILiteStruct
 void MEDGUIFileContentDial::sendSelectionToDB()
 {
   std::vector<ParaMEDMEM::MEDCalculatorBrowserLiteStruct> lt2send2db;
@@ -438,7 +438,7 @@ void MEDGUIFileContentDial::selStepsPopup(bool checkable)
 
 }
 
-//  Methode to set all elements of a MEDGUILiteStruct to (un)selected according to a string (such as "all", "none", ...)
+//  Method to set all elements of a MEDGUILiteStruct to (un)selected according to a string (such as "all", "none", ...)
 //  3 cases :
 //  - you want to select all time steps of all fields, the selection is made directly
 //  - you want to unselect all time steps of all fields, the unselection is made directly
@@ -478,7 +478,7 @@ void MEDGUIFileContentDial::selFromFile(QTreeWidgetItem* qtwi, QString sel)
   }
 }
 
-//  Methode to set all elements of a MEDGUIField to (un)selected according to a string (such as "all", "none", ...)
+//  Method to set all elements of a MEDGUIField to (un)selected according to a string (such as "all", "none", ...)
 //  If empty string, no change are made
 //  Else :
 //   First get the file and field id
@@ -585,7 +585,7 @@ void MEDGUIFileContentDial::selFromField(QTreeWidgetItem* qtwi, QString sel)
   }
 }
 
-//  Methode to set all elements of a MEDGUIField when selection is made from a MEDGUIStep to (un)selected according to a string (such as "all", "none", ...)
+//  Method to set all elements of a MEDGUIField when selection is made from a MEDGUIStep to (un)selected according to a string (such as "all", "none", ...)
 //  Calling it on a step is the same as calling it from is father (the corresponding field)
 void MEDGUIFileContentDial::selFromStep(QTreeWidgetItem* qtwi,QString sel)
 {

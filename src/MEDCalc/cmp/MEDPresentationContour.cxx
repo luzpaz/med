@@ -80,7 +80,7 @@ MEDPresentationContour::internalGeneratePipeline()
       throw KERNEL::createSalomeException(mes);
     }
 
-  setOrCreateRenderView(); // instanciate __viewXXX, needs to be after the exception above otherwise previous elements in the view will be hidden.
+  setOrCreateRenderView(); // instantiate __viewXXX, needs to be after the exception above otherwise previous elements in the view will be hidden.
 
   // Contour needs point data:
   applyCellToPointIfNeeded();

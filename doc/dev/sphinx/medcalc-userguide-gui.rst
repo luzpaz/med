@@ -29,7 +29,7 @@ General presentation of MED module
 ==================================
 
 The overall ergonomics of MED module for field manipulation is inspired by
-softwares such as octave or scilab. It combines a graphical interface (GUI) to
+software such as octave or scilab. It combines a graphical interface (GUI) to
 select and prepare data, with a textual interface (the python console, TUI)
 for actual work on data.
 

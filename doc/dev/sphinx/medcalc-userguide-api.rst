@@ -42,7 +42,7 @@ installed together with this module by the installation process of
 SALOME. Nevertheless, it is possible for low-weight deployment to
 install only the MEDMEM library from the source files embedded in the
 SALOME MED module. Keep in mind that the MEDMEM library is designed to
-be a self-consistent library with very few third party softwares (only
+be a self-consistent library with very few third party software (only
 med-file, glibc and mpi typically). In particular, it is strictly
 independent from the SALOME framework even if it distributed with
 SALOME for convenience reasons.
@@ -119,7 +119,7 @@ Preparing the shell environment
 We make the hypothesis here that the MEDMEM library is installed using
 the SALOME procedure and then is located in the MED module
 installation directory. In addition to the MED library, the third
-party softwares required for executing the examples are: python, hdf5
+party software required for executing the examples are: python, hdf5
 and med-fichier. Then, you should prepare your shell environment
 with a set of instructions that looks like::
 
@@ -377,18 +377,18 @@ operation required first to load the mesh:
    :start-after: # _T3A
    :end-before: # _T3B
 
-Exemple 05: Compare fields load from different files
+Example 05: Compare fields load from different files
 ----------------------------------------------------
 
 :objectives: Illustrates the usage of the function
              changeUnderlyingMesh
 
-Exemple 06: Create a field from scratch on a spatial domain
+Example 06: Create a field from scratch on a spatial domain
 -----------------------------------------------------------
 
 :objectives: Illustrates the applyFunc method of fields
 
-Exemple 07: Manipulate structured mesh
+Example 07: Manipulate structured mesh
 --------------------------------------
 
 :objectives: Illustrates the basic usage of the advanced interface of
@@ -433,7 +433,7 @@ methode :tt:`write` of the :tt:`MEDFileMesh` object:
    :start-after: # _T3A
    :end-before: # _T3B
 
-Exemple 08: Make a projection of a field
+Example 08: Make a projection of a field
 ----------------------------------------
 
 :objectives: Make the projection of a field from a source mesh to a
@@ -487,7 +487,7 @@ the target mesh, as illustrated on the figure below:
 .. image:: images/medop_projection_result.png
    :align: center
 
-Exemple 09: Make a partition of a mesh using a field
+Example 09: Make a partition of a mesh using a field
 ----------------------------------------------------
 
 :objective: This illustrates how to make a mesh partition using the
@@ -523,6 +523,6 @@ This section could explain how to process the physical data
 (dataArray) and to manipulate the advanced concepts of the MEDMEM
 library.
 
-.. Exemple 01: Create a field from an image
+.. Example 01: Create a field from an image
 .. ----------------------------------------
 

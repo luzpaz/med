@@ -112,7 +112,7 @@ void DatasourceController::createActions() {
  * This function adds the specified MED file as a datasource in the
  * dataspace. Technically speaking, the engine loads the
  * meta-information concerning med data from the file, gives this
- * informations to the GUI, and the GUI creates a tree view of these
+ * information to the GUI, and the GUI creates a tree view of these
  * data in the study object browser.
  */
 // This function emits a signal that will be caught by workspace to delegate command (datasource creation) to python console.

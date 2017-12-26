@@ -151,7 +151,7 @@ MEDPresentationSlices::internalGeneratePipeline()
       throw KERNEL::createSalomeException(mes);
   }
 
-  setOrCreateRenderView(); // instanciate __viewXXX
+  setOrCreateRenderView(); // instantiate __viewXXX
 
   // Now create the initial slices list
   oss << _sliceListVar << " = [];";

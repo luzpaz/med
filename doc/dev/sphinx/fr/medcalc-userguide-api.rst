@@ -44,7 +44,7 @@ install only the MEDMEM library from the source files embedded in the
 SALOME MED module. Keep in mind that the MEDMEM library is designed to
 be a self-consistent library with very few third party softwares (only
 med-file, glibc and mpi typically). In particular, it is strictly
-independant from the SALOME framework even if it distributed with
+independent from the SALOME framework even if it distributed with
 SALOME for convenience reasons.
 
 Components of the MEDMEM library
@@ -119,7 +119,7 @@ Preparing the shell environment
 We make the hypothesis here that the MEDMEM library is installed using
 the SALOME procedure and then is located in the MED module
 installation directory. In addition to the MED library, the third
-party softwares required for executing the examples are: python, hdf5
+party software required for executing the examples are: python, hdf5
 and med-fichier. Then, you should prepare your shell environment
 with a set of instructions that looks like::
 
@@ -292,7 +292,7 @@ does not provide such data structures.
 We suggest to work with a simple list concept to store the metadata
 for each mesh entry and each field entry. Note that a mesh entry is
 characterized by the mesh name only, while a field entry is
-charaterized by the following attributes:
+characterized by the following attributes:
 
 * :tt:`fieldName`: the name of the field
 * :tt:`meshName`: the name of the mesh that supports the field
@@ -300,7 +300,7 @@ charaterized by the following attributes:
 * :tt:`iteration`: a couple of integers :tt:`(iter,order)` that
   characterizes the step in a serie (timeseries or spectrum).
 
-By default, we suggest to work with a simple map concept (dictionnary in a
+By default, we suggest to work with a simple map concept (dictionary in a
 python context, map in a C++ context) to register the meshes and
 fields loaded from the med file for each metadata entry.
 
@@ -309,7 +309,7 @@ you may dispatch the data in a tree structure that fit your specific
 case, for performance reasons. For example, the following code
 illustrates how to dispatch the metadata in a tree data structure
 where leaves are the physical data (field objects). We first have to
-define a tree structure (basic definition in htis simple case, but it
+define a tree structure (basic definition in this simple case, but it
 works fine):
 
 .. include:: ../../../tut/medloader/manage.py
@@ -377,18 +377,18 @@ operation required first to load the mesh:
    :start-after: # _T3A
    :end-before: # _T3B
 
-Exemple 05: Compare fields load from different files
+Example 05: Compare fields load from different files
 ----------------------------------------------------
 
 :objectives: Illustrates the usage of the function
              changeUnderlyingMesh
 
-Exemple 06: Create a field from scratch on a spatial domain
+Example 06: Create a field from scratch on a spatial domain
 -----------------------------------------------------------
 
 :objectives: Illustrates the applyFunc method of fields
 
-Exemple 07: Manipulate structured mesh
+Example 07: Manipulate structured mesh
 --------------------------------------
 
 :objectives: Illustrates the basic usage of the advanced interface of
@@ -433,7 +433,7 @@ methode :tt:`write` of the :tt:`MEDFileMesh` object:
    :start-after: # _T3A
    :end-before: # _T3B
 
-Exemple 08: Make a projection of a field
+Example 08: Make a projection of a field
 ----------------------------------------
 
 :objectives: Make the projection of a field from a source mesh to a
@@ -487,7 +487,7 @@ the target mesh, as illustrated on the figure below:
 .. image:: ../images/medop_projection_result.png
    :align: center
 
-Exemple 09: Make a partition of a mesh using a field
+Example 09: Make a partition of a mesh using a field
 ----------------------------------------------------
 
 :objective: This illustrates how to make a mesh partition using the
@@ -523,6 +523,6 @@ This section could explain how to process the physical data
 (dataArray) and to manipulate the advanced concepts of the MEDMEM
 library.
 
-.. Exemple 01: Create a field from an image
+.. Example 01: Create a field from an image
 .. ----------------------------------------
 

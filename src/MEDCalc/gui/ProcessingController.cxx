@@ -82,7 +82,7 @@ ProcessingController::createActions()
 void
 ProcessingController::OnChangeUnderlyingMesh()
 {
-  // Get the selected objects in the study (SObject). In cas of a
+  // Get the selected objects in the study (SObject). In case of a
   // multiple selection, we consider only the first item. At least one
   // item must be selected.
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();

@@ -48,9 +48,9 @@ class MEDGUIFileContentDial : public QDialog
   
  protected:
   void changeEvent(QEvent *e);
-  void selFromFile(QTreeWidgetItem*, QString);//  Methode to set all elements of a MedGUI_LiteStruct to (un)selected according to a string (such as "all", "none", ...)
-  void selFromField(QTreeWidgetItem*, QString);//  Methode to set all elements of a MedGUI_Field to (un)selected according to a string (such as "all", "none", ...)
-  void selFromStep(QTreeWidgetItem*,QString);//  Methode to set all elements of a MedGUI_Field when selection is made from a MedGUI_Step to (un)selected according to a string (such as "all", "none", ...)
+  void selFromFile(QTreeWidgetItem*, QString);//  Method to set all elements of a MedGUI_LiteStruct to (un)selected according to a string (such as "all", "none", ...)
+  void selFromField(QTreeWidgetItem*, QString);//  Method to set all elements of a MedGUI_Field to (un)selected according to a string (such as "all", "none", ...)
+  void selFromStep(QTreeWidgetItem*,QString);//  Method to set all elements of a MedGUI_Field when selection is made from a MedGUI_Step to (un)selected according to a string (such as "all", "none", ...)
   
 public slots:
   void openFile();//  Create a new MedGUI_LiteStruct from a file and add content to QTreeWidgets

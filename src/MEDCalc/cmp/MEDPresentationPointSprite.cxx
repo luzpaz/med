@@ -59,7 +59,7 @@ MEDPresentationPointSprite::internalGeneratePipeline()
 
   MEDPyLockWrapper lock;
 
-  setOrCreateRenderView(); // instanciate __viewXXX
+  setOrCreateRenderView(); // instantiate __viewXXX
   createSource();
 
   // Populate internal array of available components:

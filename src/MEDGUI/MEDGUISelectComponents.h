@@ -39,7 +39,7 @@ namespace Ui
 
 //  This class is implemented to provide a dialog box for selecting fields components and/or setting components names
 //  The basic graphic part was made with QtDesigner4 and is in MedGUI_FileContentDial.ui file
-//  It use a MedGUI_LiteStruct object to get components informations
+//  It use a MedGUI_LiteStruct object to get components information
 //  If one field is selected (call made from a step or a field), the box will only display components from this field
 //  If all fields are selected (call made on MED file), the box will display all the components for each field
 

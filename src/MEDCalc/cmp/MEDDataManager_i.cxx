@@ -93,7 +93,7 @@ std::string MEDDataManager_i::source_to_file(const char * source)
 /*!
  * This function loads the meta-data from the specified med file and
  * returns the associated datasource handler. The data source handler
- * is a key to retrieve all informations concerning the data (meshes,
+ * is a key to retrieve all information concerning the data (meshes,
  * fields).
  */
 MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepath) {
@@ -153,7 +153,7 @@ MEDCALC::DatasourceHandler * MEDDataManager_i::loadDatasource(const char *filepa
 
           // As a consequence, before loading values of a field, we have
           // to determine the types of spatial discretization defined for
-          // this field and to chooose one.
+          // this field and to choose one.
 
           vector<TypeOfField> listOfTypes = GetTypesOfField(filepath,
               meshName,
@@ -269,12 +269,12 @@ MEDCALC::MeshHandler * MEDDataManager_i::getMeshHandler(CORBA::Long meshId) {
 
 /*!
  * This function returns the list of mesh handlers associated to the
- * specified datasource. It corresponds to the list ofmeshes defined
+ * specified datasource. It corresponds to the list of meshes defined
  * in the datasource.
  */
 MEDCALC::MeshHandlerList * MEDDataManager_i::getMeshHandlerList(CORBA::Long datasourceId) {
 
-  // We initiate a list with the maximum lentgh
+  // We initiate a list with the maximum length
   MEDCALC::MeshHandlerList_var meshHandlerList = new MEDCALC::MeshHandlerList();
   meshHandlerList->length(_meshHandlerMap.size());
 
@@ -298,7 +298,7 @@ MEDCALC::MeshHandlerList * MEDDataManager_i::getMeshHandlerList(CORBA::Long data
  * specified mesh.
  */
 MEDCALC::FieldseriesHandlerList * MEDDataManager_i::getFieldseriesListOnMesh(CORBA::Long meshId) {
-  // We initiate a list with the maximum lentgh
+  // We initiate a list with the maximum length
   MEDCALC::FieldseriesHandlerList_var
     fieldseriesHandlerList = new MEDCALC::FieldseriesHandlerList();
   fieldseriesHandlerList->length(_fieldseriesHandlerMap.size());
@@ -324,7 +324,7 @@ MEDCALC::FieldseriesHandlerList * MEDDataManager_i::getFieldseriesListOnMesh(COR
  */
 MEDCALC::FieldHandlerList * MEDDataManager_i::getFieldListInFieldseries(CORBA::Long fieldseriesId) {
 
-  // We initiate a list with the maximum lentgh
+  // We initiate a list with the maximum length
   MEDCALC::FieldHandlerList_var fieldHandlerList = new MEDCALC::FieldHandlerList();
   fieldHandlerList->length(_fieldHandlerMap.size());
 
@@ -369,9 +369,9 @@ MEDCALC::FieldHandler * MEDDataManager_i::getFieldHandler(CORBA::Long fieldHandl
   FieldHandlerMapIterator fieldIt = _fieldHandlerMap.find(fieldHandlerId);
   if ( fieldIt != _fieldHandlerMap.end() ) {
     // >>> WARNING: CORBA struct specification indicates that the
-    // assignement acts as a desctructor for the structure that is
-    // pointed to. The values of the fields are copy first in the new
-    // structure that receives the assignement and finally the initial
+    // assignment acts as a destructor for the structure that its
+    // pointed to. The values of the fields are copied first in the new
+    // structure that receives the assignment and finally the initial
     // structure is destroyed. In the present case, WE WANT to keep
     // the initial fieldHandler in the map. We must then make a deep
     // copy of the structure found in the map and return the copy. The
@@ -593,7 +593,7 @@ long MEDDataManager_i::getUMeshId(const MEDCouplingMesh * mesh) {
  * i.e. the MEDCoupling field associated to the specified field
  * handler. If the field source is a file and the data ar not loaded
  * yet, the this function load the data from the file in a MEDCoupling
- * field instance. Otherwize, it just returns the MEDCoupling field
+ * field instance. Otherwise, it just returns the MEDCoupling field
  * instance.
  */
 MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDCALC::FieldHandler * fieldHandler)
@@ -620,7 +620,7 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDCALC::FieldHa
   // one case where we can arrive here with no previous call to
   // loadDataSource: for example the field handler list can be obtained
   // from a call to addFieldsFromFile instead of loadDataSource (see
-  // for exemple the getFieldRepresentation service of the
+  // for example the getFieldRepresentation service of the
   // dataManager, that comes here and then calls getUMesh where we
   // need a map initialized only in loadDataSource) <<<<
   long meshid = fieldHandler->meshid;
@@ -674,7 +674,7 @@ MEDCALC::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fiel
   // WARN: note that the variables "iteration" and "order" are passed
   // by reference to the function getTime (see documentation of
   // MEDCouplingField). As a consequence, the values of these
-  // variables are updated by this function call. This is the mean to
+  // variables are updated by this function call. This is the means to
   // retrieve the iteration and order of the field.
   double timestamp = fieldDouble->getTime(iteration, order);
 
@@ -691,7 +691,7 @@ MEDCALC::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fiel
                                                        source->c_str());
 
   if ( meshHandlerId == LONG_UNDEFINED ) {
-    // We have to gess the id of the underlying mesh to preserve data
+    // We have to guess the id of the underlying mesh to preserve data
     // integrity (a fieldHandler must have an attribute that contains
     // the id of its underlying mesh):
     //
@@ -714,9 +714,9 @@ MEDCALC::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fiel
 
   _fieldHandlerMap[fieldHandler->id] = fieldHandler;
   _fieldDoubleMap[fieldHandler->id] = fieldDouble;
-  // >>> WARNING: CORBA structure assignement specification ==> return
+  // >>> WARNING: CORBA structure assignment specification ==> return
   // >>> a deep copy to avoid the destruction of the fieldHandler
-  // >>> registered in the map (assignement acts as a destructor for
+  // >>> registered in the map (assignment acts as a destructor for
   // >>> CORBA struct).
   return new MEDCALC::FieldHandler(*fieldHandler);
 }
