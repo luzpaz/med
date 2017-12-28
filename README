@@ -73,7 +73,7 @@ In order to avoid most of the problem the user or the installer should first
 check the HDF5HOME and the MED2HOME environment variables. This version of
 Med Memory with Med File V2.2.2, V2.2.3, as well as V2.3.0 but with the
 version of HDF5 V1.6.3. In the installation of Med File you should take care
-of the $HDF5HOME environement variable. This warning is especially intended
+of the $HDF5HOME environment variable. This warning is especially intended
 to the user of The Med Memory in stand alone (without the SALOME KERNEL
 component).
 

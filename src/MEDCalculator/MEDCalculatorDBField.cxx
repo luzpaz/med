@@ -219,7 +219,7 @@ const MEDCalculatorDBFieldReal& MEDCalculatorDBFieldReal::operator=(const MEDCal
   std::vector<int> ids2=other._t.getIds(other._time_steps.size());
   unsigned int sz=ids.size();
   if(sz!=ids2.size())
-    throw INTERP_KERNEL::Exception("FieldReal::operator= : Timesteps lengthes mismatch !");
+    throw INTERP_KERNEL::Exception("FieldReal::operator= : Timesteps lengths mismatch !");
   fetchData();
   other.fetchData();
   for(unsigned int i=0;i<sz;i++)
@@ -263,7 +263,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::add(const MEDCalculatorDBFieldRe
   std::vector<int> ids=_t.getIds(_time_steps.size());
   std::vector<int> ids2=other._t.getIds(other._time_steps.size());
   if(ids.size()!=ids2.size())
-    throw INTERP_KERNEL::Exception("FieldReal::add : Timesteps lengthes mismatch !");
+    throw INTERP_KERNEL::Exception("FieldReal::add : Timesteps lengths mismatch !");
   int step=ids[0];
   int step2=ids2[0];
   const MEDCouplingMesh *mesh=_time_steps[step]->getMesh(_type,_file_name,_mesh_name,_field_name);
@@ -360,7 +360,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::substract(const MEDCalculatorDBF
   std::vector<int> ids=_t.getIds(_time_steps.size());
   std::vector<int> ids2=other._t.getIds(other._time_steps.size());
   if(ids.size()!=ids2.size())
-    throw INTERP_KERNEL::Exception("FieldReal::substract : Timesteps lengthes mismatch !");
+    throw INTERP_KERNEL::Exception("FieldReal::substract : Timesteps lengths mismatch !");
   int step=ids[0];
   int step2=ids2[0];
   const MEDCouplingMesh *mesh=_time_steps[step]->getMesh(_type,_file_name,_mesh_name,_field_name);
@@ -410,7 +410,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::multiply(const MEDCalculatorDBFi
   std::vector<int> ids=_t.getIds(_time_steps.size());
   std::vector<int> ids2=other._t.getIds(other._time_steps.size());
   if(ids.size()!=ids2.size())
-    throw INTERP_KERNEL::Exception("FieldReal::multiply : Timesteps lengthes mismatch !");
+    throw INTERP_KERNEL::Exception("FieldReal::multiply : Timesteps lengths mismatch !");
   int step=ids[0];
   int step2=ids2[0];
   const MEDCouplingMesh *mesh=_time_steps[step]->getMesh(_type,_file_name,_mesh_name,_field_name);
@@ -460,7 +460,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::divide(const MEDCalculatorDBFiel
   std::vector<int> ids=_t.getIds(_time_steps.size());
   std::vector<int> ids2=other._t.getIds(other._time_steps.size());
   if(ids.size()!=ids2.size())
-    throw INTERP_KERNEL::Exception("FieldReal::divide : Timesteps lengthes mismatch !");
+    throw INTERP_KERNEL::Exception("FieldReal::divide : Timesteps lengths mismatch !");
   int step=ids[0];
   int step2=ids2[0];
   const MEDCouplingMesh *mesh=_time_steps[step]->getMesh(_type,_file_name,_mesh_name,_field_name);
@@ -495,7 +495,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::dot(const MEDCalculatorDBFieldRe
   std::vector<int> ids2=other._t.getIds(other._time_steps.size());
   unsigned int sz=ids.size();
   if(sz!=ids2.size())
-    throw INTERP_KERNEL::Exception("FieldReal::dot : Timesteps lengthes mismatch !");
+    throw INTERP_KERNEL::Exception("FieldReal::dot : Timesteps lengths mismatch !");
   ret->_time_steps.resize(sz);
   for(unsigned int i=0;i<sz;i++)
     ret->_time_steps[i]=_time_steps[ids[i]]->dot(other._time_steps[ids2[i]],_c_labels.size(),_c,other._c_labels.size(),other._c);
@@ -515,7 +515,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::crossProduct(const MEDCalculator
   std::vector<int> ids2=other._t.getIds(other._time_steps.size());
   unsigned int sz=ids.size();
   if(sz!=ids2.size())
-    throw INTERP_KERNEL::Exception("FieldReal::crossProduct : Timesteps lengthes mismatch !");
+    throw INTERP_KERNEL::Exception("FieldReal::crossProduct : Timesteps lengths mismatch !");
   ret->_time_steps.resize(sz);
   for(unsigned int i=0;i<sz;i++)
     ret->_time_steps[i]=_time_steps[ids[i]]->crossProduct(other._time_steps[ids2[i]],_c_labels.size(),_c,other._c_labels.size(),other._c);
@@ -770,14 +770,14 @@ std::vector<MEDCouplingFieldDouble *> MEDCalculatorDBFieldReal::getFields() cons
 std::string MEDCalculatorDBFieldReal::getInfoOnComponent(int i) const throw(INTERP_KERNEL::Exception)
 {
   if(i>=(int)_c_labels.size())
-    throw INTERP_KERNEL::Exception("MEDCalculatorDBFieldReal::getInfoOnComponent : sepcified id >= number of component !");
+    throw INTERP_KERNEL::Exception("MEDCalculatorDBFieldReal::getInfoOnComponent : specified id >= number of component !");
   return _c_labels[i];
 }
 
 void MEDCalculatorDBFieldReal::setInfoOnComponent(int i, const char *info) throw(INTERP_KERNEL::Exception)
 {
   if(i>=(int)_c_labels.size())
-    throw INTERP_KERNEL::Exception("MEDCalculatorDBFieldReal::setInfoOnComponent : sepcified id >= number of component !");
+    throw INTERP_KERNEL::Exception("MEDCalculatorDBFieldReal::setInfoOnComponent : specified id >= number of component !");
   _c_labels[i]=info;
 }
 

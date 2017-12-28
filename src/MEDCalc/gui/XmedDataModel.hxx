@@ -72,7 +72,7 @@ public:
 // then get the result you are interested in, using the corresponding
 // "result*" function.
 //
-// 2) Alternativly, you can just call directly the suitable master
+// 2) Alternatively, you can just call directly the suitable master
 // "get*" function to process and get the result you are interested
 // in.
 //

@@ -118,10 +118,10 @@ void MEDCouplingMeshClient::fillMeshFromCorbaData(MEDCouplingMesh *meshCpp, SALO
   delete tinyD;
   DataArrayInt* a1=DataArrayInt::New();
   DataArrayDouble* a2=DataArrayDouble::New();
-  //thanks to the entry point tinyV get from the 1st CORBA invokation,
+  //thanks to the entry point tinyV get from the 1st CORBA invocation,
   //resizing a1,a2 and sts.
   std::vector<std::string> uselessVector;
-  //vector 'uselessVector' is useless thanks to CORBA that , contrary to MPI, does not need to allocate right length of arrays before invokation
+  //vector 'uselessVector' is useless thanks to CORBA that , contrary to MPI, does not need to allocate right length of arrays before invocation
   meshCpp->resizeForUnserialization(tinyV,a1,a2,uselessVector);
   SALOME_TYPES::ListOfLong *a1Corba;
   SALOME_TYPES::ListOfDouble *a2Corba;

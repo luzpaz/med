@@ -55,7 +55,7 @@ public:
   XmedConsoleDriver* getConsoleDriver() { return _consoleDriver; }
 
 public slots:
-  // Slots overiding TreeGuiManager
+  // Slots overriding TreeGuiManager
   void processItemList(QStringList itemNameIdList, int actionId);
 
   // Internal slots

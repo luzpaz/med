@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  MED MEDGUI : MED component GUI implemetation
+//  MED MEDGUI : MED component GUI implementation
 //  File   : MEDGUISelectComponents.cxx
 //  Module : MED
 //

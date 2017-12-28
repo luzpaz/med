@@ -68,7 +68,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   ret->resizeForUnserialization(tinyLV,array0,arrays);
   SALOME_TYPES::ListOfLong *bigArr0;
   SALOME_TYPES::ListOfDouble2 *bigArr;
-  //3rd CORBA invokation to get big content
+  //3rd CORBA invocation to get big content
   fieldPtr->getSerialisationData(bigArr0,bigArr);
   if(bigArr0->length()!=0)
     {

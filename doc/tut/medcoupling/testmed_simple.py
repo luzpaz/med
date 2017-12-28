@@ -70,7 +70,7 @@ print cmesh.getSpaceDimension()
 #print cmesh
 
 # WARN: In the current state of development of MEDLoader, only
-# unstructured meshes are supported for writting function in med
+# unstructured meshes are supported for writing function in med
 # files. We just have to convert the cartesian mesh in an unstructured
 # mesh before creating the field.
 umesh=cmesh.buildUnstructured();

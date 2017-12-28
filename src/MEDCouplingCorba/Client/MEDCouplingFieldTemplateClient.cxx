@@ -66,7 +66,7 @@ MEDCouplingFieldTemplate *MEDCouplingFieldTemplateClient::New(SALOME_MED::MEDCou
   DataArrayInt *array0;
   ret->resizeForUnserialization(tinyLV,array0);
   SALOME_TYPES::ListOfLong *bigArr0;
-  //3rd CORBA invokation to get big content
+  //3rd CORBA invocation to get big content
   fieldPtr->getSerialisationData(bigArr0);
   if(bigArr0->length()!=0)
     {
