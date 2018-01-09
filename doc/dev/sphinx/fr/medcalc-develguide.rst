@@ -185,9 +185,9 @@ Ecrire un service CORBA qui retourne une structure CORBA:
     _fieldHandlerMap[fieldHandler->id] = fieldHandler;
 
     // >>> WARNING: CORBA struct specification indicates that the
-    // assignement acts as a desctructor for the structure that is
+    // assignment acts as a destructor for the structure that is
     // pointed to. The values of the fields are copy first in the new
-    // structure that receives the assignement and finally the initial
+    // structure that receives the assignment and finally the initial
     // structure is destroyed. In the present case, WE WANT to keep
     // the initial fieldHandler in the map. We must then make a deep
     // copy of the structure found in the map and return the copy. The
