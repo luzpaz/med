@@ -20,7 +20,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  MED MEDGUI : MED component GUI implemetation
+//  MED MEDGUI : MED component GUI implementation
 //  File   : MEDGUIFileContentDial.cxx
 //  Module : MED
 #include "MEDGUIFileContentDial.h"
@@ -358,7 +358,7 @@ void MEDGUIFileContentDial::unselectAll()
 }
 
 //  Show in red the corresponding meshes from a field or a step or a field hoovered by mouse
-//  First clean alrady colored meshes list (color back in black and empty coloredMeshes vector)
+//  First clean already colored meshes list (color back in black and empty coloredMeshes vector)
 //  Then, get the id of the MEDGUILiteStruct corresponding to the currently hovered item
 //  Get corresponding meshes as string from the currently hovered item
 //  Get the corresponding root of the meshes QTreeWidget from the root of the fields QTreeWidget

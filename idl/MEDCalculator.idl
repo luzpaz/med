@@ -56,7 +56,7 @@ module MEDCALC
     /*! Linear transformation of the field f (factor*f+offset) */
     FieldHandler lin(in FieldHandler f, in double factor, in double offset)
       raises (SALOME::SALOME_Exception);
-    /*! Dublication of the field f */
+    /*! Duplication of the field f */
     FieldHandler dup(in FieldHandler f)
       raises (SALOME::SALOME_Exception);
 

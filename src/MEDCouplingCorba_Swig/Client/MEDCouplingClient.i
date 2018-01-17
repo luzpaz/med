@@ -652,10 +652,10 @@ def MEDCouplingDataArrayIntTupleIdiv(self,*args):
 def MEDCouplingDataArrayIntTupleImod(self,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.DataArrayIntTuple____imod___(self, self, *args)
-def ParaMEDMEMDenseMatrixIadd(self,*args):
+def MEDCouplingDenseMatrixIadd(self,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.DenseMatrix____iadd___(self, self, *args)
-def ParaMEDMEMDenseMatrixIsub(self,*args):
+def MEDCouplingDenseMatrixIsub(self,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.DenseMatrix____isub___(self, self, *args)
 %}

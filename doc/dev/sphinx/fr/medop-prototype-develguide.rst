@@ -515,7 +515,7 @@ l'interface du servant ``SALOME_MED_MEDOP``):
     FIELD pow(in FIELD f, in long power) raises (SALOME::SALOME_Exception);
     /*! Linear transformation of the field f (factor*f+offset) */
     FIELD lin(in FIELD f, in double factor, in double offset) raises (SALOME::SALOME_Exception);
-    /*! Dublication of the field f */
+    /*! Duplication of the field f */
     FIELD dup(in FIELD f) raises (SALOME::SALOME_Exception);
 
 Cette interface est implémentée dans la classe C++ ``MEDOP_i`` du

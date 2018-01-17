@@ -1,4 +1,4 @@
-# You first have to set the shell environement for medcoupling
+# You first have to set the shell environment for medcoupling
 # (see medcoupling/env.sh)
 
 all:
