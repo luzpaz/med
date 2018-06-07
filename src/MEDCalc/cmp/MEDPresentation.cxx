@@ -29,6 +29,14 @@
 
 #include <sstream>
 
+#if PY_VERSION_HEX < 0x03050000
+static char*
+Py_EncodeLocale(const wchar_t *text, size_t *error_pos)
+{
+	return _Py_wchar2char(text, error_pos);
+}
+#endif
+
 const std::string MEDPresentation::PROP_NAME  = "name";
 const std::string MEDPresentation::PROP_NB_COMPONENTS = "nbComponents";
 const std::string MEDPresentation::PROP_SELECTED_COMPONENT = "selectedComponent";
@@ -583,8 +591,8 @@ MEDPresentation::fillAvailableFieldComponents()
   execPyLine(oss.str());
   PyObject* p_obj = getPythonObjectFromMain("__nbCompo");
   long nbCompo;
-  if (p_obj && PyInt_Check(p_obj))
-    nbCompo = PyInt_AS_LONG(p_obj);
+  if (p_obj && PyLong_Check(p_obj))
+    nbCompo = PyLong_AS_LONG(p_obj);
   else
     {
       STDLOG("Unexpected Python error");
@@ -598,8 +606,8 @@ MEDPresentation::fillAvailableFieldComponents()
       execPyLine(oss2.str());
       PyObject* p_obj = getPythonObjectFromMain("__compo");
       std::string compo;
-      if (p_obj && PyString_Check(p_obj))
-        compo = std::string(PyString_AsString(p_obj));  // pointing to internal Python memory, so make a copy!!
+      if (p_obj && PyUnicode_Check(p_obj))
+        compo = std::string(Py_EncodeLocale(PyUnicode_AS_UNICODE(p_obj), NULL));  // pointing to internal Python memory, so make a copy!!
       else
         {
           STDLOG("Unexpected Python error");

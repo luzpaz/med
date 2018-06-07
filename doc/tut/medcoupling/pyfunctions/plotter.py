@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (C) 2012-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -26,6 +26,6 @@ def plot(function, start=0., stop=1., step=0.01):
     """
     arrX=numpy.arange(start, stop, step, dtype='float64')
     # function is a callable
-    arrY=map(function,arrX)
+    arrY=list(map(function,arrX))
     pylab.plot(arrX, arrY)
     pylab.show()

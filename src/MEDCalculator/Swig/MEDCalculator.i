@@ -170,8 +170,7 @@ namespace MEDCoupling
                if(!PySlice_Check(obj))
                  throw INTERP_KERNEL::Exception(msg);
                Py_ssize_t strt,stp,step;
-               PySliceObject *oC=reinterpret_cast<PySliceObject *>(obj);
-               PySlice_GetIndices(oC,std::numeric_limits<int>::max(),&strt,&stp,&step);
+               PySlice_GetIndices(obj,std::numeric_limits<int>::max(),&strt,&stp,&step);
                if(strt!=0 || stp!=std::numeric_limits<int>::max() || step!=1)
                  throw INTERP_KERNEL::Exception(msg);
                tr.setAll(); pr.setAll(); cr.setAll();
@@ -189,9 +188,9 @@ namespace MEDCoupling
                convertPyObjToRS2(obj2,cr,"for 3rd tuple element for components of field");
              }
            MCAuto<MEDCalculatorDBFieldReal> ret=self->operator()(tr,pr,cr);
-           if(PyInt_Check(val))
+           if(PyLong_Check(val))
              {
-               (*ret)=double(PyInt_AS_LONG(val));
+               (*ret)=double(PyLong_AS_LONG(val));
                ret->incrRef();
                return ret;
              }
@@ -401,6 +400,7 @@ def MEDCouplingDenseMatrixIsub(self,*args):
 %include "MEDCouplingFinalize.i"
 
 %pythoncode %{
+MEDCalculatorDBFieldReal.__rtruediv__ = MEDCalculatorDBFieldReal.__rdiv__
 def MEDCouplingMEDFileUMeshReduce(self):
   return MEDCouplingStdReduceFunct,(MEDFileUMesh,((),(self.__getstate__()),))
 MEDFileUMesh.__reduce__=MEDCouplingMEDFileUMeshReduce

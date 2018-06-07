@@ -45,34 +45,34 @@ def saveWorkspace(filename):
   """
   try:
     dataManager.savePersistentFields(filename)
-  except SALOME.SALOME_Exception, ex:
+  except SALOME.SALOME_Exception as ex:
     medcalc.err(ex.details.text)
 #
 
 # Clean workspace
-from medevents import notifyGui_cleanWorkspace
+from .medevents import notifyGui_cleanWorkspace
 def cleanWorkspace():
   dvars = pyConsoleGlobals
   if dvars is None:
     return
   all_keys = []
-  for varkey, var in dvars.items():
+  for varkey, var in list(dvars.items()):
     if isinstance(var, medcalc.FieldProxy):
       all_keys.append("%s"%varkey)
   if len(all_keys) > 0:
-    exec "del "+",".join(all_keys) in pyConsoleGlobals
+    exec("del "+",".join(all_keys), pyConsoleGlobals)
   notifyGui_cleanWorkspace()
 #
 
 # Remove variable from console
-from medevents import notifyGui_removeFromWorkspace
+from .medevents import notifyGui_removeFromWorkspace
 def removeFromWorkspace(fieldProxy):
   dvars = pyConsoleGlobals
   if dvars is None:
     return
-  for varkey, var in dvars.items():
+  for varkey, var in list(dvars.items()):
     if isinstance(var, medcalc.FieldProxy) and var.id == fieldProxy.id:
-      exec("del %s"%varkey) in pyConsoleGlobals
+      exec(("del %s"%varkey), pyConsoleGlobals)
   notifyGui_removeFromWorkspace(fieldProxy.id)
 #
 
@@ -90,7 +90,7 @@ def getEnvironment(local=True, remote=False):
       medcalc.inf("Type this command \"import medcalc; medcalc.setConsoleGlobals(globals())")
     if remote is True:
       status="========= Fields used in the current context ===\n"
-    for varkey in dvars.keys():
+    for varkey in list(dvars.keys()):
       var = dvars[varkey]
       if isinstance(var, medcalc.FieldProxy):
         status+="%s \t(id=%s, name=%s)\n"%(varkey,var.id,var.fieldname)
@@ -116,7 +116,7 @@ def getEnvironment(local=True, remote=False):
 #
 
 # For simpler typing, one can create a python command for status
-# (avoid to type "print getEnvironment()")
+# (avoid to type "print(getEnvironment())")
 class ListFields(object):
   """
   A stat object displays the status of the med operating context, i.e. the
@@ -140,7 +140,7 @@ la = ListFields(all=True)
 
 #
 # Add variable to workspace
-from medevents import notifyGui_putInWorkspace
+from .medevents import notifyGui_putInWorkspace
 def putInWorkspace(fieldProxy):
   """
   This function puts a reference to this field in the GUI data

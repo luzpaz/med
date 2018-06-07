@@ -64,7 +64,7 @@ class MEDGUITest(unittest.TestCase):
 
     base_pth = os.path.join(GetBaselineDirGUI(), basename)
     gen_path = os.path.join(self._tmpDir, basename)
-    print base_pth, gen_path
+    print(base_pth, gen_path)
     try:
       ret = filecmp.cmp(base_pth, gen_path, shallow=False)
     except OSError:

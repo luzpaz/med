@@ -20,6 +20,7 @@
 import medcalc
 import MEDCALC, SALOME
 from medcalc.medevents import notifyGui_addPresentation, notifyGui_removePresentation, notifyGui_error, notifyGui_modifyPresentation
+from functools import reduce
 
 __manager = medcalc.medcorba.factory.getPresentationManager()
 
@@ -149,7 +150,7 @@ def RemovePresentation(presentation_id):
 #
 
 def __GetGENERICParameters(tag, presentation_id):
-  exec "params = __manager.get%sParameters(presentation_id)" % tag
+  exec("params = __manager.get%sParameters(presentation_id)" % tag)
   return params
 
 GetMeshViewParameters = lambda pres_id: __GetGENERICParameters("MeshView", pres_id)
@@ -162,7 +163,7 @@ GetDeflectionShapeParameters = lambda pres_id: __GetGENERICParameters("Deflectio
 
 
 def __UpdateGENERIC(tag, presentation_id, params):
-  exec "__manager.update%s(presentation_id, params)" % tag
+  exec("__manager.update%s(presentation_id, params)" % tag)
   notifyGui_modifyPresentation(presentation_id)
 
 UpdateMeshView = lambda pres_id, params: __UpdateGENERIC("MeshView", pres_id, params)
@@ -178,7 +179,7 @@ def ComputeCellAverageSize(obj):
   @return the average cell size
   """
   bb, nCells = obj.GetDataInformation().GetBounds(), obj.GetDataInformation().GetNumberOfCells()
-  bb = zip(bb[::2], bb[1::2])
+  bb = list(zip(bb[::2], bb[1::2]))
   deltas = [x[1]-x[0] for x in bb]
   ## Filter out null dimensions:
   avgDelta = sum(deltas) / 3.0
@@ -193,7 +194,7 @@ def GetDomainCenter(obj):
   @return the center of the domain as the central point of the bounding box
   """
   bb = obj.GetDataInformation().GetBounds()
-  bb = zip(bb[::2], bb[1::2])
+  bb = list(zip(bb[::2], bb[1::2]))
   mids = [x[0] + 0.5*(x[1]-x[0]) for x in bb]
   return mids
 
@@ -204,7 +205,7 @@ def GetSliceOrigins(obj, nbSlices, normal):
   """
   from math import sqrt
   bb = obj.GetDataInformation().GetBounds()
-  bb = zip(bb[::2], bb[1::2])
+  bb = list(zip(bb[::2], bb[1::2]))
   origin = [x[0] + 0.5*(x[1]-x[0]) for x in bb]
   deltas = [x[1]-x[0] for x in bb]
   # Compute extent of slices:

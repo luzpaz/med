@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#  -*- coding: iso-8859-1 -*-
+#!/usr/bin/env python3
 # Copyright (C) 2007-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -61,7 +60,7 @@ if salome.lcc is None:
 __import__(corbaModule)
 factory=salome.lcc.FindOrLoadComponent(containerType,componentName)
 # This is not the main CORBA component of the SALOME module MED
-# (i.e. the engine associated to the active study), but the CORBA
+# (i.e. the engine associated to the study), but the CORBA
 # entry point for MED fields operations (i.e. a CORBA component
 # reachable throughout the LifeCycleCORBA). This entry point is used to
 # get the other SALOME CORBA components required for MED field
@@ -76,7 +75,7 @@ import os
 
 try:
     MED_ROOT_DIR=os.environ["MED_ROOT_DIR"]
-except KeyError, e:
+except KeyError as e:
     raise RuntimeError("MED_ROOT_DIR should be defined to load the test data")
 
 RESDIR=os.path.join(MED_ROOT_DIR,"share","salome","resources","med","medcalc_testfiles")
@@ -114,7 +113,7 @@ def TEST_loadDatasource():
     dataManager = factory.getDataManager()
     datasource = dataManager.loadDatasource(testFilePath)
     if datasource.name != testFileName:
-        print "ERR: datasource.name=%s (should be %s)"%(datasource.name,testFilePath)
+        print("ERR: datasource.name=%s (should be %s)"%(datasource.name,testFilePath))
         return False
 
     # We try to load the file twice. It should not load twice and
@@ -122,7 +121,7 @@ def TEST_loadDatasource():
     sourceid_ref = datasource.id
     datasource = dataManager.loadDatasource(testFilePath)
     if datasource.id != sourceid_ref:
-        print "ERR: datasource.id=%s (should be %s)"%(datasource.id,sourceid_ref)
+        print("ERR: datasource.id=%s (should be %s)"%(datasource.id,sourceid_ref))
         return False
 
     return True
@@ -141,7 +140,7 @@ def TEST_getFieldRepresentation():
     fieldHandlerList = dataManager.getFieldHandlerList()
     fieldHandler0 = fieldHandlerList[0]
 
-    print dataManager.getFieldRepresentation(fieldHandler0.id)
+    print(dataManager.getFieldRepresentation(fieldHandler0.id))
     return True
 
 def TEST_updateFieldMetadata():
@@ -159,10 +158,10 @@ def TEST_updateFieldMetadata():
                                     fieldHandler0.source)
 
     fieldHandlerModified = dataManager.getFieldHandler(fieldid)
-    print fieldHandlerModified
+    print(fieldHandlerModified)
 
     if fieldHandlerModified.fieldname != newname:
-        print "ERR: the name is %s (should be %s)"%(fieldHandlerModified.fieldname,newname)
+        print("ERR: the name is %s (should be %s)"%(fieldHandlerModified.fieldname,newname))
         return False
     return True
 
@@ -174,15 +173,15 @@ def TEST_saveFields():
     fieldIdList = [fieldHandler0.id]
     filepath = "/tmp/test_xmed_saveFields.med"
 
-    print "fieldIdList = %s"%fieldIdList
-    print "filepath = %s"%filepath
+    print("fieldIdList = %s"%fieldIdList)
+    print("filepath = %s"%filepath)
 
     dataManager.saveFields(filepath,fieldIdList)
     # We just control that the file exists. But we should reload the
     # contents to check the fields
     import os
     if not os.path.exists(filepath):
-        print "ERR: the file %s does not exist"%(filepath)
+        print("ERR: the file %s does not exist"%(filepath))
         return False
     return True
 
@@ -195,7 +194,7 @@ def TEST_MEDDataManager_getMeshList():
     dataManager = factory.getDataManager()
     datasourceHandler = dataManager.loadDatasource(testFilePath)
     meshHandlerList = dataManager.getMeshList(datasourceHandler.id)
-    print meshHandlerList
+    print(meshHandlerList)
 
     if len(meshHandlerList) == 0:
         return False
@@ -208,7 +207,7 @@ def TEST_MEDDataManager_getMesh():
     for mRef in meshHandlerList:
         meshId = mRef.id
         mRes = dataManager.getMesh(meshId)
-        print mRes
+        print(mRes)
         if ( mRes.name != mRef.name ) or ( mRes.sourceid != mRef.sourceid):
             return False
     return True
@@ -221,7 +220,7 @@ def TEST_MEDDataManager_getFieldseriesListOnMesh():
     # We look for the fieldseries defined on the first mesh of the list
     meshId = meshHandlerList[0].id
     fieldseriesList = dataManager.getFieldseriesListOnMesh(meshId)
-    print fieldseriesList
+    print(fieldseriesList)
 
     if len(fieldseriesList) == 0:
         return False
@@ -242,7 +241,7 @@ def TEST_MEDDataManager_getFieldListInFieldseries():
     # i.e. the time steps for this field.
     fieldseriesId = fieldseriesList[0].id
     fieldList = dataManager.getFieldListInFieldseries(fieldseriesId)
-    print fieldList
+    print(fieldList)
 
     if len(fieldList) == 0:
         return False
@@ -261,22 +260,22 @@ def TEST_Calculator_basics():
     # Try to operate on the two first fields
     fieldHandler0 = fieldHandlerList[0]
     fieldHandler1 = fieldHandlerList[1]
-    print fieldHandler0
-    print fieldHandler1
+    print(fieldHandler0)
+    print(fieldHandler1)
 
     calculator = factory.getCalculator()
     add = calculator.add(fieldHandler0, fieldHandler1)
-    print add
+    print(add)
     sub = calculator.sub(fieldHandler0, fieldHandler1)
-    print sub
+    print(sub)
     mul = calculator.mul(fieldHandler0, fieldHandler1)
-    print mul
+    print(mul)
     div = calculator.div(fieldHandler0, fieldHandler1)
-    print div
+    print(div)
     #power = calculator.pow(fieldHandler0, 2)
-    #print power
+    # print(power)
     linear = calculator.lin(fieldHandler0, 3,2)
-    print linear
+    print(linear)
 
     return True
 
@@ -291,12 +290,12 @@ def TEST_Calculator_applyFunc():
     import MEDCALC
     nbResultingComponent = MEDCALC.NBCOMP_DEFAULT
     res = calculator.fct(fieldHandler,"abs(u)",nbResultingComponent);
-    print res
+    print(res)
 
     # In this example, "a" stands for the first component
     nbResultingComponent = 1
     res = calculator.fct(fieldHandler,"a+2",nbResultingComponent)
-    print res
+    print(res)
 
     return True
 
@@ -320,7 +319,7 @@ def TEST_markAsPersistent():
     dataManager.savePersistentFields(filepath)
     import os
     if not os.path.exists(filepath):
-        print "ERR: the file %s does not exist"%(filepath)
+        print("ERR: the file %s does not exist"%(filepath))
         return False
     return True
 

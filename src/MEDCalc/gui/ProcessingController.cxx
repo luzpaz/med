@@ -82,9 +82,6 @@ ProcessingController::createActions()
 void
 ProcessingController::OnChangeUnderlyingMesh()
 {
-  // We need a studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
-
   // Get the selected objects in the study (SObject). In case of a
   // multiple selection, we consider only the first item. At least one
   // item must be selected.
@@ -143,9 +140,6 @@ ProcessingController::OnChangeUnderlyingMeshInputValidated()
 void
 ProcessingController::OnInterpolateField()
 {
-  // We need a studyEditor updated on the active study
-  _studyEditor->updateActiveStudy();
-
   // Get the selected objects in the study (SObject). In case of a
   // multiple selection, we consider only the first item. At least one
   // item must be selected.

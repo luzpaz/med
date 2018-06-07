@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-#  -*- coding: iso-8859-1 -*-
+#!/usr/bin/env python3
 # Copyright (C) 2011-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -53,7 +52,7 @@ sizeX = size
 nbNodesX = sizeX+1
 stepX = 0.1
 arrX = [float(i * stepX) for i in range(nbNodesX)]
-print "Size of arrX = %d"%len(arrX)
+print("Size of arrX = %d"%len(arrX))
 
 coordsX=MC.DataArrayDouble.New()
 coordsX.setValues(arrX,nbNodesX,1)
@@ -66,8 +65,8 @@ coordsY=MC.DataArrayDouble.New()
 coordsY.setValues(arrY,sizeY,1)
 
 cmesh.setCoords(coordsX,coordsY)
-print cmesh.getSpaceDimension()
-#print cmesh
+print(cmesh.getSpaceDimension())
+# print(cmesh)
 
 # WARN: In the current state of development of MEDLoader, only
 # unstructured meshes are supported for writing function in med

@@ -59,7 +59,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         pass
     
     def testMultiFetchingToTestMemoryManagement(self):
-        for i in xrange(1000):
+        for i in range(1000):
             meshPtr=self._objC.get2DMesh();
             _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
             meshPtr.UnRegister();
@@ -198,14 +198,14 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         li=8*[None]
         th=8*[None]
         fieldPtr=self._objC.getFieldScalarOn2DNT();
-        for i in xrange(8):
+        for i in range(8):
             th[i]=threading.Thread(None,self.corbaField2DNTMFMTThread,"Test"+str(i),(i,fieldPtr,li))
             th[i].start()
             pass
-        for i in xrange(8):
+        for i in range(8):
             th[i].join()
             pass
-        for i in xrange(8-1):
+        for i in range(8-1):
             self.assertTrue(li[i].isEqual(li[i+1],1.e-12,1.e-15));
             pass
         fieldPtr.UnRegister()
@@ -418,7 +418,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         ts=fotc.getTimeSteps();
         self.assertEqual(6,len(ts));
         expected=[0.2,0.7,1.2,1.35,1.7,2.7];
-        for i in xrange(6):
+        for i in range(6):
             self.assertAlmostEqual(expected[i],ts[i],12);
         pass
     

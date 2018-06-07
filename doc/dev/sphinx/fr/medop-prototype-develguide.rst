@@ -289,7 +289,7 @@ l'utilisateur pour désigner les champs dans les opérations.
 Ces classes proxy sont conçues pour être le lieu d'implémentation de
 l'interprétation des commandes utilisateur et donc de l'ergonomie
 de manipulation des champs au niveau l'interface textuelle. Ce point
-est développé :ref:`plus bas <develguide_execFieldOperation>`.
+est développé :ref:`plus bas <develguide_execFieldOperation-fr>`.
 
 Programmation de l'interface textuelle
 --------------------------------------
@@ -312,9 +312,9 @@ graphique en images:
 .. |IMG_SELECT| image:: ../images/medop-gui-selectfield_scale.png
 .. |IMG_ALIAS| image:: ../images/medop-gui-aliasfield_scale.png
 
-+---------------+---------------+
-| |IMG_SELECT|  | |IMG_ALIAS|   |
-+---------------+---------------+
++--------------+-------------+
+| |IMG_SELECT| | |IMG_ALIAS| |
++--------------+-------------+
 
 L'image de gauche montre la sélection du pas de temps, l'image de
 droite la boîte de dialogue qui permet la saisie de l'alias avec
@@ -423,7 +423,7 @@ associée à ce servant (en fait associée au servant
 ``SALOME_MED::MEDOP`` créé sur demande par le servant
 ``SALOME_MED::MED``, voir la fonction ``getFieldFromMed(...)``).
 
-.. _develguide_execFieldOperation:
+.. _develguide_execFieldOperation-fr:
 
 Exécution des opérations sur le champs
 --------------------------------------
@@ -543,9 +543,9 @@ module du champ dans l'exemple implémenté par défaut):
 .. |IMG_VISU| image:: ../images/medop-gui-visufield_scale.png
 .. |IMG_RESULT| image:: ../images/medop-gui-result_scale.png
 
-+---------------+---------------+
-| |IMG_VISU|    | |IMG_RESULT|  |
-+---------------+---------------+
++------------+--------------+
+| |IMG_VISU| | |IMG_RESULT| |
++------------+--------------+
 
 Cette fonction répond au besoin de contrôle interactif des résultats
 produits par les opérations de manipulation de champs.
@@ -561,7 +561,6 @@ donnée du servant ``SALOME_MED::FIELD`` qui lui est associé
    import VISU
 
    visuComp = salome.lcc.FindOrLoadComponent("FactoryServer", "VISU")
-   visuComp.SetCurrentStudy(salome.myStudy)
 
    # Then we can import the specified field in the VISU module. This
    # creates an study entry in the VISU folder.

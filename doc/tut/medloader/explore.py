@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (C) 2012-2016  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ READ_PHYSICAL_DATA=False
 
 for meshName in meshNames:
 
-    print "%s"%meshName
+    print("%s"%meshName)
 
     # At this step, one can load the mesh of name meshName (but it is
     # not an obligation to continue to explore the metadata)
@@ -53,7 +53,7 @@ for meshName in meshNames:
 
     for fieldName in fieldNames:
 
-        print "  %s"%fieldName
+        print("  %s"%fieldName)
         
         # A field name could identify several MEDCoupling fields, that
         # differ by their spatial discretization on the mesh (values on
@@ -71,7 +71,7 @@ for meshName in meshNames:
 
         listOfTypes = MEDLoader.GetTypesOfField(filepath,meshName,fieldName)
         for typeOfDiscretization in listOfTypes:
-            print "    %s"%typeOfDiscretization
+            print("    %s"%typeOfDiscretization)
 
             # Then, we can get the iterations associated to this field on
             # this type of spatial discretization:
@@ -85,7 +85,7 @@ for meshName in meshNames:
             for fieldIteration in fieldIterations:
                 itNumber = fieldIteration[0]
                 itOrder  = fieldIteration[1]
-                print "      (%s,%s)"%(itNumber,itOrder)
+                print("      (%s,%s)"%(itNumber,itOrder))
                 
                 if READ_PHYSICAL_DATA:
                     medCouplingField = MEDLoader.ReadField(typeOfDiscretization,
@@ -95,4 +95,4 @@ for meshName in meshNames:
                                                            fieldName,
                                                            itNumber,
                                                            itOrder)
-                    print medCouplingField
+                    print(medCouplingField)

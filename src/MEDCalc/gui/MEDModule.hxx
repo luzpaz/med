@@ -22,6 +22,7 @@
 #ifndef _MED_MODULE_HXX_
 #define _MED_MODULE_HXX_
 
+#include <Python.h>
 #include "MEDCALCGUI.hxx"
 
 #include <SalomeApp_Module.h>

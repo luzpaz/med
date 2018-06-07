@@ -36,16 +36,16 @@ def connectEventListener():
   try:
     eventListenerIOR = dataManager.getEventListenerIOR()
     __eventListener = salome.orb.string_to_object(eventListenerIOR)
-  except SALOME.SALOME_Exception, e:
+  except SALOME.SALOME_Exception as e:
     medcalc.wrn("The event listener is not running yet")
     msg ="When you'll have loaded the MED GUI, "
     msg+="call explicitly \"medcalc.medevents.connectEventListener()\" "
     msg+="to connect the GUI event listener"
     medcalc.inf(msg)
     __eventListener = None
-  except Exception, e:
+  except Exception as e:
     medcalc.err("An unknown error occurs. Check if this ior=%s is valid."%eventListenerIOR)
-    print e
+    print(e)
 #
 
 def eventListenerIsRunning():

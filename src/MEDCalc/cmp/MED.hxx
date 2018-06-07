@@ -25,7 +25,6 @@
 #include CORBA_SERVER_HEADER(MEDDataManager)
 #include CORBA_CLIENT_HEADER(SALOMEDS)
 #include <SALOME_Component_i.hxx>
-#include <SALOMEDS_Study.hxx>
 
 #include <map>
 #include <string>
@@ -44,46 +43,40 @@ public:
       const char* interfaceName);
   virtual ~MED();
 
-  MED_ORB::status addDatasourceToStudy(SALOMEDS::Study_ptr study,
-                                       const MEDCALC::DatasourceHandler& datasourceHandler);
+  MED_ORB::status addDatasourceToStudy(const MEDCALC::DatasourceHandler& datasourceHandler);
 
-  MED_ORB::status registerPresentationField(SALOMEDS::Study_ptr study,
-                                       CORBA::Long fieldId,
-                                       const char* name,
-                                       const char* type,
-                                       const char* ico,
-                                       CORBA::Long presentationId);
+  MED_ORB::status registerPresentationField(CORBA::Long fieldId,
+                                            const char* name,
+                                            const char* type,
+                                            const char* ico,
+                                            CORBA::Long presentationId);
 
-  MED_ORB::status registerPresentationMesh(SALOMEDS::Study_ptr study,
-                                         CORBA::Long meshId,
-                                         const char* name,
-                                         const char* type,
-                                         const char* ico,
-                                         CORBA::Long presentationId);
+  MED_ORB::status registerPresentationMesh(CORBA::Long meshId,
+                                           const char* name,
+                                           const char* type,
+                                           const char* ico,
+                                           CORBA::Long presentationId);
 
-  MED_ORB::status unregisterPresentation(SALOMEDS::Study_ptr study,
-                                         CORBA::Long presentationId);
+  MED_ORB::status unregisterPresentation(CORBA::Long presentationId);
 
 //  // Caller owns the returned list, and is responsible for the list deletion.
-//  MED_ORB::PresentationsList* getSiblingPresentations(SALOMEDS::Study_ptr study,
-//                                                      CORBA::Long presentationId);
+//  MED_ORB::PresentationsList* getSiblingPresentations(CORBA::Long presentationId);
 
   // Get all presentations registered in the study
-  MED_ORB::PresentationsList* getStudyPresentations(SALOMEDS::Study_ptr study);
+  MED_ORB::PresentationsList* getStudyPresentations();
 
-  char* getStudyPresentationEntry(SALOMEDS::Study_ptr study, CORBA::Long presentationId);
+  char* getStudyPresentationEntry(CORBA::Long presentationId);
 
   void cleanUp();
 
   /*! Dump the study as a Python file */
-  virtual Engines::TMPFile* DumpPython(CORBA::Object_ptr theStudy,
-                                       CORBA::Boolean isPublished,
+  virtual Engines::TMPFile* DumpPython(CORBA::Boolean isPublished,
                                        CORBA::Boolean isMultiFile,
                                        CORBA::Boolean& isValidScript);
 
   // For tooltips
   virtual CORBA::Boolean hasObjectInfo();
-  virtual char* getObjectInfo(CORBA::Long studyId, const char* entry);
+  virtual char* getObjectInfo(const char* entry);
 
  private:
   std::map<long, std::string> _fieldSeriesEntries;

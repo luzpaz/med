@@ -145,7 +145,7 @@ de type valeur numérique.
 Par exemple, la formule ``W=OP(U,V)`` indique que le champ W est formé
 à partir des champs U et V en arguments d'une fonction OP. Dans le cas
 d'une opération algébrique comme l'addition (cf. :ref:`Spécification
-des opérations<xmed-specifications>`, le résultat attendu par défaut
+des opérations<xmed-specifications-fr>`, le résultat attendu par défaut
 est que pour chaque instant t, chaque position p et chaque composante
 c, on a ``W(t,p,c)=U(t,p,c)+V(t,p,c)`` (que l'on peut noter également
 ``W(:,:,:)=U(:,:,:)+V(:,:,:)`` compte-tenu de la convention présentée
@@ -347,7 +347,7 @@ Un scénario d'utilisation type est:
     tableaux de valeurs sauvegardés dans un fichier texte ou exporté
     sous forme de tableau numpy
 
-.. _xmed-specifications:
+.. _xmed-specifications-fr:
 
 Spécification des opérations
 ============================

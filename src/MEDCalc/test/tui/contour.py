@@ -41,5 +41,5 @@ try:
   presentation_id = medcalc.MakeContour(accessField(55), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
   sys.exit(-1);
 except:
-  print "Contour failed as expected."
+  print("Contour failed as expected.")
 sleep(1)

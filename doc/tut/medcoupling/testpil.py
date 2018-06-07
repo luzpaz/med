@@ -43,20 +43,20 @@ def image2matrix():
     # Get the data
     imgdata=imgbw.getdata()
     width,height=imgbw.size
-    print list(imgdata)
-    print width,height
+    print(list(imgdata))
+    print(width,height)
 
     # Convert the data in a matrix using numpy
     tab=numpy.array(imgdata,dtype='float64')
-    print list(tab)
-    print tab
+    print(list(tab))
+    print(tab)
     nbRows=height
     nbCols=width
     matrix=numpy.reshape(tab,(nbRows,nbCols))
     # Note that in the reshape function, the height (sizeY) of the image
     # is specified first, because it corresponds to the number of rows.
-    print matrix
-    print list(matrix)
+    print(matrix)
+    print(list(matrix))
 
 import MEDCoupling as MC
 import MEDLoader as ML
@@ -93,7 +93,7 @@ def createMesh(meshname, sizeX, sizeY):
     coordsY.setValues(arrY,nbNodesY,1)
     
     cmesh.setCoords(coordsX,coordsY)
-    print "Imagem mesh dimension: %d"%cmesh.getSpaceDimension()
+    print("Imagem mesh dimension: %d"%cmesh.getSpaceDimension())
     
     # WARN: In the current state of development of MEDLoader, only
     # unstructured meshes are supported for writing function in med

@@ -83,7 +83,7 @@ class FieldBuilder:
         coordsY.setValues(arrY,nbNodesY,1)
 
         cmesh.setCoords(coordsX,coordsY)
-        print "Imagem mesh dimension: %d"%cmesh.getSpaceDimension()
+        print("Imagem mesh dimension: %d"%cmesh.getSpaceDimension())
 
         # WARN: In the current state of development of MEDLoader, only
         # unstructured meshes are supported for writing function in med

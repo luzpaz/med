@@ -20,6 +20,7 @@
 #ifndef SRC_MEDCALC_GUI_MEDWIDGETHELPER_HXX_
 #define SRC_MEDCALC_GUI_MEDWIDGETHELPER_HXX_
 
+#include <Python.h>
 #include "WidgetPresentationParameters.hxx"
 #include "PresentationEvent.hxx"
 

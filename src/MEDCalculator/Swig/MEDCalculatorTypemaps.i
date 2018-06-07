@@ -20,6 +20,14 @@
 
 #include <limits>
 
+#if PY_VERSION_HEX < 0x03050000
+static char*
+Py_EncodeLocale(const wchar_t *text, size_t *error_pos)
+{
+   return _Py_wchar2char(text, error_pos);
+}
+#endif
+
 static PyObject* convertMEDCalculatorDBField(MEDCoupling::MEDCalculatorDBField *f, int owner)
 {
   PyObject *ret=0;
@@ -32,15 +40,15 @@ static PyObject* convertMEDCalculatorDBField(MEDCoupling::MEDCalculatorDBField *
 
 void convertPyObjToRS(PyObject *o, MEDCoupling::MEDCalculatorDBRangeSelection& rs)
 {
-  if(PyInt_Check(o))
+  if(PyLong_Check(o))
     {
-      int val=(int)PyInt_AS_LONG(o);
+      int val=(int)PyLong_AS_LONG(o);
       rs=val;
       return ;
     }
   if(PyString_Check(o))
     {
-      char *s=PyString_AsString(o);
+      char *s=Py_EncodeLocale(PyUnicode_AS_UNICODE(o), NULL);
       rs=s;
       return ;
     }
@@ -49,9 +57,9 @@ void convertPyObjToRS(PyObject *o, MEDCoupling::MEDCalculatorDBRangeSelection& r
 
 void convertPyObjToRS2(PyObject *o, MEDCoupling::MEDCalculatorDBRangeSelection& rs, const char *msg)
 {
-  if(PyInt_Check(o))
+  if(PyLong_Check(o))
     {
-      int val=(int)PyInt_AS_LONG(o);
+      int val=(int)PyLong_AS_LONG(o);
       rs=val;
       return ;
     }
@@ -62,8 +70,7 @@ void convertPyObjToRS2(PyObject *o, MEDCoupling::MEDCalculatorDBRangeSelection& 
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
   Py_ssize_t strt,stp,step;
-  PySliceObject *oC=reinterpret_cast<PySliceObject *>(o);
-  PySlice_GetIndices(oC,std::numeric_limits<int>::max(),&strt,&stp,&step);
+  PySlice_GetIndices(o,std::numeric_limits<int>::max(),&strt,&stp,&step);
   rs.setPyStart(strt);
   rs.setPyEnd(stp);
 }

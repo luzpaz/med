@@ -45,7 +45,7 @@ import MEDCALC   # corbaModule
 med_engine = salome.lcc.FindOrLoadComponent(containerType,medComponentName)
 factory = salome.lcc.FindOrLoadComponent(containerType,factoryComponentName)
 # The factory is not the main CORBA component of the SALOME module MED
-# (i.e. the engine associated to the active study), but the CORBA
+# (i.e. the engine associated to the study), but the CORBA
 # entry point for MED fields operations (i.e. a CORBA component
 # reachable through the LifeCycleCORBA). This entry point is used to
 # get the other SALOME CORBA components required for MED field

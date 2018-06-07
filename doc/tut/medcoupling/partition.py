@@ -76,4 +76,4 @@ numberOf3DVolSharing=revDescI.deltaShiftIndex()
 ids2D=numberOf3DVolSharing.findIdsEqual(1)
 skin_V650=m2D[ids2D]
 # We can check if the two skins are identical
-print "Are two meshes equal between V660 and V650 ?",skin.isEqual(skin_V650,1e-12)
+print("Are two meshes equal between V660 and V650 ?",skin.isEqual(skin_V650,1e-12))
