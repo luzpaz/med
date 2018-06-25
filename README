@@ -98,7 +98,7 @@ Memory, the installer may run:
 - test_MEDMEM_MeshingPoly
 
 To check the upper layer (CORBA, Client), the installer may run in the SALOME
-Python consol:
+Python console:
 
  - Med_Gen_test.py
  - medClient_test.py
