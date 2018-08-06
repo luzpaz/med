@@ -1,9 +1,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
- Documentation du module MED
+ Documentation du module FIELDS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Le module SALOME MED (pour Modèle d'Echange de Données) fournit la
+Le module SALOME FIELDS (pour Modèle d'Echange de Données) fournit la
 bibliothèque MEDCoupling (bibliothèque C++ dédiée à la manipulation de
 maillages et de champs conformes au modèle MED), ainsi qu'une
 interface graphique pour la réalisation des opérations de manipulation

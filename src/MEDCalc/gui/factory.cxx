@@ -33,7 +33,7 @@
  * configuration below is MEDModule.
  */
 
-#include <MED_version.h>
+#include <FIELDS_version.h>
 #include "MEDModule.hxx"
 #include "MEDCALCGUI.hxx"
 
@@ -59,7 +59,7 @@ extern "C" {
 
   /*! This function specifies the version of the module to be displayed in the about dialog box */
   MEDCALCGUI_EXPORT char* getModuleVersion() {
-    return (char*)SALOMEMED_VERSION_STR;
+    return (char*)SALOMEFIELDS_VERSION_STR;
   }
 
 }

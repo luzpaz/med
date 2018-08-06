@@ -32,7 +32,7 @@
 # containerType = Name of the container factory
 #
 factoryComponentName = "MEDFactory"
-medComponentName = "MED"
+medComponentName = "FIELDS"
 #corbaModule   = "MEDCALC"
 containerType = "FactoryServer"
 
@@ -44,7 +44,7 @@ if salome.lcc is None:
 import MEDCALC   # corbaModule
 med_engine = salome.lcc.FindOrLoadComponent(containerType,medComponentName)
 factory = salome.lcc.FindOrLoadComponent(containerType,factoryComponentName)
-# The factory is not the main CORBA component of the SALOME module MED
+# The factory is not the main CORBA component of the SALOME module FIELDS
 # (i.e. the engine associated to the study), but the CORBA
 # entry point for MED fields operations (i.e. a CORBA component
 # reachable through the LifeCycleCORBA). This entry point is used to

@@ -32,7 +32,7 @@ DlgImageToMed::DlgImageToMed(QDialog *parent) : GenericDialog(parent)
 {
   ui.setupUi(this->getPanel());
 
-  QString moduleName = "MED";
+  QString moduleName = "FIELDS";
   QPixmap aPixmap = GUI::getResourcesManager()->loadPixmap( moduleName, tr("ICO_FOLDER") );
   QIcon icon(aPixmap);
   ui.btnImageFileChooser->setIcon(icon);

@@ -5,10 +5,10 @@
 .. include:: medcalc-definitions.rst
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-MED module: User guide for graphical interface
+FIELDS module: User guide for graphical interface
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This document is a quick guide for Graphical User Interface of MED module. It
+This document is a quick guide for Graphical User Interface of FIELDS module. It
 shows how to use this module on the basis of a few reference examples, built
 from use cases identified during requirement analysis stage.
 
@@ -25,10 +25,10 @@ from use cases identified during requirement analysis stage.
              7, VISU module has been replaced by PARAVIS module. The
              look-and-feel may thus be slightly different.
 
-General presentation of MED module
+General presentation of FIELDS module
 ==================================
 
-The overall ergonomics of MED module for field manipulation is inspired by
+The overall ergonomics of FIELDS module for field manipulation is inspired by
 software such as octave or scilab. It combines a graphical interface (GUI) to
 select and prepare data, with a textual interface (the python console, TUI)
 for actual work on data.
@@ -61,10 +61,10 @@ A typical use of field manipulation functions is:
 5. Save (parts of) produced fields to a med file.
 
 
-Quick tour on functions available in MED module
+Quick tour on functions available in FIELDS module
 ===============================================
 
-This section presents some use examples of MED module like a "storyboard",
+This section presents some use examples of FIELDS module like a "storyboard",
 illustrating the functions proposed by the module.
 
 .. warning:: This section is under construction. Please consider that its
@@ -189,7 +189,7 @@ file name:
    :align: center
    :width: 800px
 
-The file ``result.med`` can then be reloaded in MED module (or PARAVIS module)
+The file ``result.med`` can then be reloaded in FIELDS module (or PARAVIS module)
 to check the presence of saved fields.
 
 .. BUG: plantage à l'utilsation dans XMED d'un fichier rechargé
@@ -540,7 +540,7 @@ Example 8: Continue analysis in PARAVIS
 
    * Export fields to PARAVIS module
 
-The solutions for field representation in MED module aims at proposing a quick
+The solutions for field representation in FIELDS module aims at proposing a quick
 visual control.
 
 For a detailed analysis of fields, user shall switch to PARAVIS. The field

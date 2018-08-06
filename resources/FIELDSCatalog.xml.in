@@ -75,18 +75,18 @@
         <component>
                 <component-name>MEDFactory</component-name>
                 <component-username>MEDCalc Factory</component-username>
-                <component-type>MED</component-type>
+                <component-type>FIELDS</component-type>
                 <component-author>Guillaume Boulant</component-author>
-                <component-version>@SALOMEMED_VERSION@</component-version>
+                <component-version>@SALOMEFIELDS_VERSION@</component-version>
                 <component-comment>Factory of SALOME components for MED Field operations</component-comment>
         </component>
 
         <component>
-            <component-name>MED</component-name>
-            <component-username>Med</component-username>
-            <component-type>MED</component-type>
-            <component-version>@SALOMEMED_VERSION@</component-version>
-            <component-comment>MED component engine</component-comment>
+            <component-name>FIELDS</component-name>
+            <component-username>Fields</component-username>
+            <component-type>FIELDS</component-type>
+            <component-version>@SALOMEFIELDS_VERSION@</component-version>
+            <component-comment>FIELDS component engine</component-comment>
         </component>
 
 </component-list>

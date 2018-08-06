@@ -85,10 +85,10 @@ public:
 
 extern "C"
 MEDCALC_EXPORT
-PortableServer::ObjectId* MEDEngine_factory( CORBA::ORB_ptr orb,
-                                             PortableServer::POA_ptr poa,
-                                             PortableServer::ObjectId* contId,
-                                             const char* instanceName,
-                                             const char* interfaceName );
+PortableServer::ObjectId* FIELDSEngine_factory( CORBA::ORB_ptr orb,
+                                               PortableServer::POA_ptr poa,
+                                               PortableServer::ObjectId* contId,
+                                               const char* instanceName,
+                                               const char* interfaceName );
 
 #endif

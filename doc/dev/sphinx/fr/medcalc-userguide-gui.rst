@@ -5,11 +5,11 @@
 .. include:: medcalc-definitions.rst
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Module MED: Guide d'utilisation de l'interface graphique
+Module FIELDS: Guide d'utilisation de l'interface graphique
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Ce document est un guide rapide pour l'utilisation de l'interface
-graphique du module MED. Il montre comment utiliser le module sur la
+graphique du module FIELDS. Il montre comment utiliser le module sur la
 base de quelques exemples de référence, inspirés des cas d'utilisation
 identifiés lors de l'analyse des besoins en matière de manipulation de
 champs.
@@ -23,7 +23,7 @@ champs.
    :local:
    :backlinks: none
 
-Présentation générale du module MED
+Présentation générale du module FIELDS
 ===================================
 
 L'ergonomie générale d'utilisation du module de manipulation de champs
@@ -70,7 +70,7 @@ processus de la forme suivante:
 5. Enregistrement d'une partie des champs produits dans un fichier med
 
 
-Tour rapide des fonctions du module MED
+Tour rapide des fonctions du module FIELDS
 =======================================
 
 Cette section présente des exemples d'utilisation du module XMED sous
@@ -623,7 +623,7 @@ Exemple 8: Continuer l'analyse dans PARAVIS
    * Export de champs vers le module PARAVIS.
 
 Les possibilités de représentation graphique des champs fournies par
-le module MED ont pour seul objectif le contrôle visuel rapide. Par
+le module FIELDS ont pour seul objectif le contrôle visuel rapide. Par
 défaut, le viewer de VISU est employé.
 
 Pour une analyse plus détaillées des champs, il est nécessaire de
@@ -655,7 +655,7 @@ carte de champ:
 
 .. _xmed.userguide.tui-fr:
 
-Utilisation de l'interface textuelle du module MED (TUI)
+Utilisation de l'interface textuelle du module FIELDS (TUI)
 ========================================================
 
 Toutes les opérations menées au moyen de l'interface graphique peuvent

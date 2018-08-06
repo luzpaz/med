@@ -58,7 +58,7 @@
 MED_ORB::MED_Gen_var MEDModule::_MED_engine;
 
 MEDModule::MEDModule() :
-  SalomeApp_Module("MED"), _studyEditor(0),
+  SalomeApp_Module("FIELDS"), _studyEditor(0),
   _datasourceController(0), _workspaceController(0), _presentationController(0),
   _processingController(0), _pvGuiElements(0)
 {
@@ -99,15 +99,15 @@ MEDModule::engine()
 void
 MEDModule::init()
 {
-  // initialize MED module engine (load, if necessary)
+  // initialize FIELDS module engine (load, if necessary)
   if ( CORBA::is_nil( _MED_engine ) ) {
     Engines::EngineComponent_var comp =
-      SalomeApp_Application::lcc()->FindOrLoad_Component( "FactoryServer", "MED" );
+      SalomeApp_Application::lcc()->FindOrLoad_Component( "FactoryServer", "FIELDS" );
     if (CORBA::is_nil( comp ))
-        STDLOG("Could not FindOrLoad_Component MED");
+        STDLOG("Could not FindOrLoad_Component FIELDS");
     _MED_engine = MED_ORB::MED_Gen::_narrow( comp );
     if (CORBA::is_nil( _MED_engine ))
-        STDLOG("Could not narrow MED engine");
+        STDLOG("Could not narrow FIELDS engine");
   }
 }
 
@@ -345,7 +345,7 @@ MEDModule::createStandardAction(const QString& label,
   if (iconName.isEmpty())
     ico = QIcon();
   else
-    ico = QIcon(resMgr->loadPixmap("MED", iconName));
+    ico = QIcon(resMgr->loadPixmap("FIELDS", iconName));
 
   QAction* action = createAction(-1,
                                  label,
@@ -413,7 +413,7 @@ MEDModule::itemClickGeneric(std::string & name, std::string & type, int & presId
   if (!model)
     return false;
 
-  if (item->componentDataType().toStdString() != "MED")
+  if (item->componentDataType().toStdString() != "FIELDS")
     return false;
   _PTR(SObject) obj = item->object();
   _PTR(GenericAttribute) anAttribute;

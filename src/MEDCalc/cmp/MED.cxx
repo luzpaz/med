@@ -84,12 +84,12 @@ MED::addDatasourceToStudy(const MEDCALC::DatasourceHandler& datasourceHandler)
       SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
 
       // find MED component; create it if not found
-      SALOMEDS::SComponent_var father = aStudy->FindComponent("MED");
+      SALOMEDS::SComponent_var father = aStudy->FindComponent("FIELDS");
       if (CORBA::is_nil(father)) {
         // create component
-        father = studyBuilder->NewComponent("MED");
+        father = studyBuilder->NewComponent("FIELDS");
         // set name attribute
-        father->SetAttrString("AttributeName", "MEDCalc");
+        father->SetAttrString("AttributeName", "FIELDS");
         // set icon attribute
         father->SetAttrString("AttributePixMap", "ICO_MED");
         // register component in the study
@@ -272,7 +272,7 @@ MED::unregisterPresentation(CORBA::Long presentationId)
   SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
 
   SALOMEDS::GenericAttribute_var anAttribute;
-  SALOMEDS::SComponent_var father = aStudy->FindComponent("MED");
+  SALOMEDS::SComponent_var father = aStudy->FindComponent("FIELDS");
   SALOMEDS::ChildIterator_var it = aStudy->NewChildIterator(father);
   for (it->InitEx(true); it->More(); it->Next()) {
     SALOMEDS::SObject_var child(it->Value());
@@ -307,7 +307,7 @@ MED::getStudyPresentations()
   SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
 
   SALOMEDS::GenericAttribute_var anAttribute;
-  SALOMEDS::SComponent_var father = aStudy->FindComponent("MED");
+  SALOMEDS::SComponent_var father = aStudy->FindComponent("FIELDS");
   SALOMEDS::ChildIterator_var it = aStudy->NewChildIterator(father);
   for (it->InitEx(true); it->More(); it->Next())
     {
@@ -339,7 +339,7 @@ MED::getStudyPresentationEntry(CORBA::Long presentationId)
   SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
 
   SALOMEDS::GenericAttribute_var anAttribute;
-  SALOMEDS::SComponent_var father = aStudy->FindComponent("MED");
+  SALOMEDS::SComponent_var father = aStudy->FindComponent("FIELDS");
   SALOMEDS::ChildIterator_var it = aStudy->NewChildIterator(father);
   for (it->InitEx(true); it->More(); it->Next())
     {
@@ -363,7 +363,7 @@ MED::DumpPython(CORBA::Boolean isPublished,
                 CORBA::Boolean isMultiFile,
                 CORBA::Boolean& isValidScript)
 {
-  SALOMEDS::SObject_var aSO = KERNEL::getStudyServant()->FindComponent("MED");
+  SALOMEDS::SObject_var aSO = KERNEL::getStudyServant()->FindComponent("FIELDS");
   if(CORBA::is_nil(aSO)) {
     std::cerr << "Error: Cannot find component MED\n";
     return new Engines::TMPFile(0);
@@ -475,7 +475,7 @@ extern "C"
     \param interfaceName SALOME component interface name
     \return CORBA object identifier of the registered servant
   */
-  PortableServer::ObjectId* MEDEngine_factory(CORBA::ORB_ptr orb,
+  PortableServer::ObjectId* FIELDSEngine_factory(CORBA::ORB_ptr orb,
                                               PortableServer::POA_ptr poa,
                                               PortableServer::ObjectId* contId,
                                               const char* instanceName,

@@ -5,14 +5,14 @@
 .. include:: medcalc-definitions.rst
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Module MED: Guide de développement du composant MEDCalc
+Module FIELDS: Guide de développement du composant MEDCalc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Le composant logiciel MEDCalc est un élément du module MED. Il fournit
+Le composant logiciel MEDCalc est un élément du module FIELDS. Il fournit
 une interface utilisateur pour la manipulation de maillages et de
 champs, composée d'une interface texte (TUI) et d'une interface
 graphique (GUI). L'interface graphique constitue l'interface graphique
-du module MED.
+du module FIELDS.
 
 Ce document est la documentation technique du composant MEDCalc. Il
 fournit les instructions à suivre pour installer le composant en vue
@@ -28,10 +28,10 @@ Mise en place de l'espace de développement
 Gestion de configuration du composant MEDCalc
 ---------------------------------------------
 
-Le composant logiciel MEDCalc est un package du module SALOME MED,
+Le composant logiciel MEDCalc est un package du module SALOME FIELDS,
 hébergé dans l'espace source au niveau du sous-répertoire
 `src/MEDCalc`. La gestion des fichiers sources est donc intégrée dans le
-module SALOME MED.
+module SALOME FIELDS.
 
 Organisation des sources du composant MEDCalc
 ---------------------------------------------
@@ -42,7 +42,7 @@ suivants:
 * cmp: package containing the SALOME components
 * tui: package containing the python user interface
 * gui: package containing the graphical user interface (the GUI part
-  of the MED module)
+  of the FIELDS module)
 * res: resources files associated to the MEDCalc package (icons, config
   files, data files, ...)
 * exe: additional executable programs that can be launched from the
@@ -51,7 +51,7 @@ suivants:
 Construction du composant MEDCalc
 ---------------------------------
 
-Intégré à la construction du module MED. Le composant MEDCalc dépend de
+Intégré à la construction du module FIELDS. Le composant MEDCalc dépend de
 MEDCoupling et MEDLoader uniquement.
 
 Exécution des tests unitaires du composant MEDCalc
@@ -61,7 +61,7 @@ Les tests unitaires peuvent être exécutés au moyen de scripts python
 lancés depuis une session shell SALOME. Dans un nouveau shell, taper::
 
  $ ./appli/runSession
- [NS=mars:2810]$ python appli/bin/salome/med/test_medcalc_components.py
+ [NS=mars:2810]$ python appli/bin/salome/fields/test_medcalc_components.py
 
 L'exécution imprime un rapport détaillant le résultat pour chaque
 fonction de test::
@@ -80,21 +80,21 @@ fonction de test::
  test_saveFields (__main__.MyTestSuite) ... ok
  test_updateFieldMetadata (__main__.MyTestSuite) ... ok
 
-Les scripts de test sont installés dans le répertoire ``bin/med``. On trouve:
+Les scripts de test sont installés dans le répertoire ``bin/fields``. On trouve:
 
 * ``test_medcalc_components.py``: test les composants SALOME développés pour
   la manipulation de champs (``MEDDataManager`` et ``MEDCalculator``).
 * ``test_xmed_fieldOperations.py``: test des operations de champs telles
   qu'elles sont mises en oeuvre depuis l'interface textuelle.
 * ``test_xmed_uiEventListener.py``: test du système de notification
-  d'évènements des composants vers la partie gui du module MED.
+  d'évènements des composants vers la partie gui du module FIELDS.
 * ``test_xmed_visualisation.py``: test du système de visualisation
-  des champs tel que piloté depuis le module MED.
+  des champs tel que piloté depuis le module FIELDS.
 
 Architecture du module XMED
 ===========================
 
-Le module MED pour la manipulation de champs est composé de:
+Le module FIELDS pour la manipulation de champs est composé de:
 
 * une bibliothèque de fonctions pour le traitement de données sur des
   maillages et des champs conformes au modèle MED (package
@@ -212,7 +212,7 @@ ANNEXE B: Traçabilité avec le module XMED
 =========================================
 
 Le module SALOME de nom XMED est l'espace de développement initial du
-composant logiciel MEDCalc, intégré aujourd'hui au module MED. Cette
+composant logiciel MEDCalc, intégré aujourd'hui au module FIELDS. Cette
 annexe est la notice technique de ce module, qui reste disponible mais
 qui n'est plus maintenu.
 

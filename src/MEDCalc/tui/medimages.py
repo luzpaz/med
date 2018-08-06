@@ -130,8 +130,8 @@ class FieldBuilder:
 
 def getTestImagePath():
     import os
-    MED_ROOT_DIR=os.environ["MED_ROOT_DIR"]
-    RESDIR=os.path.join(MED_ROOT_DIR, "share", "salome", "resources", "med", "medcalc_testfiles")
+    FIELDS_ROOT_DIR=os.environ["FIELDS_ROOT_DIR"]
+    RESDIR=os.path.join(FIELDS_ROOT_DIR, "share", "salome", "resources", "fields", "medcalc_testfiles")
     imgFileName="irm_test1.png"
     imgFilePath=os.path.join(RESDIR,imgFileName)
     return imgFilePath

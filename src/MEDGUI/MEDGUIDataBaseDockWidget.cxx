@@ -49,11 +49,11 @@ MEDGUIDataBaseDockWidget::MEDGUIDataBaseDockWidget(CAM_Application *app, QWidget
   //
   QPixmap pixmap;
   SUIT_ResourceMgr* mgr=_app->resourceMgr();
-  pixmap=mgr->loadPixmap("MED","med_field.png");
+  pixmap=mgr->loadPixmap("FIELDS","med_field.png");
   _fields=new QTreeWidgetItem((QTreeWidget*)0,QStringList(QString("Fields")));
   _fields->setIcon(0,QIcon(pixmap));
   _tree_widget->addTopLevelItem(_fields);
-  pixmap=mgr->loadPixmap("MED","med_mesh.png");
+  pixmap=mgr->loadPixmap("FIELDS","med_mesh.png");
   _meshes=new QTreeWidgetItem((QTreeWidget*)0,QStringList(QString("Meshes")));
   _meshes->setIcon(0,QIcon(pixmap));
   _tree_widget->addTopLevelItem(_meshes);

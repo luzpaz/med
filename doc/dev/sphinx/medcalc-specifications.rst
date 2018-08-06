@@ -5,7 +5,7 @@
 .. include:: medcalc-definitions.rst
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Module MED: Spécifications fonctionnelles et techniques
+Module FIELDS: Spécifications fonctionnelles et techniques
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Ce texte présente les spécifications informatiques pour le
@@ -278,7 +278,7 @@ informatiques correspondant aux maillages sont différents (chargés de
 deux fichiers différents). En l'état, il est donc impossible par
 exemple de faire la comparaison de champs résultats d'une étude
 paramétriques. MEDCoupling fournit une solution qu'il faudra mettre en
-oeuvre de manière ergonomique au niveau du module MED. Il est possible
+oeuvre de manière ergonomique au niveau du module FIELDS. Il est possible
 de changer le maillage support M1 d'un champs par un maillage M2 à
 partir du moment où les maillages M1 et M2 sont identiques
 géométriquement à une erreur près qu'il est possible de spécifier.
@@ -756,7 +756,7 @@ Sur cette base, on peut envisager une grande variété de cas d'utilisation:
 Spécification des fonctions de visualisation
 ============================================
 
-Dans le cadre du module MED, on appelle *fonction de visualisation*
+Dans le cadre du module FIELDS, on appelle *fonction de visualisation*
 une fonction qui permet d'avoir un aperçu graphique d'un champ, par
 exemple au moyen d'une carte de champ construite sur une de ses
 composante. Il s'agit là de vue de contrôle pour avoir une idée rapide
@@ -765,9 +765,9 @@ préférera passer par les fonctions d'export vers le module PARAVIS.
 
 Les modules VISU et PARAVIS offre des interface de programmation C++
 et python qui permettent le pilotage depuis un module tiers comme le
-module MED. On peut donc envisager une fonction de visualisation
+module FIELDS. On peut donc envisager une fonction de visualisation
 intégrée au module de manipulation de champs, c'est-à-dire que l'on
-déclenche sans sortir du module MED, et qui exploite les fonctions de
+déclenche sans sortir du module FIELDS, et qui exploite les fonctions de
 visualisation des modules VISU et/ou PARAVIS.
 
 Les captures d'écran ci-dessous illustrent la mise en oeuvre de la
@@ -812,7 +812,7 @@ On adopte le principe de fonctionnement suivant:
   c’est-à-dire qu’il ne permet pas la sauvegarde du travail dans une
   étude au format hdf, ni le dump sous la forme de script python
   SALOME. Le besoin n'est pas avéré et on peut même dire que ça n'a
-  pas de sens compte-tenu de l'usage envisagé pour le module MED.
+  pas de sens compte-tenu de l'usage envisagé pour le module FIELDS.
 * Par contre, le module fournit des fonctions de sauvegarde du travail
   sous forme de fichiers med, l’export vers les modules VISU et
   PARAVIZ, ou même la sauvegarde de l’historique de l’interface de
@@ -831,7 +831,7 @@ Plusieurs export peuvent être proposés:
 
 * Export des champs vers le module PARAVIZ, dans l'objectif par
   exemple d'en faire une analyse visuelle plus poussée qu'avec les
-  cartes de champs disponibles par défaut dans le module MED
+  cartes de champs disponibles par défaut dans le module FIELDS
 * Export des données sous forme de tableau numpy, par exemple pour
   permettre un travail algorithmique sur les valeurs des champs.
 
@@ -839,12 +839,12 @@ Spécifications techniques
 =========================
 
 Il s'agit d'exprimer ici les contraintes techniques applicables à la
-conception et au développement du nouveau module MED.
+conception et au développement du nouveau module FIELDS.
 
 Implantation technique du module
 --------------------------------
 
-Il est convenu que le module MED existant dans la plate-forme SALOME
+Il est convenu que le module FIELDS existant dans la plate-forme SALOME
 incarne le module de manipulation de champ. Dans la pratique, il
 s'agit d'identifier clairement les parties à conserver, d'une part,
 puis les parties à re-écrire, d'autre part. On peut partir sur les
@@ -854,7 +854,7 @@ hypothèses techniques suivantes:
   champs proprement dites est construit sur la base des paquets
   logiciels MEDCoupling (lui-même basé sur le INTERP_KERNEL) et
   MEDLoader.
-* L'interface graphique du module MED est complétement re-écrite et
+* L'interface graphique du module FIELDS est complétement re-écrite et
   remplacée par une interface adaptée spécialement à la manipulation
   des champs et la gestion des données associées
 * Le contrôle visuel pourra être déclenché dans les visualisateurs
@@ -874,12 +874,12 @@ figure ci-dessous:
    :align: center
 
 Le schéma représente les packages logiciels qui composent le module
-MED (cf. |REF_CEA_VBE_MEDMEM|_):
+FIELDS (cf. |REF_CEA_VBE_MEDMEM|_):
 
 * La partie MEDMEM, représentées en blanc. Cette partie est conservée
   pour compatibilité ascendante au niveau des applications métier qui
   ont fait le choix historique de s'appuyer sur MEDMEM. Cette partie
-  du module MED aura tendance à disparaitre dans le futur au bénéfice
+  du module FIELDS aura tendance à disparaitre dans le futur au bénéfice
   de MEDCoupling et MEDLoader.
 * La partie MEDCoupling, représentée en orange et qui founrnit le
   modèle MED mémoire de référence (composé de maillage et de champs)

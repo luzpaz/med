@@ -194,8 +194,8 @@ void DatasourceController::OnAddImagesource()
   QString medFilename   = dialog.getMedFilepath();
   bool autoLoad         = dialog.isAutoLoaded();
 
-  std::string ROOT_DIR(getenv("MED_ROOT_DIR"));
-  std::string command(ROOT_DIR+"/bin/salome/med/image2med.py");
+  std::string ROOT_DIR(getenv("FIELDS_ROOT_DIR"));
+  std::string command(ROOT_DIR+"/bin/salome/fields/image2med.py");
   command += " -i "+QS2S(imageFilename);
   command += " -m "+QS2S(medFilename);
   int error = system(command.c_str());

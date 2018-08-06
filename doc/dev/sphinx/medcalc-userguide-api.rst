@@ -37,11 +37,11 @@ example to perform field projections from a mesh to another.
 Installation of the MEDMEM library
 ----------------------------------
 
-The MEDMEM library is part of the SALOME MED module and then is
+The MEDMEM library is part of the SALOME FIELDS module and then is
 installed together with this module by the installation process of
 SALOME. Nevertheless, it is possible for low-weight deployment to
 install only the MEDMEM library from the source files embedded in the
-SALOME MED module. Keep in mind that the MEDMEM library is designed to
+SALOME FIELDS module. Keep in mind that the MEDMEM library is designed to
 be a self-consistent library with very few third party software (only
 med-file, glibc and mpi typically). In particular, it is strictly
 independent from the SALOME framework even if it distributed with
@@ -117,7 +117,7 @@ Preparing the shell environment
 -------------------------------
 
 We make the hypothesis here that the MEDMEM library is installed using
-the SALOME procedure and then is located in the MED module
+the SALOME procedure and then is located in the FIELDS module
 installation directory. In addition to the MED library, the third
 party software required for executing the examples are: python, hdf5
 and med-fichier. Then, you should prepare your shell environment
@@ -142,11 +142,11 @@ with a set of instructions that looks like::
  export LD_LIBRARY_PATH=${MED2HOME}/lib:${LD_LIBRARY_PATH}
 
  #------ medmem ---
- MED_ROOT_DIR=<path/to/salome_med_module>
- export LD_LIBRARY_PATH=${MED_ROOT_DIR}/lib/salome:${LD_LIBRARY_PATH}
- PYTHONPATH=${MED_ROOT_DIR}/lib/python2.6/site-packages/salome:${PYTHONPATH}
- PYTHONPATH=${MED_ROOT_DIR}/bin/salome:${PYTHONPATH}
- PYTHONPATH=${MED_ROOT_DIR}/lib/salome:${PYTHONPATH}
+ FIELDS_ROOT_DIR=<path/to/salome_fields_module>
+ export LD_LIBRARY_PATH=${FIELDS_ROOT_DIR}/lib/salome:${LD_LIBRARY_PATH}
+ PYTHONPATH=${FIELDS_ROOT_DIR}/lib/python2.6/site-packages/salome:${PYTHONPATH}
+ PYTHONPATH=${FIELDS_ROOT_DIR}/bin/salome:${PYTHONPATH}
+ PYTHONPATH=${FIELDS_ROOT_DIR}/lib/salome:${PYTHONPATH}
  export PYTHONPATH
 
 Example 01: Explore a med file to get information concerning meshes and fields

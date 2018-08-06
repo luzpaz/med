@@ -1,9 +1,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-Documentation of MED module
+Documentation of FIELDS module
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The SALOME MED module provides MEDCoupling library (a C++ library dedicated of
+The SALOME FIELDS module provides MEDCoupling library (a C++ library dedicated of
 mesh and field manipulation consistent with MED model), as well as a Graphical
 User Interface to access some usual operations.
 

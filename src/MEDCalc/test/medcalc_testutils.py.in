@@ -20,7 +20,7 @@
 import os
 
 def __getRootDir():
-  rootDir = os.environ.get("MED_ROOT_DIR", "")
+  rootDir = os.environ.get("FIELDS_ROOT_DIR", "")
   return rootDir
 
 # === GUI ===

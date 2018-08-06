@@ -59,7 +59,7 @@ if salome.lcc is None:
     salome.salome_init()
 __import__(corbaModule)
 factory=salome.lcc.FindOrLoadComponent(containerType,componentName)
-# This is not the main CORBA component of the SALOME module MED
+# This is not the main CORBA component of the SALOME module FIELDS
 # (i.e. the engine associated to the study), but the CORBA
 # entry point for MED fields operations (i.e. a CORBA component
 # reachable throughout the LifeCycleCORBA). This entry point is used to
@@ -74,11 +74,11 @@ factory=salome.lcc.FindOrLoadComponent(containerType,componentName)
 import os
 
 try:
-    MED_ROOT_DIR=os.environ["MED_ROOT_DIR"]
+    FIELDS_ROOT_DIR=os.environ["FIELDS_ROOT_DIR"]
 except KeyError as e:
-    raise RuntimeError("MED_ROOT_DIR should be defined to load the test data")
+    raise RuntimeError("FIELDS_ROOT_DIR should be defined to load the test data")
 
-RESDIR=os.path.join(MED_ROOT_DIR,"share","salome","resources","med","medcalc_testfiles")
+RESDIR=os.path.join(FIELDS_ROOT_DIR,"share","salome","resources","fields","medcalc_testfiles")
 
 def getFilePath(filename):
     """
