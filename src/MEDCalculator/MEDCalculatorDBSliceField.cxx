@@ -96,7 +96,8 @@ MEDCouplingFieldDouble *MEDCalculatorDBSliceField::getField(TypeOfField type, co
 {
   if(!_field)
     {
-      MCAuto<MEDCouplingFieldDouble> tmp(ReadField(type,fname.c_str(),mname.c_str(),0,fieldName.c_str(),_iteration,_order));
+      MCAuto<MEDCouplingField> tmpp(ReadField(type,fname.c_str(),mname.c_str(),0,fieldName.c_str(),_iteration,_order));
+      MCAuto<MEDCouplingFieldDouble> tmp(DynamicCast<MEDCouplingField,MEDCouplingFieldDouble>(tmpp));
       _field=tmp.retn();
     }
   return _field;
