@@ -37,7 +37,13 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../../MEDCouplingCorba/Client
   )
 
-SWIG_ADD_MODULE(MEDCouplingClient python MEDCouplingClient.i)
+
+IF(${CMAKE_VERSION} VERSION_LESS "3.8.0") 
+  SWIG_ADD_MODULE(MEDCouplingClient python MEDCouplingClient.i)
+ELSE()
+  SWIG_ADD_LIBRARY(MEDCouplingClient LANGUAGE python SOURCES MEDCouplingClient.i)
+ENDIF()
+
 SWIG_LINK_LIBRARIES(MEDCouplingClient ${PYTHON_LIBRARIES} medcouplingclient)
 IF(WIN32)
   SET_TARGET_PROPERTIES(_MEDCouplingClient PROPERTIES DEBUG_OUTPUT_NAME _MEDCouplingClient_d)

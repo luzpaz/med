@@ -48,7 +48,12 @@ SET (SWIG_MODULE_MEDCouplingCorba_EXTRA_DEPS ${MEDCouplingCorba_SWIG_DPYS_FILES}
     ${medcoupling_HEADERS_HXX} ${medcoupling_HEADERS_TXX}
     ${interpkernel_HEADERS_HXX} ${interpkernel_HEADERS_TXX})
 
-SWIG_ADD_MODULE(MEDCouplingCorba python MEDCouplingCorba.i)
+IF(${CMAKE_VERSION} VERSION_LESS "3.8.0") 
+  SWIG_ADD_MODULE(MEDCouplingCorba python MEDCouplingCorba.i)
+ELSE()
+  SWIG_ADD_LIBRARY(MEDCouplingCorba LANGUAGE python SOURCES MEDCouplingCorba.i)
+ENDIF()
+
 SWIG_LINK_LIBRARIES(MEDCouplingCorba ${PYTHON_LIBRARIES} medcouplingcorba ${PLATFORM_LIBS})
 IF(WIN32)
   SET_TARGET_PROPERTIES(_MEDCouplingCorba PROPERTIES DEBUG_OUTPUT_NAME _MEDCouplingCorba_d)
