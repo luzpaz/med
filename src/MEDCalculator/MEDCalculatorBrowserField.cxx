@@ -63,12 +63,16 @@ MEDCalculatorBrowserField::MEDCalculatorBrowserField(const char *fname, const ch
   MCAuto<MEDCouplingFieldDouble> tmpf;
   try
     {
-      tmpf=ReadField(_type,fname,meshNames[0].c_str(),0,fieldName,dtits[0].first.first,dtits[0].first.second);
+      MCAuto<MEDCouplingField> tmpf2(ReadField(_type,fname,meshNames[0].c_str(),0,fieldName,dtits[0].first.first,dtits[0].first.second));
+      tmpf=DynamicCast<MEDCouplingField,MEDCouplingFieldDouble>(tmpf2);
     }
   catch(INTERP_KERNEL::Exception& e)
     {
       if(_type==ON_CELLS)
-        tmpf=ReadField(_type,fname,meshNames[0].c_str(),-1,fieldName,dtits[0].first.first,dtits[0].first.second);
+        {
+          MCAuto<MEDCouplingField> tmpf2(ReadField(_type,fname,meshNames[0].c_str(),-1,fieldName,dtits[0].first.first,dtits[0].first.second));
+          tmpf=DynamicCast<MEDCouplingField,MEDCouplingFieldDouble>(tmpf2);
+        }
       else
         throw e;
     }
