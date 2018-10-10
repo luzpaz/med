@@ -27,7 +27,11 @@ dataManager = factory.getDataManager()
 calculator  = factory.getCalculator()
 
 # Some helper functions to deal with the fields and meshes
-import MEDCoupling
+import sys
+if sys.platform == "win32":
+  import MEDCouplingCompat as MEDCoupling
+else:
+  import MEDCoupling
 __mapTypeOfFieldLabel = {
   MEDCoupling.ON_CELLS:    "ON_CELLS",
   MEDCoupling.ON_NODES:    "ON_NODES",

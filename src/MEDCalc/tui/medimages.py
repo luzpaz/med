@@ -20,7 +20,12 @@
 
 # Author : Guillaume Boulant (EDF)
 
-import MEDCoupling as MC
+import sys
+if sys.platform == "win32":
+  import MEDCouplingCompat as MC
+else:
+  import MEDCoupling as MC
+
 import MEDLoader as ML
 
 from PIL import Image
