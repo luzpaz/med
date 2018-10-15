@@ -30,7 +30,7 @@ programs as in python scripts for data processing on meshes and
 fields. The library contains the data structure to describe meshes and
 fields as C++ objects (MEDCoupling package). It provides a set of
 functions to manage the persistency toward the med file format
-(MEDLoader package), and to process the data througt interpolation and
+(MEDLoader package), and to process the data through interpolation and
 localization algorithms (INTERP_KERNEL and REMAPPER packages), for
 example to perform field projections from a mesh to another.
 
@@ -70,9 +70,9 @@ library:
    :align: center
 
 What we call MEDMEM library in this document is represented by the
-orange packages on this diagram. The white packages reprensent the old
-deprecated MEDMEM library. The blue packages represent the aditionnal
-components for field manipulation througth the user interface (TUI and
+orange packages on this diagram. The white packages represent the old
+deprecated MEDMEM library. The blue packages represent the additional
+components for field manipulation through the user interface (TUI and
 GUI).
 
 The MEDMEM library comes also with this set of atomic libraries for
@@ -267,7 +267,7 @@ The variables :tt:`mesh` and :tt:`field` in this code example are instances of
 the MEDCoupling classes describing the meshes and fields.
 
 Note that the read functions required the parameter
-:tt:`dimrestriction`. This parameter discreminates the mesh dimensions you
+:tt:`dimrestriction`. This parameter discriminates the mesh dimensions you
 are interested to relatively to the maximal dimension of cells
 contained in the mesh (then its value could be 0, -1, -2 or -3
 depending on the max dimension of the mesh). A value of
@@ -437,7 +437,7 @@ Example 08: Make a projection of a field
 ----------------------------------------
 
 :objectives: Make the projection of a field from a source mesh to a
-             target meshe. The source mesh and the target mesh are
+             target mesh. The source mesh and the target mesh are
              two different mesh of the same geometry.
 
 The input data of this use case are:
@@ -525,4 +525,3 @@ library.
 
 .. Example 01: Create a field from an image
 .. ----------------------------------------
-

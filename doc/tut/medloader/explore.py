@@ -42,7 +42,7 @@ for meshName in meshNames:
     if READ_PHYSICAL_DATA:
         mesh = MEDLoader.ReadUMeshFromFile(filepath,meshName,meshDimRelToMax)
     # Note that the read function required the parameter
-    # meshDimRelToMax. This parameter discreminates the meshdim you
+    # meshDimRelToMax. This parameter discriminates the meshdim you
     # are interested to relatively to the maximal dimension of cells
     # contained in the mesh in file (then its value could be 0, -1, -2
     # or -3 depending on the max dimension of the mesh. 0 means "no
@@ -54,15 +54,15 @@ for meshName in meshNames:
     for fieldName in fieldNames:
 
         print("  %s"%fieldName)
-        
+
         # A field name could identify several MEDCoupling fields, that
         # differ by their spatial discretization on the mesh (values on
         # cells, values on nodes, ...). This spatial discretization is
         # specified by the TypeOfField that is an integer value in this
         # list:
-        # 0 = ON_CELLS 	
-        # 1 = ON_NODES 	
-        # 2 = ON_GAUSS_PT 	
+        # 0 = ON_CELLS
+        # 1 = ON_NODES
+        # 2 = ON_GAUSS_PT
         # 3 = ON_GAUSS_NE
         #
         # As a consequence, before loading values of a field, we have
@@ -86,7 +86,7 @@ for meshName in meshNames:
                 itNumber = fieldIteration[0]
                 itOrder  = fieldIteration[1]
                 print("      (%s,%s)"%(itNumber,itOrder))
-                
+
                 if READ_PHYSICAL_DATA:
                     medCouplingField = MEDLoader.ReadField(typeOfDiscretization,
                                                            filepath,

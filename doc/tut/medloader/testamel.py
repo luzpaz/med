@@ -33,7 +33,7 @@ filepath = os.path.join(os.path.abspath(os.path.dirname(__file__)),filename)
 
 rmedfilename = filepath
 
-# Load the meshe data
+# Load the mesh data
 meshname = "Grid_80x80"
 fieldname = "Pulse"
 dimrestriction = 0 # no restriction
