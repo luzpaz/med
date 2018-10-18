@@ -30,19 +30,19 @@ def GetScriptDirGUI():
   return os.path.join(__getRootDir(), relativeDir)
 
 def GetScenarioDirGUI():
-  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/gui/scenarios"
+  relativeDir = "@SALOME_FIELDS_INSTALL_RES_DATA@/tests/gui/scenarios"
   return os.path.join(__getRootDir(), relativeDir)
 
 def GetBaselineDirGUI():
-  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/gui/baselines"
+  relativeDir = "@SALOME_FIELDS_INSTALL_RES_DATA@/tests/gui/baselines"
   return os.path.join(__getRootDir(), relativeDir)
 
 def GetMEDFileDirGUI():
-  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/gui/medfiles"
+  relativeDir = "@SALOME_FIELDS_INSTALL_RES_DATA@/tests/gui/medfiles"
   return os.path.join(__getRootDir(), relativeDir)
 
 # === TUI ===
 
 def GetMEDFileDirTUI():
-  relativeDir = "@SALOME_MED_INSTALL_RES_DATA@/tests/tui/medfiles"
+  relativeDir = "@SALOME_FIELDS_INSTALL_RES_DATA@/tests/tui/medfiles"
   return os.path.join(__getRootDir(), relativeDir)
