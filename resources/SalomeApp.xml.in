@@ -31,10 +31,10 @@
     <parameter name="version"       value="@SALOMEFIELDS_VERSION@"/>
   </section>
   <section name="med_help" >
-    <parameter name="User's Guide/Fields module/User's Guide"      value="%FIELDS_ROOT_DIR%/share/doc/salome/dev/FIELDS/index.html"/>    
-    <parameter name="User's Guide/Fields module/MEDCoupling/User's Guide" value="%MEDCOUPLING_ROOT_DIR%/share/doc/user/html/index.html"/>
-    <parameter name="User's Guide/Fields module/MEDCoupling/Developer's Guide" value="%MEDCOUPLING_ROOT_DIR%/share/doc/developer/index.html"/>
-    <parameter name="User's Guide/Fields module/MEDCoupling/Tutorial" value="%MEDCOUPLING_ROOT_DIR%/share/doc/tutorial/index.html"/>
+    <parameter name="User's Guide/Fields module/User's Guide"      value="%FIELDS_ROOT_DIR%/share/doc/salome/dev/FIELDS/index.html;;http://docs.salome-platform.org/latest/dev/FIELDS/index.html"/>
+    <parameter name="User's Guide/Fields module/MEDCoupling/User's Guide" value="%MEDCOUPLING_ROOT_DIR%/share/doc/user/html/index.html;;http://docs.salome-platform.org/latest/dev/MEDCoupling/user/html/index.html"/>
+    <parameter name="User's Guide/Fields module/MEDCoupling/Developer's Guide" value="%MEDCOUPLING_ROOT_DIR%/share/doc/developer/index.html;;http://docs.salome-platform.org/latest/dev/MEDCoupling/developer/index.html"/>
+    <parameter name="User's Guide/Fields module/MEDCoupling/Tutorial" value="%MEDCOUPLING_ROOT_DIR%/share/doc/tutorial/index.html;;http://docs.salome-platform.org/latest/dev/MEDCoupling/tutorial/index.html"/>
     <parameter name="User's Guide/Fields module/MEDFile/User Manual" value="%MEDFILE_ROOT_DIR%/share/doc/med/index.html"/>
   </section>
   <section name="resources">
