@@ -20,58 +20,66 @@ dnl
 dnl See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 dnl
 
-# Check availability of Med binary distribution
+# Check availability of Fields binary distribution
 #
 # Author : Nicolas REJNERI (OPEN CASCADE, 2003)
 #
 
-AC_DEFUN([CHECK_MED],[
+AC_DEFUN([CHECK_FIELDS],[
 AC_REQUIRE([AC_LINKER_OPTIONS])dnl
 AC_REQUIRE([CHECK_MED3])
 
-AC_CHECKING(for Med)
+AC_CHECKING(for Fields)
 
-Med_ok=no
+Fields_ok=no
 
-MED_LDFLAGS=""
-MED_CXXFLAGS=""
+FIELDS_LDFLAGS=""
+FIELDS_CXXFLAGS=""
 
-AC_ARG_WITH(med,
-	    [  --with-med=DIR root directory path of MED installation ],
-	    MED_DIR="$withval",MED_DIR="")
+AC_ARG_WITH(fields,
+	    [  --with-fields=DIR root directory path of Fields installation ],
+	    FIELDS_DIR="$withval",FIELDS_DIR="")
 
-if test "x${MED_DIR}" == "x" ; then
-  AC_MSG_RESULT(for \${MED_ROOT_DIR}: ${MED_ROOT_DIR})
-   # --with-med option is not used
-   if test "x${MED_ROOT_DIR}" != "x" ; then
-
-    # MED_ROOT_DIR environment variable defined
-      MED_DIR=${MED_ROOT_DIR}
-
+if test "x${FIELDS_DIR}" == "x" ; then
+   AC_MSG_RESULT(for \${FIELDS_ROOT_DIR}: ${FIELDS_ROOT_DIR})
+   # --with-fields option is not used
+   if test "x${FIELDS_ROOT_DIR}" != "x" ; then
+      # FIELDS_ROOT_DIR environment variable defined
+      FIELDS_DIR=${FIELDS_ROOT_DIR}
    fi
-
 fi
 
-if test -f ${MED_DIR}/idl/salome/MEDCouplingCorbaServant.idl ; then
-   AC_MSG_RESULT(Using Med module distribution in ${MED_DIR})
-   Med_ok=yes
+if test -f ${FIELDS_DIR}/idl/salome/MEDCouplingCorbaServant.idl ; then
+   AC_MSG_RESULT(Using Fields module distribution in ${FIELDS_DIR})
+   Fields_ok=yes
 
-   if test "x$MED_ROOT_DIR" == "x" ; then
-      MED_ROOT_DIR=${MED_DIR}
+   if test "x$FIELDS_ROOT_DIR" == "x" ; then
+      FIELDS_ROOT_DIR=${FIELDS_DIR}
    fi
 
-   AC_SUBST(MED_ROOT_DIR)
+   AC_SUBST(FIELDS_ROOT_DIR)
 
-   MED_LDFLAGS=-L${MED_DIR}/lib${LIB_LOCATION_SUFFIX}/salome
-   MED_CXXFLAGS=-I${MED_DIR}/include/salome
+   FIELDS_LDFLAGS=-L${FIELDS_DIR}/lib${LIB_LOCATION_SUFFIX}/salome
+   FIELDS_CXXFLAGS=-I${FIELDS_DIR}/include/salome
 
-   AC_SUBST(MED_LDFLAGS)
-   AC_SUBST(MED_CXXFLAGS)
+   AC_SUBST(FIELDS_LDFLAGS)
+   AC_SUBST(FIELDS_CXXFLAGS)
 
 else
-   AC_MSG_WARN("Cannot find Med module sources")
+   AC_MSG_WARN("Cannot find Fields module sources")
 fi
 
-AC_MSG_RESULT(for Med: $Med_ok)
+AC_MSG_RESULT(for Fields: $Fields_ok)
+
+dnl Backward compatibility
+MED_ROOT_DIR=${FIELDS_ROOT_DIR}
+MED_CXXFLAGS=${FIELDS_CXXFLAGS}
+MED_LDFLAGS=${FIELDS_LDFLAGS}
+AC_SUBST(MED_ROOT_DIR)
+AC_SUBST(MED_CXXFLAGS)
+AC_SUBST(MED_LDFLAGS)
 
 ])dnl
+
+dnl Backward compatibility
+AC_DEFUN([CHECK_MED],[CHECK_FIELDS])
