@@ -29,14 +29,14 @@ calculator  = factory.getCalculator()
 # Some helper functions to deal with the fields and meshes
 import sys
 if sys.platform == "win32":
-  import MEDCouplingCompat as MEDCoupling
+  import MEDCouplingCompat as medcoupling
 else:
-  import MEDCoupling
+  import medcoupling
 __mapTypeOfFieldLabel = {
-  MEDCoupling.ON_CELLS:    "ON_CELLS",
-  MEDCoupling.ON_NODES:    "ON_NODES",
-  MEDCoupling.ON_GAUSS_PT: "ON_GAUSS_PT",
-  MEDCoupling.ON_GAUSS_NE: "ON_GAUSS_NE"
+  medcoupling.ON_CELLS:    "ON_CELLS",
+  medcoupling.ON_NODES:    "ON_NODES",
+  medcoupling.ON_GAUSS_PT: "ON_GAUSS_PT",
+  medcoupling.ON_GAUSS_NE: "ON_GAUSS_NE"
   }
 #
 def _typeOfFieldLabel(typeOfField):
@@ -92,7 +92,9 @@ class FieldProxy:
     """
     self.__fieldHandler = fieldHandler
     self.__restriction  = None
-    print(self.__repr__())
+    from salome_utils import verbose
+    if verbose():
+      print(self.__repr__())
   #
   def __getattr__(self, name ):
     """
@@ -407,7 +409,9 @@ class FieldProxy:
     notifyGui_updateField(self.id)
 
     # Print for visual control
-    print(self.__repr__())
+    from salome_utils import verbose
+    if verbose():
+      print(self.__repr__())
   #
 #
 

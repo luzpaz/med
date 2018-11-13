@@ -24,7 +24,7 @@
 # fields when defined on a cartesian mesh (grid).
 # (gboulant - 11/07/2011)
 
-import MEDCoupling as MC
+import medcoupling as MC
 import MEDLoader as ML
 
 import numpy

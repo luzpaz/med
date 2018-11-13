@@ -25,7 +25,7 @@
 #
 # (gboulant, nov. 2012)
 from MEDLoader import *
-from MEDCoupling import *
+from medcoupling import *
 
 import os
 filename = "timeseries.med"

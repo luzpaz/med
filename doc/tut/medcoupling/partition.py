@@ -26,7 +26,7 @@
 # WRN: this use case does not require a med input file because the
 # data (mesh and field) to work with are created from scratch. 
 
-from MEDCoupling import *
+from medcoupling import *
 
 # =======================================================
 # Creation of the input data (mesh and field) 

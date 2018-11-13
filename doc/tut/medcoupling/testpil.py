@@ -58,7 +58,7 @@ def image2matrix():
     print(matrix)
     print(list(matrix))
 
-import MEDCoupling as MC
+import medcoupling as MC
 import MEDLoader as ML
 def createMesh(meshname, sizeX, sizeY):
     """

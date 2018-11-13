@@ -20,9 +20,19 @@
 # This functions are to be used to notify the USER of some events
 # arising on the field operation. It is NOT to be used for logging
 # purpose
+def print_verbose(function):
+    from functools import wraps
+    @wraps(function)
+    def wrapper(self, *args, **kwargs):
+        from salome_utils import verbose
+        if verbose():
+            function(self, *args, **kwargs)
+    return wrapper
+@print_verbose
 def inf(msg): print("INF: "+str(msg))
 def wrn(msg): print("WRN: "+str(msg))
 def err(msg): print("ERR: "+str(msg))
+@print_verbose
 def dbg(msg): print("DBG: "+str(msg))
 
 # Initialize CORBA stuff

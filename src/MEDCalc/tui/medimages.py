@@ -24,7 +24,7 @@ import sys
 if sys.platform == "win32":
   import MEDCouplingCompat as MC
 else:
-  import MEDCoupling as MC
+  import medcoupling as MC
 
 import MEDLoader as ML
 

@@ -23,7 +23,7 @@
 # and save all the stuff in a med file.
 # (gboulant - 27/06/2011)
 
-import MEDCoupling as MC
+import medcoupling as MC
 import MEDLoader as ML
 
 #

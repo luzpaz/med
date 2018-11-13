@@ -25,7 +25,7 @@
 
 import os
 
-import MEDCoupling as MC
+import medcoupling as MC
 import MEDLoader as ML
 
 #

@@ -18,7 +18,7 @@
 #
 # Author : Anthony Geay (CEA/DEN)
 
-from MEDCoupling import *
+from medcoupling import *
 import math
 import os
 
