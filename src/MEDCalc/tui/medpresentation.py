@@ -151,7 +151,7 @@ def RemovePresentation(presentation_id):
 
 def __GetGENERICParameters(tag, presentation_id):
   exec("params = __manager.get%sParameters(presentation_id)" % tag)
-  return params
+  return locals()['params']
 
 GetMeshViewParameters = lambda pres_id: __GetGENERICParameters("MeshView", pres_id)
 GetScalarMapParameters = lambda pres_id: __GetGENERICParameters("ScalarMap", pres_id)
