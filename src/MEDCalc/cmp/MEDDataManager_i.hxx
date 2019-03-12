@@ -34,27 +34,26 @@ using namespace MEDCoupling;
 /*! This map is used for lifecycle management of fields used in this operator */
 #include <map>
 #include <string>
-using namespace std;
 
-typedef map<long,MEDCALC::DatasourceHandler*> DatasourceHandlerMap;
-typedef map<long,MEDCALC::DatasourceHandler*>::iterator DatasourceHandlerMapIterator;
+typedef std::map<long,MEDCALC::DatasourceHandler*> DatasourceHandlerMap;
+typedef std::map<long,MEDCALC::DatasourceHandler*>::iterator DatasourceHandlerMapIterator;
 
-typedef map<long,MEDCALC::MeshHandler*> MeshHandlerMap;
-typedef map<long,MEDCALC::MeshHandler*>::iterator MeshHandlerMapIterator;
+typedef std::map<long,MEDCALC::MeshHandler*> MeshHandlerMap;
+typedef std::map<long,MEDCALC::MeshHandler*>::iterator MeshHandlerMapIterator;
 
-typedef map<long,MEDCALC::FieldseriesHandler*> FieldseriesHandlerMap;
-typedef map<long,MEDCALC::FieldseriesHandler*>::iterator FieldseriesHandlerMapIterator;
+typedef std::map<long,MEDCALC::FieldseriesHandler*> FieldseriesHandlerMap;
+typedef std::map<long,MEDCALC::FieldseriesHandler*>::iterator FieldseriesHandlerMapIterator;
 
-typedef map<long,MEDCALC::FieldHandler*> FieldHandlerMap;
-typedef map<long,MEDCALC::FieldHandler*>::iterator FieldHandlerMapIterator;
-typedef map<long,bool> FieldPersistencyMap;
-typedef map<long,bool>::iterator FieldPersistencyMapIterator;
+typedef std::map<long,MEDCALC::FieldHandler*> FieldHandlerMap;
+typedef std::map<long,MEDCALC::FieldHandler*>::iterator FieldHandlerMapIterator;
+typedef std::map<long,bool> FieldPersistencyMap;
+typedef std::map<long,bool>::iterator FieldPersistencyMapIterator;
 
-typedef map<long,MEDCouplingFieldDouble*> FieldDoubleMap;
-typedef map<long,MEDCouplingFieldDouble*>::iterator FieldDoubleMapIterator;
+typedef std::map<long,MEDCouplingFieldDouble*> FieldDoubleMap;
+typedef std::map<long,MEDCouplingFieldDouble*>::iterator FieldDoubleMapIterator;
 
-typedef map<long,MEDCouplingUMesh*> MeshMap;
-typedef map<long,MEDCouplingUMesh*>::iterator MeshMapIterator;
+typedef std::map<long,MEDCouplingUMesh*> MeshMap;
+typedef std::map<long,MEDCouplingUMesh*>::iterator MeshMapIterator;
 
 #include "MEDCALC.hxx"
 class MEDDataManager_i: public POA_MEDCALC::MEDDataManager,
@@ -140,7 +139,7 @@ private:
   MeshMap _meshMap;
   FieldPersistencyMap _fieldPersistencyMap;
 
-  string _medEventListenerIOR;
+  std::string _medEventListenerIOR;
 
   MEDCALC::FieldHandler * newFieldHandler(const char * fieldname,
                                           const char * meshname,

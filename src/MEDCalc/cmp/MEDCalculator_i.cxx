@@ -247,7 +247,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::pow(const MEDCALC::FieldHandler & f_hdl
   MEDCouplingFieldDouble* field_result;
   try {
     field_result = field->clone(true);
-    string functionToApply = "u^"+ToString(power);
+    std::string functionToApply = "u^"+ToString(power);
     field_result->applyFunc(functionToApply.c_str());
   }
   catch (INTERP_KERNEL::Exception &ex) {
@@ -255,7 +255,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::pow(const MEDCALC::FieldHandler & f_hdl
   }
 
   // Set the name (the default is the same as the original field)
-  string name(field_result->getName());
+  std::string name(field_result->getName());
   name.append("^");
   name.append(ToString(power));
   field_result->setName(name.c_str());
@@ -286,7 +286,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::lin(const MEDCALC::FieldHandler & f_hdl
   MEDCouplingFieldDouble* field_result;
   try {
     field_result = field->clone(true);
-    string functionToApply = "u*"+ToString(factor)+"+"+ToString(offset);
+    std::string functionToApply = "u*"+ToString(factor)+"+"+ToString(offset);
     field_result->applyFunc(functionToApply.c_str());
   }
   catch (INTERP_KERNEL::Exception &ex) {
@@ -294,7 +294,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::lin(const MEDCALC::FieldHandler & f_hdl
   }
 
   // Set the name (the default is the same as the original field)
-  string name = string("lin(");
+  std::string name = std::string("lin(");
   name.append(field->getName());
   name.append(",factor=");
   name.append(ToString(factor));
@@ -333,7 +333,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::dup(const MEDCALC::FieldHandler & f_hdl
   }
 
   // Set the name (the default is the same as the original field)
-  string name = string("dup(");
+  std::string name = std::string("dup(");
   name.append(field->getName());
   name.append(")");
   field_result->setName(name.c_str());
@@ -376,7 +376,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::fct(const MEDCALC::FieldHandler & f_hdl
     throw KERNEL::createSalomeException(ex.what());
   }
 
-  string name = string("fct("); name.append(field->getName());
+  std::string name = std::string("fct("); name.append(field->getName());
   name.append(",\""); name.append(function);
   name.append(",\""); name.append(ToString(nbResComponents)); name.append("\")");
   field_result->setName(name.c_str());
