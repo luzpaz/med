@@ -288,7 +288,7 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
   }
   else if ( event->type == MEDCALC::EVENT_REMOVE_FROM_WORKSPACE ) {
     STDLOG("remove field");
-    std::map<string, DataObject*>::iterator itr = dataModel->begin();
+    std::map<std::string, DataObject*>::iterator itr = dataModel->begin();
     for ( ; itr != dataModel->end(); ++itr) {
       XmedDataObject* obj = dynamic_cast<XmedDataObject*>(itr->second);
       if (obj->getFieldHandler()->id == event->dataId) {
@@ -301,7 +301,7 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
   }
   else if ( event->type == MEDCALC::EVENT_CLEAN_WORKSPACE ) {
     STDLOG("clean workspace");
-    std::map<string, DataObject*>::iterator itr = dataModel->begin();
+    std::map<std::string, DataObject*>::iterator itr = dataModel->begin();
     for ( ; itr != dataModel->end(); ++itr) {
       XmedDataObject* obj = dynamic_cast<XmedDataObject*>(itr->second);
       std::string itemNameId = obj->getNameId();

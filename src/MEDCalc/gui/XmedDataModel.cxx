@@ -33,16 +33,16 @@ XmedDataObject::XmedDataObject() : DataObject(), _presId(-1) {
 /*! This function specified the localization of the object in the
  * hierarchical organization
  */
-string XmedDataObject::getPath() {
-  string path =
-    string(_fieldHandler.meshname) + pathsep +
+std::string XmedDataObject::getPath() {
+  std::string path =
+    std::string(_fieldHandler.meshname) + pathsep +
     _getTypedFieldLabel();
   return path;
 }
 
 void XmedDataObject::setFieldHandler(MEDCALC::FieldHandler fieldHandler) {
   _fieldHandler = fieldHandler;
-  this->setLabel(string("it = ")+ToString(_fieldHandler.iteration));
+  this->setLabel(std::string("it = ")+ToString(_fieldHandler.iteration));
 }
 MEDCALC::FieldHandler * XmedDataObject::getFieldHandler() {
   return &_fieldHandler;
@@ -59,7 +59,7 @@ int XmedDataObject::getPresentationId() const { return _presId; }
  * This function implements the convention for displaying a fieldname
  * characterized by its spatial discretisation type.
  */
-string XmedDataObject::_getTypedFieldLabel() {
+std::string XmedDataObject::_getTypedFieldLabel() {
   // A field name could identify several MEDCoupling fields, that
   // differ by their spatial discretization on the mesh (values on
   // cells, values on nodes, ...). This spatial discretization is
@@ -71,10 +71,10 @@ string XmedDataObject::_getTypedFieldLabel() {
   // 3 = ON_GAUSS_NE
   if ( _fieldHandler.type < 0 ||
        _fieldHandler.type >= NB_TYPE_OF_FIELDS ) {
-    return string("UNKNOWN");
+    return std::string("UNKNOWN");
   }
-  string label(_fieldHandler.fieldname);
-  label +=" ("+string(mapTypeOfFieldLabel[_fieldHandler.type])+")";
+  std::string label(_fieldHandler.fieldname);
+  label +=" ("+std::string(mapTypeOfFieldLabel[_fieldHandler.type])+")";
   return label;
 }
 

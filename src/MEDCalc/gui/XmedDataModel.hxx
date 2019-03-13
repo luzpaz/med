@@ -35,7 +35,7 @@
 class MEDCALCGUI_EXPORT XmedDataObject: public DataObject {
 public:
   XmedDataObject();
-  virtual string getPath();
+  virtual std::string getPath();
 
   void setFieldHandler(MEDCALC::FieldHandler fieldHandler);
   MEDCALC::FieldHandler * getFieldHandler();
@@ -46,7 +46,7 @@ public:
 private:
   MEDCALC::FieldHandler _fieldHandler;
   int _presId;
-  string _getTypedFieldLabel();
+  std::string _getTypedFieldLabel();
 };
 
 //
