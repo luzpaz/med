@@ -303,7 +303,7 @@ MEDPresentation::createSource()
   }
 
   std::ostringstream oss;
-  oss << _srcObjVar << " = pvs.MEDReader(FileName='" << _fileName << "');";
+  oss << _srcObjVar << " = pvs.MEDReader(FileName=r'" << _fileName << "');";
   pushAndExecPyLine(oss.str()); oss.str("");
   oss << "medcalc.SelectSourceField(" << _srcObjVar << ", '" << _meshName << "', '"
       << _fieldName << "', '" << typ << "');";
