@@ -118,11 +118,7 @@ IF(SALOME_BUILD_GUI)
     ELSE(EXISTS ${GUI_ROOT_DIR})
       MESSAGE(FATAL_ERROR "We absolutely need a Salome GUI, please define GUI_ROOT_DIR or turn option SALOME_BUILD_GUI to OFF !")
     ENDIF(EXISTS ${GUI_ROOT_DIR})
-    IF(NOT SALOME_GUI_BUILD_WITH_QT5)
-      FIND_PACKAGE(SalomeQt4 REQUIRED COMPONENTS QtCore QtGui)
-    ELSE()
-      FIND_PACKAGE(SalomeQt5 REQUIRED)
-    ENDIF()
+    FIND_PACKAGE(SalomeQt5 REQUIRED)
 ENDIF(SALOME_BUILD_GUI)
 
 IF(SALOME_FIELDS_ENABLE_PYTHON)
@@ -279,11 +275,7 @@ SET(CPPUNIT_ROOT_DIR "${CPPUNIT_ROOT_DIR}")
 SET(GRAPHVIZ_ROOT_DIR "${GRAPHVIZ_ROOT_DIR}")
 SET(DOXYGEN_ROOT_DIR "${DOXYGEN_ROOT_DIR}")
 SET(SPHINX_ROOT_DIR "${SPHINX_ROOT_DIR}")
-IF(NOT SALOME_GUI_BUILD_WITH_QT5)
-  SET(QT_ROOT_DIR "${QT4_ROOT_DIR}")
-ELSE()
-  SET(QT_ROOT_DIR "${QT5_ROOT_DIR}")
-ENDIF()
+SET(QT_ROOT_DIR "${QT5_ROOT_DIR}")
 
 #   - in the install tree:
 #       Get the relative path of the include directory so
@@ -291,13 +283,8 @@ ENDIF()
 SET(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/${INSTALL_INCLUDE_DIR}")
 
 # Build variables that will be expanded when configuring Salome<MODULE>Config.cmake:
-IF(NOT SALOME_GUI_BUILD_WITH_QT5)
-   SALOME_CONFIGURE_PREPARE(MEDCoupling Qt4 MPI omniORB CppUnit Graphviz Doxygen Sphinx
+SALOME_CONFIGURE_PREPARE(MEDCoupling Qt5 MPI omniORB CppUnit Graphviz Doxygen Sphinx
                                                                         PThread Python)
- ELSE()
-   SALOME_CONFIGURE_PREPARE(MEDCoupling Qt5 MPI omniORB CppUnit Graphviz Doxygen Sphinx
-                                                                        PThread Python)
-ENDIF()
 
 CONFIGURE_PACKAGE_CONFIG_FILE(${PROJECT_NAME}Config.cmake.in
     ${PROJECT_BINARY_DIR}/to_install/${PROJECT_NAME}Config.cmake
