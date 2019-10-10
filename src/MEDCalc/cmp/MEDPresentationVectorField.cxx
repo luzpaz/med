@@ -81,14 +81,15 @@ MEDPresentationVectorField::internalGeneratePipeline()
 
   showObject(); // to be done first so that the scale factor computation properly works
 
-  oss << _objVar << ".Scalars = ['"<< _pvFieldType << "', 'None'];";
-  pushAndExecPyLine(oss.str()); oss.str("");
-
   std::string fieldName = nbCompo <= 2 ? _fieldName + "_Vector" : _fieldName;
-  oss << _objVar << ".Vectors = ['"<< _pvFieldType << "', '" << fieldName << "'];";
+
+  oss << _objVar << ".ScaleArray = ['"<< _pvFieldType << "', '" << fieldName << "'];";
+  pushAndExecPyLine(oss.str()); oss.str("");
+
+  oss << _objVar << ".OrientationArray = ['"<< _pvFieldType << "', '" << fieldName << "'];";
 
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _objVar << ".ScaleMode = 'vector';";
+  oss << _objVar << ".VectorScaleMode = 'Scale by Magnitude';";
   pushAndExecPyLine(oss.str()); oss.str("");
   oss << _objVar << ".GlyphMode = 'All Points';";
   pushAndExecPyLine(oss.str()); oss.str("");
