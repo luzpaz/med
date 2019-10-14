@@ -220,6 +220,17 @@ void DatasourceController::OnAddImagesource()
 
 void DatasourceController::OnExpandField()
 {
+  SALOMEDS::Study_var aStudy = KERNEL::getStudyServant();
+  // check if reference to study is valid
+  if (CORBA::is_nil(aStudy)) 
+    return;
+
+  // check if reference to use case builder is valid
+  SALOMEDS::UseCaseBuilder_var useCaseBuilder = aStudy->GetUseCaseBuilder();
+  if (CORBA::is_nil(useCaseBuilder)) 
+    return;
+
+
   // Get the selected objects in the study (SObject)
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
   for (int i=0; i<listOfSObject->size(); i++) {
@@ -259,6 +270,7 @@ void DatasourceController::OnExpandField()
       _studyEditor->setName(soField,label.c_str());
       _studyEditor->setParameterInt(soField, FIELD_ID, fieldHandler.id);
       _studyEditor->setParameterBool(soField,IS_IN_WORKSPACE,false);
+      useCaseBuilder->AppendTo(soField->GetFather(), soField);
     }
   }
   _salomeModule->updateObjBrowser(true);
