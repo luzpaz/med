@@ -200,7 +200,7 @@ def createTestFieldOnNodes():
 # -------------------------------------------------
 
 # In these functions, (x,y) are the indexes of the element in the
-# numpy array. Note that theses indexes maps the indexes of the
+# numpy array. Note that these indexes maps the indexes of the
 # cartesian mesh.
 
 # A function can be a simple python function ...

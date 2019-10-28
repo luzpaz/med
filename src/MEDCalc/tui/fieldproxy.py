@@ -102,7 +102,7 @@ class FieldProxy:
     handler.
     """
     # WRN: Note that the modification of this function can lead to
-    # coercion problem. Modify this function with extrem care.
+    # coercion problem. Modify this function with extreme care.
     return getattr( self.__fieldHandler, name )
   #
   def __setattr__(self, name, value):
@@ -163,7 +163,7 @@ class FieldProxy:
     # choose to not raise the possible exceptions to the console
     # by a clear message. Keep this in mind for unit test. You
     # have to test the return value, which should not be
-    # null. This principle is applyed for all operations.
+    # null. This principle is applied for all operations.
     try:
       if isinstance(operande, FieldProxy):
         # The operande is an other field

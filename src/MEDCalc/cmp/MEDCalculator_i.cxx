@@ -347,7 +347,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::dup(const MEDCALC::FieldHandler & f_hdl
 /*!
  * This creates a new field by applying a function on the specified
  * field. The function is defined by a string of characters
- * (function), that specifies the litteral equation to apply, and an
+ * (function), that specifies the literal equation to apply, and an
  * integer (nbcomponents), that specifies the number of components to
  * consider in the resulting field. This is to mimic the interface of
  * MEDCouplingFieldDouble::applyFunc.

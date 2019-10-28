@@ -268,7 +268,7 @@ Scalar variables can be used if needed::
  >>> r=4*f3-f4/1000
  >>> ...
 
-In theses examples, the variable ``r`` corresponds to a work field containing
+In these examples, the variable ``r`` corresponds to a work field containing
 the operation result. By default the field is nor referenced in workspace
 tree. If user wants to add it, for example to make it considered when saving,
 then the following command is used::

@@ -29,7 +29,7 @@ filepath = os.path.join(os.path.abspath(os.path.dirname(__file__)),filename)
 meshNames = MEDLoader.GetMeshNames(filepath)
 
 # Set to True if the meshes and fields data must be loaded. Otherwise,
-# only theire descriptions will be loaded.
+# only their descriptions will be loaded.
 READ_PHYSICAL_DATA=False
 
 for meshName in meshNames:

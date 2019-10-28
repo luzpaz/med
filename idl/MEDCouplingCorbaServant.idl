@@ -58,7 +58,7 @@ module SALOME_MED
   interface MEDCouplingMeshCorbaInterface : MEDCouplingRefCountCorbaInterface
   {
     string getName();
-    //!CORBA inplementation of MEDCouplingPointSet::getTinySerializationInformation
+    //!CORBA implementation of MEDCouplingPointSet::getTinySerializationInformation
     void getTinyInfo(out SALOME_TYPES::ListOfDouble da, out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfString sa);
     void getSerialisationData(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da);
   };
