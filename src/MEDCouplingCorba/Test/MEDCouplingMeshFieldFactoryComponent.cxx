@@ -39,7 +39,7 @@ namespace SALOME_TEST
   MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build1DMesh()
   {
     double coords[4]={ 0.0, 0.3, 0.75, 1.0 };
-    int conn[2*3]={ 0,1, 1,2, 2,3 };
+    mcIdType conn[2*3]={ 0,1, 1,2, 2,3 };
     MEDCoupling::MEDCouplingUMesh *mesh=MEDCoupling::MEDCouplingUMesh::New("1DMeshForCorba",1);
     mesh->setDescription("build1DMesh");
     mesh->allocateCells(3);
@@ -68,7 +68,7 @@ namespace SALOME_TEST
   MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build2DMesh()
   {
     double targetCoords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
-    int targetConn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+    mcIdType targetConn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
     MEDCoupling::MEDCouplingUMesh *targetMesh=MEDCoupling::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(2);
     targetMesh->setName("MyMesh2D");
@@ -93,7 +93,7 @@ namespace SALOME_TEST
     double targetCoords[81]={ 0., 0., 0., 50., 0., 0. , 200., 0., 0.  , 0., 50., 0., 50., 50., 0. , 200., 50., 0.,   0., 200., 0., 50., 200., 0. , 200., 200., 0. ,
                               0., 0., 50., 50., 0., 50. , 200., 0., 50.  , 0., 50., 50., 50., 50., 50. , 200., 50., 50.,   0., 200., 50., 50., 200., 50. , 200., 200., 50. ,
                               0., 0., 200., 50., 0., 200. , 200., 0., 200.  , 0., 50., 200., 50., 50., 200. , 200., 50., 200.,   0., 200., 200., 50., 200., 200. , 200., 200., 200. };
-    int targetConn[64]={0,1,4,3,9,10,13,12, 1,2,5,4,10,11,14,13, 3,4,7,6,12,13,16,15, 4,5,8,7,13,14,17,16,
+    mcIdType targetConn[64]={0,1,4,3,9,10,13,12, 1,2,5,4,10,11,14,13, 3,4,7,6,12,13,16,15, 4,5,8,7,13,14,17,16,
                         9,10,13,12,18,19,22,21, 10,11,14,13,19,20,23,22, 12,13,16,15,21,22,25,24, 13,14,17,16,22,23,26,25};
     MEDCoupling::MEDCouplingUMesh *targetMesh=MEDCoupling::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(3);
@@ -115,7 +115,7 @@ namespace SALOME_TEST
   MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build3DSurfMesh()
   {
     double targetCoords[27]={-0.3,-0.3,0.5, 0.2,-0.3,1., 0.7,-0.3,1.5, -0.3,0.2,0.5, 0.2,0.2,1., 0.7,0.2,1.5, -0.3,0.7,0.5, 0.2,0.7,1., 0.7,0.7,1.5};
-    int targetConn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+    mcIdType targetConn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
     MEDCoupling::MEDCouplingUMesh *targetMesh=MEDCoupling::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(2);
     targetMesh->setName("MyMesh3DSurf");
@@ -141,7 +141,7 @@ namespace SALOME_TEST
   MEDCoupling::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build0DMesh()
   {
     double targetCoords[27]={-0.3,-0.3,0.5, 0.2,-0.3,1., 0.7,-0.3,1.5, -0.3,0.2,0.5, 0.2,0.2,1., 0.7,0.2,1.5, -0.3,0.7,0.5, 0.2,0.7,1., 0.7,0.7,1.5};
-    const int targetConn[]={0,1,2,3,4,5,7,6};
+    const mcIdType targetConn[]={0,1,2,3,4,5,7,6};
     MEDCoupling::MEDCouplingUMesh *targetMesh=MEDCoupling::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(0);
     targetMesh->allocateCells(8);
@@ -228,7 +228,7 @@ namespace SALOME_TEST
     targetMesh->setTimeUnit("us");
     targetMesh->setName("Example of IMesh");
     targetMesh->setDescription("buildIMesh");
-    int ns[3]={6,7,8};
+    mcIdType ns[3]={6,7,8};
     double orig[3]={4.25,3.75,-6.125};
     double inter[3]={0.5,0.375,0.75};
     targetMesh->setSpaceDimension(3);
@@ -252,7 +252,7 @@ namespace SALOME_TEST
     a1->rearrange(3);
     targetMesh->setCoords(a1);
     a1->decrRef();
-    int structure[2]={4,5};
+    mcIdType structure[2]={4,5};
     targetMesh->setNodeGridStructure(structure,structure+2);
     //
     targetMesh->checkConsistencyLight();
@@ -268,9 +268,9 @@ namespace SALOME_TEST
     targetMesh->setDescription("My Description of 1SGTU");
     MEDCoupling::DataArrayDouble *a1=MEDCoupling::DataArrayDouble::New(); a1->alloc(10,3); a1->setInfoOnComponent(0,"X1 [m]");  a1->setInfoOnComponent(1,"YY2 [km]"); a1->setInfoOnComponent(2,"ZZZ3 [km]");
     const double coords[30]={1.,1.,0.,2.,1.,0.,3.,1.,0.,1.,0.,0.,2.,0.,0.,0.,0.,0.,0.,1.,0.,3.,0.,0.,4.,0.,0.,4.,1.,0.};
-    const int conn[16]={6,0,3,5,3,0,1,4,1,2,7,4,8,7,2,9};
+    const mcIdType conn[16]={6,0,3,5,3,0,1,4,1,2,7,4,8,7,2,9};
     std::copy(coords,coords+30,a1->getPointer()); targetMesh->setCoords(a1); a1->decrRef();
-    MEDCoupling::DataArrayInt *a2(MEDCoupling::DataArrayInt::New()); a2->alloc(4*4,1);
+    MEDCoupling::DataArrayIdType *a2(MEDCoupling::DataArrayIdType::New()); a2->alloc(4*4,1);
     std::copy(conn,conn+16,a2->getPointer());
     targetMesh->setNodalConnectivity(a2); a2->decrRef();
     //
@@ -287,12 +287,12 @@ namespace SALOME_TEST
     targetMesh->setDescription("My Description of 1DGTU");
     MEDCoupling::DataArrayDouble *a1=MEDCoupling::DataArrayDouble::New(); a1->alloc(10,3); a1->setInfoOnComponent(0,"X1 [m]");  a1->setInfoOnComponent(1,"YY2 [km]"); a1->setInfoOnComponent(2,"ZZZ3 [km]");
     const double coords[30]={1.,1.,0.,2.,1.,0.,3.,1.,0.,1.,0.,0.,2.,0.,0.,0.,0.,0.,0.,1.,0.,3.,0.,0.,4.,0.,0.,4.,1.,0.};
-    const int conn[15]={6,0,3,5,3,0,1,4,1,2,7,4,8,7,2};
-    const int conni[5]={0,4,8,12,15};
+    const mcIdType conn[15]={6,0,3,5,3,0,1,4,1,2,7,4,8,7,2};
+    const mcIdType conni[5]={0,4,8,12,15};
     std::copy(coords,coords+30,a1->getPointer()); targetMesh->setCoords(a1); a1->decrRef();
-    MEDCoupling::DataArrayInt *a2(MEDCoupling::DataArrayInt::New()); a2->alloc(15,1);
+    MEDCoupling::DataArrayIdType *a2(MEDCoupling::DataArrayIdType::New()); a2->alloc(15,1);
     std::copy(conn,conn+15,a2->getPointer());
-    MEDCoupling::DataArrayInt *a3(MEDCoupling::DataArrayInt::New()); a3->alloc(5,1);
+    MEDCoupling::DataArrayIdType *a3(MEDCoupling::DataArrayIdType::New()); a3->alloc(5,1);
     std::copy(conni,conni+5,a3->getPointer());
     targetMesh->setNodalConnectivity(a2,a3); a2->decrRef(); a3->decrRef();
     //

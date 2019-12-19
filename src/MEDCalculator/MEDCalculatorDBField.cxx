@@ -118,7 +118,7 @@ void MEDCalculatorDBFieldReal::setDescription(const char *descr)
 void MEDCalculatorDBFieldReal::write(const char *fName, bool writeFromScratch) const throw(INTERP_KERNEL::Exception)
 {
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   int step=ids[0];
   const MEDCouplingFieldDouble *field=_time_steps[step]->getField(_type,_file_name,_mesh_name,_field_name);
   const MEDCouplingUMesh *mesh=static_cast<const MEDCouplingUMesh *>(field->getMesh());
@@ -139,17 +139,17 @@ void MEDCalculatorDBFieldReal::write(const char *fName, bool writeFromScratch) c
         }
     }
   WriteUMesh(fName,mesh,writeFromScratch);
-  for(std::vector<int>::const_iterator iter=ids.begin();iter!=ids.end();iter++)
+  for(std::vector<std::size_t>::const_iterator iter=ids.begin();iter!=ids.end();iter++)
     _time_steps[*iter]->write(fName,_name,_description);
 }
 
 void MEDCalculatorDBFieldReal::display() const throw(INTERP_KERNEL::Exception)
 {
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   std::vector< MCAuto<MEDCouplingFieldDouble> > fs2(ids.size());
   int ii=0;
-  for(std::vector<int>::const_iterator iter=ids.begin();iter!=ids.end();iter++)
+  for(std::vector<std::size_t>::const_iterator iter=ids.begin();iter!=ids.end();iter++)
     fs2[ii++]=_time_steps[*iter]->getFieldWithoutQuestion(_c_labels.size(),_c);
   std::vector<MEDCouplingFieldDouble *> fs(fs2.size());
   std::copy(fs2.begin(),fs2.end(),fs.begin());
@@ -193,8 +193,8 @@ std::string MEDCalculatorDBFieldReal::simpleRepr() const
   oss << "Number of time steps of multitime field : " << getNumberOfSteps() << ".\n";
   oss << "Number of components of multitime field : " << getNumberOfComponents() << ".\n";
   oss << "Components names attached are : ";
-  std::vector<int> ids=_c.getIds(_c_labels.size());
-  for(std::vector<int>::const_iterator iter=ids.begin();iter!=ids.end();iter++)
+  std::vector<std::size_t> ids=_c.getIds(_c_labels.size());
+  for(std::vector<std::size_t>::const_iterator iter=ids.begin();iter!=ids.end();iter++)
     oss << "\"" << _c_labels[*iter] << "\" ";
   oss << ".\nNumber of fetched field in multime field : " << getNumberOfFetchedSteps() << "/" << getNumberOfSteps() << ".\n";
   return oss.str();
@@ -215,8 +215,8 @@ MEDCalculatorDBFieldReal::MEDCalculatorDBFieldReal(const MEDCalculatorBrowserFie
 const MEDCalculatorDBFieldReal& MEDCalculatorDBFieldReal::operator=(const MEDCalculatorDBFieldReal& other) throw(INTERP_KERNEL::Exception)
 {
   checkConsistencyLight(other);
-  std::vector<int> ids=_t.getIds(_time_steps.size());
-  std::vector<int> ids2=other._t.getIds(other._time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids2=other._t.getIds(other._time_steps.size());
   unsigned int sz=ids.size();
   if(sz!=ids2.size())
     throw INTERP_KERNEL::Exception("FieldReal::operator= : Timesteps lengths mismatch !");
@@ -259,9 +259,9 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::add(const MEDCalculatorDBFieldRe
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
-  DataArrayInt *cellCor,*nodeCor;
-  std::vector<int> ids=_t.getIds(_time_steps.size());
-  std::vector<int> ids2=other._t.getIds(other._time_steps.size());
+  DataArrayIdType *cellCor,*nodeCor;
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids2=other._t.getIds(other._time_steps.size());
   if(ids.size()!=ids2.size())
     throw INTERP_KERNEL::Exception("FieldReal::add : Timesteps lengths mismatch !");
   int step=ids[0];
@@ -309,9 +309,9 @@ bool MEDCalculatorDBFieldReal::isEqualSameType(const MEDCalculatorDBFieldReal& o
     return false;
   fetchData();
   other.fetchData();
-  DataArrayInt *cellCor,*nodeCor;
-  std::vector<int> ids=_t.getIds(_time_steps.size());
-  std::vector<int> ids2=other._t.getIds(other._time_steps.size());
+  DataArrayIdType *cellCor,*nodeCor;
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids2=other._t.getIds(other._time_steps.size());
   if(ids.size()!=ids2.size())
     return false;
   int step=ids[0];
@@ -356,9 +356,9 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::substract(const MEDCalculatorDBF
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
-  DataArrayInt *cellCor,*nodeCor;
-  std::vector<int> ids=_t.getIds(_time_steps.size());
-  std::vector<int> ids2=other._t.getIds(other._time_steps.size());
+  DataArrayIdType *cellCor,*nodeCor;
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids2=other._t.getIds(other._time_steps.size());
   if(ids.size()!=ids2.size())
     throw INTERP_KERNEL::Exception("FieldReal::substract : Timesteps lengths mismatch !");
   int step=ids[0];
@@ -406,9 +406,9 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::multiply(const MEDCalculatorDBFi
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
-  DataArrayInt *cellCor,*nodeCor;
-  std::vector<int> ids=_t.getIds(_time_steps.size());
-  std::vector<int> ids2=other._t.getIds(other._time_steps.size());
+  DataArrayIdType *cellCor,*nodeCor;
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids2=other._t.getIds(other._time_steps.size());
   if(ids.size()!=ids2.size())
     throw INTERP_KERNEL::Exception("FieldReal::multiply : Timesteps lengths mismatch !");
   int step=ids[0];
@@ -456,9 +456,9 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::divide(const MEDCalculatorDBFiel
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
-  DataArrayInt *cellCor,*nodeCor;
-  std::vector<int> ids=_t.getIds(_time_steps.size());
-  std::vector<int> ids2=other._t.getIds(other._time_steps.size());
+  DataArrayIdType *cellCor,*nodeCor;
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids2=other._t.getIds(other._time_steps.size());
   if(ids.size()!=ids2.size())
     throw INTERP_KERNEL::Exception("FieldReal::divide : Timesteps lengths mismatch !");
   int step=ids[0];
@@ -491,8 +491,8 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::dot(const MEDCalculatorDBFieldRe
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
-  std::vector<int> ids2=other._t.getIds(other._time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids2=other._t.getIds(other._time_steps.size());
   unsigned int sz=ids.size();
   if(sz!=ids2.size())
     throw INTERP_KERNEL::Exception("FieldReal::dot : Timesteps lengths mismatch !");
@@ -511,8 +511,8 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::crossProduct(const MEDCalculator
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
   other.fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
-  std::vector<int> ids2=other._t.getIds(other._time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids2=other._t.getIds(other._time_steps.size());
   unsigned int sz=ids.size();
   if(sz!=ids2.size())
     throw INTERP_KERNEL::Exception("FieldReal::crossProduct : Timesteps lengths mismatch !");
@@ -529,7 +529,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::doublyContractedProduct() const 
 {
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
   ret->_time_steps.resize(sz);
   for(unsigned int i=0;i<sz;i++)
@@ -544,7 +544,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::determinant() const throw(INTERP
 {
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
   ret->_time_steps.resize(sz);
   for(unsigned int i=0;i<sz;i++)
@@ -559,7 +559,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::eigenValues() const throw(INTERP
 {
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
   ret->_time_steps.resize(sz);
   for(unsigned int i=0;i<sz;i++)
@@ -580,7 +580,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::eigenVectors() const throw(INTER
 {
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
   ret->_time_steps.resize(sz);
   for(unsigned int i=0;i<sz;i++)
@@ -601,7 +601,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::inverse() const throw(INTERP_KER
 {
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
   ret->_time_steps.resize(sz);
   for(unsigned int i=0;i<sz;i++)
@@ -622,7 +622,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::trace() const throw(INTERP_KERNE
 {
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
   ret->_time_steps.resize(sz);
   for(unsigned int i=0;i<sz;i++)
@@ -637,7 +637,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::deviator() const throw(INTERP_KE
 {
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
   ret->_time_steps.resize(sz);
   for(unsigned int i=0;i<sz;i++)
@@ -658,7 +658,7 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::magnitude() const throw(INTERP_K
 {
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   unsigned int sz=ids.size();
   ret->_time_steps.resize(sz);
   for(unsigned int i=0;i<sz;i++)
@@ -672,8 +672,8 @@ MEDCalculatorDBField *MEDCalculatorDBFieldReal::magnitude() const throw(INTERP_K
 void MEDCalculatorDBFieldReal::applyFunc(const char *func) throw(INTERP_KERNEL::Exception)
 {
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
-  for(std::vector<int>::const_iterator it=ids.begin();it!=ids.end();it++)
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
+  for(std::vector<std::size_t>::const_iterator it=ids.begin();it!=ids.end();it++)
     _time_steps[*it]->applyFunc(func,_c_labels.size(),_c);
 }
 
@@ -682,7 +682,7 @@ MEDCalculatorDBFieldReal *MEDCalculatorDBFieldReal::buildCstFieldFromThis(double
   MCAuto<MEDCalculatorDBFieldReal> ret=new MEDCalculatorDBFieldReal(_type);
   ret->_p=_p;
   ret->_c_labels.resize(_c.getSize(_c_labels.size()));
-  std::vector<int> stps=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> stps=_t.getIds(_time_steps.size());
   int stepSize=stps.size();
   ret->_time_steps.resize(stepSize);
   if(stepSize==0)
@@ -709,9 +709,9 @@ void MEDCalculatorDBFieldReal::checkConsistencyLight(const MEDCalculatorDBFieldR
 void MEDCalculatorDBFieldReal::fetchData() const throw(INTERP_KERNEL::Exception)
 {
   std::vector<std::pair<int,int> > idstoFetch;
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   int sz=ids.size();
-  std::vector<int> idsInGlobalToFetch;
+  std::vector<std::size_t> idsInGlobalToFetch;
   for(int i=0;i<sz;i++)
     {
       MCAuto<MEDCalculatorDBSliceField> elt=_time_steps[ids[i]];
@@ -741,8 +741,8 @@ int MEDCalculatorDBFieldReal::getNumberOfSteps() const
 int MEDCalculatorDBFieldReal::getNumberOfFetchedSteps() const
 {
   int ret=0;
-  std::vector<int> ids=_t.getIds(_time_steps.size());
-  for(std::vector<int>::const_iterator it=ids.begin();it!=ids.end();it++)
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
+  for(std::vector<std::size_t>::const_iterator it=ids.begin();it!=ids.end();it++)
     if(_time_steps[*it]->isFetched())
       ret++;
   return ret;
@@ -759,10 +759,10 @@ int MEDCalculatorDBFieldReal::getNumberOfComponents() const
 std::vector<MEDCouplingFieldDouble *> MEDCalculatorDBFieldReal::getFields() const throw(INTERP_KERNEL::Exception)
 {
   fetchData();
-  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector<std::size_t> ids=_t.getIds(_time_steps.size());
   std::vector<MEDCouplingFieldDouble *> ret(ids.size());
   int i=0;
-  for(std::vector<int>::const_iterator it=ids.begin();it!=ids.end();it++,i++)
+  for(std::vector<std::size_t>::const_iterator it=ids.begin();it!=ids.end();it++,i++)
     ret[i]=_time_steps[*it]->getFieldWithoutQuestion(_c_labels.size(),_c);
   return ret;
 }

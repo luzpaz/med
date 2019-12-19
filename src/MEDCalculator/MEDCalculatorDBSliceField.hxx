@@ -57,16 +57,16 @@ namespace MEDCoupling
     //
     void assign(const MEDCalculatorDBSliceField* other, int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                 int sizeCOther, const MEDCalculatorDBRangeSelection& otherC);
-    MEDCalculatorDBSliceField *add(const MEDCalculatorDBSliceField* other, const DataArrayInt *cc, const DataArrayInt *nc,
+    MEDCalculatorDBSliceField *add(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                                 int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                 int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const;
-    MEDCalculatorDBSliceField *substract(const MEDCalculatorDBSliceField* other, const DataArrayInt *cc, const DataArrayInt *nc,
+    MEDCalculatorDBSliceField *substract(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                                       int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                       int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const;
-    MEDCalculatorDBSliceField *multiply(const MEDCalculatorDBSliceField* other, const DataArrayInt *cc, const DataArrayInt *nc,
+    MEDCalculatorDBSliceField *multiply(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                                      int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                      int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const;
-    MEDCalculatorDBSliceField *divide(const MEDCalculatorDBSliceField* other, const DataArrayInt *cc, const DataArrayInt *nc,
+    MEDCalculatorDBSliceField *divide(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                                    int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                    int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const;
     MEDCalculatorDBSliceField *dot(const MEDCalculatorDBSliceField* other,
@@ -84,7 +84,7 @@ namespace MEDCoupling
     MEDCalculatorDBSliceField *deviator(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception);
     MEDCalculatorDBSliceField *magnitude(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception);
     void applyFunc(const char *func, int sizeCThis, const MEDCalculatorDBRangeSelection& thisC);
-    bool isEqual(const MEDCalculatorDBSliceField* other, const DataArrayInt *cc, const DataArrayInt *nc,
+    bool isEqual(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                  int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                  int sizeCOther, const MEDCalculatorDBRangeSelection& otherC, double prec) const;
   private:

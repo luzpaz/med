@@ -39,7 +39,7 @@ void MEDCouplingMeshServant::getTinyInfo(SALOME_TYPES::ListOfDouble_out da, SALO
   da=new SALOME_TYPES::ListOfDouble;
   la=new SALOME_TYPES::ListOfLong;
   std::vector<double> tinyInfoD;
-  std::vector<int> tinyInfoI;
+  std::vector<mcIdType> tinyInfoI;
   std::vector<std::string> tinyInfoS;
   getPointer()->getTinySerializationInformation(tinyInfoD,tinyInfoI,tinyInfoS);
   da->length(tinyInfoD.size());
@@ -58,14 +58,14 @@ void MEDCouplingMeshServant::getTinyInfo(SALOME_TYPES::ListOfDouble_out da, SALO
 
 void MEDCouplingMeshServant::getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da)
 {
-  DataArrayInt *array1;
+  DataArrayIdType *array1;
   DataArrayDouble *array2;
   getPointer()->serialize(array1,array2);
   la=new SALOME_TYPES::ListOfLong;
   if(array1)
     {
       int lgth=array1->getNbOfElems();
-      const int *data=array1->getConstPointer();
+      const mcIdType *data=array1->getConstPointer();
       la->length(lgth);
       for(int i=0;i<lgth;i++)
         (*la)[i]=data[i];

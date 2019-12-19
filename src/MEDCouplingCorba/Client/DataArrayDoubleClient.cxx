@@ -35,7 +35,7 @@ DataArrayDouble *DataArrayDoubleClient::New(SALOME_MED::DataArrayDoubleCorbaInte
   dadPtr->getTinyInfo(tinyL,tinyS);
   DataArrayDouble *ret=DataArrayDouble::New();
   int tinyLgth=tinyL->length();
-  std::vector<int> v1(tinyLgth);
+  std::vector<mcIdType> v1(tinyLgth);
   for(int j=0;j<tinyLgth;j++)
     v1[j]=(*tinyL)[j];
   delete tinyL; tinyL=0;

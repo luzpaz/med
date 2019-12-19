@@ -60,7 +60,7 @@ void MEDCouplingFieldOverTimeClient::retrieveFieldTemplates()
   CORBA::Long nbOfFields;
   CORBA::Long nbOfMeshes=_field_ptr->getMainTinyInfo(tinyL,tinyD,nbOfArrays,nbOfFields);
   int tinyLgth=tinyL->length();
-  std::vector<int> mainI(tinyLgth);
+  std::vector<mcIdType> mainI(tinyLgth);
   for(int i=0;i<tinyLgth;i++)
     mainI[i]=(*tinyL)[i];
   delete tinyL; tinyL=0;
@@ -79,7 +79,7 @@ void MEDCouplingFieldOverTimeClient::retrieveFieldTemplates()
     {
       _field_ptr->getTinyInfo(i,tinyL,tinyD,tinyS);
       int tinyLgth=tinyL->length();
-      std::vector<int> tinyLV(tinyLgth);
+      std::vector<mcIdType> tinyLV(tinyLgth);
       for(int j=0;j<tinyLgth;j++)
         tinyLV[j]=(*tinyL)[j];
       delete tinyL; tinyL=0;
@@ -98,13 +98,13 @@ void MEDCouplingFieldOverTimeClient::retrieveFieldTemplates()
       TypeOfField type=(TypeOfField) tinyLV[0];
       MEDCouplingFieldTemplate *f1=MEDCouplingFieldTemplate::New(type);
       //
-      DataArrayInt *array0;
+      DataArrayIdType *array0;
       f1->resizeForUnserialization(tinyLV,array0);
       if(array0)
         {
           _field_ptr->getSerialisationData(i,tinyL);
           tinyLgth=tinyL->length();
-          int *ptr=array0->getPointer();
+          mcIdType *ptr=array0->getPointer();
           for(int j=0;j<tinyLgth;j++)
             ptr[j]=(*tinyL)[j];
           delete tinyL; tinyL=0;

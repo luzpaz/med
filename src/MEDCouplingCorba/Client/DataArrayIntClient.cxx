@@ -34,7 +34,7 @@ DataArrayInt *DataArrayIntClient::New(SALOME_MED::DataArrayIntCorbaInterface_ptr
   dadPtr->getTinyInfo(tinyL,tinyS);
   DataArrayInt *ret=DataArrayInt::New();
   int tinyLgth=tinyL->length();
-  std::vector<int> v1(tinyLgth);
+  std::vector<mcIdType> v1(tinyLgth);
   for(int j=0;j<tinyLgth;j++)
     v1[j]=(*tinyL)[j];
   delete tinyL; tinyL=0;

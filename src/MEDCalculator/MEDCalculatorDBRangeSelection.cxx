@@ -58,7 +58,7 @@ void MEDCalculatorDBRangeSelection::setPyEnd(int val)
   _end=TraducePyVal(val);
 }
 
-std::vector<int> MEDCalculatorDBRangeSelection::getIds(int lgth) const throw(INTERP_KERNEL::Exception)
+std::vector<std::size_t> MEDCalculatorDBRangeSelection::getIds(int lgth) const throw(INTERP_KERNEL::Exception)
 {
   if(_start>=lgth || _start<0)
     {
@@ -75,7 +75,7 @@ std::vector<int> MEDCalculatorDBRangeSelection::getIds(int lgth) const throw(INT
     throw INTERP_KERNEL::Exception("RangeSelection::getIds : end specficied is higher than length !");
   if(_start>trueEnd)
     throw INTERP_KERNEL::Exception("RangeSelection::getIds : begin of range after end !");
-  std::vector<int> ret(trueEnd-_start);
+  std::vector<std::size_t> ret(trueEnd-_start);
   int j=0;
   for(int i=_start;i<trueEnd;i++,j++)
     ret[j]=i;

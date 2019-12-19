@@ -80,7 +80,7 @@ SALOME_TYPES::ListOfString *MEDCouplingMultiFieldsServant::getInfoOnComponents()
 
 CORBA::Long MEDCouplingMultiFieldsServant::getMainTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, CORBA::Long& nbOfArrays, CORBA::Long& nbOfFields)
 {
-  std::vector<int> tinyInfo;
+  std::vector<mcIdType> tinyInfo;
   std::vector<double> tinyInfo2;
   int nbOfDiffMeshes, nbOfDiffArr;
   nbOfFields=getPointer()->getNumberOfFields();
@@ -103,7 +103,7 @@ void MEDCouplingMultiFieldsServant::getTinyInfo(CORBA::Long id, SALOME_TYPES::Li
   const MEDCouplingFieldDouble *f=getPointer()->getFieldWithId(id);
   MEDCouplingFieldTemplate *f2=MEDCouplingFieldTemplate::New(*f);
   la=new SALOME_TYPES::ListOfLong;
-  std::vector<int> tinyInfo;
+  std::vector<mcIdType> tinyInfo;
   f2->getTinySerializationIntInformation(tinyInfo);
   la->length(tinyInfo.size());
   for(int i=0;i<(int)tinyInfo.size();i++)
@@ -129,16 +129,16 @@ void MEDCouplingMultiFieldsServant::getSerialisationData(CORBA::Long id, SALOME_
 {
   const MEDCouplingFieldDouble *f=getPointer()->getFieldWithId(id);
   MEDCouplingFieldTemplate *f2=MEDCouplingFieldTemplate::New(*f);
-  DataArrayInt *dataInt;
+  DataArrayIdType *dataInt;
   f2->serialize(dataInt);
   //
   la=new SALOME_TYPES::ListOfLong;
   if(dataInt)
     {
-      int lgth=dataInt->getNbOfElems();
-      const int *ptr=dataInt->getConstPointer();
+      mcIdType lgth=dataInt->getNbOfElems();
+      const mcIdType *ptr=dataInt->getConstPointer();
       la->length(lgth);
-      for(int i=0;i<lgth;i++)
+      for(mcIdType i=0;i<lgth;i++)
         (*la)[i]=ptr[i];
     }
   else

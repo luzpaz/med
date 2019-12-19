@@ -37,7 +37,7 @@ MEDCouplingFieldTemplate *MEDCouplingFieldTemplateClient::New(SALOME_MED::MEDCou
   //1st CORBA call : getting all tiny info of all types (int, double string).
   fieldPtr->getTinyInfo(tinyL,tinyD,tinyS);
   int tinyLgth=tinyL->length();
-  std::vector<int> tinyLV(tinyLgth);
+  std::vector<mcIdType> tinyLV(tinyLgth);
   for(int i=0;i<tinyLgth;i++)
     tinyLV[i]=(*tinyL)[i];
   delete tinyL;
@@ -63,16 +63,16 @@ MEDCouplingFieldTemplate *MEDCouplingFieldTemplateClient::New(SALOME_MED::MEDCou
   CORBA::release(meshPtr);
   ret->setMesh(mesh);
   mesh->decrRef();
-  DataArrayInt *array0;
+  DataArrayIdType *array0;
   ret->resizeForUnserialization(tinyLV,array0);
   SALOME_TYPES::ListOfLong *bigArr0;
   //3rd CORBA invocation to get big content
   fieldPtr->getSerialisationData(bigArr0);
   if(bigArr0->length()!=0)
     {
-      int *pt=array0->getPointer();
-      int lgth=array0->getNbOfElems();
-      for(int i=0;i<lgth;i++)
+      mcIdType *pt=array0->getPointer();
+      mcIdType lgth=array0->getNbOfElems();
+      for(mcIdType i=0;i<lgth;i++)
         pt[i]=(*bigArr0)[i];
     }
   delete bigArr0;

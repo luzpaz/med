@@ -108,7 +108,7 @@ MEDCouplingFieldDouble *MEDCalculatorDBSliceField::getField(TypeOfField type, co
  */
 MEDCouplingFieldDouble *MEDCalculatorDBSliceField::getFieldWithoutQuestion(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   return _field->keepSelectedComponents(tIds);
 }
 
@@ -124,20 +124,20 @@ MEDCouplingFieldDouble *MEDCalculatorDBSliceField::buildCstFromThis(double val, 
 void MEDCalculatorDBSliceField::assign(const MEDCalculatorDBSliceField* other, int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                     int sizeCOther, const MEDCalculatorDBRangeSelection& otherC)
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
-  std::vector<int> oIds=otherC.getIds(sizeCOther);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> oIds=otherC.getIds(sizeCOther);
   MCAuto<MEDCouplingFieldDouble> f1=other->_field->keepSelectedComponents(oIds);
   _field->setSelectedComponents(f1,tIds);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::add(const MEDCalculatorDBSliceField* other, const DataArrayInt *cc, const DataArrayInt *nc,
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::add(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                                                     int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                                     int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const
 {
   if(cc!=0 || nc!=0)
     throw INTERP_KERNEL::Exception("Slice::add : not implemented yet node/cell permutation !");
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
-  std::vector<int> oIds=otherC.getIds(sizeCOther);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> oIds=otherC.getIds(sizeCOther);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
@@ -145,14 +145,14 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::add(const MEDCalculatorDBS
   return new MEDCalculatorDBSliceField(f3);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::substract(const MEDCalculatorDBSliceField* other, const DataArrayInt *cc, const DataArrayInt *nc,
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::substract(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                                                           int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                                           int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const
 {
   if(cc!=0 || nc!=0)
     throw INTERP_KERNEL::Exception("Slice::substract : not implemented yet node/cell permutation !");
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
-  std::vector<int> oIds=otherC.getIds(sizeCOther);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> oIds=otherC.getIds(sizeCOther);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
@@ -160,14 +160,14 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::substract(const MEDCalcula
   return new MEDCalculatorDBSliceField(f3);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::multiply(const MEDCalculatorDBSliceField* other, const DataArrayInt *cc, const DataArrayInt *nc,
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::multiply(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                                                          int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                                          int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const
 {
   if(cc!=0 || nc!=0)
     throw INTERP_KERNEL::Exception("Slice::multiply : not implemented yet node/cell permutation !");
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
-  std::vector<int> oIds=otherC.getIds(sizeCOther);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> oIds=otherC.getIds(sizeCOther);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
@@ -175,14 +175,14 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::multiply(const MEDCalculat
   return new MEDCalculatorDBSliceField(f3);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::divide(const MEDCalculatorDBSliceField* other, const DataArrayInt *cc, const DataArrayInt *nc,
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::divide(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                                                        int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                                        int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const
 {
   if(cc!=0 || nc!=0)
     throw INTERP_KERNEL::Exception("Slice::divide : not implemented yet node/cell permutation !");
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
-  std::vector<int> oIds=otherC.getIds(sizeCOther);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> oIds=otherC.getIds(sizeCOther);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
@@ -193,8 +193,8 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::divide(const MEDCalculator
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::dot(const MEDCalculatorDBSliceField* other, int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                                     int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
-  std::vector<int> oIds=otherC.getIds(sizeCOther);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> oIds=otherC.getIds(sizeCOther);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
@@ -205,8 +205,8 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::dot(const MEDCalculatorDBS
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::crossProduct(const MEDCalculatorDBSliceField* other, int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                                              int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
-  std::vector<int> oIds=otherC.getIds(sizeCOther);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> oIds=otherC.getIds(sizeCOther);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());
@@ -216,7 +216,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::crossProduct(const MEDCalc
 
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::doublyContractedProduct(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->doublyContractedProduct();
   return new MEDCalculatorDBSliceField(f2);
@@ -224,7 +224,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::doublyContractedProduct(in
 
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::determinant(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->determinant();
   return new MEDCalculatorDBSliceField(f2);
@@ -232,7 +232,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::determinant(int sizeCThis,
 
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenValues(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->eigenValues();
   return new MEDCalculatorDBSliceField(f2);
@@ -240,7 +240,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenValues(int sizeCThis,
 
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenVectors(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->eigenVectors();
   return new MEDCalculatorDBSliceField(f2);
@@ -248,7 +248,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenVectors(int sizeCThis
 
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::inverse(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->inverse();
   return new MEDCalculatorDBSliceField(f2);
@@ -256,7 +256,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::inverse(int sizeCThis, con
 
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::trace(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->trace();
   return new MEDCalculatorDBSliceField(f2);
@@ -264,7 +264,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::trace(int sizeCThis, const
 
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::deviator(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->deviator();
   return new MEDCalculatorDBSliceField(f2);
@@ -272,7 +272,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::deviator(int sizeCThis, co
 
 MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::magnitude(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MEDCouplingFieldDouble *f2=f1->magnitude();
   return new MEDCalculatorDBSliceField(f2);
@@ -280,20 +280,20 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::magnitude(int sizeCThis, c
 
 void MEDCalculatorDBSliceField::applyFunc(const char *func, int sizeCThis, const MEDCalculatorDBRangeSelection& thisC)
 {
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   f1->applyFunc(func);
   _field->setSelectedComponents(f1,tIds);
 }
 
-bool MEDCalculatorDBSliceField::isEqual(const MEDCalculatorDBSliceField* other, const DataArrayInt *cc, const DataArrayInt *nc,
+bool MEDCalculatorDBSliceField::isEqual(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                                      int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                      int sizeCOther, const MEDCalculatorDBRangeSelection& otherC, double prec) const
 {
   if(cc!=0 || nc!=0)
     throw INTERP_KERNEL::Exception("Slice::isEqual : not implemented yet node/cell permutation !");
-  std::vector<int> tIds=thisC.getIds(sizeCThis);
-  std::vector<int> oIds=otherC.getIds(sizeCOther);
+  std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
+  std::vector<std::size_t> oIds=otherC.getIds(sizeCOther);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
   MCAuto<MEDCouplingFieldDouble> f2=other->_field->keepSelectedComponents(oIds);
   f2->setMesh(f1->getMesh());

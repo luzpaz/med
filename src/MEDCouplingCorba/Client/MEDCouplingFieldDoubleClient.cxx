@@ -36,7 +36,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   //1st CORBA call : getting all tiny info of all types (int, double string).
   fieldPtr->getTinyInfo(tinyL,tinyD,tinyS);
   int tinyLgth=tinyL->length();
-  std::vector<int> tinyLV(tinyLgth);
+  std::vector<mcIdType> tinyLV(tinyLgth);
   for(int i=0;i<tinyLgth;i++)
     tinyLV[i]=(*tinyL)[i];
   delete tinyL;
@@ -63,7 +63,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   CORBA::release(meshPtr);
   ret->setMesh(mesh);
   mesh->decrRef();
-  DataArrayInt *array0;
+  DataArrayIdType *array0;
   std::vector<DataArrayDouble *> arrays;
   ret->resizeForUnserialization(tinyLV,array0,arrays);
   SALOME_TYPES::ListOfLong *bigArr0;
@@ -72,9 +72,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   fieldPtr->getSerialisationData(bigArr0,bigArr);
   if(bigArr0->length()!=0)
     {
-      int *pt=array0->getPointer();
-      int lgth=array0->getNbOfElems();
-      for(int i=0;i<lgth;i++)
+      mcIdType *pt=array0->getPointer();
+      mcIdType lgth=array0->getNbOfElems();
+      for(mcIdType i=0;i<lgth;i++)
         pt[i]=(*bigArr0)[i];
     }
   delete bigArr0;

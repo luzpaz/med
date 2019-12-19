@@ -45,7 +45,7 @@ void MEDCoupling::MEDCalculatorBasicsTest::testLightStruct1()
 void MEDCoupling::MEDCalculatorBasicsTest::testRangeSelection1()
 {
   MEDCalculatorDBRangeSelection sel1(":");
-  std::vector<int> v=sel1.getIds(6);
+  std::vector<std::size_t> v=sel1.getIds(6);
   CPPUNIT_ASSERT_EQUAL(6,(int)v.size());
   const int expected1[6]={0,1,2,3,4,5};
   CPPUNIT_ASSERT(std::equal(expected1,expected1+6,v.begin()));
@@ -111,7 +111,7 @@ void MEDCoupling::MEDCalculatorBasicsTest::testDBField1()
 void MEDCoupling::MEDCalculatorBasicsTest::generateAFile1(const char *fName)
 {
   double targetCoords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
-  int targetConn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mcIdType targetConn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
   MEDCouplingUMesh *m=MEDCouplingUMesh::New();
   m->setName("AMesh");
   m->setMeshDimension(2);

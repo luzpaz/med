@@ -50,7 +50,7 @@ void MEDCouplingMultiFieldsClient::BuildFullMultiFieldsCorbaFetch(MEDCouplingMul
   CORBA::Long nbOfFields;
   CORBA::Long nbOfMeshes=fieldPtr->getMainTinyInfo(tinyL,tinyD,nbOfArrays,nbOfFields);
   int tinyLgth=tinyL->length();
-  std::vector<int> mainI(tinyLgth);
+  std::vector<mcIdType> mainI(tinyLgth);
   for(int i=0;i<tinyLgth;i++)
     mainI[i]=(*tinyL)[i];
   delete tinyL; tinyL=0;
@@ -83,7 +83,7 @@ void MEDCouplingMultiFieldsClient::BuildFullMultiFieldsCorbaFetch(MEDCouplingMul
     {
       fieldPtr->getTinyInfo(i,tinyL,tinyD,tinyS);
       int tinyLgth2=tinyL->length();
-      std::vector<int> tinyLV(tinyLgth2);
+      std::vector<mcIdType> tinyLV(tinyLgth2);
       for(int j=0;j<tinyLgth2;j++)
         tinyLV[j]=(*tinyL)[j];
       delete tinyL; tinyL=0;
@@ -102,13 +102,13 @@ void MEDCouplingMultiFieldsClient::BuildFullMultiFieldsCorbaFetch(MEDCouplingMul
       TypeOfField type=(TypeOfField) tinyLV[0];
       MEDCouplingFieldTemplate *f1=MEDCouplingFieldTemplate::New(type);
       //
-      DataArrayInt *array0;
+      DataArrayIdType *array0;
       f1->resizeForUnserialization(tinyLV,array0);
       if(array0)
         {
           fieldPtr->getSerialisationData(i,tinyL);
           tinyLgth2=tinyL->length();
-          int *ptr=array0->getPointer();
+          mcIdType *ptr=array0->getPointer();
           for(int j=0;j<tinyLgth2;j++)
             ptr[j]=(*tinyL)[j];
           delete tinyL; tinyL=0;

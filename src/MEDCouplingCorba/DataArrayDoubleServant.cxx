@@ -30,7 +30,7 @@ DataArrayDoubleServant::DataArrayDoubleServant(const DataArrayDouble *cppPointer
 void DataArrayDoubleServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa)
 {
   la=new SALOME_TYPES::ListOfLong;
-  std::vector<int> tinyInfo;
+  std::vector<mcIdType> tinyInfo;
   getPointer()->getTinySerializationIntInformation(tinyInfo);
   la->length(tinyInfo.size());
   for(int i=0;i<(int)tinyInfo.size();i++)

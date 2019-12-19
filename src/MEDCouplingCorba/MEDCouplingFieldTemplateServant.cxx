@@ -32,7 +32,7 @@ MEDCouplingFieldTemplateServant::MEDCouplingFieldTemplateServant(const MEDCoupli
 void MEDCouplingFieldTemplateServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa)
 {
   la=new SALOME_TYPES::ListOfLong;
-  std::vector<int> tinyInfo;
+  std::vector<mcIdType> tinyInfo;
   getPointer()->getTinySerializationIntInformation(tinyInfo);
   la->length(tinyInfo.size());
   for(int i=0;i<(int)tinyInfo.size();i++)
@@ -55,16 +55,16 @@ void MEDCouplingFieldTemplateServant::getTinyInfo(SALOME_TYPES::ListOfLong_out l
 
 void MEDCouplingFieldTemplateServant::getSerialisationData(SALOME_TYPES::ListOfLong_out la)
 {
-  DataArrayInt *dataInt;
+  DataArrayIdType *dataInt;
   getPointer()->serialize(dataInt);
   //
   la=new SALOME_TYPES::ListOfLong;
   if(dataInt)
     {
-      int lgth=dataInt->getNbOfElems();
-      const int *ptr=dataInt->getConstPointer();
+      mcIdType lgth=dataInt->getNbOfElems();
+      const mcIdType *ptr=dataInt->getConstPointer();
       la->length(lgth);
-      for(int i=0;i<lgth;i++)
+      for(mcIdType i=0;i<lgth;i++)
         (*la)[i]=ptr[i];
     }
   else

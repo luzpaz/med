@@ -103,7 +103,7 @@ void MEDCouplingMeshClient::fillMeshFromCorbaData(MEDCouplingMesh *meshCpp, SALO
   SALOME_TYPES::ListOfString *tinyS;
   meshPtr->getTinyInfo(tinyD,tinyI,tinyS);
   int tinyLgth=tinyI->length();
-  std::vector<int> tinyV(tinyLgth);
+  std::vector<mcIdType> tinyV(tinyLgth);
   for(int i=0;i<tinyLgth;i++)
     tinyV[i]=(*tinyI)[i];
   int tinyLgth2=tinyD->length();
@@ -116,7 +116,7 @@ void MEDCouplingMeshClient::fillMeshFromCorbaData(MEDCouplingMesh *meshCpp, SALO
   delete tinyS;
   delete tinyI;
   delete tinyD;
-  DataArrayInt* a1=DataArrayInt::New();
+  DataArrayIdType* a1=DataArrayIdType::New();
   DataArrayDouble* a2=DataArrayDouble::New();
   //thanks to the entry point tinyV get from the 1st CORBA invocation,
   //resizing a1,a2 and sts.
@@ -127,7 +127,7 @@ void MEDCouplingMeshClient::fillMeshFromCorbaData(MEDCouplingMesh *meshCpp, SALO
   SALOME_TYPES::ListOfDouble *a2Corba;
   meshPtr->getSerialisationData(a1Corba,a2Corba);
   int myLgth=a1Corba->length();
-  int *ptToFill=a1->getPointer();
+  mcIdType *ptToFill=a1->getPointer();
   for(int i=0;i<myLgth;i++)
     ptToFill[i]=(*a1Corba)[i];
   delete a1Corba;

@@ -38,7 +38,7 @@ namespace MEDCoupling
     void setPyEnd(int val);
     MEDCalculatorDBRangeSelection& operator=(const char *v) throw(INTERP_KERNEL::Exception);
     MEDCalculatorDBRangeSelection& operator=(int v) throw(INTERP_KERNEL::Exception);
-    std::vector<int> getIds(int lgth) const throw(INTERP_KERNEL::Exception);
+    std::vector<std::size_t> getIds(int lgth) const throw(INTERP_KERNEL::Exception);
     int getSize(int lgth) const throw(INTERP_KERNEL::Exception);
     bool isAll() const;
     void setAll();
