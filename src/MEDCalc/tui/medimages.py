@@ -53,7 +53,7 @@ class FieldBuilder:
         # just have to specify the field and the MEDLoader will save the
         # underlying mesh.
         createFromScratch=True
-        ML.MEDLoader.WriteField(medFilepath,field,createFromScratch)
+        ML.WriteField(medFilepath,field,createFromScratch)
 
     def createMesh(self, meshname, sizeX, sizeY):
         """
