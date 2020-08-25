@@ -54,9 +54,8 @@ public:
    */
   ~MEDPyLockWrapper()
   {
-    PyThreadState* _currState = PyGILState_GetThisThreadState();
 #ifdef _DEBUG_
-    if (_currState != _state)
+    if (PyGILState_GetThisThreadState() != _state)
     {
       std::cout << "!!!!!!!!! MEDPyLockWrapper inconsistency - now entering infinite loop for debugging\n";
       while(1);

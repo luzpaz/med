@@ -289,7 +289,7 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
   // For each object, emit a signal to the workspace to request a
   // visualisation using the tui command (so that the user can see how
   // to make a view of an object from the tui console).
-  for (int i=0; i<listOfSObject->size(); i++) {
+  for (int i=0; i<(int)listOfSObject->size(); i++) {
       SALOMEDS::SObject_var soObj = listOfSObject->at(i);
       std::string name(_studyEditor->getName(soObj));
       if (soObj->_is_nil() || name == "MEDCalc")
@@ -388,7 +388,7 @@ PresentationController::onDeletePresentation()
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
 
   // For each object, emit a signal to the workspace to request pres deletion
-  for (int i=0; i<listOfSObject->size(); i++) {
+  for (int i=0; i<(int)listOfSObject->size(); i++) {
       SALOMEDS::SObject_var soPres = listOfSObject->at(i);
       std::string name(_studyEditor->getName(soPres));
       if (soPres->_is_nil() || name == "MEDCalc")
@@ -581,7 +581,7 @@ PresentationController::processPresentationEvent(const PresentationEvent* event)
 }
 
 MEDWidgetHelper *
-PresentationController::findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager_ptr presManager,
+PresentationController::findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager_ptr /*presManager*/,                  // todo: unused
                                                  int presId, const std::string& type, const std::string& name )
 {
   std::map<int, MEDWidgetHelper *>::const_iterator it =_presHelperMap.find(presId);
@@ -604,8 +604,7 @@ PresentationController::findOrCreateWidgetHelper(MEDCALC::MEDPresentationManager
     wh = new MEDWidgetHelperDeflectionShape(this, _presManager, presId, name, _widgetPresentationParameters);
   else
     {
-      const char * msg ="findOrCreateWidgetHelper(): NOT IMPLEMENTED !!!";
-      STDLOG(msg);
+      STDLOG("findOrCreateWidgetHelper(): NOT IMPLEMENTED !!!");
       return wh;
     }
   _presHelperMap[presId] = wh;
@@ -643,7 +642,7 @@ PresentationController::onParavisDump()
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
 
   // For the first object only, request the dump
-  for (int i=0; i<listOfSObject->size(); i++) {
+  for (int i=0; i<(int)listOfSObject->size(); i++) {
       SALOMEDS::SObject_var soPres = listOfSObject->at(i);
       std::string name(_studyEditor->getName(soPres));
       if (soPres->_is_nil() || name == "MEDCalc")

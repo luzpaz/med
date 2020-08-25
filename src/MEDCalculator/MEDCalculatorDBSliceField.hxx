@@ -48,7 +48,7 @@ namespace MEDCoupling
     void setField(MEDCouplingFieldDouble *f) const;
     void setName(const char *name);
     void setDescription(const char *descr);
-    void write(const char *fName, const std::string& n, const std::string& d) const throw(INTERP_KERNEL::Exception);
+    void write(const char *fName, const std::string& n, const std::string& d) const;
     const MEDCouplingMesh *getMesh(TypeOfField type, const std::string& fname, const std::string& mname, const std::string& fieldName) const;
     MEDCouplingFieldDouble *getField(TypeOfField type, const std::string& fname, const std::string& mname, const std::string& fieldName) const;
     MEDCouplingFieldDouble *getFieldWithoutQuestion(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const;
@@ -75,14 +75,14 @@ namespace MEDCoupling
     MEDCalculatorDBSliceField *crossProduct(const MEDCalculatorDBSliceField* other,
                                          int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,
                                          int sizeCOther, const MEDCalculatorDBRangeSelection& otherC) const;
-    MEDCalculatorDBSliceField *doublyContractedProduct(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception);
-    MEDCalculatorDBSliceField *determinant(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception);
-    MEDCalculatorDBSliceField *eigenValues(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception);
-    MEDCalculatorDBSliceField *eigenVectors(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception);
-    MEDCalculatorDBSliceField *inverse(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception);
-    MEDCalculatorDBSliceField *trace(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception);
-    MEDCalculatorDBSliceField *deviator(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception);
-    MEDCalculatorDBSliceField *magnitude(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception);
+    MEDCalculatorDBSliceField *doublyContractedProduct(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const;
+    MEDCalculatorDBSliceField *determinant(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const;
+    MEDCalculatorDBSliceField *eigenValues(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const;
+    MEDCalculatorDBSliceField *eigenVectors(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const;
+    MEDCalculatorDBSliceField *inverse(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const;
+    MEDCalculatorDBSliceField *trace(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const;
+    MEDCalculatorDBSliceField *deviator(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const;
+    MEDCalculatorDBSliceField *magnitude(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const;
     void applyFunc(const char *func, int sizeCThis, const MEDCalculatorDBRangeSelection& thisC);
     bool isEqual(const MEDCalculatorDBSliceField* other, const DataArrayIdType *cc, const DataArrayIdType *nc,
                  int sizeCThis, const MEDCalculatorDBRangeSelection& thisC,

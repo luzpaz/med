@@ -79,7 +79,7 @@ void MEDWidgetHelperSlices::onNbSlicesChanged(int nbSlices)
 }
 
 
-void MEDWidgetHelperSlices::onSliceOrientationChanged(int sliceOrient)
+void MEDWidgetHelperSlices::onSliceOrientationChanged(int /*sliceOrient*/)
 {
   STDLOG("MEDWidgetHelperSlices::onSliceOrientationChanged");
   PresentationEvent* event = new PresentationEvent();

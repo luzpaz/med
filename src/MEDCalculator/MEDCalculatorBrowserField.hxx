@@ -70,7 +70,7 @@ namespace MEDCoupling
     void setComponentName(int,const std::string&);//  Change the name of a component
     bool isAnySelection() const;
     void setMeshName(const std::string& m);
-    MEDCalculatorBrowserField getSelectedTimeSteps() const throw(INTERP_KERNEL::Exception);
+    MEDCalculatorBrowserField getSelectedTimeSteps() const;
   private:
     std::string _name;// field name
     std::string _file_name;// file name

@@ -66,7 +66,7 @@ void MEDCalculatorDBSliceField::setDescription(const char *descr)
   _field->setDescription(descr);
 }
 
-void MEDCalculatorDBSliceField::write(const char *fName, const std::string& n, const std::string& d) const throw(INTERP_KERNEL::Exception)
+void MEDCalculatorDBSliceField::write(const char *fName, const std::string& n, const std::string& d) const
 {
   std::string kn=_field->getName();
   std::string kd=_field->getDescription();
@@ -214,7 +214,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::crossProduct(const MEDCalc
   return new MEDCalculatorDBSliceField(f3);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::doublyContractedProduct(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::doublyContractedProduct(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const
 {
   std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
@@ -222,7 +222,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::doublyContractedProduct(in
   return new MEDCalculatorDBSliceField(f2);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::determinant(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::determinant(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const
 {
   std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
@@ -230,7 +230,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::determinant(int sizeCThis,
   return new MEDCalculatorDBSliceField(f2);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenValues(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenValues(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const
 {
   std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
@@ -238,7 +238,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenValues(int sizeCThis,
   return new MEDCalculatorDBSliceField(f2);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenVectors(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenVectors(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const
 {
   std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
@@ -246,7 +246,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::eigenVectors(int sizeCThis
   return new MEDCalculatorDBSliceField(f2);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::inverse(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::inverse(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const
 {
   std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
@@ -254,7 +254,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::inverse(int sizeCThis, con
   return new MEDCalculatorDBSliceField(f2);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::trace(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::trace(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const
 {
   std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
@@ -262,7 +262,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::trace(int sizeCThis, const
   return new MEDCalculatorDBSliceField(f2);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::deviator(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::deviator(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const
 {
   std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);
@@ -270,7 +270,7 @@ MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::deviator(int sizeCThis, co
   return new MEDCalculatorDBSliceField(f2);
 }
 
-MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::magnitude(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBSliceField *MEDCalculatorDBSliceField::magnitude(int sizeCThis, const MEDCalculatorDBRangeSelection& thisC) const
 {
   std::vector<std::size_t> tIds=thisC.getIds(sizeCThis);
   MCAuto<MEDCouplingFieldDouble> f1=_field->keepSelectedComponents(tIds);

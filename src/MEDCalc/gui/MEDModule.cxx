@@ -104,11 +104,13 @@ MEDModule::init()
   if ( CORBA::is_nil( _MED_engine ) ) {
     Engines::EngineComponent_var comp =
       SalomeApp_Application::lcc()->FindOrLoad_Component( "FactoryServer", "FIELDS" );
-    if (CORBA::is_nil( comp ))
-        STDLOG("Could not FindOrLoad_Component FIELDS");
+    if (CORBA::is_nil( comp )) {
+      STDLOG("Could not FindOrLoad_Component FIELDS");
+    }
     _MED_engine = MED_ORB::MED_Gen::_narrow( comp );
-    if (CORBA::is_nil( _MED_engine ))
-        STDLOG("Could not narrow FIELDS engine");
+    if (CORBA::is_nil( _MED_engine )) {
+      STDLOG("Could not narrow FIELDS engine");
+    }
   }
 }
 
@@ -451,7 +453,7 @@ MEDModule::itemClickGeneric(std::string & name, std::string & type, int & presId
 }
 
 void
-MEDModule::onClick(const QModelIndex & index)
+MEDModule::onClick(const QModelIndex & /*index*/)
 {
   int presId;
   std::string name, type;
@@ -473,7 +475,7 @@ MEDModule::onClick(const QModelIndex & index)
 }
 
 void
-MEDModule::onDblClick(const QModelIndex& index)
+MEDModule::onDblClick(const QModelIndex& /*index*/)
 {
   int presId;
   std::string name, type;

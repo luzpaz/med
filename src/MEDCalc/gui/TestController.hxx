@@ -29,7 +29,7 @@ class SUIT_Desktop;
 class QAction;
 namespace MEDCALC {
   class MedEvent;
-};
+}
 
 class TestController: public QObject {
   Q_OBJECT

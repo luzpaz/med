@@ -4,9 +4,9 @@
 
 .. include:: medcalc-definitions.rst
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Module FIELDS: Spécifications fonctionnelles et techniques
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Ce texte présente les spécifications informatiques pour le
 développement d'un module de manipulation de champs qui répond à
@@ -714,7 +714,7 @@ Dans le cadre défini ci-dessus, une session d'utilisation type est:
 
 * Effectuer les contrôles visuel et les diagnostics en ligne de
   commandes python (cf. :ref:`Spécification des fonctions de
-  visualisation<specification_visualisation>`)::
+  visualisation<specification_visualisation-fr>`)::
 
   >>> view(r)
 
@@ -751,7 +751,7 @@ Sur cette base, on peut envisager une grande variété de cas d'utilisation:
   l'utilisateur peut visualiser les ligne de commandes nécessaires à
   taper pour exécuter sa requête.
 
-.. _specification_visualisation:
+.. _specification_visualisation-fr:
 
 Spécification des fonctions de visualisation
 ============================================

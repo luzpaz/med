@@ -56,12 +56,12 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
   pthread_mutex_destroy (&m2);
 }
 
-void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling, const char * ior) throw(SALOME::SALOME_Exception)
+void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling, const char * ior)
 {
   int gsize, grank;
   except_st *est;
   void *ret_th;
-  pthread_t *th;
+  pthread_t *th = 0;
   ostringstream msg;
   
   pthread_mutex_lock(&m1);
@@ -145,11 +145,11 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling, const char
     }
 }
 
-void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
+void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling)
 {
   except_st *est;
   void *ret_th;
-  pthread_t *th;
+  pthread_t *th = 0;
   ostringstream msg;
 
   pthread_mutex_lock(&m2);
@@ -234,11 +234,11 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
                                                     CORBA::Double max_distance_for_3Dsurf_intersect,
                                                     CORBA::Long orientation,
                                                     CORBA::Boolean measure_abs,
-                                                    const char * splitting_policy) throw(SALOME::SALOME_Exception)
+                                                    const char * splitting_policy)
 {
   except_st *est;
   void *ret_th;
-  pthread_t *th;
+  pthread_t *th = 0;
   ostringstream msg;
 
   if(_numproc == 0)

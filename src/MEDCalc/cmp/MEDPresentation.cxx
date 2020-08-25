@@ -49,9 +49,10 @@ MEDPresentation::MEDPresentation(MEDPresentation::TypeID handlerId, const std::s
                                  const MEDCALC::ViewModeType viewMode,
                                  const MEDCALC::ColorMapType colorMap,
                                  const MEDCALC::ScalarBarRangeType sbRange)
-    : _handlerId(handlerId), _propertiesStr(),
+    : _meshName(""), _fileName(""), _fieldName(""),
       _mcFieldType(MEDCoupling::ON_CELLS),
-      _pvFieldType(""), _meshName(""), _fieldName(""), _fileName(""),
+      _pvFieldType(""),
+      _handlerId(handlerId),
       _selectedComponentIndex(-1),
       _viewMode(viewMode),
       _colorMap(colorMap),
@@ -93,7 +94,7 @@ MEDPresentation::initFieldMeshInfos()
   MEDCALC::MEDDataManager_ptr dataManager(MEDFactoryClient::getDataManager());
   MEDCALC::FieldHandler* fieldHandler = dataManager->getFieldHandler(_handlerId);
   MEDCALC::MeshHandler* meshHandler = dataManager->getMeshHandler(fieldHandler->meshid);
-  MEDCALC::DatasourceHandler* dataSHandler = dataManager->getDatasourceHandlerFromID(meshHandler->sourceid);
+  //MEDCALC::DatasourceHandler* dataSHandler = dataManager->getDatasourceHandlerFromID(meshHandler->sourceid); // todo: unused
 
   // get the file name of the field (or its memory information)
   extractFileName(std::string(fieldHandler->source));
@@ -111,8 +112,7 @@ MEDPresentation::extractFileName(const std::string& name)
   STDLOG("MEDPresentation::extractFileName('" << name << "')");
   _fileName = name;
   if (_fileName.substr(0, 7) != std::string("file://")) {
-    const char* msg = "MEDPresentation(): Data source is in memory! Saving it in tmp file.";
-    STDLOG(msg);
+    STDLOG("MEDPresentation(): Data source is in memory! Saving it in tmp file.");
     // export a med file with this field
     // we could instead use CORBA to transfer the field to PARAVIS like in MEDCalculatorDBFieldReal::display()
     _fileName = std::tmpnam(NULL);
@@ -401,7 +401,7 @@ MEDPresentation::setOrCreateRenderView()
   } else if (_viewMode == MEDCALC::VIEW_MODE_NEW_LAYOUT) {
       oss2 <<  "nbLayouts = len(pvs.GetLayouts());";
       pushAndExecPyLine(oss2.str()); oss2.str("");
-      oss2 <<  "__layout1 = pvs.CreateLayout('Layout #\%i'%(nbLayouts+1));";
+      oss2 <<  "__layout1 = pvs.CreateLayout('Layout #%i'%(nbLayouts+1));";
       pushAndExecPyLine(oss2.str()); oss2.str("");
       oss2 << view << " = pvs.CreateView('RenderView');";
       pushAndExecPyLine(oss2.str()); oss2.str("");

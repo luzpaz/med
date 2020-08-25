@@ -76,7 +76,6 @@ void XmedConsoleDriver::exec(const QStringList& commands) {
   MEDCALC::MEDCommandsHistoryManager_ptr history = MEDFactoryClient::getCommandsHistoryManager();
 
   QStringListIterator it(commands);
-  int i = 0;
   while (it.hasNext()) {
     const QString& command = it.next();
     _pyConsole->exec(command);

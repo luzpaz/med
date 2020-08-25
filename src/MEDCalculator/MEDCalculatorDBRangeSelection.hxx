@@ -31,20 +31,20 @@ namespace MEDCoupling
   class MEDCALCULATOR_EXPORT MEDCalculatorDBRangeSelection
   {
   public:
-    MEDCalculatorDBRangeSelection(const char *v) throw(INTERP_KERNEL::Exception);
+    MEDCalculatorDBRangeSelection(const char *v);
     MEDCalculatorDBRangeSelection(int v);
     MEDCalculatorDBRangeSelection();
     void setPyStart(int val);
     void setPyEnd(int val);
-    MEDCalculatorDBRangeSelection& operator=(const char *v) throw(INTERP_KERNEL::Exception);
-    MEDCalculatorDBRangeSelection& operator=(int v) throw(INTERP_KERNEL::Exception);
-    std::vector<std::size_t> getIds(int lgth) const throw(INTERP_KERNEL::Exception);
-    int getSize(int lgth) const throw(INTERP_KERNEL::Exception);
+    MEDCalculatorDBRangeSelection& operator=(const char *v);
+    MEDCalculatorDBRangeSelection& operator=(int v);
+    std::vector<std::size_t> getIds(int lgth) const;
+    int getSize(int lgth) const;
     bool isAll() const;
     void setAll();
   private:
-    void setValue(const char *v) throw(INTERP_KERNEL::Exception);
-    void setValue(int v) throw(INTERP_KERNEL::Exception);
+    void setValue(const char *v);
+    void setValue(int v);
     static int TraducePyVal(int val);
   private:
     static const char SEPARATOR=':';

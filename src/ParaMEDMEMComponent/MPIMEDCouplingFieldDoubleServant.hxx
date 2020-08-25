@@ -36,7 +36,7 @@ namespace MEDCoupling
   {
   public:
     MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,PortableServer::POA_ptr poa,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field);
-    void getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception);
+    void getDataByMPI(const char* coupling);
     char* getRef();
     // only for coupling one component with itself
     CORBA::LongLong getImplementation() {return (CORBA::LongLong)_field;}

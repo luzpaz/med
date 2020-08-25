@@ -4,9 +4,9 @@
 
 .. include:: medcalc-definitions.rst
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 FIELDS module: User guide for graphical interface
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This document is a quick guide for Graphical User Interface of FIELDS module. It
 shows how to use this module on the basis of a few reference examples, built
@@ -26,7 +26,7 @@ from use cases identified during requirement analysis stage.
              look-and-feel may thus be slightly different.
 
 General presentation of FIELDS module
-==================================
+=====================================
 
 The overall ergonomics of FIELDS module for field manipulation is inspired by
 software such as octave or scilab. It combines a graphical interface (GUI) to
@@ -62,7 +62,7 @@ A typical use of field manipulation functions is:
 
 
 Quick tour on functions available in FIELDS module
-===============================================
+==================================================
 
 This section presents some use examples of FIELDS module like a "storyboard",
 illustrating the functions proposed by the module.

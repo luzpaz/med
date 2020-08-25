@@ -100,8 +100,10 @@ ProcessingController::OnChangeUnderlyingMesh()
       if ( fieldSeriesId < 0)
         return;
       MEDCALC::FieldHandlerList* fieldHandlerList = MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldSeriesId);
+      /* todo: always false!
       if (fieldHandlerList->length() < 0)
         return;
+      */
       // For a field series, get the first real field entry:
       MEDCALC::FieldHandler fieldHandler = (*fieldHandlerList)[0];
       fieldId = fieldHandler.id;
@@ -158,8 +160,10 @@ ProcessingController::OnInterpolateField()
       if ( fieldSeriesId < 0)
         return;
       MEDCALC::FieldHandlerList* fieldHandlerList = MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldSeriesId);
+      /* todo: always false!
       if (fieldHandlerList->length() < 0)
         return;
+      */
       // For a field series, get the first real field entry:
       MEDCALC::FieldHandler fieldHandler = (*fieldHandlerList)[0];
       fieldId = fieldHandler.id;

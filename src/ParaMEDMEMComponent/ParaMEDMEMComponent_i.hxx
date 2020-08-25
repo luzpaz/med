@@ -90,9 +90,9 @@ namespace MEDCoupling
                                  CORBA::Double max_distance_for_3Dsurf_intersect,
                                  CORBA::Long orientation,
                                  CORBA::Boolean measure_abs,
-                                 const char * splitting_policy ) throw(SALOME::SALOME_Exception);
-    virtual void initializeCoupling(const char * coupling, const char * ior) throw(SALOME::SALOME_Exception);
-    virtual void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
+                                 const char * splitting_policy );
+    virtual void initializeCoupling(const char * coupling, const char * ior);
+    virtual void terminateCoupling(const char * coupling);
     virtual void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
     
   protected:

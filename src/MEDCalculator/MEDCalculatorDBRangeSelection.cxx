@@ -28,7 +28,7 @@ using namespace MEDCoupling;
 
 const char MEDCalculatorDBRangeSelection::ALL_ELTS[]=":";
 
-MEDCalculatorDBRangeSelection::MEDCalculatorDBRangeSelection(const char *v) throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBRangeSelection::MEDCalculatorDBRangeSelection(const char *v)
 try
   {
     setValue(v);
@@ -58,7 +58,7 @@ void MEDCalculatorDBRangeSelection::setPyEnd(int val)
   _end=TraducePyVal(val);
 }
 
-std::vector<std::size_t> MEDCalculatorDBRangeSelection::getIds(int lgth) const throw(INTERP_KERNEL::Exception)
+std::vector<std::size_t> MEDCalculatorDBRangeSelection::getIds(int lgth) const
 {
   if(_start>=lgth || _start<0)
     {
@@ -82,7 +82,7 @@ std::vector<std::size_t> MEDCalculatorDBRangeSelection::getIds(int lgth) const t
   return ret;
 }
 
-int MEDCalculatorDBRangeSelection::getSize(int lgth) const throw(INTERP_KERNEL::Exception)
+int MEDCalculatorDBRangeSelection::getSize(int lgth) const
 {
   return getIds(lgth).size();
 }
@@ -98,19 +98,19 @@ void MEDCalculatorDBRangeSelection::setAll()
   _end=std::numeric_limits<int>::max();
 }
 
-MEDCalculatorDBRangeSelection& MEDCalculatorDBRangeSelection::operator=(const char *v) throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBRangeSelection& MEDCalculatorDBRangeSelection::operator=(const char *v)
 {
   setValue(v);
   return *this;
 }
 
-MEDCalculatorDBRangeSelection& MEDCalculatorDBRangeSelection::operator=(int v) throw(INTERP_KERNEL::Exception)
+MEDCalculatorDBRangeSelection& MEDCalculatorDBRangeSelection::operator=(int v)
 {
   setValue(v);
   return *this;
 }
 
-void MEDCalculatorDBRangeSelection::setValue(const char *v) throw(INTERP_KERNEL::Exception)
+void MEDCalculatorDBRangeSelection::setValue(const char *v)
 {
   try
   {
@@ -159,7 +159,7 @@ void MEDCalculatorDBRangeSelection::setValue(const char *v) throw(INTERP_KERNEL:
    }
 }
 
-void MEDCalculatorDBRangeSelection::setValue(int v) throw(INTERP_KERNEL::Exception)
+void MEDCalculatorDBRangeSelection::setValue(int v)
 {
   _start=v;
   _end=v+1;

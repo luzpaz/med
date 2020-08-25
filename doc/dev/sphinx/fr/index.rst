@@ -1,7 +1,7 @@
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- Documentation du module FIELDS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Documentation du module FIELDS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Le module SALOME FIELDS (pour Modèle d'Echange de Données) fournit la
 bibliothèque MEDCoupling (bibliothèque C++ dédiée à la manipulation de

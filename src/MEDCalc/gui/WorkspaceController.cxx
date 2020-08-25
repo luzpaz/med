@@ -116,8 +116,8 @@ WorkspaceController::~WorkspaceController() {
  * connected slots.
  */
 void WorkspaceController::createActions() {
-  QWidget* dsk = _salomeModule->getApp()->desktop();
-  SUIT_ResourceMgr* resMgr = _salomeModule->getApp()->resourceMgr();
+  // QWidget* dsk = _salomeModule->getApp()->desktop(); // todo: unused
+  // SUIT_ResourceMgr* resMgr = _salomeModule->getApp()->resourceMgr(); // todo: unused
   int toolbarId = _salomeModule->createTool("Workspace", "WorkspaceToolbar");
 
   QString label   = tr("LAB_SAVE_WORKSPACE");
@@ -361,8 +361,9 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
       std::string msg(event->msg);
       QMessageBox::warning(_salomeModule->getApp()->desktop(), "Error", QString::fromStdString(msg));
   }
-  else
+  else {
     STDLOG("WorkspaceController::processMedEvent(): Unhandled event!!!");
+  }
 }
 
 /*!
@@ -458,9 +459,9 @@ void WorkspaceController::_exportItemList(QStringList itemNameIdList) {
     LOG("WorkspaceController: WARN! No data object associated to the item "<<itemNameId);
     return;
   }
-  MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
   QStringList commands;
   /*
+  MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler(); // todo: unused
   commands+=QString("from xmed.driver_pvis import pvis_scalarmap");
   commands+=QString("pvis_scalarmap('%1','%2','%3',%4,%5)")
     .arg(tmpfilename)
@@ -502,7 +503,7 @@ void WorkspaceController::_viewItemList(QStringList itemNameIdList) {
 
   // Then, we can request this data object to obtain the associated
   // FieldHandler.
-  MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler();
+  //MEDCALC::FieldHandler* fieldHandler = dataObject->getFieldHandler(); // todo: unused
 
   // And finally, we can create the set of medcalc instructions to
   // generate the scalar map on this field.

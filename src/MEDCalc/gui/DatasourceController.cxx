@@ -233,7 +233,7 @@ void DatasourceController::OnExpandField()
 
   // Get the selected objects in the study (SObject)
   SALOME_StudyEditor::SObjectList* listOfSObject = _studyEditor->getSelectedObjects();
-  for (int i=0; i<listOfSObject->size(); i++) {
+  for (int i=0; i<(int)listOfSObject->size(); i++) {
     SALOMEDS::SObject_var soFieldseries = listOfSObject->at(i);
     std::string name(_studyEditor->getName(soFieldseries));
     if (soFieldseries->_is_nil() || name == "MEDCalc")
@@ -359,7 +359,7 @@ void DatasourceController::OnUseInWorkspace() {
   else {
     // In this case, we don't ask the user to specify an alias for
     // each item, we just import the whole set of items.
-    for (int i=0; i<listOfSObject->size(); i++) {
+    for (int i=0; i<(int)listOfSObject->size(); i++) {
       SALOMEDS::SObject_var soField = listOfSObject->at(i);
       if (soField->_is_nil())
         continue;

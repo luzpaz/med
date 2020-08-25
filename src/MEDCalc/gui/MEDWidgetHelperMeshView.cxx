@@ -72,7 +72,7 @@ void MEDWidgetHelperMeshView::releaseWidget()
   QObject::disconnect( _paramWidget, SIGNAL(comboMeshIndexChanged(int)), this, SLOT(onMeshModeChanged(int)) );
 }
 
-void MEDWidgetHelperMeshView::onMeshModeChanged(int meshMode)
+void MEDWidgetHelperMeshView::onMeshModeChanged(int /*meshMode*/)
 {
   STDLOG("MEDWidgetHelperMeshView::onMeshModeChanged");
   PresentationEvent* event = new PresentationEvent();

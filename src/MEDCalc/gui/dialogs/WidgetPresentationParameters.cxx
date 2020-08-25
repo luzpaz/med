@@ -218,16 +218,20 @@ WidgetPresentationParameters::setScalarBarRange(MEDCALC::ScalarBarRangeType sbra
 {
   _blockSig = true;
 
-  int idx;
+  int idx = -1;
   if (sbrange == MEDCALC::SCALAR_BAR_ALL_TIMESTEPS)
     idx = _ui.comboBoxScalarBarRange->findText(tr("LAB_ALL_TIMESTEPS"));
   else if (sbrange == MEDCALC::SCALAR_BAR_CURRENT_TIMESTEP)
     idx = _ui.comboBoxScalarBarRange->findText(tr("LAB_CURRENT_TIMESTEP"));
 
   if (idx >= 0)
-      _ui.comboBoxScalarBarRange->setCurrentIndex(idx);
+  {
+    _ui.comboBoxScalarBarRange->setCurrentIndex(idx);
+  }
   else
+  {
     STDLOG("Strange!! No matching found - unable to set scalar bar range in GUI.");
+  }
 
   _blockSig = false;
 }
@@ -244,9 +248,13 @@ WidgetPresentationParameters::setColorMap(MEDCALC::ColorMapType colorMap)
     idx = _ui.comboBoxColorMap->findText(tr("LAB_COOL_TO_WARM"));
 
   if (idx >= 0)
-      _ui.comboBoxColorMap->setCurrentIndex(idx);
+  {
+    _ui.comboBoxColorMap->setCurrentIndex(idx);
+  }
   else
+  {
     STDLOG("Strange!! No matching found - unable to set color map in GUI.");
+  }
 
   _blockSig = false;
 }
@@ -276,9 +284,13 @@ WidgetPresentationParameters::setMeshMode(MEDCALC::MeshModeType mode)
       idx = -1;
   }
   if (idx >= 0)
-      _ui.comboBoxMesh->setCurrentIndex(idx);
+  {
+    _ui.comboBoxMesh->setCurrentIndex(idx);
+  }
   else
+  {
     STDLOG("Strange!! No matching found - unable to set mesh mode in GUI.");
+  }
 
   _blockSig = false;
 }
@@ -320,9 +332,13 @@ WidgetPresentationParameters::setSliceOrientation(MEDCALC::SliceOrientationType 
       idx = -1;
   }
   if (idx >= 0)
+  {
     _ui.comboBoxSliceOrient->setCurrentIndex(idx);
+  }
   else
+  {
     STDLOG("Strange!! No matching found - unable to set slice orientation in GUI.");
+  }
 
   _blockSig = false;
 }

@@ -169,9 +169,10 @@ MEDPresentationManager_i::makePointSprite(const MEDCALC::PointSpriteParameters& 
 MEDCALC::MeshViewParameters
 MEDPresentationManager_i::getMeshViewParameters(MEDPresentation::TypeID presentationID)
 {
-  MEDCALC::MeshViewParameters p;
-  _getParameters<MEDPresentationMeshView>(presentationID, p);
-  return p;
+  MEDCALC::MeshViewParameters* p = new MEDCALC::MeshViewParameters();
+  _getParameters<MEDPresentationMeshView>(presentationID, *p);
+  MEDCALC::MeshViewParameters_var tmp(p);
+  return tmp._retn();
 }
 
 
@@ -187,9 +188,10 @@ MEDPresentationManager_i::getScalarMapParameters(MEDPresentation::TypeID present
 MEDCALC::ContourParameters
 MEDPresentationManager_i::getContourParameters(MEDPresentation::TypeID presentationID)
 {
-  MEDCALC::ContourParameters p;
-  _getParameters<MEDPresentationContour>(presentationID, p);
-  return p;
+  MEDCALC::ContourParameters* p = new MEDCALC::ContourParameters();
+  _getParameters<MEDPresentationContour>(presentationID, *p);
+  MEDCALC::ContourParameters_var tmp(p);
+  return tmp._retn();
 }
 
 MEDCALC::SlicesParameters*
@@ -204,9 +206,10 @@ MEDPresentationManager_i::getSlicesParameters(MEDPresentation::TypeID presentati
 MEDCALC::VectorFieldParameters
 MEDPresentationManager_i::getVectorFieldParameters(MEDPresentation::TypeID presentationID)
 {
-  MEDCALC::VectorFieldParameters p;
-  _getParameters<MEDPresentationVectorField>(presentationID, p);
-  return p;
+  MEDCALC::VectorFieldParameters* p = new MEDCALC::VectorFieldParameters();
+  _getParameters<MEDPresentationVectorField>(presentationID, *p);
+  MEDCALC::VectorFieldParameters_var tmp(p);
+  return tmp._retn();
 }
 
 MEDCALC::PointSpriteParameters*
@@ -221,9 +224,10 @@ MEDPresentationManager_i::getPointSpriteParameters(MEDPresentation::TypeID prese
 MEDCALC::DeflectionShapeParameters
 MEDPresentationManager_i::getDeflectionShapeParameters(MEDPresentation::TypeID presentationID)
 {
-  MEDCALC::DeflectionShapeParameters p;
-  _getParameters<MEDPresentationDeflectionShape>(presentationID, p);
-  return p;
+  MEDCALC::DeflectionShapeParameters* p = new MEDCALC::DeflectionShapeParameters();
+  _getParameters<MEDPresentationDeflectionShape>(presentationID, *p);
+  MEDCALC::DeflectionShapeParameters_var tmp(p);
+  return tmp._retn();
 }
 
 

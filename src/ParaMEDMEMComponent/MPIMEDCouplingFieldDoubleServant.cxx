@@ -41,11 +41,11 @@ MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_pt
   BCastIOR(orb,pobj,false);
 }
 
-void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception)
+void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling)
 {
   except_st *est;
   void *ret_th;
-  pthread_t *th;
+  pthread_t *th = 0;
 
   if(_numproc == 0)
     {

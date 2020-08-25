@@ -17,6 +17,8 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#ifndef SRC_MEDCALC_CMP_MEDCALCCONSTANTS_HXX_
+
 // This constant strings are used to specify an attribute name for
 // AttributeParameter attributes associated to a SObject
 #define IS_IN_WORKSPACE  "isInWorkspace"
@@ -28,7 +30,8 @@
 #define IS_PRESENTATION  "isPresentation"
 #define PRESENTATION_TYPE  "presentationType"
 
-static const int NB_TYPE_OF_FIELDS = 4;
-static const char* mapTypeOfFieldLabel[NB_TYPE_OF_FIELDS] =
+const int NB_TYPE_OF_FIELDS = 4;
+const char* const mapTypeOfFieldLabel[NB_TYPE_OF_FIELDS] =
   {"ON_CELLS", "ON_NODES", "ON_GAUSS_PT", "ON_GAUSS_NE" };
 
+#endif

@@ -4,9 +4,9 @@
 
 .. include:: medcalc-definitions.rst
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Module FIELDS: Guide d'utilisation de l'interface graphique
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Ce document est un guide rapide pour l'utilisation de l'interface
 graphique du module FIELDS. Il montre comment utiliser le module sur la
@@ -24,7 +24,7 @@ champs.
    :backlinks: none
 
 Présentation générale du module FIELDS
-===================================
+======================================
 
 L'ergonomie générale d'utilisation du module de manipulation de champs
 est inspirée des logiciels comme octave ou scilab. Elle associe une
@@ -71,7 +71,7 @@ processus de la forme suivante:
 
 
 Tour rapide des fonctions du module FIELDS
-=======================================
+==========================================
 
 Cette section présente des exemples d'utilisation du module XMED sous
 la forme de "storyboard", et illustre au passage les fonctions mises à
@@ -656,7 +656,7 @@ carte de champ:
 .. _xmed.userguide.tui-fr:
 
 Utilisation de l'interface textuelle du module FIELDS (TUI)
-========================================================
+===========================================================
 
 Toutes les opérations menées au moyen de l'interface graphique peuvent
 être réalisées (avec plus ou moins de facilité) avec l'interface

@@ -25,8 +25,8 @@
 MEDWidgetHelper::MEDWidgetHelper(const PresentationController * presController,
                                  MEDCALC::MEDPresentationManager_ptr presManager, int presId,
                                  const std::string & presName,  WidgetPresentationParameters * paramWidget):
-  _presController(presController),
   _presManager(presManager),
+  _presController(presController),
   _presId(presId),
   _presName(presName),
   _paramWidget(paramWidget)
@@ -102,7 +102,7 @@ void MEDWidgetHelper::onComponentChanged(int idx)
   emit presentationUpdateSignal(event); // --> PresentationController::processPresentationEvent
 }
 
-void MEDWidgetHelper::onColorMapChanged(int idx)
+void MEDWidgetHelper::onColorMapChanged(int /*idx*/)
 {
   STDLOG("MEDWidgetHelper::onColorMapChanged");
   PresentationEvent* event = new PresentationEvent();

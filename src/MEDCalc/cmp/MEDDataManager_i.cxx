@@ -505,7 +505,7 @@ void MEDDataManager_i::savePersistentFields(const char * filepath) {
 
   MEDCALC::FieldIdList fieldIdList;
   fieldIdList.length(listId.size());
-  for (int i=0; i<listId.size(); i++) {
+  for (int i=0; i<(int)listId.size(); i++) {
     fieldIdList[i] = CORBA::Long(listId[i]);
   }
 
@@ -641,7 +641,7 @@ double MEDDataManager_i::getFieldTimestamp(CORBA::Long fieldHandlerId)
     const char * meshSourceUri = (_datasourceHandlerMap[sourceid])->uri;
     std::string fileName(source_to_file(meshSourceUri));
     const char * fieldName = fieldHandler->fieldname;
-    const char * meshName = _meshHandlerMap[meshHandlerId]->name;
+    //const char * meshName = _meshHandlerMap[meshHandlerId]->name; // todo: unused
     timestamp = GetTimeAttachedOnFieldIteration(fileName.c_str(), fieldName, fieldHandler->iteration, fieldHandler->order);
     LOG("timestamp in med file is " << timestamp);
   }
@@ -750,7 +750,7 @@ MEDCALC::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fiel
   // MEDCouplingField). As a consequence, the values of these
   // variables are updated by this function call. This is the means to
   // retrieve the iteration and order of the field.
-  double timestamp = fieldDouble->getTime(iteration, order);
+  /*double timestamp = */fieldDouble->getTime(iteration, order); // todo: unused
 
   // For the fields that are created in memory (by operations for
   // example), the convention for the source attribute is to specify
@@ -948,8 +948,7 @@ void MEDDataManager_i::serverlog() {
   LOG("Size = "<<_fieldHandlerMap.size());
   FieldHandlerMapIterator fhmIt;
   for ( fhmIt = _fieldHandlerMap.begin(); fhmIt != _fieldHandlerMap.end(); fhmIt++) {
-    long id = fhmIt->first;
-    LOG("------------------------------------- id = "<<ToString(id));
+    LOG("------------------------------------- id = "<<ToString(fhmIt->first));
     LOG("- id        \t= "<<fhmIt->second->id);
     LOG("- fieldname \t= "<<fhmIt->second->fieldname);
     LOG("- meshname  \t= "<<fhmIt->second->meshname);
@@ -959,11 +958,9 @@ void MEDDataManager_i::serverlog() {
   LOG("Size = "<<_fieldDoubleMap.size());
   FieldDoubleMapIterator fdmIt;
   for ( fdmIt = _fieldDoubleMap.begin(); fdmIt != _fieldDoubleMap.end(); fdmIt++) {
-    long id = (*fdmIt).first;
-    MEDCouplingFieldDouble * fieldDouble = (*fdmIt).second;
-    LOG("------------------------------------- id = "<<ToString(id));
-    LOG("- fieldname \t= "<<fieldDouble->getName());
-    LOG("- meshname  \t= "<<fieldDouble->getMesh()->getName());
+    LOG("------------------------------------- id = "<<ToString(fdmIt->first));
+    LOG("- fieldname \t= "<<fdmIt->second->getName());
+    LOG("- meshname  \t= "<<fdmIt->second->getMesh()->getName());
   }
 }
 

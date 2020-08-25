@@ -68,7 +68,7 @@ SALOME::StringSeq *DataArrayIntServant::GetExportableFormats()
   return ret;
 }
 
-CORBA::Boolean DataArrayIntServant::ExportDataAs(const char *format, SALOME::GenericObj_out exporter)
+CORBA::Boolean DataArrayIntServant::ExportDataAs(const char * /*format*/, SALOME::GenericObj_out exporter)
 {
   exporter=SALOME::GenericObj::_nil();
   return false;

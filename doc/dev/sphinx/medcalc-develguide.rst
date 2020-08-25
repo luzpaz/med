@@ -4,9 +4,9 @@
 
 .. include:: medcalc-definitions.rst
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Module FIELDS: Guide de développement du composant MEDCalc
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Le composant logiciel MEDCalc est un élément du module FIELDS. Il fournit
 une interface utilisateur pour la manipulation de maillages et de

@@ -81,6 +81,7 @@ public:
 class MEDCALCGUI_EXPORT XmedDataProcessor : public DataProcessor {
 public:
   XmedDataProcessor(DataModel * dataModel):DataProcessor(dataModel) {};
+  virtual ~XmedDataProcessor() {};
 
   MEDCALC::FieldHandlerList * getResultingFieldHandlerList();
   MEDCALC::FieldIdList * getResultingFieldIdList();

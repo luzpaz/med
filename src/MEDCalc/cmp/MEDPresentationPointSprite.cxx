@@ -81,7 +81,7 @@ MEDPresentationPointSprite::internalGeneratePipeline()
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();
-  int nbCompo = getIntProperty(MEDPresentation::PROP_NB_COMPONENTS);
+  //int nbCompo = getIntProperty(MEDPresentation::PROP_NB_COMPONENTS); // todo: unused
 
   // Point sprite needs point data:
   applyCellToPointIfNeeded();

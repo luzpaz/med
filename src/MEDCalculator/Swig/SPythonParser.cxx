@@ -94,7 +94,7 @@ void SPythonParser::keepSelectedLevOfPar(const std::string& s, int parLev, PyObj
   int curLev=0;
   std::size_t i=0;
   std::size_t len=s.length();
-  bool found=false;
+  //bool found=false; // todo: unused
   if(parLev==0)
     {
       _content=s;
@@ -119,7 +119,7 @@ void SPythonParser::keepSelectedLevOfPar(const std::string& s, int parLev, PyObj
           std::size_t end=s.find_first_of(')',i);
           end=end!=std::string::npos?end-i:std::string::npos;
           _content=s.substr(i,end);
-          found=true;
+          //found=true; // todo: unused
           break;
         }
     }

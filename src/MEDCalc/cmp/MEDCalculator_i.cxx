@@ -365,7 +365,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::fct(const MEDCALC::FieldHandler & f_hdl
   try {
     field_result = field->clone(true);
     if ( (nbResComponents == MEDCALC::NBCOMP_DEFAULT ) ||
-   (nbResComponents < 1) || (nbResComponents > field_result->getNumberOfComponents()) ) {
+	 (nbResComponents < 1) || (nbResComponents > (int)field_result->getNumberOfComponents()) ) {
       field_result->applyFunc(function);
     }
     else {

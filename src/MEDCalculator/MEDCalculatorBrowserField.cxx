@@ -324,7 +324,7 @@ void MEDCalculatorBrowserField::setMeshName(const std::string& m)
  * This method returns a restriction of this containing only selected TimeSteps.
  * This methods throws an exception if multiple meshes exists in selected time steps.
  */
-MEDCalculatorBrowserField MEDCalculatorBrowserField::getSelectedTimeSteps() const throw(INTERP_KERNEL::Exception)
+MEDCalculatorBrowserField MEDCalculatorBrowserField::getSelectedTimeSteps() const
 {
   int nbOfTs=std::count(_steps.begin(),_steps.end(),true);
   std::vector<MEDCalculatorBrowserStep> ts(nbOfTs);

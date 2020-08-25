@@ -332,7 +332,7 @@ MED::getStudyPresentationEntry(CORBA::Long presentationId)
   // set exception handler to catch unexpected CORBA exceptions
   Unexpect aCatch(SALOME_SalomeException);
 
-  MED_ORB::PresentationsList* presList = new MED_ORB::PresentationsList;
+  //MED_ORB::PresentationsList* presList = new MED_ORB::PresentationsList; // todo: unused
 
   SALOMEDS::Study_var aStudy = KERNEL::getStudyServant();
   SALOMEDS::StudyBuilder_var studyBuilder = aStudy->NewBuilder();
@@ -359,8 +359,8 @@ MED::getStudyPresentationEntry(CORBA::Long presentationId)
 
 
 Engines::TMPFile*
-MED::DumpPython(CORBA::Boolean isPublished,
-                CORBA::Boolean isMultiFile,
+MED::DumpPython(CORBA::Boolean /*isPublished*/,
+                CORBA::Boolean /*isMultiFile*/,
                 CORBA::Boolean& isValidScript)
 {
   SALOMEDS::SObject_var aSO = KERNEL::getStudyServant()->FindComponent("FIELDS");
