@@ -123,13 +123,17 @@ MEDPresentation::~MEDPresentation()
     MEDPyLockWrapper lock;
     std::ostringstream oss;
 
-    oss << "pvs.Hide(" << _objVar <<  ", view=" << getRenderViewVar() << ");";
-    execPyLine(oss.str());
-    // :TRICKY: The two following lines raise an exception when closing MED module
-    //          after sequence: MED - load file - PARAVIS - MED - close SALOME
-    //          (see Mantis #23461)
-    //execPyLine(getRenderViewVar() + ".ResetCamera();");
-    //execPyLine("pvs.Render();");
+    try {
+      oss << "pvs.Hide(" << _objVar <<  ", view=" << getRenderViewVar() << ");";
+      execPyLine(oss.str());
+      // :TRICKY: The two following lines raise an exception when closing MED module
+      //          after sequence: MED - load file - PARAVIS - MED - close SALOME
+      //          (see Mantis #23461)
+      //execPyLine(getRenderViewVar() + ".ResetCamera();");
+      //execPyLine("pvs.Render();");
+    }
+    catch(SALOME::SALOME_Exception&) {
+    }
   }
 }
 
