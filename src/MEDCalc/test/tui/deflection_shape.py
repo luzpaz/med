@@ -33,7 +33,7 @@ source_id = medcalc.LoadDataSource(datafile)
 
 # For "beton_arme_30_officiel.med", field 7 = __DEPL__ (NODES)
 # For "deplacements", field 0 = DEP1 (NODES)
-presentation_id = medcalc.MakeDeflectionShape(accessField(7), viewMode=MEDCALC.VIEW_MODE_REPLACE, 
+presentation_id = medcalc.MakeDeflectionShape(accessField(0), viewMode=MEDCALC.VIEW_MODE_REPLACE,
                                           colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW,
                                           scalarBarRange=MEDCALC.SCALAR_BAR_CURRENT_TIMESTEP
                                           )
