@@ -17,18 +17,20 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(TEST_NAMES
-  access_API
-  load_file
-  import_pvsimple
-## These tests need a display to open a render window (paraview calls from python)
-## Uncomment these lines to add the tests to the test suite and run them manually
-#  scalar_map
-#  contour
-#  slices
-#  mesh_view
-#  point_sprite
-#  vector_field
-#  deflection_shape
-#  elno_field
-)
+import os
+from time import sleep
+
+import medcalc
+medcalc.medconsole.setConsoleGlobals(globals())
+import MEDCALC
+from medcalc.medconsole import accessField
+
+from medcalc_testutils import GetMEDFileDirTUI
+
+datafile = os.path.join(GetMEDFileDirTUI(), "portico_elno.med")
+source_id = medcalc.LoadDataSource(datafile)
+
+presentation_id = medcalc.MakeScalarMap(accessField(0), MEDCALC.VIEW_MODE_REPLACE, colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW)
+sleep(1)
+medcalc.RemovePresentation(presentation_id)
+sleep(1)

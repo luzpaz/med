@@ -333,7 +333,7 @@ MEDPresentation::createSource()
     {
       std::ostringstream oss, oss2;
       oss2 << "__srcObj" << GeneratePythonId();
-      oss << oss2.str() << " = pvs.ELNOMesh(Input=" << _srcObjVar << ");";
+      oss << oss2.str() << " = pvs.ELNOfieldToSurface(Input=" << _srcObjVar << ");";
       pushAndExecPyLine(oss.str()); oss.str("");
       // Now the source becomes the result of the CellDatatoPointData:
       _srcObjVar = oss2.str();
