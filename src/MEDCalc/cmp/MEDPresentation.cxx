@@ -326,7 +326,7 @@ MEDPresentation::createSource()
     {
       std::ostringstream oss, oss2;
       oss2 << "__srcObj" << GeneratePythonId();
-      oss << oss2.str() << " = pvs.GaussPoints(Input=" << _srcObjVar << ");";
+      oss << oss2.str() << " = pvs.ELGAfieldToPointGaussian(Input=" << _srcObjVar << ");";
       pushAndExecPyLine(oss.str()); oss.str("");
       // Now the source becomes the result of the CellDatatoPointData:
       _srcObjVar = oss2.str();
@@ -337,7 +337,7 @@ MEDPresentation::createSource()
     {
       std::ostringstream oss, oss2;
       oss2 << "__srcObj" << GeneratePythonId();
-      oss << oss2.str() << " = pvs.ELNOMesh(Input=" << _srcObjVar << ");";
+      oss << oss2.str() << " = pvs.ELNOfieldToSurface(Input=" << _srcObjVar << ");";
       pushAndExecPyLine(oss.str()); oss.str("");
       // Now the source becomes the result of the CellDatatoPointData:
       _srcObjVar = oss2.str();
@@ -604,6 +604,12 @@ MEDPresentation::fillAvailableFieldComponents()
       throw KERNEL::createSalomeException("Unexpected Python error");
     }
   setIntProperty(MEDPresentation::PROP_NB_COMPONENTS, nbCompo);
+
+  // if the field is not a vector (2 or 3 components), select the first component of the tensor,
+  // like in WidgetPresentationParameters::setComponents
+  if (!(nbCompo > 1 && nbCompo <= 3))
+    _selectedComponentIndex = 0;
+
   for (long i = 0; i<nbCompo; i++)
     {
       std::ostringstream oss2;

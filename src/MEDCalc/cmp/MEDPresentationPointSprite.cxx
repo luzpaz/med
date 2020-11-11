@@ -47,7 +47,23 @@ void
 MEDPresentationPointSprite::scaleBallRadius()
 {
   std::ostringstream oss;
-  oss << _dispVar << ".RadiusVectorComponent = " << _selectedComponentIndex << ";";
+  int nbCompo = getIntProperty(MEDPresentation::PROP_NB_COMPONENTS);
+
+  // set component or euclidean norm as the array to scale the ball radius
+  if (nbCompo > 1)
+  {
+    if (_selectedComponentIndex == -1)
+      oss << _dispVar << ".ScaleArrayComponent = 'Magnitude';";
+    else
+      oss << _dispVar << ".ScaleArrayComponent = " << _selectedComponentIndex << ";";
+    pushAndExecPyLine(oss.str()); oss.str("");
+  }
+
+  // rescale transfer function to update scalar bar and get min-max range
+  rescaleTransferFunction();
+
+  // _rangeVar (to get min and max of the fields) is updated in rescaleTransferFunction
+  oss << _dispVar << ".ScaleTransferFunction.RescaleTransferFunction(" << _rangeVar << "[0], " << _rangeVar << "[1]);";
   pushAndExecPyLine(oss.str()); oss.str("");
 }
 
@@ -73,36 +89,32 @@ MEDPresentationPointSprite::internalGeneratePipeline()
 
   showObject(); // needs to be done before cell size computation to be sure ParaView has computed bounds, etc ...
 
-  // Compute cell average size in the mesh to have a nice scaling ratio:
-  std::ostringstream oss;
-  oss << "__avgSize = medcalc.ComputeCellAverageSize(" << _srcObjVar << ");";
-  pushAndExecPyLine(oss.str()); oss.str("");
-
   colorBy();    // see initFieldInfo() - necessarily POINTS like in Contour
 
+  std::ostringstream oss;
+
   // Set point sprite:
-  oss << _dispVar << ".SetRepresentationType('Point Sprite');";
+  oss << _dispVar << ".SetRepresentationType('Point Gaussian');";
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _dispVar << ".PointSpriteDefaultsInitialized = 1;";
+  oss << _dispVar << ".ScaleByArray = 1;";
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _dispVar << ".RadiusArray = ['POINTS', '" << _fieldName << "'];";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _dispVar << ".RadiusMode = 'Scalar';";
+  oss << _dispVar << ".SetScaleArray = ['POINTS', '" << _fieldName << "'];";
   pushAndExecPyLine(oss.str()); oss.str("");
 
-  scaleBallRadius();
-  oss << _dispVar << ".RadiusIsProportional = 0 ;";
+  // Compute the best radius again (like reset using current data value in GUI)
+  oss << "pvs.ResetProperty('GaussianRadius');";
   pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _dispVar << ".RadiusTransferFunctionEnabled = 1 ;";
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _dispVar << ".MaxPixelSize = 30 ;";   // Avoid too big balls
-  pushAndExecPyLine(oss.str()); oss.str("");
-  oss << _dispVar << ".RadiusRange = [0.0, __avgSize];";
+
+  // Make the radius twice the default radius
+  oss << _dispVar << ".GaussianRadius = 2*" << _dispVar << ".GaussianRadius" << ";";
   pushAndExecPyLine(oss.str()); oss.str("");
 
   showScalarBar();
   selectColorMap();
-  rescaleTransferFunction();
+
+  // Scale the radius array with the component and the scalar map
+  scaleBallRadius();
+
   resetCameraAndRender();
 }
 
