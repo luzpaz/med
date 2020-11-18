@@ -154,6 +154,8 @@ module MEDCALC
 
     //void saveFields(in FieldHandlerList fieldHandlerList, in string filepath);
 
+    double getFieldTimeStep(in long fieldHandlerId);
+
     void changeUnderlyingMesh(in long fieldHandlerId, in long meshHandlerId)
       raises (SALOME::SALOME_Exception);
 

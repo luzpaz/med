@@ -18,6 +18,7 @@
 #
 
 import medcalc
+import MEDCALC
 
 dataManager = medcalc.medcorba.factory.getDataManager()
 
@@ -159,3 +160,10 @@ def accessField(fieldHandlerId):
   """
   return medcalc.newFieldProxy(fieldHandlerId)
 #
+
+def view(field):
+  """
+  Display the field at its timestep
+  """
+  medcalc.MakeScalarMap(field, viewMode=MEDCALC.VIEW_MODE_REPLACE, scalarBarRange=MEDCALC.SCALAR_BAR_CURRENT_TIMESTEP)
+  pass

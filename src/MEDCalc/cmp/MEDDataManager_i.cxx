@@ -588,6 +588,23 @@ long MEDDataManager_i::getUMeshId(const MEDCouplingMesh * mesh) {
   return LONG_UNDEFINED;
 }
 
+/**
+ * Get the timestep associated to a field
+ */
+double MEDDataManager_i::getFieldTimeStep(CORBA::Long fieldHandlerId)
+{
+  int iteration, order;
+  // WARN: note that the variables "iteration" and "order" are passed
+  // by reference to the function getTime (see documentation of
+  // MEDCouplingField). As a consequence, the values of these
+  // variables are updated by this function call. This is the means to
+  // retrieve the iteration and order of the field.
+  MEDCALC::FieldHandler * fieldHandler = getFieldHandler(fieldHandlerId);
+  MEDCouplingFieldDouble* fieldDouble = getFieldDouble(fieldHandler);
+  double timestamp = fieldDouble->getTime(iteration, order);
+  return timestamp;
+}
+
 /*!
  * This method returns the physical data of the specified field,
  * i.e. the MEDCoupling field associated to the specified field

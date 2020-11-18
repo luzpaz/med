@@ -161,6 +161,8 @@ private:
   MEDCouplingUMesh * getUMesh(long meshHandlerId);
   long getUMeshId(const MEDCouplingMesh * mesh);
 
+  double getFieldTimeStep(CORBA::Long fieldHandlerId);
+
   INTERP_KERNEL::IntersectionType _getIntersectionType(const char* intersType);
   MEDCoupling::NatureOfField _getNatureOfField(const char* fieldNature);
 

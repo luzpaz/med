@@ -61,7 +61,7 @@ void XmedConsoleDriver::setup() {
     commands += "";
     commands += "from medcalc.medconsole import saveWorkspace, cleanWorkspace";
     commands += "from medcalc.medconsole import putInWorkspace, removeFromWorkspace";
-    commands += "from medcalc.medconsole import accessField";
+    commands += "from medcalc.medconsole import accessField, view";
     commands += "from medcalc.medconsole import getEnvironment, ls, la";
     commands += "";
     this->exec(commands);

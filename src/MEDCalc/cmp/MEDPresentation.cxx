@@ -95,7 +95,8 @@ MEDPresentation::initFieldMeshInfos()
   MEDCALC::MeshHandler* meshHandler = dataManager->getMeshHandler(fieldHandler->meshid);
   MEDCALC::DatasourceHandler* dataSHandler = dataManager->getDatasourceHandlerFromID(meshHandler->sourceid);
 
-  extractFileName(std::string(dataSHandler->uri));
+  // get the file name of the field (or its memory information)
+  extractFileName(std::string(fieldHandler->source));
 
   _fieldName = fieldHandler->fieldname;
   _mcFieldType = (MEDCoupling::TypeOfField) fieldHandler->type;
@@ -107,13 +108,23 @@ MEDPresentation::initFieldMeshInfos()
 void
 MEDPresentation::extractFileName(const std::string& name)
 {
+  STDLOG("MEDPresentation::extractFileName('" << name << "')");
   _fileName = name;
   if (_fileName.substr(0, 7) != std::string("file://")) {
-    const char* msg = "MEDPresentation(): Data source is not a file! Can not proceed.";
+    const char* msg = "MEDPresentation(): Data source is in memory! Saving it in tmp file.";
     STDLOG(msg);
-    throw MEDPresentationException(msg);
+    // export a med file with this field
+    // we could instead use CORBA to transfer the field to PARAVIS like in MEDCalculatorDBFieldReal::display()
+    _fileName = std::tmpnam(NULL);
+    MEDCALC::FieldIdList fieldIdList;
+    fieldIdList.length(1);
+    fieldIdList[0] = _handlerId;
+    MEDFactoryClient::getDataManager()->saveFields(_fileName.c_str(), fieldIdList);
   }
-  _fileName = _fileName.substr(7, _fileName.size());
+  else
+    // removing "file://"
+    _fileName = _fileName.substr(7, _fileName.size());
+  STDLOG("MEDPresentation::extractFileName _fileName=" << _fileName);
 }
 
 MEDPresentation::~MEDPresentation()
@@ -342,6 +353,25 @@ MEDPresentation::createSource()
       // Now the source becomes the result of the CellDatatoPointData:
       _srcObjVar = oss2.str();
     }
+}
+
+/*
+ * Set the timestep of the animation to the timestep of the field.
+ * Especially useful when working on a field's iteration:
+ * in the workspace, in the python console, or using changeUnderlyingMesh.
+ */
+void
+MEDPresentation::setTimestep()
+{
+  // get the timestep of the field
+  double timestep = MEDFactoryClient::getDataManager()->getFieldTimeStep(_handlerId);
+
+  std::ostringstream oss;
+
+  // go to the right timestep in animation (view and VCR toolbar)
+  pushAndExecPyLine("pvs.GetAnimationScene().UpdateAnimationUsingDataTimeSteps()");
+  oss << "pvs.GetAnimationScene().AnimationTime = " << timestep << ";";
+  pushAndExecPyLine(oss.str()); oss.str("");
 }
 
 void
