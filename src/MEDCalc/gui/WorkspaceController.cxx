@@ -347,7 +347,7 @@ void WorkspaceController::processMedEvent(const MEDCALC::MedEvent* event) {
     commands += QString("mesh_id");
     commands += QString("field_id = medcalc.GetFirstFieldFromMesh(mesh_id)");
     commands += QString("field_id");
-    commands += QString("presentation_id = medcalc.MakeScalarMap(accessField(field_id), viewMode=MEDCALC.VIEW_MODE_NEW_LAYOUT)");
+    commands += QString("presentation_id = medcalc.MakeScalarMap(accessField(field_id), viewMode=MEDCALC.VIEW_MODE_REPLACE)");
     commands += QString("presentation_id");
     _consoleDriver->exec(commands);
   }
