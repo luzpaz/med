@@ -82,6 +82,8 @@ public:
   MEDCALC_EXPORT MEDCALC::FieldseriesHandlerList * getFieldseriesListOnMesh(CORBA::Long meshId);
   MEDCALC_EXPORT MEDCALC::FieldHandlerList * getFieldListInFieldseries(CORBA::Long fieldseriesId);
 
+  MEDCALC_EXPORT CORBA::Long getFieldIdAtTimestamp(CORBA::Long fieldseriesId, double timestamp);
+
   MEDCALC_EXPORT MEDCALC::FieldHandler *     getFieldHandler(CORBA::Long fieldHandlerId);
   MEDCALC_EXPORT char *                    getFieldRepresentation(CORBA::Long fieldHandlerId);
   MEDCALC_EXPORT MEDCALC::FieldHandlerList * getFieldHandlerList();
@@ -156,12 +158,13 @@ private:
 
   std::string  file_to_source(const char * filepath);
   std::string  source_to_file(const char * source);
+  bool isSourceInFile(const char * sourceName);
   long getDatasourceId(const char *filepath);
 
   MEDCouplingUMesh * getUMesh(long meshHandlerId);
   long getUMeshId(const MEDCouplingMesh * mesh);
 
-  double getFieldTimeStep(CORBA::Long fieldHandlerId);
+  double getFieldTimestamp(CORBA::Long fieldHandlerId);
 
   INTERP_KERNEL::IntersectionType _getIntersectionType(const char* intersType);
   MEDCoupling::NatureOfField _getNatureOfField(const char* fieldNature);

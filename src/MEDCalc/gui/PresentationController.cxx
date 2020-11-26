@@ -294,7 +294,6 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
       std::string name(_studyEditor->getName(soObj));
       if (soObj->_is_nil() || name == "MEDCalc")
         return;
-
       int fieldId = _salomeModule->getIntParamFromStudyEditor(soObj, FIELD_ID);
       int meshId = _salomeModule->getIntParamFromStudyEditor(soObj, MESH_ID);
       MEDCALC::FieldHandler* fieldHandler = 0;
@@ -317,12 +316,10 @@ PresentationController::visualize(PresentationEvent::EventType eventType)
               if ( fieldSeriesId < 0)
                   continue;
 
-              MEDCALC::FieldHandlerList* fieldHandlerList = MEDFactoryClient::getDataManager()->getFieldListInFieldseries(fieldSeriesId);
-              if (fieldHandlerList->length() < 0)
-                continue;
-              // For a field series, get the first real field entry:
-              MEDCALC::FieldHandler fieldHandler = (*fieldHandlerList)[0];
-              fieldId = fieldHandler.id;
+              // get the current timestamp
+              double timestamp = _salomeModule->getCurrentAnimationTimestamp();
+              // get the field id a the current timestamp
+              fieldId = MEDFactoryClient::getDataManager()->getFieldIdAtTimestamp(fieldSeriesId, timestamp);
             }
           fieldHandler = MEDFactoryClient::getDataManager()->getFieldHandler(fieldId);
         }

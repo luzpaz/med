@@ -45,7 +45,7 @@ MEDPresentationScalarMap::internalGeneratePipeline()
 
   setOrCreateRenderView(); // instantiate __viewXXX
   createSource();
-  setTimestep();
+  setTimestamp();
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();

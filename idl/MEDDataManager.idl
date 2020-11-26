@@ -133,6 +133,8 @@ module MEDCALC
     FieldseriesHandlerList getFieldseriesListOnMesh(in long meshId);
     FieldHandlerList getFieldListInFieldseries(in long fieldseriesId);
 
+    long getFieldIdAtTimestamp(in long fieldseriesId, in double timestamp);
+
     FieldHandler     getFieldHandler(in long fieldHandlerId);
     FieldHandlerList getFieldHandlerList();
     // __GBO__ Maybe it could be useful to define a getFieldHandlerList with a datasourceId in argument
@@ -154,7 +156,7 @@ module MEDCALC
 
     //void saveFields(in FieldHandlerList fieldHandlerList, in string filepath);
 
-    double getFieldTimeStep(in long fieldHandlerId);
+    double getFieldTimestamp(in long fieldHandlerId);
 
     void changeUnderlyingMesh(in long fieldHandlerId, in long meshHandlerId)
       raises (SALOME::SALOME_Exception);

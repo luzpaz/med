@@ -30,8 +30,9 @@ from medcalc_testutils import GetMEDFileDirTUI
 datafile = os.path.join(GetMEDFileDirTUI(), "agitateur.med")
 source_id = medcalc.LoadDataSource(datafile)
 
-# Field 55 = VITESSE_ELEM_DOM (ON_CELLS)
-presentation_id = medcalc.MakeVectorField(accessField(55), viewMode=MEDCALC.VIEW_MODE_REPLACE,
+# Field 55 = VITESSE_ELEM_DOM (ON_CELLS) at timestamp 0
+# Field 65 = VITESSE_ELEM_DOM (ON_CELLS) at timestamp 10
+presentation_id = medcalc.MakeVectorField(accessField(65), viewMode=MEDCALC.VIEW_MODE_REPLACE,
                                           colorMap=MEDCALC.COLOR_MAP_BLUE_TO_RED_RAINBOW,
                                           scalarBarRange=MEDCALC.SCALAR_BAR_CURRENT_TIMESTEP
                                           )

@@ -84,7 +84,7 @@ protected:
   // The most common elements of the ParaView pipeline:
   void setOrCreateRenderView();
   void createSource();
-  void setTimestep();
+  void setTimestamp();
   void selectFieldComponent();
   void showObject();
   void colorBy();

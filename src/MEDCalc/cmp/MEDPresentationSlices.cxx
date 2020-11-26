@@ -141,6 +141,7 @@ MEDPresentationSlices::internalGeneratePipeline()
   std::ostringstream oss;
 
   createSource();
+  setTimestamp();
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();

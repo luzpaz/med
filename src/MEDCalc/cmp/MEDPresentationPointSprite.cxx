@@ -77,6 +77,7 @@ MEDPresentationPointSprite::internalGeneratePipeline()
 
   setOrCreateRenderView(); // instantiate __viewXXX
   createSource();
+  setTimestamp();
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();

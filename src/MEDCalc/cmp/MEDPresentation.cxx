@@ -356,21 +356,24 @@ MEDPresentation::createSource()
 }
 
 /*
- * Set the timestep of the animation to the timestep of the field.
+ * Set the timestamp of the animation to the timestamp of the field.
  * Especially useful when working on a field's iteration:
  * in the workspace, in the python console, or using changeUnderlyingMesh.
  */
 void
-MEDPresentation::setTimestep()
+MEDPresentation::setTimestamp()
 {
-  // get the timestep of the field
-  double timestep = MEDFactoryClient::getDataManager()->getFieldTimeStep(_handlerId);
+  // get the timestamp of the field
+  double timestamp = MEDFactoryClient::getDataManager()->getFieldTimestamp(_handlerId);
+  STDLOG("Displaying timestamp : " << timestamp);
 
   std::ostringstream oss;
 
-  // go to the right timestep in animation (view and VCR toolbar)
+  // go to the right timestamp in animation (view and VCR toolbar)
   pushAndExecPyLine("pvs.GetAnimationScene().UpdateAnimationUsingDataTimeSteps()");
-  oss << "pvs.GetAnimationScene().AnimationTime = " << timestep << ";";
+  oss << "pvs.GetAnimationScene().AnimationTime = " << timestamp << ";";
+  pushAndExecPyLine(oss.str()); oss.str("");
+  oss << "pvs.GetTimeKeeper().Time = " << timestamp << ";";
   pushAndExecPyLine(oss.str()); oss.str("");
 }
 

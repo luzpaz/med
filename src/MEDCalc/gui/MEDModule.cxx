@@ -53,6 +53,7 @@
 
 #include <pqAnimationManager.h>
 #include <pqPVApplicationCore.h>
+#include <pqAnimationScene.h>
 
 //! The only instance of the reference to engine
 MED_ORB::MED_Gen_var MEDModule::_MED_engine;
@@ -313,6 +314,13 @@ MEDModule::initToolbars()
   connect(_workspaceController, SIGNAL(workspaceSignal(const MEDCALC::MedEvent*)),
     _testController, SLOT(processWorkspaceEvent(const MEDCALC::MedEvent*)));
 #endif
+}
+
+double
+MEDModule::getCurrentAnimationTimestamp()
+{
+  double timestamp = pqPVApplicationCore::instance()->animationManager()->getActiveScene()->getAnimationTime();
+  return timestamp;
 }
 
 void

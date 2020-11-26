@@ -64,6 +64,7 @@ MEDPresentationContour::internalGeneratePipeline()
   MEDPyLockWrapper lock;
 
   createSource();
+  setTimestamp();
 
   // Populate internal array of available components:
   fillAvailableFieldComponents();

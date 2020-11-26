@@ -91,6 +91,17 @@ std::string MEDDataManager_i::source_to_file(const char * source)
 }
 
 /*!
+ * Check if a source (from its uri name) is in a file or in memory
+ */
+bool MEDDataManager_i::isSourceInFile(const char * sourceName)
+{
+  std::string sourceString(sourceName);
+  return (sourceString.substr(0, 7) == std::string("file://"));
+}
+
+
+
+/*!
  * This function loads the meta-data from the specified med file and
  * returns the associated datasource handler. The data source handler
  * is a key to retrieve all information concerning the data (meshes,
@@ -323,7 +334,6 @@ MEDCALC::FieldseriesHandlerList * MEDDataManager_i::getFieldseriesListOnMesh(COR
  * the different time iterations defined for the specified field id.
  */
 MEDCALC::FieldHandlerList * MEDDataManager_i::getFieldListInFieldseries(CORBA::Long fieldseriesId) {
-
   // We initiate a list with the maximum length
   MEDCALC::FieldHandlerList_var fieldHandlerList = new MEDCALC::FieldHandlerList();
   fieldHandlerList->length(_fieldHandlerMap.size());
@@ -341,6 +351,32 @@ MEDCALC::FieldHandlerList * MEDDataManager_i::getFieldListInFieldseries(CORBA::L
   // Adjust the length to the real number of elements
   fieldHandlerList->length(itemIdx);
   return fieldHandlerList._retn();
+}
+
+/*!
+ *  Get the field id of a field series at a given timestep
+ */
+CORBA::Long MEDDataManager_i::getFieldIdAtTimestamp(CORBA::Long fieldseriesId, double timestampOfPvAnimation) {
+  // Scan the map looking for field defined on the specified mesh at given timestep
+  int itemIdx = 0;
+  CORBA::Long fieldId = 0;
+  double timestampOfField;
+  FieldHandlerMapIterator it;
+  for ( it=_fieldHandlerMap.begin(); it != _fieldHandlerMap.end(); it++) {
+    if ( it->second->fieldseriesId == fieldseriesId ) {
+      if (itemIdx == 0) {
+        // set the fieldId to the first one in case it is not found
+        fieldId = it->second->id;
+      }
+      timestampOfField = getFieldTimestamp(it->second->id);
+      if (timestampOfField == timestampOfPvAnimation) {
+        fieldId = it->second->id;
+        break;
+      }
+      itemIdx++;
+    }
+  }
+  return fieldId;
 }
 
 /*!
@@ -589,19 +625,39 @@ long MEDDataManager_i::getUMeshId(const MEDCouplingMesh * mesh) {
 }
 
 /**
- * Get the timestep associated to a field
+ * Get the timestamp associated to a field
  */
-double MEDDataManager_i::getFieldTimeStep(CORBA::Long fieldHandlerId)
+double MEDDataManager_i::getFieldTimestamp(CORBA::Long fieldHandlerId)
 {
-  int iteration, order;
-  // WARN: note that the variables "iteration" and "order" are passed
-  // by reference to the function getTime (see documentation of
-  // MEDCouplingField). As a consequence, the values of these
-  // variables are updated by this function call. This is the means to
-  // retrieve the iteration and order of the field.
+  LOG("getFieldTimestamp(" << fieldHandlerId << ")");
+  double timestamp(0);
   MEDCALC::FieldHandler * fieldHandler = getFieldHandler(fieldHandlerId);
-  MEDCouplingFieldDouble* fieldDouble = getFieldDouble(fieldHandler);
-  double timestamp = fieldDouble->getTime(iteration, order);
+
+  // if the field is in a file, get the timestamp by MEDLoader tiny information
+  long meshHandlerId = fieldHandler->meshid;
+  long sourceid = _meshHandlerMap[meshHandlerId]->sourceid;
+  if (isSourceInFile(fieldHandler->source))
+  {
+    const char * meshSourceUri = (_datasourceHandlerMap[sourceid])->uri;
+    std::string fileName(source_to_file(meshSourceUri));
+    const char * fieldName = fieldHandler->fieldname;
+    const char * meshName = _meshHandlerMap[meshHandlerId]->name;
+    timestamp = GetTimeAttachedOnFieldIteration(fileName.c_str(), fieldName, fieldHandler->iteration, fieldHandler->order);
+    LOG("timestamp in med file is " << timestamp);
+  }
+  else
+  {
+    // else get the timestamp with MEDCouplingField
+    int iteration, order;
+    // WARN: note that the variables "iteration" and "order" are passed
+    // by reference to the function getTime (see documentation of
+    // MEDCouplingField). As a consequence, the values of these
+    // variables are updated by this function call. This is the means to
+    // retrieve the iteration and order of the field.
+    MEDCouplingFieldDouble* fieldDouble = getFieldDouble(fieldHandler);
+    timestamp = fieldDouble->getTime(iteration, order);
+    LOG("timestamp in MEDCouplingFieldDouble is " << timestamp);
+  }
   return timestamp;
 }
 

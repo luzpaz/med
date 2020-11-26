@@ -92,6 +92,8 @@ public:
 
   int getIntParamFromStudyEditor(SALOMEDS::SObject_var obj, const char* name);
 
+  double getCurrentAnimationTimestamp();
+
 signals:
   void presentationSelected(int presId, const QString& presType, const QString& presName);
 
