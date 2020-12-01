@@ -399,12 +399,22 @@ MEDPresentation::setOrCreateRenderView()
       oss2 << "pvs.Render();";
       pushAndExecPyLine(oss2.str()); oss2.str("");
   } else if (_viewMode == MEDCALC::VIEW_MODE_NEW_LAYOUT) {
-      oss2 <<  "__layout1 = pvs.servermanager.misc.ViewLayout(registrationGroup='layouts');";
+      oss2 <<  "nbLayouts = len(pvs.GetLayouts());";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
+      oss2 <<  "__layout1 = pvs.CreateLayout('Layout #\%i'%(nbLayouts+1));";
       pushAndExecPyLine(oss2.str()); oss2.str("");
       oss2 << view << " = pvs.CreateView('RenderView');";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
+      oss2 <<  "pvs.AssignViewToLayout(view=" << view << ", layout=__layout1, hint=0);";
       pushAndExecPyLine(oss2.str()); oss2.str("");
   } else if (_viewMode == MEDCALC::VIEW_MODE_SPLIT_VIEW) {
+      oss2 <<  "__activeLayout = pvs.GetLayout();";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
+      oss2 << "__activeLayout.SplitHorizontal(0, 0.5);";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
       oss2 << view << " = pvs.CreateView('RenderView');";
+      pushAndExecPyLine(oss2.str()); oss2.str("");
+      oss2 << "pvs.AssignViewToLayout(view=" << view << ", layout=__activeLayout, hint=2);";
       pushAndExecPyLine(oss2.str()); oss2.str("");
   }
 }
