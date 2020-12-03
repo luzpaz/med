@@ -51,7 +51,7 @@
 # containerType = Name of the container factory
 #
 componentName = "MEDFactory"
-corbaModule   = "MEDCalc"
+corbaModule   = "MEDCALC"
 containerType = "FactoryServer"
 
 import salome
@@ -190,10 +190,10 @@ def TEST_saveFields():
 # Use cases of the MEDDataManager for data loading
 # ==================================================
 #
-def TEST_MEDDataManager_getMeshList():
+def TEST_MEDDataManager_getMeshHandlerList():
     dataManager = factory.getDataManager()
     datasourceHandler = dataManager.loadDatasource(testFilePath)
-    meshHandlerList = dataManager.getMeshList(datasourceHandler.id)
+    meshHandlerList = dataManager.getMeshHandlerList(datasourceHandler.id)
     print(meshHandlerList)
 
     if len(meshHandlerList) == 0:
@@ -203,10 +203,10 @@ def TEST_MEDDataManager_getMeshList():
 def TEST_MEDDataManager_getMesh():
     dataManager = factory.getDataManager()
     datasourceHandler = dataManager.loadDatasource(testFilePath)
-    meshHandlerList = dataManager.getMeshList(datasourceHandler.id)
+    meshHandlerList = dataManager.getMeshHandlerList(datasourceHandler.id)
     for mRef in meshHandlerList:
         meshId = mRef.id
-        mRes = dataManager.getMesh(meshId)
+        mRes = dataManager.getMeshHandler(meshId)
         print(mRes)
         if ( mRes.name != mRef.name ) or ( mRes.sourceid != mRef.sourceid):
             return False
@@ -216,7 +216,7 @@ def TEST_MEDDataManager_getFieldseriesListOnMesh():
     dataManager = factory.getDataManager()
     datasourceHandler = dataManager.loadDatasource(testFilePath)
 
-    meshHandlerList = dataManager.getMeshList(datasourceHandler.id)
+    meshHandlerList = dataManager.getMeshHandlerList(datasourceHandler.id)
     # We look for the fieldseries defined on the first mesh of the list
     meshId = meshHandlerList[0].id
     fieldseriesList = dataManager.getFieldseriesListOnMesh(meshId)
@@ -233,7 +233,7 @@ def TEST_MEDDataManager_getFieldListInFieldseries():
     testFilePath  = getFilePath("timeseries.med")
     datasourceHandler = dataManager.loadDatasource(testFilePath)
 
-    meshHandlerList = dataManager.getMeshList(datasourceHandler.id)
+    meshHandlerList = dataManager.getMeshHandlerList(datasourceHandler.id)
     # We look for the fieldseries defined on the first mesh of the list
     meshId = meshHandlerList[0].id
     fieldseriesList = dataManager.getFieldseriesListOnMesh(meshId)
@@ -245,6 +245,37 @@ def TEST_MEDDataManager_getFieldListInFieldseries():
 
     if len(fieldList) == 0:
         return False
+    return True
+
+def TEST_MEDDataManager_getFieldIdAtTimestamp():
+    dataManager = factory.getDataManager()
+    testFilePath = os.path.join(RESDIR,testFileName)
+
+    testFilePath  = getFilePath("timeseries.med")
+    datasourceHandler = dataManager.loadDatasource(testFilePath)
+
+    meshHandlerList = dataManager.getMeshHandlerList(datasourceHandler.id)
+    # We look for the fieldseries defined on the first mesh of the list
+    meshId = meshHandlerList[0].id
+    fieldseriesList = dataManager.getFieldseriesListOnMesh(meshId)
+    # We look for the fields defined in the first fieldseries,
+    # i.e. the time steps for this field.
+    fieldseriesId = fieldseriesList[0].id
+    requestedTimestamp8 = 8
+    fieldId8 = dataManager.getFieldIdAtTimestamp(fieldseriesId, requestedTimestamp8)
+    timestamp8 = dataManager.getFieldTimestamp(fieldId8)
+    print("fieldId8: ", fieldId8)
+    print("timestamp8: ", timestamp8)
+    requestedTimestamp9 = 9
+    fieldId9 = dataManager.getFieldIdAtTimestamp(fieldseriesId, 9)
+    timestamp9 = dataManager.getFieldTimestamp(fieldId9)
+    print("fieldId9: ", fieldId9)
+    print("timestamp9: ", timestamp9)
+
+    if (timestamp8!=requestedTimestamp8):
+      return False
+    if (timestamp9!=requestedTimestamp9):
+      return False
     return True
 
 #
@@ -352,8 +383,8 @@ class MyTestSuite(unittest.TestCase):
         self.assertTrue(TEST_saveFields())
 
     # === MEDDataManager (data request functions)
-    def test_MEDDataManager_getMeshList(self):
-        self.assertTrue(TEST_MEDDataManager_getMeshList())
+    def test_MEDDataManager_getMeshHandlerList(self):
+        self.assertTrue(TEST_MEDDataManager_getMeshHandlerList())
 
     def test_MEDDataManager_getMesh(self):
         self.assertTrue(TEST_MEDDataManager_getMesh())
@@ -363,6 +394,9 @@ class MyTestSuite(unittest.TestCase):
 
     def test_MEDDataManager_getFieldListInFieldseries(self):
         self.assertTrue(TEST_MEDDataManager_getFieldListInFieldseries())
+
+    def test_MEDDataManager_getFieldIdAtTimestamp(self):
+        self.assertTrue(TEST_MEDDataManager_getFieldIdAtTimestamp())
 
     # === MEDCalculator (need MEDDataManager)
     def test_Calculator_basics(self):

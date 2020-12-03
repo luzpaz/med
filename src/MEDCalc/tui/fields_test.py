@@ -117,4 +117,8 @@ class TestFields(unittest.TestCase):
         self.processGuiEvents()
 
 if __name__ == '__main__':
-    unittest.main()
+    exit = True
+    # Keep Salome GUI alive
+    if salome.sg.hasDesktop():
+      exit=False
+    unittest.main(exit=exit)
