@@ -42,9 +42,9 @@ public:
       this->_msg = oss.str();
     }
 
-  virtual ~MEDPresentationException() throw() {}
+  virtual ~MEDPresentationException() noexcept {}
 
-  virtual const char* what() const throw() {
+  virtual const char* what() const noexcept {
     return this->_msg.c_str();
   }
 
