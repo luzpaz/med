@@ -45,17 +45,17 @@ module MEDCALC
   typedef sequence<MeshHandler> MeshHandlerList;
 
   /**
-   * The Fieldseries is a virtal object that does not exist in the MED
+   * The Fieldseries is a virtual object that does not exist in the MED
    * data model (at least in the MEDCoupling data model). It is just a
-   * point that aggregate a list of fields that relie on the same mesh
+   * point that aggregates a list of fields that rely on the same mesh
    * with the same type (the fields in a timeseries differ by their
    * time step).
    *
    * Then you could have a field with no fieldseries associated but
    * directly associated to a mesh. That is typically the case of
-   * fields created by MED operations: if you operate tow fields
+   * fields created by MED operations: if you operate two fields
    * coming from 2 different timeseries (and relying on the same
-   * mesh), you obtain a field that can not be associate to the
+   * mesh), you obtain a field that can not be associated to the
    * original timeseries. Then this new created field must be directly
    * associated to its underlying mesh (as defined in the MEDCoupling
    * data model).

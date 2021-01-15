@@ -73,7 +73,7 @@ p4.setMesh(mesh)
 result = p3+p4
 result.setName("p3+p4")
 
-# We can finally save the result together with the operandes fields
+# We can finally save the result together with the operands fields
 outfilename = "addition.med"
 MEDLoader.WriteField(outfilename,result,True)
 MEDLoader.WriteField(outfilename,p3,False)

@@ -244,7 +244,7 @@ namespace SALOME_TEST
     MEDCoupling::MEDCouplingCurveLinearMesh *targetMesh=MEDCoupling::MEDCouplingCurveLinearMesh::New();
     targetMesh->setTime(2.3,4,5);
     targetMesh->setTimeUnit("us");
-    targetMesh->setName("Example of Cuve linear mesh");
+    targetMesh->setName("Example of Curve linear mesh");
     targetMesh->setDescription("buildCLMesh");
     MEDCoupling::DataArrayDouble *a1=MEDCoupling::DataArrayDouble::New();
     a1->alloc(3*20,1);

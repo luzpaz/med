@@ -59,13 +59,13 @@ MEDCalculator_i::~MEDCalculator_i()
 MEDCALC::FieldHandler * MEDCalculator_i::add(const MEDCALC::FieldHandler & f1_hdl,
              const MEDCALC::FieldHandler & f2_hdl)
 {
-  // We first check that both operandes share the same mesh id. Note
+  // We first check that both operands share the same mesh id. Note
   // that it's not strictly required because the MEDCoupling operation
   // would raise an exception if the fields does not share the same
   // mesh support.
   if ( f1_hdl.meshid != f2_hdl.meshid ) {
     std::string message =
-      std::string("ERROR: Mesh ids are different for the field operandes ") +
+      std::string("ERROR: Mesh ids are different for the field operands ") +
       std::string(f1_hdl.fieldname) + std::string(" and ") + std::string(f2_hdl.fieldname);
     throw KERNEL::createSalomeException(message.c_str());
   }
@@ -103,7 +103,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::add(const MEDCALC::FieldHandler & f1_hd
 
   // >>>>>>>>>
   // _GBO_ We should test here if the iteration and order of the input
-  // files are identical for both operandes. A convention has to be
+  // files are identical for both operands. A convention has to be
   // defined here. By default, we let the iteration and order be
   // determined by the resulting MEDCouplingFieldDouble instance (see
   // function addField of the data manager).
@@ -126,7 +126,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::sub(const MEDCALC::FieldHandler & f1_hd
 {
   if ( f1_hdl.meshid != f2_hdl.meshid ) {
     std::string message =
-      std::string("ERROR: Mesh ids are different for the field operandes ") +
+      std::string("ERROR: Mesh ids are different for the field operands ") +
       std::string(f1_hdl.fieldname) + std::string(" and ") + std::string(f2_hdl.fieldname);
     throw KERNEL::createSalomeException(message.c_str());
   }
@@ -165,7 +165,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::mul(const MEDCALC::FieldHandler & f1_hd
 {
   if ( f1_hdl.meshid != f2_hdl.meshid ) {
     std::string message =
-      std::string("ERROR: Mesh ids are different for the field operandes ") +
+      std::string("ERROR: Mesh ids are different for the field operands ") +
       std::string(f1_hdl.fieldname) + std::string(" and ") + std::string(f2_hdl.fieldname);
     throw KERNEL::createSalomeException(message.c_str());
   }
@@ -203,7 +203,7 @@ MEDCALC::FieldHandler * MEDCalculator_i::div(const MEDCALC::FieldHandler & f1_hd
 {
   if ( f1_hdl.meshid != f2_hdl.meshid ) {
     std::string message =
-      std::string("ERROR: Mesh ids are different for the field operandes ") +
+      std::string("ERROR: Mesh ids are different for the field operands ") +
       std::string(f1_hdl.fieldname) + std::string(" and ") + std::string(f2_hdl.fieldname);
     throw KERNEL::createSalomeException(message.c_str());
   }

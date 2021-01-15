@@ -194,7 +194,7 @@ class MEDCouplingCorbaServBasicsTest:
         targetMesh=MEDCouplingCurveLinearMesh();
         targetMesh.setTime(2.3,4,5);
         targetMesh.setTimeUnit("us");
-        targetMesh.setName("Example of Cuve linear mesh");
+        targetMesh.setName("Example of Curve linear mesh");
         targetMesh.setDescription("buildCLMesh");
         a1=DataArrayDouble(3*20,1);
         a1.iota(7.) ; a1.rearrange(3);

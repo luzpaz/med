@@ -650,4 +650,4 @@ The following TUI commands need to work in graphical environment:
 * ``medcalc.MakeVectorField``
 
 
-..  LocalWords:  softwares
+..  LocalWords:  software
